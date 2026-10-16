@@ -86,7 +86,7 @@ typedef uint16_t __hip_fp8x2_storage_t;
 #else
 // Ampere does not support FP8 features, but CUDA 13+ always provides the
 // header.
-#if __CUDACC_VER_MAJOR__ >= 13
+#if __CUDACC_VER_MAJOR__ >= 12
 #include <cuda_fp8.h>
 #else
 #define __NV_E4M3 0

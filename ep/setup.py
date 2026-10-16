@@ -190,6 +190,13 @@ if __name__ == "__main__":
             include_dirs.append(Path(libfabric_home) / "include")
             library_dirs.append(Path(libfabric_home) / "lib")
 
+    use_urma = int(os.getenv("USE_URMA", "0"))
+    if use_urma:
+        print("Building with URMA transport support (USE_URMA)")
+        cxx_flags.append("-DUSE_URMA")
+        nvcc_flags.append("-DUSE_URMA")
+        libraries.append("urma")
+
     if torch.version.cuda:
         # Add CUDA library directory to library_dirs
         cuda_home = os.getenv("CUDA_HOME", "/usr/local/cuda")
