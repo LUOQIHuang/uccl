@@ -13,6 +13,10 @@
 
 </div>
 
+## URMA branch quick start
+
+本分支提供 verbs/RDMA 与 URMA 对比测试：**[中文快速上手教程](urma_validation/baseline/QUICKSTART.zh-CN.md)**，包含下载、环境配置、一键编译运行和错误报告收集。架构说明见 [CPU Proxy 完整流程](urma_validation/baseline/CPU_PROXY_FLOW.md)。
+
 ## About 
 
 UCCL is an efficient communication library for GPUs, covering collectives, P2P (e.g., KV cache transfer, RL weight transfer), and EP (e.g., IBGDA), with two key focuses: 
