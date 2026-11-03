@@ -1,0 +1,15 @@
+--- urma_transport.cpp
++++ urma_transport.cpp
+@@ -394,8 +394,10 @@
+ void UrmaTransport::register_main_buffer(void* ptr, size_t len, int device) {
+   if (!urma_ctx_ || main_tseg_)
+     throw std::logic_error("invalid main registration state");
+-  uccl::gpu_p2p::prepare_main_buffer(ptr, len, device);
+-  main_tseg_ = register_segment(ptr, len, true, false);
++  bool const host_main = std::getenv("UCCL_DIAG_MAIN_HOST") &&
++                         std::strcmp(std::getenv("UCCL_DIAG_MAIN_HOST"), "1") == 0;
++  if (!host_main) uccl::gpu_p2p::prepare_main_buffer(ptr, len, device);
++  main_tseg_ = register_segment(ptr, len, !host_main, false);
+   main_buffer_ = ptr;
+   main_buffer_len_ = len;
+   local_info_.addr = reinterpret_cast<uintptr_t>(ptr);

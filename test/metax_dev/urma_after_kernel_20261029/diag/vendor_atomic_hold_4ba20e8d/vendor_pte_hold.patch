@@ -1,0 +1,21 @@
+--- a/perftest_run_test.c
++++ b/perftest_run_test.c
+@@ -2218,6 +2218,18 @@
+             return -1;
+         }
+         fprintf(stderr, "VENDOR_ATOMIC_GPU_TARGET_INIT=%lu\n", (unsigned long)initial);
++        const char *release_file = getenv("UCCL_DIAG_RELEASE_FILE");
++        if (release_file && release_file[0]) {
++            fprintf(stderr, "UCCL_PTE_HOLD_READY\n");
++            unsigned int wait_step;
++            for (wait_step = 0; wait_step < 240 && access(release_file, F_OK) != 0; ++wait_step)
++                usleep(250000);
++            if (wait_step == 240) {
++                fprintf(stderr, "UCCL_PTE_HOLD_TIMEOUT\n");
++                return -1;
++            }
++            fprintf(stderr, "UCCL_PTE_HOLD_RELEASED\n");
++        }
+     } else {
+         value = UINT64_C(0xa5a5a5a5a5a5a5a5);
+         memcpy((char *)ctx->local_buf[0] + ctx->buf_size, &value, sizeof(value));
