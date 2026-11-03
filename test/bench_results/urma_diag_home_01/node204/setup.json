@@ -1,0 +1,42 @@
+{
+  "fingerprint": {
+    "job": "urma_diag_home_01",
+    "backend": "urma",
+    "repeats": 1,
+    "hca": null,
+    "ifname": "enp33s0",
+    "sha": "5826d74b98e5f80843ad419e09dc15737a79aa9f3d3854405b553da56db1fe2e",
+    "gpu": "0",
+    "bundle": {
+      "urma_support.py": "75e1257e0d85d7c3c0fa89453cd27b0e05b216e587cebe8736bb75ffc9bb56ac",
+      "worker.py": "45d35c1208b0d472b3a63b38a1580c54f4b40aa1b61355da10a215c8eaad3176",
+      "summarize.py": "220078cb3eda6597459eb01a0141391aed1da5c6a366ce3877d7a36539711b2b",
+      "exit_guard.py": "9cba31fe18074bbf5b6fbe2345b570100663a3ed9da95cf6e118eedb409740c7",
+      "collect_results.py": "fd1dd84cd990fd379f7b6d15ac8f7ec40675a10aa33adaa14e8559dcddc7aac8",
+      "driver.py": "4eca84b501d362fb8c8d3df688328f1fee9217345e2f4bf8c814f4f90368673d"
+    },
+    "urma": {
+      "device": "udmac0d1e2",
+      "cpus": [
+        4,
+        5,
+        6,
+        7
+      ],
+      "kernel": "6.6.0-gdr_f00955680_diag",
+      "libraries": {
+        "libummu.so.1": "ad8bb0e5153549f4b76f1a8eeffcab62f503a1114e2373ceed8784c45e88105a",
+        "liburma.so": "56d6374553c2843c13eb7f7bc98a5bb65fa2fa4eb5f3b4a331f56cf126fb1f22",
+        "liburma.so.0": "56d6374553c2843c13eb7f7bc98a5bb65fa2fa4eb5f3b4a331f56cf126fb1f22",
+        "liburma.so.0.0.3": "56d6374553c2843c13eb7f7bc98a5bb65fa2fa4eb5f3b4a331f56cf126fb1f22",
+        "liburma_common.so": "c159fffbce1c82944ceccc98555d8e181fe405414384ed671e9ce3fb0b437fad",
+        "liburma_common.so.0": "c159fffbce1c82944ceccc98555d8e181fe405414384ed671e9ce3fb0b437fad",
+        "liburma_common.so.0.0.1": "c159fffbce1c82944ceccc98555d8e181fe405414384ed671e9ce3fb0b437fad"
+      }
+    }
+  },
+  "error": null,
+  "module": "/home/h00918771/metax_dev/urma_after_kernel_20261029/diag/ep_native_relax_4f3b30a6/module/ep.abi3.so",
+  "python": "/home/h00918771/metax_dev/venv-maca-py312/bin/python",
+  "library_path": "/home/h00918771/metax_dev/urma_after_kernel_20261029/diag/umdk_private_618957c3/lib:/home/h00918771/metax_dev/urma_after_kernel_20261029/diag/umdk_private_618957c3/lib:/opt/maca-3.7.0/lib:/opt/maca-3.7.0/mxgpu_llvm/lib:/usr/local/ubm/lib64/:/usr/local/ubm/lib/:/usr/lib64:/lib:/usr/lib:/usr/local/lib/:/usr/local/lib64/mami/:"
+}
