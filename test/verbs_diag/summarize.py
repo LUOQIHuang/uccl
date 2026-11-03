@@ -10,7 +10,10 @@ import statistics
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('results', type=Path)
+    parser.add_argument('--output', type=Path, help='write summaries elsewhere without modifying the input result directory')
     args = parser.parse_args()
+    output = args.output or args.results
+    output.mkdir(parents=True, exist_ok=True)
     rows = []
     for path in sorted(args.results.rglob('metrics.jsonl')):
         status = json.loads((path.parent/'status.json').read_text())
@@ -26,7 +29,7 @@ def main():
             rows.append(dict(node=path.parent.parent.name, repeat=int(match[1]), affinity=match[2], **value))
     if not rows:
         raise RuntimeError('no completed metrics found')
-    with (args.results/'metrics.csv').open('w', newline='', encoding='utf-8-sig') as out:
+    with (output/'metrics.csv').open('w', newline='', encoding='utf-8-sig') as out:
         writer = csv.DictWriter(out, fieldnames=list(rows[0]))
         writer.writeheader()
         writer.writerows(rows)
@@ -49,14 +52,14 @@ def main():
             item[f'unpinned_{metric}'] = unpinned
             item[f'unpinned_change_{metric}_pct'] = 100*(unpinned/pinned-1)
         summaries.append(item)
-    with (args.results/'summary.csv').open('w', newline='', encoding='utf-8-sig') as out:
+    with (output/'summary.csv').open('w', newline='', encoding='utf-8-sig') as out:
         writer = csv.DictWriter(out, fieldnames=list(summaries[0]))
         writer.writeheader()
         writer.writerows(summaries)
     for row in summaries:
         if row['rdma'] in (16, 32):
             print(f"{row['node']} {row['op']:14s} chunk={row['rdma']:2d} transmit pinned/off={row['pinned_transmit_us']:.1f}/{row['unpinned_transmit_us']:.1f} us; API-event pinned/off={row['pinned_api_cuda_event_us']:.1f}/{row['unpinned_api_cuda_event_us']:.1f} us")
-    print(f'Wrote {args.results / "metrics.csv"} and summary.csv')
+    print(f'Wrote {output / "metrics.csv"} and summary.csv')
 
 if __name__ == '__main__':
     main()
