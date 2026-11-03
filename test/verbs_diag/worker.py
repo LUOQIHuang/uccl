@@ -11,6 +11,7 @@ import time
 from datetime import timedelta
 import urma_support
 import profile_support
+import transport_support
 
 faulthandler.enable()
 runtime = pathlib.Path(os.environ.get('MACA_PATH', '/opt/maca-3.7.0'))/'lib/libmcruntime.so'
@@ -50,6 +51,11 @@ if backend=='urma':
     affinity_control = urma_support.ProxyAffinity(cpus, os.environ['URMA_DIAG_PINNED']=='1', case/'proxy_starts.jsonl')
     utils._diag_start_proxy = affinity_control.start
     print('DIAG_PRIVATE_URMA_OK', str(urma_libraries), flush=True)
+
+tracer=None
+if os.environ.get('DIAG_TRACE_LIBRARY'):
+    assert backend=='urma'
+    tracer=transport_support.TraceSession(os.environ['DIAG_TRACE_LIBRARY'],os.environ['URMA_DIAG_LIBRARY_DIR'])
 
 def snapshot(label):
     records = []
@@ -119,6 +125,40 @@ def measured_profile(fn, kernel_names, *args, **kwargs):
     print('DIAG_METRIC '+json.dumps(row), flush=True)
     with (case/'metrics.jsonl').open('a') as out:
         out.write(json.dumps(row)+'\n')
+    if os.environ.get('DIAG_SUITE')=='boundaries':
+        # Dedicated diagnostic work after the regular measurements. No perf.
+        tids=[]
+        if tracer is not None:
+            assert all(len(group['new_tids'])==1 for group in affinity_control.groups), 'ambiguous Proxy TIDs'
+            tids=[group['new_tids'][0] for group in affinity_control.groups]
+        for _ in range(3): fn()
+        torch.cuda.synchronize()
+        dist.barrier()
+        iterations=int(os.environ['DIAG_TRACE_ITERATIONS'])
+        start_event=torch.cuda.Event(enable_timing=True)
+        end_event=torch.cuda.Event(enable_timing=True)
+        start_event.record()
+        if tracer is not None: tracer.begin()
+        data={}
+        try:
+            for _ in range(iterations): fn()
+            end_event.record()
+            torch.cuda.synchronize()
+        finally:
+            if tracer is not None: data=tracer.end(case/'transport_snapshot.json')
+        data.update(op=op,rdma=rdma,nvl=4,sm=24,iterations=iterations,trace_api_cuda_event_us=start_event.elapsed_time(end_event)*1000/iterations,expected_proxy_tids=tids)
+        timing=dict(op=op,rdma=rdma,iterations=iterations,transport_trace=tracer is not None,api_cuda_event_us=data['trace_api_cuda_event_us'])
+        with (case/'boundary_timings.jsonl').open('a') as output:
+            output.write(json.dumps(timing)+'\n')
+        if tracer is not None:
+            totals=transport_support.validate(data,tids)
+            data['totals']=totals
+            data['per_iteration']={key:totals[key]/iterations for key in ('write_wrs','fadd_wrs','write_bytes','posted_wrs','completed')}
+            with (case/'transport.jsonl').open('a') as output:
+                output.write(json.dumps(data)+'\n')
+            print('DIAG_TRANSPORT_OK '+json.dumps(dict(op=op,rdma=rdma,iterations=iterations,totals=totals)),flush=True)
+        print('DIAG_BOUNDARY_OK '+json.dumps(timing),flush=True)
+        dist.barrier()
     return result
 
 utils.bench_kineto = measured_profile

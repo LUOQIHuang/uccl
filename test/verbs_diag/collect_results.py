@@ -5,8 +5,8 @@ from pathlib import Path
 import re
 import shutil
 
-ROOT_FILES = {'setup.json', 'host.json', 'lscpu.txt', 'ibv_devinfo.txt', 'test_internode_diag.py', 'metrics.csv', 'summary.csv', 'urma_preflight.json', 'perf_capability.json'}
-CASE_FILES = {'bench.log', 'status.json', 'metrics.jsonl', 'affinity.jsonl', 'gpu_before.txt', 'counters_before.json', 'counters_after.json', 'preflight_error.txt', 'runtime.json', 'proxy_starts.jsonl', 'urma_preflight.json', 'perf.report.txt', 'perf.callgraph.txt', 'perf.stderr.log', 'perf.status.json'}
+ROOT_FILES = {'setup.json', 'host.json', 'lscpu.txt', 'ibv_devinfo.txt', 'test_internode_diag.py', 'metrics.csv', 'summary.csv', 'urma_preflight.json', 'perf_capability.json', 'boundary_summary.csv'}
+CASE_FILES = {'bench.log', 'status.json', 'metrics.jsonl', 'affinity.jsonl', 'gpu_before.txt', 'counters_before.json', 'counters_after.json', 'preflight_error.txt', 'runtime.json', 'proxy_starts.jsonl', 'urma_preflight.json', 'perf.report.txt', 'perf.callgraph.txt', 'perf.stderr.log', 'perf.status.json', 'transport.jsonl', 'transport_snapshot.json', 'boundary_timings.jsonl'}
 
 def collect(source, destination):
     if not source.is_dir():
@@ -15,6 +15,9 @@ def collect(source, destination):
     generated_utils = source/'diagnostic_utils/utils.py'
     if generated_utils.is_file():
         selected.append(generated_utils)
+    for name in ('manifest.json','build.log','selftest.json'):
+        path=source/'transport_build'/name
+        if path.is_file(): selected.append(path)
     for case in source.iterdir():
         if case.is_dir() and re.fullmatch(r'r\d+_(?:pinned|unpinned)', case.name):
             selected.extend(p for p in case.iterdir() if p.is_file() and p.name in CASE_FILES)

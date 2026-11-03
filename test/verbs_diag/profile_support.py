@@ -10,16 +10,17 @@ import tempfile
 import time
 
 def plan(suite):
-    if suite not in ('scan','focused'):
+    if suite not in ('scan','focused','boundaries'):
         raise ValueError(f'unknown suite: {suite}')
-    dispatch = (32,) if suite=='focused' else range(4,33,4)
-    combine = (16,) if suite=='focused' else range(12,33,4)
+    dispatch = range(4,33,4) if suite=='scan' else (32,)
+    combine = range(12,33,4) if suite=='scan' else (12,16) if suite=='boundaries' else (16,)
     return [(op,chunk) for op in ('dispatch_fp8','dispatch_bf16') for chunk in dispatch] + [('combine',chunk) for chunk in combine]
 
 def prepare_benchmark(source, suite):
     changes = [('for nvl_chunk_size in range(4, 45, 4):','for nvl_chunk_size in (4,):'), ('for nvl_chunk_size in range(1, 8, 1):','for nvl_chunk_size in (4,):')]
-    if suite=='focused':
-        changes += [('for rdma_chunk_size in range(4, 33, 4):','for rdma_chunk_size in (32,):'), ('for rdma_chunk_size in range(12 if num_nodes == 2 else 8, 33, 4):','for rdma_chunk_size in (16,):')]
+    if suite in ('focused','boundaries'):
+        combine='(12, 16)' if suite=='boundaries' else '(16,)'
+        changes += [('for rdma_chunk_size in range(4, 33, 4):','for rdma_chunk_size in (32,):'), ('for rdma_chunk_size in range(12 if num_nodes == 2 else 8, 33, 4):',f'for rdma_chunk_size in {combine}:')]
     for old,new in changes:
         if source.count(old)!=1:
             raise ValueError(f'unexpected tuning loop: {old}')

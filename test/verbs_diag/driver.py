@@ -14,6 +14,8 @@ import sys
 import time
 import urma_support
 import profile_support
+import transport_support
+import tempfile
 
 HERE = Path(__file__).resolve().parent
 EXPECTED = {'test_internode.py': 'd679e4bdad167251dbc9d2c2f12634501b0f72db33231e1f1ce26d06ebac1b5f', 'buffer.py': '606d5a088fe5656aa6052862520c45a9092ca08bd1b7b3bd273683f9b549188c', 'utils.py': '5d9a7be095a3851ed300e67936bbad91ea75ef8c5ecf6e5bb87b0944441a5199'}
@@ -133,10 +135,14 @@ def main():
     parser.add_argument('--output', type=Path)
     parser.add_argument('--check-only', action='store_true', help='check local paths, Python and ELF dependencies; do not run benchmark or contact peer')
     parser.add_argument('--repeats', type=int, default=3)
-    parser.add_argument('--suite', choices=('scan','focused'), default='scan', help='focused: FP8/BF16 dispatch chunk32, combine chunk16')
+    parser.add_argument('--suite', choices=('scan','focused','boundaries'), default='scan', help='focused: dispatch32/combine16; boundaries adds combine12')
     parser.add_argument('--affinity-mode', choices=('both','unpinned','pinned'), default='both')
     parser.add_argument('--profile-cpu', action='store_true', help='URMA focused only: sample native Proxy threads during BF16 dispatch')
     parser.add_argument('--perf-callgraph', choices=('dwarf','fp','none'), default='dwarf')
+    parser.add_argument('--trace-transport', action='store_true', help='URMA boundaries only: separate API-count/timing passes with a host-built interposer')
+    parser.add_argument('--trace-iterations', type=int, default=30)
+    parser.add_argument('--urma-include-dir', type=Path, default=os.environ.get('URMA_DIAG_INCLUDE_DIR'))
+    parser.add_argument('--host-cxx', default=os.environ.get('URMA_DIAG_HOST_CXX','g++'))
     parser.add_argument('--hca', default='rocep40s0f0')
     parser.add_argument('--ifname', default='enp33s0')
     parser.add_argument('--gpu', default='0')
@@ -151,6 +157,10 @@ def main():
     args = parser.parse_args()
     if args.profile_cpu and (args.backend!='urma' or args.suite!='focused'):
         parser.error('--profile-cpu requires --backend urma --suite focused')
+    if args.trace_transport and (args.backend!='urma' or args.suite!='boundaries' or args.profile_cpu):
+        parser.error('--trace-transport requires URMA boundaries, without --profile-cpu')
+    if not 1 <= args.trace_iterations <= 200:
+        parser.error('--trace-iterations must be 1..200')
     expected_metrics = len(profile_support.plan(args.suite))
     args.module_sha = args.module_sha or (urma_support.URMA_SHA if args.backend=='urma' else DEFAULT_SHA)
     args.output = args.output or dev_root/f'{args.backend}_diag_results'
@@ -190,6 +200,14 @@ def main():
             print('URMA_LIBRARY_SHA', json.dumps(urma_support.library_manifest(args.urma_lib_dir)), flush=True)
         if args.profile_cpu:
             print('PERF_CAPABILITY', json.dumps(profile_support.capability_check(args.perf_callgraph)), flush=True)
+        trace_temporary = None
+        if args.trace_transport:
+            trace_temporary = tempfile.TemporaryDirectory(prefix='uccl_trace_check_')
+            trace_library, manifest, _ = transport_support.build(trace_temporary.name,args.urma_lib_dir,args.urma_include_dir,args.host_cxx)
+            print('TRACE_BUILD_SELFTEST_OK',json.dumps(manifest),flush=True)
+            os.environ['LD_PRELOAD']=str(trace_library)
+            os.environ['DIAG_TRACE_LIBRARY']=str(trace_library)
+            os.environ['UCCL_URMA_TRACE_REAL_LIB']=str((args.urma_lib_dir/'liburma.so').resolve())
         probe = '''import ctypes,importlib.util,os,pathlib,sys,types
 runtime=pathlib.Path(os.environ.get('MACA_PATH','/opt/maca-3.7.0'))/'lib/libmcruntime.so'
 if runtime.exists(): ctypes.CDLL(str(runtime),mode=os.RTLD_NOW|os.RTLD_GLOBAL)
@@ -213,10 +231,21 @@ if maps.exists():
         expected=pathlib.Path(os.environ['URMA_DIAG_LIBRARY_DIR']).resolve()
         assert libraries and all(path.is_relative_to(expected) for path in libraries), 'unexpected liburma: '+str(libraries)
         assert extension.get_num_proxy_threads()==len(os.environ['URMA_DIAG_CPUS'].split(',')), 'CPU list does not match Proxy count'
+if os.environ.get('DIAG_TRACE_LIBRARY'):
+    tracer=ctypes.CDLL(os.environ['DIAG_TRACE_LIBRARY'])
+    assert tracer.uccl_trace_ready()==1, 'trace resolver failed'
+    tracer.uccl_trace_real_path.restype=ctypes.c_char_p
+    real=pathlib.Path(tracer.uccl_trace_real_path().decode()).resolve()
+    assert real.is_relative_to(pathlib.Path(os.environ['URMA_DIAG_LIBRARY_DIR']).resolve()), str(real)
+    print('TRACE_REAL_LIBRARY_OK=',real)
 '''
         check = subprocess.run([sys.executable, '-c', probe, str(module.resolve())], text=True)
         if check.returncode:
             raise RuntimeError('selected Python cannot import MetaX torch/extension; inspect paths and runtime libraries')
+        if trace_temporary is not None:
+            os.environ.pop('LD_PRELOAD',None)
+            os.environ.pop('DIAG_TRACE_LIBRARY',None)
+            trace_temporary.cleanup()
         if shutil.which('ldd'):
             linked = subprocess.run(['ldd', str(module.resolve())], capture_output=True, text=True, timeout=15)
             print(linked.stdout + linked.stderr)
@@ -229,6 +258,7 @@ if maps.exists():
     error = None
     fingerprint = dict(job=args.job, backend=args.backend, repeats=args.repeats, hca=args.hca if args.backend=='verbs' else None, ifname=args.ifname, sha=args.module_sha, gpu=args.gpu, bundle={p.name: sha(p) for p in HERE.glob('*.py')})
     fingerprint.update(suite=args.suite, affinity_mode=args.affinity_mode, profile_cpu=args.profile_cpu, perf_callgraph=args.perf_callgraph if args.profile_cpu else None)
+    fingerprint.update(trace_transport=args.trace_transport,trace_iterations=args.trace_iterations if args.suite=='boundaries' else None)
     try:
         if not module.is_file() or sha(module) != args.module_sha:
             raise RuntimeError(f'EXTENSION_MISSING_OR_SHA_MISMATCH: {module}')
@@ -247,6 +277,8 @@ if maps.exists():
         (root/'test_internode_diag.py').write_text(source)
         if args.profile_cpu:
             (root/'perf_capability.json').write_text(json.dumps(profile_support.capability_check(args.perf_callgraph), indent=2))
+        if args.trace_transport:
+            trace_library, _, fingerprint['trace_build'] = transport_support.build(root/'transport_build',args.urma_lib_dir,args.urma_include_dir,args.host_cxx)
         package = root/'python/uccl'
         package.mkdir(parents=True)
         (package/'__init__.py').write_text('')
@@ -280,8 +312,13 @@ if maps.exists():
             pair(args, dict(stage='ready', job=args.job, case=name, rc=rc))
             env = os.environ.copy()
             env.update(DIAG_SUITE=args.suite, DIAG_PROFILE_CPU='1' if args.profile_cpu else '0', DIAG_PERF_CALLGRAPH=args.perf_callgraph)
+            env['DIAG_TRACE_ITERATIONS']=str(args.trace_iterations)
             for key in ('LD_PRELOAD', 'PYTHONPATH', 'UMDK_HOME', 'UCCL_PROJECT_DIAG', 'UCCL_URMA_TM', 'UCCL_URMA_DEV_NAME', 'UCCL_DIAG_EXIT_DELAY'):
                 env.pop(key, None)
+            env.pop('DIAG_TRACE_LIBRARY',None)
+            env.pop('UCCL_URMA_TRACE_REAL_LIB',None)
+            if args.trace_transport:
+                env.update(LD_PRELOAD=str(trace_library),DIAG_TRACE_LIBRARY=str(trace_library),UCCL_URMA_TRACE_REAL_LIB=str((args.urma_lib_dir/'liburma.so').resolve()),DIAG_TRACE_ITERATIONS=str(args.trace_iterations))
             env.update(UCCL_EP_TRANSPORT='verbs', UCCL_EP_VERBS_REG='dmabuf', UCCL_IB_HCA=args.hca, CUDA_VISIBLE_DEVICES=args.gpu, MCCL_IB_DISABLE='1', NCCL_IB_DISABLE='1', MCCL_SOCKET_IFNAME=args.ifname, NCCL_SOCKET_IFNAME=args.ifname, MCCL_DEBUG='INFO', NCCL_DEBUG='INFO', UCCL_EP_DISABLE_CPU_AFFINITY='0' if affinity=='pinned' else '1', UCCL_RDMA_ADAPTIVE_SLEEP='0', UCCL_METAX_URMA_HOST_ATOMICS='1', PYTHONUNBUFFERED='1', PYTHONDONTWRITEBYTECODE='1', VERBS_DIAG_CASE=str(case.resolve()), VERBS_DIAG_BENCH=str(args.bench_dir.resolve()), VERBS_DIAG_SHA=args.module_sha, UCCL_TORCHRUN_NODE_RANK=str(args.node_rank), UCCL_EXIT_GUARD='1')
             if args.backend=='urma':
                 for key in ('UCCL_EP_VERBS_REG','UCCL_IB_HCA','UCCL_METAX_URMA_HOST_ATOMICS'):
@@ -314,6 +351,10 @@ if maps.exists():
             if args.profile_cpu:
                 perf_status = case/'perf.status.json'
                 checks['cpu_profile'] = 'DIAG_PERF_DONE' in text and perf_status.is_file() and json.loads(perf_status.read_text()).get('ok') is True
+            if args.trace_transport:
+                checks['transport_trace'] = text.count('DIAG_TRANSPORT_OK ')==expected_metrics
+            if args.suite=='boundaries':
+                checks['boundary_measurements'] = text.count('DIAG_BOUNDARY_OK ')==expected_metrics
             if not all(checks.values()) and rc == 0:
                 rc = 90
             (case/'status.json').write_text(json.dumps(dict(rc=rc, checks=checks), indent=2))
