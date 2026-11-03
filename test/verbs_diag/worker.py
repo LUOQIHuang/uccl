@@ -10,6 +10,7 @@ import sys
 import time
 from datetime import timedelta
 import urma_support
+import profile_support
 
 faulthandler.enable()
 runtime = pathlib.Path(os.environ.get('MACA_PATH', '/opt/maca-3.7.0'))/'lib/libmcruntime.so'
@@ -83,13 +84,28 @@ glob.glob = scoped_glob
 
 original_profile = utils.bench_kineto
 counter = 0
+configurations = profile_support.plan(os.environ.get('DIAG_SUITE', 'scan'))
 def measured_profile(fn, kernel_names, *args, **kwargs):
     global counter
     index = counter
     counter += 1
-    op = 'dispatch_fp8' if index < 8 else 'dispatch_bf16' if index < 16 else 'combine'
-    rdma = list(range(4, 33, 4))[index % 8] if index < 16 else list(range(12, 33, 4))[index-16]
-    result = original_profile(fn, kernel_names, *args, **kwargs)
+    op, rdma = configurations[index]
+    sampling = os.environ.get('DIAG_PROFILE_CPU')=='1' and op=='dispatch_bf16'
+    profiler = None
+    if sampling:
+        assert affinity_control is not None and not args
+        assert len(affinity_control.groups)==len(cpus)
+        assert all(len(group['new_tids'])==1 for group in affinity_control.groups), 'ambiguous Proxy TIDs; refuse CPU sampling'
+        affinity_control.verify(snapshot('before_cpu_profile'))
+        profiler = profile_support.ProxyProfile(case, [group['new_tids'][0] for group in affinity_control.groups], os.environ['DIAG_PERF_CALLGRAPH'])
+        kwargs['num_tests'] = 200
+        dist.barrier()
+        profiler.start()
+    try:
+        result = original_profile(fn, kernel_names, *args, **kwargs)
+    finally:
+        if profiler is not None:
+            profiler.stop()
     observed = snapshot(f'{op}_rdma{rdma}')
     if affinity_control is not None:
         affinity_control.verify(observed)
@@ -99,6 +115,7 @@ def measured_profile(fn, kernel_names, *args, **kwargs):
     avg, minimum, maximum = utils.bench(fn, num_warmups=5, num_tests=15)
     dist.barrier()
     row = dict(op=op, sm=24, nvl=4, rdma=rdma, transmit_us=result[0]*1e6, notify_us=result[1]*1e6, api_cuda_event_us=float(avg)*1e6, api_min_us=float(minimum)*1e6, api_max_us=float(maximum)*1e6)
+    row.update(cpu_profile=sampling, profiler_num_tests=200 if sampling else 30)
     print('DIAG_METRIC '+json.dumps(row), flush=True)
     with (case/'metrics.jsonl').open('a') as out:
         out.write(json.dumps(row)+'\n')
@@ -108,6 +125,6 @@ utils.bench_kineto = measured_profile
 snapshot('before_benchmark')
 sys.argv = [str(case.parent/'test_internode_diag.py'), '--num-processes=1', '--num-tokens=4096', '--hidden=7168', '--num-topk-groups=2', '--num-topk=8', '--num-experts=256', '--test-ll-compatibility', '--pressure-test-mode=0']
 runpy.run_path(sys.argv[0], run_name='__main__')
-assert counter == 22, counter
+assert counter == len(configurations), counter
 snapshot('after_benchmark')
 print('DIAG_BENCH_DONE', flush=True)

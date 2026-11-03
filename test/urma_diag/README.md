@@ -104,4 +104,60 @@ git push https://github.com/LUOQIHuang/uccl.git HEAD:refs/heads/codex/metax-urma
 
 204 改 RANK=1。失败时也收集原始结果，summarize 拒绝失败 case 不影响 collect。私有 .so 和运行库不上传。
 
-本机无 GPU；只完成语法、配置、源码变换、mock 硬件检查及线程 affinity 回调测试，实际 URMA benchmark 需在两台测试机运行。
+## 第二轮：固定配置与 Proxy CPU 采样
+
+`urma_diag_home_01` 两端已完成，分析见 [ANALYSIS.zh-CN.md](../bench_results/urma_diag_home_01/ANALYSIS.zh-CN.md)。目前优先查 Proxy 热点，不扩大全量扫参。
+
+两端先拉取最新提交，保留上面已经通过的 Python、私有模块与库配置。202 设置 `RANK=0`，204 设置 `RANK=1`。先各自执行：
+
+```bash
+export URMA_DIAG_HOME=/home/h00918771
+export URMA_DIAG_PYTHON=/home/h00918771/metax_dev/venv-maca-py312/bin/python
+# 202 使用 0；204 使用 1
+RANK=0
+bash test/urma_diag/run.sh --node-rank "$RANK" --master-addr 141.61.17.202 \
+  --bench-dir "$PWD/ep/bench" --job urma_cpu_check --check-only \
+  --suite focused --affinity-mode unpinned --profile-cpu
+```
+
+这个预检额外做约 0.3 秒纯 CPU perf 采样，并验证文本报告可生成，不运行 GPU benchmark。需要当前内核可用的 `perf`。如果只是不支持 DWARF/callgraph，两端均加 `--perf-callgraph none` 后重试；后续正式采样也必须带同一选项。缺少 perf 或采样权限时会直接报错，不修改 sysctl 或系统配置。
+
+两端同时启动第一条、等它们均成功后再启动第二条：
+
+```bash
+# 对照：3 个固定调优点，不启用 perf
+bash test/urma_diag/run.sh --node-rank "$RANK" --master-addr 141.61.17.202 \
+  --bench-dir "$PWD/ep/bench" --job urma_focus_01 --repeats 1 \
+  --suite focused --affinity-mode unpinned
+
+# 定位：仅在 BF16 Dispatch 调优阶段采样 4 个已识别的原生 Proxy TID
+bash test/urma_diag/run.sh --node-rank "$RANK" --master-addr 141.61.17.202 \
+  --bench-dir "$PWD/ep/bench" --job urma_cpu_01 --repeats 1 \
+  --suite focused --affinity-mode unpinned --profile-cpu
+```
+
+focused 保留原 24 组正确性检查，只将调优点收敛为 FP8/BF16 Dispatch 的 RDMA chunk=32、Combine 的 chunk=16，SM=24、NVL chunk=4。Combine=16 为与既有 verbs 配置对齐；本轮 URMA 扫描中 Combine 最快点是 12，focused 不代表 URMA 自动最优参数。该模式也可用于 verbs，但当前优先完成 URMA。
+
+CPU 采样不需要重新编译 GPU 模块。使用软件事件 `cpu-clock`、99 Hz，按新 TID 逐个附着，不采 Python 主线程。若每个 Proxy 对应的新线程不止一个，会拒绝采样。为取得足够样本，仅采样那一轮 BF16 profiler 的每个 period 从 30 次增至 200 次，共 2 个 period；其 FP8/Combine 仍为 30 次。独立 API CUDA-event 计时始终在停止 perf 后执行。`metrics.jsonl` 标出 `cpu_profile` 和 `profiler_num_tests`，不要把受采样/迭代次数影响的数字当作性能优化结果。
+
+优先看 `perf.report.txt` 的函数自身 CPU 占比，结合 `perf.callgraph.txt` 的调用者找提交、完成轮询、WR 管理或 GPU 命令队列读取热点。CPU 占比不是端到端等待时间比例；忙轮询很热只能说明候选位置，仍需后续分阶段计时/单变量对照确认。符号不完整时保留服务器上的 `perf.data` 和所用二进制，下一步再补符号。
+
+回传两个 job；202 `RANK=0`，204 `RANK=1`：
+
+```bash
+export VERBS_DIAG_HOME=/home/h00918771
+PY=/home/h00918771/metax_dev/venv-maca-py312/bin/python
+for JOB in urma_focus_01 urma_cpu_01; do
+  "$PY" test/verbs_diag/summarize.py "/home/h00918771/metax_dev/urma_diag_results/$JOB/node$RANK"
+  "$PY" test/verbs_diag/collect_results.py --backend urma --job "$JOB" --node-rank "$RANK"
+done
+git add -- "test/bench_results/urma_diag/urma_focus_01/node$RANK" \
+  "test/bench_results/urma_diag/urma_cpu_01/node$RANK"
+git commit -m "[test] Add focused URMA and Proxy CPU profiles"
+git pull --rebase https://github.com/LUOQIHuang/uccl.git codex/metax-urma-integration
+git push https://github.com/LUOQIHuang/uccl.git HEAD:refs/heads/codex/metax-urma-integration
+```
+
+收集器回传 perf 的文本报告、stderr 与 status，保留本地 `perf.data`，不上传大型二进制。失败也可直接 collect 回传，不必先让 summarize 成功。
+
+本机无 GPU；只完成语法、配置、源码变换、mock 硬件检查、线程 affinity 和 perf 生命周期测试，实际 URMA benchmark 与 perf 附着需在两台测试机运行。

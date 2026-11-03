@@ -13,6 +13,7 @@ import subprocess
 import sys
 import time
 import urma_support
+import profile_support
 
 HERE = Path(__file__).resolve().parent
 EXPECTED = {'test_internode.py': 'd679e4bdad167251dbc9d2c2f12634501b0f72db33231e1f1ce26d06ebac1b5f', 'buffer.py': '606d5a088fe5656aa6052862520c45a9092ca08bd1b7b3bd273683f9b549188c', 'utils.py': '5d9a7be095a3851ed300e67936bbad91ea75ef8c5ecf6e5bb87b0944441a5199'}
@@ -132,6 +133,10 @@ def main():
     parser.add_argument('--output', type=Path)
     parser.add_argument('--check-only', action='store_true', help='check local paths, Python and ELF dependencies; do not run benchmark or contact peer')
     parser.add_argument('--repeats', type=int, default=3)
+    parser.add_argument('--suite', choices=('scan','focused'), default='scan', help='focused: FP8/BF16 dispatch chunk32, combine chunk16')
+    parser.add_argument('--affinity-mode', choices=('both','unpinned','pinned'), default='both')
+    parser.add_argument('--profile-cpu', action='store_true', help='URMA focused only: sample native Proxy threads during BF16 dispatch')
+    parser.add_argument('--perf-callgraph', choices=('dwarf','fp','none'), default='dwarf')
     parser.add_argument('--hca', default='rocep40s0f0')
     parser.add_argument('--ifname', default='enp33s0')
     parser.add_argument('--gpu', default='0')
@@ -144,6 +149,9 @@ def main():
     parser.add_argument('--atomic-port', default='0000:a0:08.0')
     parser.add_argument('--ubctl-selector', default='0,1,1', help='UB chip,device,port counters selector')
     args = parser.parse_args()
+    if args.profile_cpu and (args.backend!='urma' or args.suite!='focused'):
+        parser.error('--profile-cpu requires --backend urma --suite focused')
+    expected_metrics = len(profile_support.plan(args.suite))
     args.module_sha = args.module_sha or (urma_support.URMA_SHA if args.backend=='urma' else DEFAULT_SHA)
     args.output = args.output or dev_root/f'{args.backend}_diag_results'
     args.port = args.port if args.port is not None else (31180 if args.backend=='urma' else 31080)
@@ -180,6 +188,8 @@ def main():
         if args.backend=='urma':
             print('URMA_HARDWARE', json.dumps(urma_support.hardware_check(args)), flush=True)
             print('URMA_LIBRARY_SHA', json.dumps(urma_support.library_manifest(args.urma_lib_dir)), flush=True)
+        if args.profile_cpu:
+            print('PERF_CAPABILITY', json.dumps(profile_support.capability_check(args.perf_callgraph)), flush=True)
         probe = '''import ctypes,importlib.util,os,pathlib,sys,types
 runtime=pathlib.Path(os.environ.get('MACA_PATH','/opt/maca-3.7.0'))/'lib/libmcruntime.so'
 if runtime.exists(): ctypes.CDLL(str(runtime),mode=os.RTLD_NOW|os.RTLD_GLOBAL)
@@ -218,6 +228,7 @@ if maps.exists():
     root.mkdir(parents=True, exist_ok=False)
     error = None
     fingerprint = dict(job=args.job, backend=args.backend, repeats=args.repeats, hca=args.hca if args.backend=='verbs' else None, ifname=args.ifname, sha=args.module_sha, gpu=args.gpu, bundle={p.name: sha(p) for p in HERE.glob('*.py')})
+    fingerprint.update(suite=args.suite, affinity_mode=args.affinity_mode, profile_cpu=args.profile_cpu, perf_callgraph=args.perf_callgraph if args.profile_cpu else None)
     try:
         if not module.is_file() or sha(module) != args.module_sha:
             raise RuntimeError(f'EXTENSION_MISSING_OR_SHA_MISMATCH: {module}')
@@ -232,11 +243,10 @@ if maps.exists():
             private_utils.mkdir()
             (private_utils/'utils.py').write_text(urma_support.prepare_utils((args.bench_dir/'utils.py').read_text()))
         source = (args.bench_dir/'test_internode.py').read_text()
-        for old in ('for nvl_chunk_size in range(4, 45, 4):', 'for nvl_chunk_size in range(1, 8, 1):'):
-            if source.count(old) != 1:
-                raise RuntimeError('unexpected tuning-loop structure')
-            source = source.replace(old, 'for nvl_chunk_size in (4,):')
+        source = profile_support.prepare_benchmark(source, args.suite)
         (root/'test_internode_diag.py').write_text(source)
+        if args.profile_cpu:
+            (root/'perf_capability.json').write_text(json.dumps(profile_support.capability_check(args.perf_callgraph), indent=2))
         package = root/'python/uccl'
         package.mkdir(parents=True)
         (package/'__init__.py').write_text('')
@@ -254,6 +264,8 @@ if maps.exists():
         order = ('pinned', 'unpinned') if repeat % 2 else ('unpinned', 'pinned')
         if args.backend=='urma':
             order = tuple(reversed(order))  # Confirm the historical inherited-affinity baseline first.
+        if args.affinity_mode!='both':
+            order = (args.affinity_mode,)
         for affinity in order:
             name = f'r{repeat}_{affinity}'
             case = root/name
@@ -267,6 +279,7 @@ if maps.exists():
                 print(str(exc), flush=True)
             pair(args, dict(stage='ready', job=args.job, case=name, rc=rc))
             env = os.environ.copy()
+            env.update(DIAG_SUITE=args.suite, DIAG_PROFILE_CPU='1' if args.profile_cpu else '0', DIAG_PERF_CALLGRAPH=args.perf_callgraph)
             for key in ('LD_PRELOAD', 'PYTHONPATH', 'UMDK_HOME', 'UCCL_PROJECT_DIAG', 'UCCL_URMA_TM', 'UCCL_URMA_DEV_NAME', 'UCCL_DIAG_EXIT_DELAY'):
                 env.pop(key, None)
             env.update(UCCL_EP_TRANSPORT='verbs', UCCL_EP_VERBS_REG='dmabuf', UCCL_IB_HCA=args.hca, CUDA_VISIBLE_DEVICES=args.gpu, MCCL_IB_DISABLE='1', NCCL_IB_DISABLE='1', MCCL_SOCKET_IFNAME=args.ifname, NCCL_SOCKET_IFNAME=args.ifname, MCCL_DEBUG='INFO', NCCL_DEBUG='INFO', UCCL_EP_DISABLE_CPU_AFFINITY='0' if affinity=='pinned' else '1', UCCL_RDMA_ADAPTIVE_SLEEP='0', UCCL_METAX_URMA_HOST_ATOMICS='1', PYTHONUNBUFFERED='1', PYTHONDONTWRITEBYTECODE='1', VERBS_DIAG_CASE=str(case.resolve()), VERBS_DIAG_BENCH=str(args.bench_dir.resolve()), VERBS_DIAG_SHA=args.module_sha, UCCL_TORCHRUN_NODE_RANK=str(args.node_rank), UCCL_EXIT_GUARD='1')
@@ -292,12 +305,15 @@ if maps.exists():
                     terminate(process)
                     raise
             text = (case/'bench.log').read_text(errors='replace')
-            checks = dict(correctness=text.count('[testing] Running with')==24, tuning=text.count('[tuning] SMs ')==22, metrics=text.count('DIAG_METRIC ')==22, done='DIAG_BENCH_DONE' in text, exit_ack=f'UCCL_EXIT_ACK_OK node_rank={args.node_rank}' in text, dmabuf='GPU MR registration path=dmabuf requested=dmabuf' in text, affinity=('Local CPU thread pinned to NUMA node' in text)==(affinity=='pinned'), no_errors=not re.search(r'Traceback \(most recent call last\)|AssertionError|Failed CR status|Segmentation fault|ChildFailedError|\[WARNING\]', text))
+            checks = dict(correctness=text.count('[testing] Running with')==24, tuning=text.count('[tuning] SMs ')==expected_metrics, metrics=text.count('DIAG_METRIC ')==expected_metrics, done='DIAG_BENCH_DONE' in text, exit_ack=f'UCCL_EXIT_ACK_OK node_rank={args.node_rank}' in text, dmabuf='GPU MR registration path=dmabuf requested=dmabuf' in text, affinity=('Local CPU thread pinned to NUMA node' in text)==(affinity=='pinned'), no_errors=not re.search(r'Traceback \(most recent call last\)|AssertionError|Failed CR status|Segmentation fault|ChildFailedError|\[WARNING\]', text))
             if args.backend=='urma':
                 checks.pop('dmabuf')
                 checks['urma_device'] = f': {args.urma_device}' in text and '[Proxy] UCCL_EP_TRANSPORT=urma initialized' in text
                 checks['private_urma_library'] = 'DIAG_PRIVATE_URMA_OK' in text
-                checks['affinity'] = text.count('DIAG_URMA_AFFINITY_OK ')==22
+                checks['affinity'] = text.count('DIAG_URMA_AFFINITY_OK ')==expected_metrics+(1 if args.profile_cpu else 0)
+            if args.profile_cpu:
+                perf_status = case/'perf.status.json'
+                checks['cpu_profile'] = 'DIAG_PERF_DONE' in text and perf_status.is_file() and json.loads(perf_status.read_text()).get('ok') is True
             if not all(checks.values()) and rc == 0:
                 rc = 90
             (case/'status.json').write_text(json.dumps(dict(rc=rc, checks=checks), indent=2))

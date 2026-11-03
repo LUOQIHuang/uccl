@@ -5,8 +5,8 @@ from pathlib import Path
 import re
 import shutil
 
-ROOT_FILES = {'setup.json', 'host.json', 'lscpu.txt', 'ibv_devinfo.txt', 'test_internode_diag.py', 'metrics.csv', 'summary.csv', 'urma_preflight.json'}
-CASE_FILES = {'bench.log', 'status.json', 'metrics.jsonl', 'affinity.jsonl', 'gpu_before.txt', 'counters_before.json', 'counters_after.json', 'preflight_error.txt', 'runtime.json', 'proxy_starts.jsonl', 'urma_preflight.json'}
+ROOT_FILES = {'setup.json', 'host.json', 'lscpu.txt', 'ibv_devinfo.txt', 'test_internode_diag.py', 'metrics.csv', 'summary.csv', 'urma_preflight.json', 'perf_capability.json'}
+CASE_FILES = {'bench.log', 'status.json', 'metrics.jsonl', 'affinity.jsonl', 'gpu_before.txt', 'counters_before.json', 'counters_after.json', 'preflight_error.txt', 'runtime.json', 'proxy_starts.jsonl', 'urma_preflight.json', 'perf.report.txt', 'perf.callgraph.txt', 'perf.stderr.log', 'perf.status.json'}
 
 def collect(source, destination):
     if not source.is_dir():
