@@ -1,0 +1,709 @@
+/home/f00955680/metax_dev/urma_after_kernel_20261029/diag/torchrun_cpu_exit_a9c40b17/torchrun_exit_guard.py:8: UserWarning: Could not find flash_attn package installed. Please try to install flash_attn whl pacakge using pip command and make sure it can be imported properly
+  from torch.distributed import run
+PHASE=PYTHON_LAUNCHER_BEGIN
+MCRUNTIME_PRELOAD_OK
+/home/f00955680/metax_dev/urma_after_kernel_20261029/diag/bench_pair_2274e1bc/launcher.py:9: UserWarning: Could not find flash_attn package installed. Please try to install flash_attn whl pacakge using pip command and make sure it can be imported properly
+  import torch
+EXTENSION: /home/f00955680/metax_dev/urma_after_kernel_20261029/diag/ep_host_atomic_4ed19a6b/module/ep.abi3.so
+BUFFER_MODULE: /home/f00955680/uccl-ep-xpu-integration/ep/bench/buffer.py
+URMA_LIB_MAPS: ['/home/f00955680/metax_dev/urma_after_kernel_20261029/diag/umdk_private_618957c3/lib/liburma.so.0.0.3']
+RDMA_HINT_BYTES: 403243776
+PHASE=BENCH_SCRIPT_BEGIN RANK=1
+PHASE=SET_DEVICE_BEGIN RANK=1
+PHASE=SET_DEVICE_DONE RANK=1
+PHASE=PROCESS_GROUP_DONE RANK=1
+PHASE=NEW_GROUP_BEGIN RANK=1
+PHASE=NEW_GROUP_DONE RANK=1
+[buffer] num_nvlink_bytes=0.12 GB, num_rdma_bytes=0.48 GB
+PHASE=BUFFER_INIT_BEGIN RANK=1
+PHASE=SKIP_SHARED_BARRIER_SWEEP RANK=1
+PHASE=ALL_GATHER_OBJECT_1_BEGIN RANK=1
+worker1:284151:284151 [0] MCCL INFO MCCL_SOCKET_IFNAME set by environment to enp33s0
+worker1:284151:284151 [0] MCCL INFO Bootstrap : Using enp33s0:141.61.17.204<0>
+worker1:284151:284252 [0] MCCL INFO MCCL_IB_DISABLE set by environment to 1.
+worker1:284151:284252 [0] MCCL INFO MCCL_SOCKET_IFNAME set by environment to enp33s0
+worker1:284151:284252 [0] MCCL INFO NET/Socket : Using [0]enp33s0:141.61.17.204<0>
+worker1:284151:284252 [0] MCCL INFO Using network Socket
+worker1:284151:284252 [0] MCCL INFO comm=0xaaacf4a2eff0, lastStream is initialized
+worker1:284151:284252 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:284151:284252 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:284151:284252 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:284151:284252 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:284151:284252 [0] MCCL INFO RAS client listening socket at ::1<28028>
+worker1:284151:284252 [0] MCCL INFO rank 1 cudeDev 0, local 0 socket 0 peer -1, fabricId 0 index 0 directLinkGroup 0 totalGpu 0, switchId 0
+worker1:284151:284252 [0] MCCL INFO type:0, uuid: local 0x282b6314, remote 0xd54f50f9 0x0, topology 0, isa: 10.0
+worker1:284151:284252 [0] MCCL INFO Setting affinity for GPU 0 to ffffffff,ffffffff,ffffffff,00000000,00000000,00000000,00000000,00000000,00000000
+worker1:284151:284252 [0] MCCL INFO MCCL pcie buffer mode 0, rcCount 1, nodeType 0x0, minAp 104
+worker1:284151:284252 [0] MCCL INFO Disabling clique-based kernels due to topology (ignore with CLIQUE_IGNORE_TOPO)
+worker1:284151:284252 [0] MCCL INFO CLIQUE InitRemoteReadToggle enable_read:0, isaVersion:1000, topologyId:0
+worker1:284151:284252 [0] MCCL INFO Clique kernels disabled
+worker1:284151:284252 [0] MCCL INFO Trees [0] -1/-1/-1->1->0 [1] 0/-1/-1->1->-1 [2] -1/-1/-1->1->0 [3] 0/-1/-1->1->-1 [4] -1/-1/-1->1->0 [5] 0/-1/-1->1->-1 [6] -1/-1/-1->1->0 [7] 0/-1/-1->1->-1 [8] -1/-1/-1->1->0 [9] 0/-1/-1->1->-1 [10] -1/-1/-1->1->0 [11] 0/-1/-1->1->-1 [12] -1/-1/-1->1->0 [13] 0/-1/-1->1->-1 [14] -1/-1/-1->1->0 [15] 0/-1/-1->1->-1 [16] -1/-1/-1->1->0 [17] 0/-1/-1->1->-1 [18] -1/-1/-1->1->0 [19] 0/-1/-1->1->-1 [20] -1/-1/-1->1->0 [21] 0/-1/-1->1->-1 [22] -1/-1/-1->1->0 [23] 0/-1/-1->1->-1 [24] -1/-1/-1->1->0 [25] 0/-1/-1->1->-1 [26] -1/-1/-1->1->0 [27] 0/-1/-1->1->-1 [28] -1/-1/-1->1->0 [29] 0/-1/-1->1->-1 [30] -1/-1/-1->1->0 [31] 0/-1/-1->1->-1 comm 0xaaacf4a2eff0 nRanks 02 busId a1000
+worker1:284151:284252 [0] MCCL INFO P2P Chunksize set to 131072
+worker1:284151:284252 [0] MCCL INFO disable groupWriteback
+worker1:284151:284252 [0] MCCL INFO threadThresholds 8/8/64 | 8/8/64 | 256 | 256
+worker1:284151:284252 [0] MCCL INFO 32 coll channels, 32 p2p channels, 32 p2p channels per peer
+worker1:284151:284252 [0] MCCL INFO comm 0xaaacf4a2eff0 rank 1 nranks 2 macaDev 0 busId a1000 localSize 0 used 67228512 bytes - Init COMPLETE
+worker1:284151:284257 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:284151:284356 [0] MCCL INFO Channel 00/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaacf4a2eff0 nRanks 02
+worker1:284151:284257 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:284151:284356 [0] MCCL INFO Channel 01/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaacf4a2eff0 nRanks 02
+worker1:284151:284257 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:284151:284356 [0] MCCL INFO Channel 02/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaacf4a2eff0 nRanks 02
+worker1:284151:284257 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:284151:284356 [0] MCCL INFO Channel 03/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaacf4a2eff0 nRanks 02
+worker1:284151:284257 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:284151:284356 [0] MCCL INFO Channel 04/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaacf4a2eff0 nRanks 02
+worker1:284151:284257 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:284151:284356 [0] MCCL INFO Channel 05/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaacf4a2eff0 nRanks 02
+worker1:284151:284257 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:284151:284356 [0] MCCL INFO Channel 06/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaacf4a2eff0 nRanks 02
+worker1:284151:284257 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:284151:284356 [0] MCCL INFO Channel 07/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaacf4a2eff0 nRanks 02
+worker1:284151:284257 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:284151:284356 [0] MCCL INFO Channel 08/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaacf4a2eff0 nRanks 02
+worker1:284151:284257 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:284151:284356 [0] MCCL INFO Channel 09/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaacf4a2eff0 nRanks 02
+worker1:284151:284257 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:284151:284356 [0] MCCL INFO Channel 10/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaacf4a2eff0 nRanks 02
+worker1:284151:284257 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:284151:284356 [0] MCCL INFO Channel 11/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaacf4a2eff0 nRanks 02
+worker1:284151:284257 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:284151:284356 [0] MCCL INFO Channel 12/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaacf4a2eff0 nRanks 02
+worker1:284151:284257 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:284151:284356 [0] MCCL INFO Channel 13/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaacf4a2eff0 nRanks 02
+worker1:284151:284257 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:284151:284356 [0] MCCL INFO Channel 14/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaacf4a2eff0 nRanks 02
+worker1:284151:284257 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:284151:284356 [0] MCCL INFO Channel 15/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaacf4a2eff0 nRanks 02
+worker1:284151:284257 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:284151:284356 [0] MCCL INFO Channel 16/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaacf4a2eff0 nRanks 02
+worker1:284151:284257 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:284151:284356 [0] MCCL INFO Channel 17/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaacf4a2eff0 nRanks 02
+worker1:284151:284257 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:284151:284356 [0] MCCL INFO Channel 18/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaacf4a2eff0 nRanks 02
+worker1:284151:284257 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:284151:284356 [0] MCCL INFO Channel 19/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaacf4a2eff0 nRanks 02
+worker1:284151:284257 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:284151:284356 [0] MCCL INFO Channel 20/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaacf4a2eff0 nRanks 02
+worker1:284151:284257 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:284151:284356 [0] MCCL INFO Channel 21/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaacf4a2eff0 nRanks 02
+worker1:284151:284257 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:284151:284356 [0] MCCL INFO Channel 22/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaacf4a2eff0 nRanks 02
+worker1:284151:284257 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:284151:284356 [0] MCCL INFO Channel 23/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaacf4a2eff0 nRanks 02
+worker1:284151:284257 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:284151:284356 [0] MCCL INFO Channel 24/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaacf4a2eff0 nRanks 02
+worker1:284151:284257 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:284151:284356 [0] MCCL INFO Channel 25/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaacf4a2eff0 nRanks 02
+worker1:284151:284257 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:284151:284356 [0] MCCL INFO Channel 26/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaacf4a2eff0 nRanks 02
+worker1:284151:284257 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:284151:284356 [0] MCCL INFO Channel 27/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaacf4a2eff0 nRanks 02
+worker1:284151:284257 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:284151:284356 [0] MCCL INFO Channel 28/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaacf4a2eff0 nRanks 02
+worker1:284151:284257 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:284151:284356 [0] MCCL INFO Channel 29/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaacf4a2eff0 nRanks 02
+worker1:284151:284257 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:284151:284356 [0] MCCL INFO Channel 30/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaacf4a2eff0 nRanks 02
+worker1:284151:284257 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:284151:284356 [0] MCCL INFO Channel 31/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaacf4a2eff0 nRanks 02
+worker1:284151:284356 [0] MCCL INFO Channel 00/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaacf4a2eff0 nRanks 02
+worker1:284151:284356 [0] MCCL INFO Channel 01/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaacf4a2eff0 nRanks 02
+worker1:284151:284356 [0] MCCL INFO Channel 02/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaacf4a2eff0 nRanks 02
+worker1:284151:284356 [0] MCCL INFO Channel 03/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaacf4a2eff0 nRanks 02
+worker1:284151:284356 [0] MCCL INFO Channel 04/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaacf4a2eff0 nRanks 02
+worker1:284151:284356 [0] MCCL INFO Channel 05/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaacf4a2eff0 nRanks 02
+worker1:284151:284356 [0] MCCL INFO Channel 06/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaacf4a2eff0 nRanks 02
+worker1:284151:284356 [0] MCCL INFO Channel 07/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaacf4a2eff0 nRanks 02
+worker1:284151:284356 [0] MCCL INFO Channel 08/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaacf4a2eff0 nRanks 02
+worker1:284151:284356 [0] MCCL INFO Channel 09/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaacf4a2eff0 nRanks 02
+worker1:284151:284356 [0] MCCL INFO Channel 10/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaacf4a2eff0 nRanks 02
+worker1:284151:284356 [0] MCCL INFO Channel 11/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaacf4a2eff0 nRanks 02
+worker1:284151:284356 [0] MCCL INFO Channel 12/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaacf4a2eff0 nRanks 02
+worker1:284151:284356 [0] MCCL INFO Channel 13/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaacf4a2eff0 nRanks 02
+worker1:284151:284356 [0] MCCL INFO Channel 14/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaacf4a2eff0 nRanks 02
+worker1:284151:284356 [0] MCCL INFO Channel 15/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaacf4a2eff0 nRanks 02
+worker1:284151:284356 [0] MCCL INFO Channel 16/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaacf4a2eff0 nRanks 02
+worker1:284151:284356 [0] MCCL INFO Channel 17/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaacf4a2eff0 nRanks 02
+worker1:284151:284356 [0] MCCL INFO Channel 18/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaacf4a2eff0 nRanks 02
+worker1:284151:284356 [0] MCCL INFO Channel 19/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaacf4a2eff0 nRanks 02
+worker1:284151:284356 [0] MCCL INFO Channel 20/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaacf4a2eff0 nRanks 02
+worker1:284151:284356 [0] MCCL INFO Channel 21/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaacf4a2eff0 nRanks 02
+worker1:284151:284356 [0] MCCL INFO Channel 22/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaacf4a2eff0 nRanks 02
+worker1:284151:284356 [0] MCCL INFO Channel 23/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaacf4a2eff0 nRanks 02
+worker1:284151:284356 [0] MCCL INFO Channel 24/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaacf4a2eff0 nRanks 02
+worker1:284151:284356 [0] MCCL INFO Channel 25/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaacf4a2eff0 nRanks 02
+worker1:284151:284356 [0] MCCL INFO Channel 26/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaacf4a2eff0 nRanks 02
+worker1:284151:284356 [0] MCCL INFO Channel 27/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaacf4a2eff0 nRanks 02
+worker1:284151:284356 [0] MCCL INFO Channel 28/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaacf4a2eff0 nRanks 02
+worker1:284151:284356 [0] MCCL INFO Channel 29/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaacf4a2eff0 nRanks 02
+worker1:284151:284356 [0] MCCL INFO Channel 30/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaacf4a2eff0 nRanks 02
+worker1:284151:284356 [0] MCCL INFO Channel 31/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaacf4a2eff0 nRanks 02
+worker1:284151:284356 [0] MCCL INFO Connected all rings comm 0xaaacf4a2eff0 nRanks 02 busId a1000
+PHASE=ALL_GATHER_OBJECT_1_DONE RANK=1
+PHASE=ALL_GATHER_OBJECT_2_BEGIN RANK=1
+PHASE=ALL_GATHER_OBJECT_2_DONE RANK=1
+Registered proxies for device 0 (high-throughput mode)
+worker1:284151:284368 [0] MCCL INFO Connected all trees
+[RDMA] Selected NIC rocep40s0f0 (index 0) for affinity rank 1, CUDA device 0, NUMA node 0
+[RDMA] Registered GPU memory via DMA-BUF (addr=0xa04c00000, len=483892608, fd_offset=0, rkey=0x13bf8)
+[RDMA] GPU MR registration path=dmabuf requested=dmabuf addr=0xa04c00000 bytes=483892608
+[RDMA] Thread 1 sharing NIC rocep40s0f0 context with 1 other thread(s) for affinity rank 1
+[RDMA] Thread 2 sharing NIC rocep40s0f0 context with 2 other thread(s) for affinity rank 1
+[RDMA] Thread 3 sharing NIC rocep40s0f0 context with 3 other thread(s) for affinity rank 1
+Pinned to NUMA node 0, thread_idx: 0, local_rank: 1, running on CPU 4.
+Pinned to NUMA node 0, thread_idx: 1, local_rank: 1, running on CPU 5.
+Local CPU thread pinned to NUMA node 0, thread_idx: 0, local_rank: 1, running on CPU 4.
+Local CPU thread pinned to NUMA node 0, thread_idx: 1, local_rank: 1, running on CPU 5.
+Pinned to NUMA node 0, thread_idx: 3, local_rank: 1, running on CPU 7.
+Pinned to NUMA node 0, thread_idx: 2, local_rank: 1, running on CPU 6.
+Local CPU thread pinned to NUMA node 0, thread_idx: 3, local_rank: 1, running on CPU 7.
+Local CPU thread pinned to NUMA node 0, thread_idx: 2, local_rank: 1, running on CPU 6.
+[RDMA] Registered GPU memory via DMA-BUF (addr=0xa24a03600, len=81960, fd_offset=13824, rkey=0x182eed)
+[RDMA] control MR registration requested=dmabuf addr=0xa24a03600 bytes=81960
+[Proxy] Registered atomic_buffer_ptr MR: addr=0xa24a03600, len=81960, rkey=0x182eed
+[RDMA] Registered GPU memory via DMA-BUF (addr=0xa24a03600, len=81960, fd_offset=13824, rkey=0x182ae9)
+[RDMA] control MR registration requested=dmabuf addr=0xa24a03600 bytes=81960
+[Proxy] Registered atomic_buffer_ptr MR: addr=0xa24a03600, len=81960, rkey=0x182ae9
+[RDMA] Registered GPU memory via DMA-BUF (addr=0xa24a03600, len=81960, fd_offset=13824, rkey=0x182ceb)
+[RDMA] control MR registration requested=dmabuf addr=0xa24a03600 bytes=81960
+[Proxy] Registered atomic_buffer_ptr MR: addr=0xa24a03600, len=81960, rkey=0x182ceb
+[RDMA] Registered GPU memory via DMA-BUF (addr=0xa24a03600, len=81960, fd_offset=13824, rkey=0x1828e7)
+[RDMA] control MR registration requested=dmabuf addr=0xa24a03600 bytes=81960
+[Proxy] Registered atomic_buffer_ptr MR: addr=0xa24a03600, len=81960, rkey=0x1828e7
+[RDMA] Auto-detected GID index 3 for rocep40s0f0 (set UCCL_IB_GID_INDEX to override)
+[create_per_thread_qp] Populated atomic buffer info: addr=0xa24a03600, len=81960, rkey=0x182eed
+[RDMA] Auto-detected GID index 3 for rocep40s0f0 (set UCCL_IB_GID_INDEX to override)
+[create_per_thread_qp] Populated atomic buffer info: addr=0xa24a03600, len=81960, rkey=0x182ae9
+[RDMA] Auto-detected GID index 3 for rocep40s0f0 (set UCCL_IB_GID_INDEX to override)
+[create_per_thread_qp] Populated atomic buffer info: addr=0xa24a03600, len=81960, rkey=0x1828e7
+[RDMA] Auto-detected GID index 3 for rocep40s0f0 (set UCCL_IB_GID_INDEX to override)
+[create_per_thread_qp] Populated atomic buffer info: addr=0xa24a03600, len=81960, rkey=0x182ceb
+QP modified to INIT state
+QP modified to INIT state
+QP modified to INIT state
+QP modified to INIT state
+RoCE detected (Ethernet)
+Remote LID: 0x0, QPN: 305, PSN: 0
+Verifying port state:
+  link_layer: Ethernet (RoCE)
+  port_state: ACTIVE
+  max_mtu: 5
+  active_mtu: 3
+  lid: 0x0
+RoCE detected (Ethernet)
+Remote LID: 0x0, QPN: 306, PSN: 0
+Verifying port state:
+  link_layer: Ethernet (RoCE)
+  port_state: ACTIVE
+  max_mtu: 5
+  active_mtu: 3
+  lid: 0x0
+RoCE detected (Ethernet)
+Remote LID: 0x0, QPN: 304, PSN: 0
+Verifying port state:
+  link_layer: Ethernet (RoCE)
+  port_state: ACTIVE
+  max_mtu: 5
+  active_mtu: 3
+  lid: 0x0
+RoCE detected (Ethernet)
+Remote LID: 0x0, QPN: 307, PSN: 0
+Verifying port state:
+  link_layer: Ethernet (RoCE)
+  port_state: ACTIVE
+  max_mtu: 5
+  active_mtu: 3
+  lid: 0x0
+QP modified to RTR state
+QP modified to RTR state
+QP modified to RTR state
+ACK-QP modified to RTR state
+ACK-QP modified to RTR state
+QP modified to RTS state
+QP modified to RTR state
+ACK-QP modified to RTR state
+ACK-QP modified to RTS state
+[Proxy] Peer 0 has num_mr_chunks=0 (single MR: rkey=0x130f1)
+[Proxy] Remote atomic buffer info for peer 0: addr=0xa24a03600, len=81960, rkey=0x181edd
+ACK-QP modified to RTR state
+QP modified to RTS state
+QP modified to RTS state
+ACK-QP modified to RTS state
+[Proxy] Remote atomic buffer info for peer 0: addr=0xa24a03600, len=81960, rkey=0x17fcbc
+ACK-QP modified to RTS state
+[Proxy] Remote atomic buffer info for peer 0: addr=0xa24a03600, len=81960, rkey=0x1808c7
+QP modified to RTS state
+ACK-QP modified to RTS state
+[Proxy] Remote atomic buffer info for peer 0: addr=0xa24a03600, len=81960, rkey=0x1814d3
+PHASE=ALL_GATHER_OBJECT_3_BEGIN RANK=1
+PHASE=ALL_GATHER_OBJECT_3_DONE RANK=1
+PHASE=ALL_GATHER_OBJECT_4_BEGIN RANK=1
+PHASE=ALL_GATHER_OBJECT_4_DONE RANK=1
+PHASE=ALL_GATHER_OBJECT_5_BEGIN RANK=1
+PHASE=ALL_GATHER_OBJECT_5_DONE RANK=1
+PHASE=BUFFER_INIT_DONE RANK=1
+Testing with seed 0 ...
+[config] num_tokens=4096, hidden=7168, num_topk_groups=2, num_topk=8
+[layout] Kernel performance: 0.177 ms
+
+[testing] Running with BF16, without top-k (async=False, previous=False) ...
+[testing] Running with BF16, with top-k (async=False, previous=False) ...
+[testing] Running with BF16, without top-k (async=False, previous=False) ...
+[testing] Running with BF16, with top-k (async=False, previous=False) ...
+[testing] Running with FP8, without top-k (async=False, previous=False) ...
+[testing] Running with FP8, with top-k (async=False, previous=False) ...
+[testing] Running with BF16, without top-k (async=True, previous=False) ...
+[testing] Running with BF16, with top-k (async=True, previous=False) ...
+[testing] Running with BF16, without top-k (async=True, previous=False) ...
+[testing] Running with BF16, with top-k (async=True, previous=False) ...
+[testing] Running with FP8, without top-k (async=True, previous=False) ...
+[testing] Running with FP8, with top-k (async=True, previous=False) ...
+[testing] Running with BF16, without top-k (async=False, previous=True) ...
+[testing] Running with BF16, with top-k (async=False, previous=True) ...
+[testing] Running with BF16, without top-k (async=False, previous=True) ...
+[testing] Running with BF16, with top-k (async=False, previous=True) ...
+[testing] Running with FP8, without top-k (async=False, previous=True) ...
+[testing] Running with FP8, with top-k (async=False, previous=True) ...
+[testing] Running with BF16, without top-k (async=True, previous=True) ...
+[testing] Running with BF16, with top-k (async=True, previous=True) ...
+[testing] Running with BF16, without top-k (async=True, previous=True) ...
+[testing] Running with BF16, with top-k (async=True, previous=True) ...
+[testing] Running with FP8, without top-k (async=True, previous=True) ...
+[testing] Running with FP8, with top-k (async=True, previous=True) ...
+
+[rank1]:[W1030 15:22:31.540398220 ProcessGroupNCCL.cpp:4883] [PG ID 0 PG GUID 0 Rank 1]  using GPU 0 to perform barrier as devices used by this process are currently unknown. This can potentially cause a hang if this rank to GPU mapping is incorrect. Specify device_ids in barrier() to force use of a particular device, or call init_process_group() with a device_id.
+worker1:284151:284492 [0] MCCL INFO Using network Socket
+worker1:284151:284492 [0] MCCL INFO comm=0xaaacf77edfd0, lastStream is initialized
+worker1:284151:284492 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:284151:284492 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:284151:284492 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:284151:284492 [0] MCCL INFO rank 1 cudeDev 0, local 0 socket 0 peer -1, fabricId 0 index 0 directLinkGroup 0 totalGpu 0, switchId 0
+worker1:284151:284492 [0] MCCL INFO type:0, uuid: local 0x282b6314, remote 0xd54f50f9 0x0, topology 0, isa: 10.0
+worker1:284151:284492 [0] MCCL INFO Setting affinity for GPU 0 to ffffffff,ffffffff,ffffffff,00000000,00000000,00000000,00000000,00000000,00000000
+worker1:284151:284492 [0] MCCL INFO MCCL pcie buffer mode 0, rcCount 1, nodeType 0x0, minAp 104
+worker1:284151:284492 [0] MCCL INFO Disabling clique-based kernels due to topology (ignore with CLIQUE_IGNORE_TOPO)
+worker1:284151:284492 [0] MCCL INFO CLIQUE InitRemoteReadToggle enable_read:0, isaVersion:1000, topologyId:0
+worker1:284151:284492 [0] MCCL INFO Clique kernels disabled
+worker1:284151:284492 [0] MCCL INFO Trees [0] -1/-1/-1->1->0 [1] 0/-1/-1->1->-1 [2] -1/-1/-1->1->0 [3] 0/-1/-1->1->-1 [4] -1/-1/-1->1->0 [5] 0/-1/-1->1->-1 [6] -1/-1/-1->1->0 [7] 0/-1/-1->1->-1 [8] -1/-1/-1->1->0 [9] 0/-1/-1->1->-1 [10] -1/-1/-1->1->0 [11] 0/-1/-1->1->-1 [12] -1/-1/-1->1->0 [13] 0/-1/-1->1->-1 [14] -1/-1/-1->1->0 [15] 0/-1/-1->1->-1 [16] -1/-1/-1->1->0 [17] 0/-1/-1->1->-1 [18] -1/-1/-1->1->0 [19] 0/-1/-1->1->-1 [20] -1/-1/-1->1->0 [21] 0/-1/-1->1->-1 [22] -1/-1/-1->1->0 [23] 0/-1/-1->1->-1 [24] -1/-1/-1->1->0 [25] 0/-1/-1->1->-1 [26] -1/-1/-1->1->0 [27] 0/-1/-1->1->-1 [28] -1/-1/-1->1->0 [29] 0/-1/-1->1->-1 [30] -1/-1/-1->1->0 [31] 0/-1/-1->1->-1 comm 0xaaacf77edfd0 nRanks 02 busId a1000
+worker1:284151:284492 [0] MCCL INFO P2P Chunksize set to 131072
+worker1:284151:284492 [0] MCCL INFO disable groupWriteback
+worker1:284151:284492 [0] MCCL INFO threadThresholds 8/8/64 | 8/8/64 | 256 | 256
+worker1:284151:284492 [0] MCCL INFO 32 coll channels, 32 p2p channels, 32 p2p channels per peer
+worker1:284151:284492 [0] MCCL INFO comm 0xaaacf77edfd0 rank 1 nranks 2 macaDev 0 busId a1000 localSize 0 used 67228512 bytes - Init COMPLETE
+worker1:284151:284496 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:284151:284499 [0] MCCL INFO Channel 00/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaacf77edfd0 nRanks 02
+worker1:284151:284496 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:284151:284499 [0] MCCL INFO Channel 01/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaacf77edfd0 nRanks 02
+worker1:284151:284496 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:284151:284499 [0] MCCL INFO Channel 02/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaacf77edfd0 nRanks 02
+worker1:284151:284496 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:284151:284499 [0] MCCL INFO Channel 03/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaacf77edfd0 nRanks 02
+worker1:284151:284496 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:284151:284499 [0] MCCL INFO Channel 04/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaacf77edfd0 nRanks 02
+worker1:284151:284496 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:284151:284499 [0] MCCL INFO Channel 05/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaacf77edfd0 nRanks 02
+worker1:284151:284496 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:284151:284499 [0] MCCL INFO Channel 06/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaacf77edfd0 nRanks 02
+worker1:284151:284496 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:284151:284499 [0] MCCL INFO Channel 07/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaacf77edfd0 nRanks 02
+worker1:284151:284496 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:284151:284499 [0] MCCL INFO Channel 08/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaacf77edfd0 nRanks 02
+worker1:284151:284496 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:284151:284499 [0] MCCL INFO Channel 09/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaacf77edfd0 nRanks 02
+worker1:284151:284496 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:284151:284499 [0] MCCL INFO Channel 10/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaacf77edfd0 nRanks 02
+worker1:284151:284496 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:284151:284499 [0] MCCL INFO Channel 11/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaacf77edfd0 nRanks 02
+worker1:284151:284496 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:284151:284499 [0] MCCL INFO Channel 12/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaacf77edfd0 nRanks 02
+worker1:284151:284496 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:284151:284499 [0] MCCL INFO Channel 13/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaacf77edfd0 nRanks 02
+worker1:284151:284496 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:284151:284499 [0] MCCL INFO Channel 14/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaacf77edfd0 nRanks 02
+worker1:284151:284496 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:284151:284499 [0] MCCL INFO Channel 15/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaacf77edfd0 nRanks 02
+worker1:284151:284496 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:284151:284499 [0] MCCL INFO Channel 16/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaacf77edfd0 nRanks 02
+worker1:284151:284496 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:284151:284499 [0] MCCL INFO Channel 17/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaacf77edfd0 nRanks 02
+worker1:284151:284496 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:284151:284499 [0] MCCL INFO Channel 18/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaacf77edfd0 nRanks 02
+worker1:284151:284496 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:284151:284499 [0] MCCL INFO Channel 19/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaacf77edfd0 nRanks 02
+worker1:284151:284496 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:284151:284499 [0] MCCL INFO Channel 20/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaacf77edfd0 nRanks 02
+worker1:284151:284496 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:284151:284499 [0] MCCL INFO Channel 21/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaacf77edfd0 nRanks 02
+worker1:284151:284496 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:284151:284499 [0] MCCL INFO Channel 22/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaacf77edfd0 nRanks 02
+worker1:284151:284496 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:284151:284499 [0] MCCL INFO Channel 23/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaacf77edfd0 nRanks 02
+worker1:284151:284496 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:284151:284499 [0] MCCL INFO Channel 24/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaacf77edfd0 nRanks 02
+worker1:284151:284496 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:284151:284499 [0] MCCL INFO Channel 25/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaacf77edfd0 nRanks 02
+worker1:284151:284496 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:284151:284499 [0] MCCL INFO Channel 26/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaacf77edfd0 nRanks 02
+worker1:284151:284496 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:284151:284499 [0] MCCL INFO Channel 27/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaacf77edfd0 nRanks 02
+worker1:284151:284496 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:284151:284499 [0] MCCL INFO Channel 28/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaacf77edfd0 nRanks 02
+worker1:284151:284496 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:284151:284499 [0] MCCL INFO Channel 29/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaacf77edfd0 nRanks 02
+worker1:284151:284496 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:284151:284499 [0] MCCL INFO Channel 30/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaacf77edfd0 nRanks 02
+worker1:284151:284496 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:284151:284499 [0] MCCL INFO Channel 31/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaacf77edfd0 nRanks 02
+worker1:284151:284499 [0] MCCL INFO Channel 00/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaacf77edfd0 nRanks 02
+worker1:284151:284499 [0] MCCL INFO Channel 01/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaacf77edfd0 nRanks 02
+worker1:284151:284499 [0] MCCL INFO Channel 02/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaacf77edfd0 nRanks 02
+worker1:284151:284499 [0] MCCL INFO Channel 03/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaacf77edfd0 nRanks 02
+worker1:284151:284499 [0] MCCL INFO Channel 04/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaacf77edfd0 nRanks 02
+worker1:284151:284499 [0] MCCL INFO Channel 05/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaacf77edfd0 nRanks 02
+worker1:284151:284499 [0] MCCL INFO Channel 06/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaacf77edfd0 nRanks 02
+worker1:284151:284499 [0] MCCL INFO Channel 07/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaacf77edfd0 nRanks 02
+worker1:284151:284499 [0] MCCL INFO Channel 08/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaacf77edfd0 nRanks 02
+worker1:284151:284499 [0] MCCL INFO Channel 09/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaacf77edfd0 nRanks 02
+worker1:284151:284499 [0] MCCL INFO Channel 10/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaacf77edfd0 nRanks 02
+worker1:284151:284499 [0] MCCL INFO Channel 11/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaacf77edfd0 nRanks 02
+worker1:284151:284499 [0] MCCL INFO Channel 12/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaacf77edfd0 nRanks 02
+worker1:284151:284499 [0] MCCL INFO Channel 13/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaacf77edfd0 nRanks 02
+worker1:284151:284499 [0] MCCL INFO Channel 14/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaacf77edfd0 nRanks 02
+worker1:284151:284499 [0] MCCL INFO Channel 15/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaacf77edfd0 nRanks 02
+worker1:284151:284499 [0] MCCL INFO Channel 16/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaacf77edfd0 nRanks 02
+worker1:284151:284499 [0] MCCL INFO Channel 17/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaacf77edfd0 nRanks 02
+worker1:284151:284499 [0] MCCL INFO Channel 18/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaacf77edfd0 nRanks 02
+worker1:284151:284499 [0] MCCL INFO Channel 19/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaacf77edfd0 nRanks 02
+worker1:284151:284499 [0] MCCL INFO Channel 20/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaacf77edfd0 nRanks 02
+worker1:284151:284499 [0] MCCL INFO Channel 21/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaacf77edfd0 nRanks 02
+worker1:284151:284499 [0] MCCL INFO Channel 22/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaacf77edfd0 nRanks 02
+worker1:284151:284499 [0] MCCL INFO Channel 23/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaacf77edfd0 nRanks 02
+worker1:284151:284499 [0] MCCL INFO Channel 24/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaacf77edfd0 nRanks 02
+worker1:284151:284499 [0] MCCL INFO Channel 25/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaacf77edfd0 nRanks 02
+worker1:284151:284499 [0] MCCL INFO Channel 26/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaacf77edfd0 nRanks 02
+worker1:284151:284499 [0] MCCL INFO Channel 27/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaacf77edfd0 nRanks 02
+worker1:284151:284499 [0] MCCL INFO Channel 28/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaacf77edfd0 nRanks 02
+worker1:284151:284499 [0] MCCL INFO Channel 29/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaacf77edfd0 nRanks 02
+worker1:284151:284499 [0] MCCL INFO Channel 30/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaacf77edfd0 nRanks 02
+worker1:284151:284499 [0] MCCL INFO Channel 31/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaacf77edfd0 nRanks 02
+worker1:284151:284499 [0] MCCL INFO Connected all trees
+[tuning] SMs 24, NVL chunk 4, RDMA chunk 4, transmit: 23191.00 us, notify: 307.09 us, BW: 2.60 GB/s (RDMA), 2.60 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 4, RDMA chunk 8, transmit: 15782.00 us, notify: 512.78 us, BW: 3.82 GB/s (RDMA), 3.82 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 4, RDMA chunk 12, transmit: 23456.00 us, notify: 259.74 us, BW: 2.57 GB/s (RDMA), 2.57 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 4, RDMA chunk 16, transmit: 3241.00 us, notify: 594.62 us, BW: 18.62 GB/s (RDMA), 18.62 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 4, RDMA chunk 20, transmit: 24507.00 us, notify: 257.13 us, BW: 2.46 GB/s (RDMA), 2.46 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 4, RDMA chunk 24, transmit: 16256.00 us, notify: 712.24 us, BW: 3.71 GB/s (RDMA), 3.71 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 4, RDMA chunk 28, transmit: 23546.00 us, notify: 257.82 us, BW: 2.56 GB/s (RDMA), 2.56 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 4, RDMA chunk 32, transmit: 3268.00 us, notify: 418.66 us, BW: 18.47 GB/s (RDMA), 18.46 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 8, RDMA chunk 4, transmit: 23197.00 us, notify: 280.27 us, BW: 2.60 GB/s (RDMA), 2.60 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 8, RDMA chunk 8, transmit: 15750.00 us, notify: 554.51 us, BW: 3.83 GB/s (RDMA), 3.83 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 8, RDMA chunk 12, transmit: 23456.00 us, notify: 259.01 us, BW: 2.57 GB/s (RDMA), 2.57 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 8, RDMA chunk 16, transmit: 3256.00 us, notify: 582.91 us, BW: 18.54 GB/s (RDMA), 18.53 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 8, RDMA chunk 20, transmit: 24506.00 us, notify: 255.74 us, BW: 2.46 GB/s (RDMA), 2.46 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 8, RDMA chunk 24, transmit: 16222.00 us, notify: 715.14 us, BW: 3.72 GB/s (RDMA), 3.72 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 8, RDMA chunk 28, transmit: 23547.00 us, notify: 259.03 us, BW: 2.56 GB/s (RDMA), 2.56 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 8, RDMA chunk 32, transmit: 3287.00 us, notify: 472.88 us, BW: 18.36 GB/s (RDMA), 18.36 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 12, RDMA chunk 4, transmit: 23208.00 us, notify: 282.98 us, BW: 2.60 GB/s (RDMA), 2.60 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 12, RDMA chunk 8, transmit: 15799.00 us, notify: 467.85 us, BW: 3.82 GB/s (RDMA), 3.82 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 12, RDMA chunk 12, transmit: 23458.00 us, notify: 256.51 us, BW: 2.57 GB/s (RDMA), 2.57 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 12, RDMA chunk 16, transmit: 3263.00 us, notify: 551.91 us, BW: 18.50 GB/s (RDMA), 18.49 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 12, RDMA chunk 20, transmit: 24483.00 us, notify: 259.02 us, BW: 2.47 GB/s (RDMA), 2.46 GB/s (NVL) 
+Timeout (0:00:45)!
+Thread 0x0000ffffb11f7d00 (most recent call first):
+  File "/home/f00955680/metax_dev/venv-maca-py312/lib/python3.12/site-packages/torch/cuda/__init__.py", line 1058 in synchronize
+  File "/home/f00955680/uccl-ep-xpu-integration/ep/bench/utils.py", line 488 in bench_kineto
+  File "test_internode.py", line 434 in test_main
+  File "test_internode.py", line 578 in test_loop
+  File "test_internode.py", line 680 in <module>
+  File "<frozen runpy>", line 88 in _run_code
+  File "<frozen runpy>", line 98 in _run_module_code
+  File "<frozen runpy>", line 287 in run_path
+  File "/home/f00955680/metax_dev/urma_after_kernel_20261029/diag/bench_pair_2274e1bc/launcher.py", line 78 in <module>
+[tuning] SMs 24, NVL chunk 12, RDMA chunk 24, transmit: 16248.00 us, notify: 660.44 us, BW: 3.72 GB/s (RDMA), 3.71 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 12, RDMA chunk 28, transmit: 23544.00 us, notify: 257.51 us, BW: 2.56 GB/s (RDMA), 2.56 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 12, RDMA chunk 32, transmit: 3271.00 us, notify: 452.05 us, BW: 18.45 GB/s (RDMA), 18.44 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 16, RDMA chunk 4, transmit: 23207.00 us, notify: 277.14 us, BW: 2.60 GB/s (RDMA), 2.60 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 16, RDMA chunk 8, transmit: 15781.00 us, notify: 465.35 us, BW: 3.83 GB/s (RDMA), 3.82 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 16, RDMA chunk 12, transmit: 23458.00 us, notify: 256.39 us, BW: 2.57 GB/s (RDMA), 2.57 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 16, RDMA chunk 16, transmit: 3257.00 us, notify: 579.00 us, BW: 18.53 GB/s (RDMA), 18.52 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 16, RDMA chunk 20, transmit: 24492.00 us, notify: 259.33 us, BW: 2.46 GB/s (RDMA), 2.46 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 16, RDMA chunk 24, transmit: 16176.00 us, notify: 824.99 us, BW: 3.73 GB/s (RDMA), 3.73 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 16, RDMA chunk 28, transmit: 23551.00 us, notify: 257.85 us, BW: 2.56 GB/s (RDMA), 2.56 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 16, RDMA chunk 32, transmit: 3252.00 us, notify: 487.46 us, BW: 18.56 GB/s (RDMA), 18.55 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 20, RDMA chunk 4, transmit: 23181.00 us, notify: 276.46 us, BW: 2.60 GB/s (RDMA), 2.60 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 20, RDMA chunk 8, transmit: 15775.00 us, notify: 559.02 us, BW: 3.83 GB/s (RDMA), 3.82 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 20, RDMA chunk 12, transmit: 23459.00 us, notify: 257.23 us, BW: 2.57 GB/s (RDMA), 2.57 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 20, RDMA chunk 16, transmit: 3249.00 us, notify: 581.85 us, BW: 18.58 GB/s (RDMA), 18.57 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 20, RDMA chunk 20, transmit: 24505.00 us, notify: 257.47 us, BW: 2.46 GB/s (RDMA), 2.46 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 20, RDMA chunk 24, transmit: 16207.00 us, notify: 648.02 us, BW: 3.72 GB/s (RDMA), 3.72 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 20, RDMA chunk 28, transmit: 23551.00 us, notify: 257.71 us, BW: 2.56 GB/s (RDMA), 2.56 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 20, RDMA chunk 32, transmit: 3275.00 us, notify: 432.93 us, BW: 18.43 GB/s (RDMA), 18.42 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 24, RDMA chunk 4, transmit: 23195.00 us, notify: 280.66 us, BW: 2.60 GB/s (RDMA), 2.60 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 24, RDMA chunk 8, transmit: 15733.00 us, notify: 515.99 us, BW: 3.84 GB/s (RDMA), 3.83 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 24, RDMA chunk 12, transmit: 23458.00 us, notify: 257.11 us, BW: 2.57 GB/s (RDMA), 2.57 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 24, RDMA chunk 16, transmit: 3264.00 us, notify: 562.77 us, BW: 18.49 GB/s (RDMA), 18.48 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 24, RDMA chunk 20, transmit: 24477.00 us, notify: 258.37 us, BW: 2.47 GB/s (RDMA), 2.46 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 24, RDMA chunk 24, transmit: 16252.00 us, notify: 665.92 us, BW: 3.71 GB/s (RDMA), 3.71 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 24, RDMA chunk 28, transmit: 23544.00 us, notify: 259.40 us, BW: 2.56 GB/s (RDMA), 2.56 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 24, RDMA chunk 32, transmit: 3269.00 us, notify: 464.85 us, BW: 18.47 GB/s (RDMA), 18.46 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 28, RDMA chunk 4, transmit: 23206.00 us, notify: 278.72 us, BW: 2.60 GB/s (RDMA), 2.60 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 28, RDMA chunk 8, transmit: 15743.00 us, notify: 505.52 us, BW: 3.83 GB/s (RDMA), 3.83 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 28, RDMA chunk 12, transmit: 23458.00 us, notify: 258.76 us, BW: 2.57 GB/s (RDMA), 2.57 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 28, RDMA chunk 16, transmit: 3257.00 us, notify: 608.23 us, BW: 18.53 GB/s (RDMA), 18.52 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 28, RDMA chunk 20, transmit: 24513.00 us, notify: 256.00 us, BW: 2.46 GB/s (RDMA), 2.46 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 28, RDMA chunk 24, transmit: 16118.00 us, notify: 899.47 us, BW: 3.75 GB/s (RDMA), 3.74 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 28, RDMA chunk 28, transmit: 23544.00 us, notify: 257.67 us, BW: 2.56 GB/s (RDMA), 2.56 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 28, RDMA chunk 32, transmit: 3286.00 us, notify: 490.01 us, BW: 18.37 GB/s (RDMA), 18.36 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 32, RDMA chunk 4, transmit: 23196.00 us, notify: 285.29 us, BW: 2.60 GB/s (RDMA), 2.60 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 32, RDMA chunk 8, transmit: 15761.00 us, notify: 527.78 us, BW: 3.83 GB/s (RDMA), 3.83 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 32, RDMA chunk 12, transmit: 23457.00 us, notify: 256.91 us, BW: 2.57 GB/s (RDMA), 2.57 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 32, RDMA chunk 16, transmit: 3270.00 us, notify: 560.97 us, BW: 18.46 GB/s (RDMA), 18.45 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 32, RDMA chunk 20, transmit: 24514.00 us, notify: 257.60 us, BW: 2.46 GB/s (RDMA), 2.46 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 32, RDMA chunk 24, transmit: 16291.00 us, notify: 766.17 us, BW: 3.71 GB/s (RDMA), 3.70 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 32, RDMA chunk 28, transmit: 23548.00 us, notify: 258.53 us, BW: 2.56 GB/s (RDMA), 2.56 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 32, RDMA chunk 32, transmit: 3265.00 us, notify: 469.23 us, BW: 18.49 GB/s (RDMA), 18.48 GB/s (NVL) 
+Timeout (0:00:45)!
+Thread 0x0000ffffb11f7d00 (most recent call first):
+  File "/home/f00955680/metax_dev/venv-maca-py312/lib/python3.12/site-packages/torch/cuda/__init__.py", line 1058 in synchronize
+  File "/home/f00955680/uccl-ep-xpu-integration/ep/bench/utils.py", line 488 in bench_kineto
+  File "test_internode.py", line 434 in test_main
+  File "test_internode.py", line 578 in test_loop
+  File "test_internode.py", line 680 in <module>
+  File "<frozen runpy>", line 88 in _run_code
+  File "<frozen runpy>", line 98 in _run_module_code
+  File "<frozen runpy>", line 287 in run_path
+  File "/home/f00955680/metax_dev/urma_after_kernel_20261029/diag/bench_pair_2274e1bc/launcher.py", line 78 in <module>
+[tuning] SMs 24, NVL chunk 36, RDMA chunk 4, transmit: 23197.00 us, notify: 273.46 us, BW: 2.60 GB/s (RDMA), 2.60 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 36, RDMA chunk 8, transmit: 15775.00 us, notify: 514.24 us, BW: 3.83 GB/s (RDMA), 3.82 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 36, RDMA chunk 12, transmit: 23456.00 us, notify: 257.81 us, BW: 2.57 GB/s (RDMA), 2.57 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 36, RDMA chunk 16, transmit: 3269.00 us, notify: 568.66 us, BW: 18.47 GB/s (RDMA), 18.46 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 36, RDMA chunk 20, transmit: 24507.00 us, notify: 258.22 us, BW: 2.46 GB/s (RDMA), 2.46 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 36, RDMA chunk 24, transmit: 16190.00 us, notify: 854.49 us, BW: 3.73 GB/s (RDMA), 3.73 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 36, RDMA chunk 28, transmit: 23552.00 us, notify: 256.43 us, BW: 2.56 GB/s (RDMA), 2.56 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 36, RDMA chunk 32, transmit: 3275.00 us, notify: 455.66 us, BW: 18.43 GB/s (RDMA), 18.42 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 40, RDMA chunk 4, transmit: 23183.00 us, notify: 290.18 us, BW: 2.60 GB/s (RDMA), 2.60 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 40, RDMA chunk 8, transmit: 15786.00 us, notify: 504.70 us, BW: 3.82 GB/s (RDMA), 3.82 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 40, RDMA chunk 12, transmit: 23458.00 us, notify: 257.42 us, BW: 2.57 GB/s (RDMA), 2.57 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 40, RDMA chunk 16, transmit: 3257.00 us, notify: 566.98 us, BW: 18.53 GB/s (RDMA), 18.52 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 40, RDMA chunk 20, transmit: 24512.00 us, notify: 256.88 us, BW: 2.46 GB/s (RDMA), 2.46 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 40, RDMA chunk 24, transmit: 16165.00 us, notify: 674.39 us, BW: 3.73 GB/s (RDMA), 3.73 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 40, RDMA chunk 28, transmit: 23543.00 us, notify: 257.31 us, BW: 2.56 GB/s (RDMA), 2.56 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 40, RDMA chunk 32, transmit: 3257.00 us, notify: 424.45 us, BW: 18.53 GB/s (RDMA), 18.52 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 44, RDMA chunk 4, transmit: 23198.00 us, notify: 297.56 us, BW: 2.60 GB/s (RDMA), 2.60 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 44, RDMA chunk 8, transmit: 15745.00 us, notify: 534.32 us, BW: 3.83 GB/s (RDMA), 3.83 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 44, RDMA chunk 12, transmit: 23461.00 us, notify: 258.12 us, BW: 2.57 GB/s (RDMA), 2.57 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 44, RDMA chunk 16, transmit: 3268.00 us, notify: 571.77 us, BW: 18.47 GB/s (RDMA), 18.46 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 44, RDMA chunk 20, transmit: 24492.00 us, notify: 257.08 us, BW: 2.46 GB/s (RDMA), 2.46 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 44, RDMA chunk 24, transmit: 16210.00 us, notify: 649.71 us, BW: 3.72 GB/s (RDMA), 3.72 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 44, RDMA chunk 28, transmit: 23550.00 us, notify: 259.23 us, BW: 2.56 GB/s (RDMA), 2.56 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 44, RDMA chunk 32, transmit: 3255.00 us, notify: 454.34 us, BW: 18.54 GB/s (RDMA), 18.54 GB/s (NVL) 
+[tuning] Best dispatch (FP8): SMs 24, NVL chunk 4, RDMA chunk 16, transmit: 3241.00 us, notify: 594.62 us, BW: 18.62 GB/s (RDMA), 18.62 GB/s (NVL)
+
+[tuning] SMs 24, NVL chunk 4, RDMA chunk 4, transmit: 45339.00 us, notify: 373.18 us, BW: 2.58 GB/s (RDMA), 2.58 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 4, RDMA chunk 8, transmit: 30797.00 us, notify: 756.04 us, BW: 3.80 GB/s (RDMA), 3.80 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 4, RDMA chunk 12, transmit: 45495.00 us, notify: 259.42 us, BW: 2.57 GB/s (RDMA), 2.57 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 4, RDMA chunk 16, transmit: 5898.00 us, notify: 645.96 us, BW: 19.85 GB/s (RDMA), 19.84 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 4, RDMA chunk 20, transmit: 47289.00 us, notify: 259.51 us, BW: 2.48 GB/s (RDMA), 2.47 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 4, RDMA chunk 24, transmit: 31889.00 us, notify: 762.78 us, BW: 3.67 GB/s (RDMA), 3.67 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 4, RDMA chunk 28, transmit: 45469.00 us, notify: 257.68 us, BW: 2.57 GB/s (RDMA), 2.57 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 4, RDMA chunk 32, transmit: 6015.00 us, notify: 466.48 us, BW: 19.46 GB/s (RDMA), 19.45 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 8, RDMA chunk 4, transmit: 45310.00 us, notify: 369.62 us, BW: 2.58 GB/s (RDMA), 2.58 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 8, RDMA chunk 8, transmit: 30783.00 us, notify: 1289.00 us, BW: 3.80 GB/s (RDMA), 3.80 GB/s (NVL) 
+Timeout (0:00:45)!
+Thread 0x0000ffffb11f7d00 (most recent call first):
+  File "/home/f00955680/metax_dev/venv-maca-py312/lib/python3.12/site-packages/torch/cuda/__init__.py", line 1058 in synchronize
+  File "/home/f00955680/uccl-ep-xpu-integration/ep/bench/utils.py", line 488 in bench_kineto
+  File "test_internode.py", line 434 in test_main
+  File "test_internode.py", line 578 in test_loop
+  File "test_internode.py", line 680 in <module>
+  File "<frozen runpy>", line 88 in _run_code
+  File "<frozen runpy>", line 98 in _run_module_code
+  File "<frozen runpy>", line 287 in run_path
+  File "/home/f00955680/metax_dev/urma_after_kernel_20261029/diag/bench_pair_2274e1bc/launcher.py", line 78 in <module>
+[tuning] SMs 24, NVL chunk 8, RDMA chunk 12, transmit: 45492.00 us, notify: 258.25 us, BW: 2.57 GB/s (RDMA), 2.57 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 8, RDMA chunk 16, transmit: 5931.00 us, notify: 643.33 us, BW: 19.74 GB/s (RDMA), 19.73 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 8, RDMA chunk 20, transmit: 47286.00 us, notify: 263.47 us, BW: 2.48 GB/s (RDMA), 2.47 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 8, RDMA chunk 24, transmit: 31832.00 us, notify: 895.77 us, BW: 3.68 GB/s (RDMA), 3.68 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 8, RDMA chunk 28, transmit: 45469.00 us, notify: 258.19 us, BW: 2.57 GB/s (RDMA), 2.57 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 8, RDMA chunk 32, transmit: 6048.00 us, notify: 474.26 us, BW: 19.36 GB/s (RDMA), 19.35 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 12, RDMA chunk 4, transmit: 45305.00 us, notify: 385.80 us, BW: 2.58 GB/s (RDMA), 2.58 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 12, RDMA chunk 8, transmit: 30667.00 us, notify: 938.11 us, BW: 3.82 GB/s (RDMA), 3.82 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 12, RDMA chunk 12, transmit: 45497.00 us, notify: 255.75 us, BW: 2.57 GB/s (RDMA), 2.57 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 12, RDMA chunk 16, transmit: 5916.00 us, notify: 659.49 us, BW: 19.79 GB/s (RDMA), 19.78 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 12, RDMA chunk 20, transmit: 47285.00 us, notify: 256.99 us, BW: 2.48 GB/s (RDMA), 2.47 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 12, RDMA chunk 24, transmit: 32148.00 us, notify: 671.41 us, BW: 3.64 GB/s (RDMA), 3.64 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 12, RDMA chunk 28, transmit: 45466.00 us, notify: 255.89 us, BW: 2.57 GB/s (RDMA), 2.57 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 12, RDMA chunk 32, transmit: 6040.00 us, notify: 479.74 us, BW: 19.38 GB/s (RDMA), 19.37 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 16, RDMA chunk 4, transmit: 45331.00 us, notify: 361.60 us, BW: 2.58 GB/s (RDMA), 2.58 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 16, RDMA chunk 8, transmit: 30652.00 us, notify: 1077.00 us, BW: 3.82 GB/s (RDMA), 3.82 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 16, RDMA chunk 12, transmit: 45504.00 us, notify: 259.38 us, BW: 2.57 GB/s (RDMA), 2.57 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 16, RDMA chunk 16, transmit: 5883.00 us, notify: 673.91 us, BW: 19.90 GB/s (RDMA), 19.89 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 16, RDMA chunk 20, transmit: 47285.00 us, notify: 260.13 us, BW: 2.48 GB/s (RDMA), 2.47 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 16, RDMA chunk 24, transmit: 31998.00 us, notify: 697.51 us, BW: 3.66 GB/s (RDMA), 3.66 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 16, RDMA chunk 28, transmit: 45473.00 us, notify: 258.40 us, BW: 2.57 GB/s (RDMA), 2.57 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 16, RDMA chunk 32, transmit: 5998.00 us, notify: 446.78 us, BW: 19.52 GB/s (RDMA), 19.51 GB/s (NVL) 
+Timeout (0:00:45)!
+Thread 0x0000ffffb11f7d00 (most recent call first):
+  File "/home/f00955680/metax_dev/venv-maca-py312/lib/python3.12/site-packages/torch/cuda/__init__.py", line 1058 in synchronize
+  File "/home/f00955680/uccl-ep-xpu-integration/ep/bench/utils.py", line 488 in bench_kineto
+  File "test_internode.py", line 434 in test_main
+  File "test_internode.py", line 578 in test_loop
+  File "test_internode.py", line 680 in <module>
+  File "<frozen runpy>", line 88 in _run_code
+  File "<frozen runpy>", line 98 in _run_module_code
+  File "<frozen runpy>", line 287 in run_path
+  File "/home/f00955680/metax_dev/urma_after_kernel_20261029/diag/bench_pair_2274e1bc/launcher.py", line 78 in <module>
+[tuning] SMs 24, NVL chunk 20, RDMA chunk 4, transmit: 45399.00 us, notify: 300.41 us, BW: 2.58 GB/s (RDMA), 2.58 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 20, RDMA chunk 8, transmit: 30920.00 us, notify: 816.47 us, BW: 3.79 GB/s (RDMA), 3.78 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 20, RDMA chunk 12, transmit: 45491.00 us, notify: 256.96 us, BW: 2.57 GB/s (RDMA), 2.57 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 20, RDMA chunk 16, transmit: 5933.00 us, notify: 595.75 us, BW: 19.73 GB/s (RDMA), 19.72 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 20, RDMA chunk 20, transmit: 47302.00 us, notify: 258.15 us, BW: 2.47 GB/s (RDMA), 2.47 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 20, RDMA chunk 24, transmit: 32003.00 us, notify: 721.03 us, BW: 3.66 GB/s (RDMA), 3.66 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 20, RDMA chunk 28, transmit: 45466.00 us, notify: 256.87 us, BW: 2.57 GB/s (RDMA), 2.57 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 20, RDMA chunk 32, transmit: 6029.00 us, notify: 471.50 us, BW: 19.42 GB/s (RDMA), 19.41 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 24, RDMA chunk 4, transmit: 45344.00 us, notify: 335.13 us, BW: 2.58 GB/s (RDMA), 2.58 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 24, RDMA chunk 8, transmit: 30695.00 us, notify: 1097.00 us, BW: 3.81 GB/s (RDMA), 3.81 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 24, RDMA chunk 12, transmit: 45497.00 us, notify: 257.88 us, BW: 2.57 GB/s (RDMA), 2.57 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 24, RDMA chunk 16, transmit: 5910.00 us, notify: 662.66 us, BW: 19.81 GB/s (RDMA), 19.80 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 24, RDMA chunk 20, transmit: 47287.00 us, notify: 255.72 us, BW: 2.48 GB/s (RDMA), 2.47 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 24, RDMA chunk 24, transmit: 31926.00 us, notify: 713.32 us, BW: 3.67 GB/s (RDMA), 3.67 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 24, RDMA chunk 28, transmit: 45467.00 us, notify: 258.30 us, BW: 2.57 GB/s (RDMA), 2.57 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 24, RDMA chunk 32, transmit: 6043.00 us, notify: 441.22 us, BW: 19.37 GB/s (RDMA), 19.36 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 28, RDMA chunk 4, transmit: 45307.00 us, notify: 368.66 us, BW: 2.58 GB/s (RDMA), 2.58 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 28, RDMA chunk 8, transmit: 30724.00 us, notify: 934.63 us, BW: 3.81 GB/s (RDMA), 3.81 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 28, RDMA chunk 12, transmit: 45497.00 us, notify: 256.65 us, BW: 2.57 GB/s (RDMA), 2.57 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 28, RDMA chunk 16, transmit: 5904.00 us, notify: 617.87 us, BW: 19.83 GB/s (RDMA), 19.82 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 28, RDMA chunk 20, transmit: 47277.00 us, notify: 257.31 us, BW: 2.48 GB/s (RDMA), 2.47 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 28, RDMA chunk 24, transmit: 32066.00 us, notify: 669.77 us, BW: 3.65 GB/s (RDMA), 3.65 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 28, RDMA chunk 28, transmit: 45467.00 us, notify: 258.77 us, BW: 2.57 GB/s (RDMA), 2.57 GB/s (NVL) 
+Timeout (0:00:45)!
+Thread 0x0000ffffb11f7d00 (most recent call first):
+  File "/home/f00955680/metax_dev/venv-maca-py312/lib/python3.12/site-packages/torch/cuda/__init__.py", line 1058 in synchronize
+  File "/home/f00955680/uccl-ep-xpu-integration/ep/bench/utils.py", line 488 in bench_kineto
+  File "test_internode.py", line 434 in test_main
+  File "test_internode.py", line 578 in test_loop
+  File "test_internode.py", line 680 in <module>
+  File "<frozen runpy>", line 88 in _run_code
+  File "<frozen runpy>", line 98 in _run_module_code
+  File "<frozen runpy>", line 287 in run_path
+  File "/home/f00955680/metax_dev/urma_after_kernel_20261029/diag/bench_pair_2274e1bc/launcher.py", line 78 in <module>
+[tuning] SMs 24, NVL chunk 28, RDMA chunk 32, transmit: 5977.00 us, notify: 493.20 us, BW: 19.59 GB/s (RDMA), 19.58 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 32, RDMA chunk 4, transmit: 45334.00 us, notify: 402.33 us, BW: 2.58 GB/s (RDMA), 2.58 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 32, RDMA chunk 8, transmit: 30834.00 us, notify: 871.59 us, BW: 3.80 GB/s (RDMA), 3.79 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 32, RDMA chunk 12, transmit: 45492.00 us, notify: 254.35 us, BW: 2.57 GB/s (RDMA), 2.57 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 32, RDMA chunk 16, transmit: 5884.00 us, notify: 678.87 us, BW: 19.90 GB/s (RDMA), 19.89 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 32, RDMA chunk 20, transmit: 47278.00 us, notify: 258.54 us, BW: 2.48 GB/s (RDMA), 2.47 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 32, RDMA chunk 24, transmit: 32023.00 us, notify: 677.64 us, BW: 3.66 GB/s (RDMA), 3.65 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 32, RDMA chunk 28, transmit: 45467.00 us, notify: 258.16 us, BW: 2.57 GB/s (RDMA), 2.57 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 32, RDMA chunk 32, transmit: 6045.00 us, notify: 450.30 us, BW: 19.37 GB/s (RDMA), 19.36 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 36, RDMA chunk 4, transmit: 45327.00 us, notify: 358.36 us, BW: 2.58 GB/s (RDMA), 2.58 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 36, RDMA chunk 8, transmit: 30819.00 us, notify: 977.94 us, BW: 3.80 GB/s (RDMA), 3.80 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 36, RDMA chunk 12, transmit: 45492.00 us, notify: 261.32 us, BW: 2.57 GB/s (RDMA), 2.57 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 36, RDMA chunk 16, transmit: 5887.00 us, notify: 660.82 us, BW: 19.89 GB/s (RDMA), 19.88 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 36, RDMA chunk 20, transmit: 47285.00 us, notify: 257.68 us, BW: 2.48 GB/s (RDMA), 2.47 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 36, RDMA chunk 24, transmit: 31964.00 us, notify: 732.58 us, BW: 3.66 GB/s (RDMA), 3.66 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 36, RDMA chunk 28, transmit: 45466.00 us, notify: 260.02 us, BW: 2.57 GB/s (RDMA), 2.57 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 36, RDMA chunk 32, transmit: 6062.00 us, notify: 453.96 us, BW: 19.31 GB/s (RDMA), 19.30 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 40, RDMA chunk 4, transmit: 45341.00 us, notify: 374.20 us, BW: 2.58 GB/s (RDMA), 2.58 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 40, RDMA chunk 8, transmit: 30714.00 us, notify: 1047.00 us, BW: 3.81 GB/s (RDMA), 3.81 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 40, RDMA chunk 12, transmit: 45498.00 us, notify: 260.58 us, BW: 2.57 GB/s (RDMA), 2.57 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 40, RDMA chunk 16, transmit: 5917.00 us, notify: 648.52 us, BW: 19.78 GB/s (RDMA), 19.78 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 40, RDMA chunk 20, transmit: 47266.00 us, notify: 258.43 us, BW: 2.48 GB/s (RDMA), 2.48 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 40, RDMA chunk 24, transmit: 31959.00 us, notify: 830.76 us, BW: 3.66 GB/s (RDMA), 3.66 GB/s (NVL) 
+Timeout (0:00:45)!
+Thread 0x0000ffffb11f7d00 (most recent call first):
+  File "/home/f00955680/metax_dev/venv-maca-py312/lib/python3.12/site-packages/torch/cuda/__init__.py", line 1058 in synchronize
+  File "/home/f00955680/uccl-ep-xpu-integration/ep/bench/utils.py", line 488 in bench_kineto
+  File "test_internode.py", line 434 in test_main
+  File "test_internode.py", line 578 in test_loop
+  File "test_internode.py", line 680 in <module>
+  File "<frozen runpy>", line 88 in _run_code
+  File "<frozen runpy>", line 98 in _run_module_code
+  File "<frozen runpy>", line 287 in run_path
+  File "/home/f00955680/metax_dev/urma_after_kernel_20261029/diag/bench_pair_2274e1bc/launcher.py", line 78 in <module>
+[tuning] SMs 24, NVL chunk 40, RDMA chunk 28, transmit: 45469.00 us, notify: 258.19 us, BW: 2.57 GB/s (RDMA), 2.57 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 40, RDMA chunk 32, transmit: 5999.00 us, notify: 468.77 us, BW: 19.51 GB/s (RDMA), 19.50 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 44, RDMA chunk 4, transmit: 45346.00 us, notify: 330.92 us, BW: 2.58 GB/s (RDMA), 2.58 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 44, RDMA chunk 8, transmit: 30552.00 us, notify: 1257.00 us, BW: 3.83 GB/s (RDMA), 3.83 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 44, RDMA chunk 12, transmit: 45495.00 us, notify: 257.80 us, BW: 2.57 GB/s (RDMA), 2.57 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 44, RDMA chunk 16, transmit: 5900.00 us, notify: 702.76 us, BW: 19.84 GB/s (RDMA), 19.83 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 44, RDMA chunk 20, transmit: 47275.00 us, notify: 257.92 us, BW: 2.48 GB/s (RDMA), 2.48 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 44, RDMA chunk 24, transmit: 31917.00 us, notify: 772.91 us, BW: 3.67 GB/s (RDMA), 3.67 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 44, RDMA chunk 28, transmit: 45468.00 us, notify: 256.37 us, BW: 2.57 GB/s (RDMA), 2.57 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 44, RDMA chunk 32, transmit: 6011.00 us, notify: 453.06 us, BW: 19.48 GB/s (RDMA), 19.47 GB/s (NVL) 
+[tuning] Best dispatch (BF16): SMs 24, NVL chunk 16, RDMA chunk 16, transmit: 5883.00 us, notify: 673.91 us, BW: 19.90 GB/s (RDMA), 19.89 GB/s (NVL)
+
+[tuning] SMs 24, NVL chunk 1, RDMA chunk 12, transmit: 45809.00 us, notify: 261.26 us, BW: 2.56 GB/s (RDMA), 2.55 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 1, RDMA chunk 16, transmit: 8379.00 us, notify: 256.73 us, BW: 13.97 GB/s (RDMA), 13.96 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 1, RDMA chunk 20, transmit: 47690.00 us, notify: 259.98 us, BW: 2.45 GB/s (RDMA), 2.45 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 1, RDMA chunk 24, transmit: 32837.00 us, notify: 331.71 us, BW: 3.57 GB/s (RDMA), 3.56 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 1, RDMA chunk 28, transmit: 46091.00 us, notify: 260.21 us, BW: 2.54 GB/s (RDMA), 2.54 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 1, RDMA chunk 32, transmit: 8842.00 us, notify: 254.91 us, BW: 13.24 GB/s (RDMA), 13.23 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 2, RDMA chunk 12, transmit: 45770.00 us, notify: 260.94 us, BW: 2.56 GB/s (RDMA), 2.56 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 2, RDMA chunk 16, transmit: 7423.00 us, notify: 259.62 us, BW: 15.77 GB/s (RDMA), 15.76 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 2, RDMA chunk 20, transmit: 47661.00 us, notify: 261.03 us, BW: 2.46 GB/s (RDMA), 2.46 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 2, RDMA chunk 24, transmit: 32793.00 us, notify: 327.36 us, BW: 3.57 GB/s (RDMA), 3.57 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 2, RDMA chunk 28, transmit: 46019.00 us, notify: 264.32 us, BW: 2.54 GB/s (RDMA), 2.54 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 2, RDMA chunk 32, transmit: 7863.00 us, notify: 255.78 us, BW: 14.89 GB/s (RDMA), 14.88 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 3, RDMA chunk 12, transmit: 45768.00 us, notify: 260.08 us, BW: 2.56 GB/s (RDMA), 2.56 GB/s (NVL) 
+Timeout (0:00:45)!
+Thread 0x0000ffffb11f7d00 (most recent call first):
+  File "/home/f00955680/metax_dev/venv-maca-py312/lib/python3.12/site-packages/torch/cuda/__init__.py", line 1058 in synchronize
+  File "/home/f00955680/uccl-ep-xpu-integration/ep/bench/utils.py", line 488 in bench_kineto
+  File "test_internode.py", line 503 in test_main
+  File "test_internode.py", line 578 in test_loop
+  File "test_internode.py", line 680 in <module>
+  File "<frozen runpy>", line 88 in _run_code
+  File "<frozen runpy>", line 98 in _run_module_code
+  File "<frozen runpy>", line 287 in run_path
+  File "/home/f00955680/metax_dev/urma_after_kernel_20261029/diag/bench_pair_2274e1bc/launcher.py", line 78 in <module>
+[tuning] SMs 24, NVL chunk 3, RDMA chunk 16, transmit: 7077.00 us, notify: 263.48 us, BW: 16.54 GB/s (RDMA), 16.53 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 3, RDMA chunk 20, transmit: 47682.00 us, notify: 258.39 us, BW: 2.46 GB/s (RDMA), 2.45 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 3, RDMA chunk 24, transmit: 32816.00 us, notify: 331.71 us, BW: 3.57 GB/s (RDMA), 3.57 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 3, RDMA chunk 28, transmit: 46030.00 us, notify: 259.35 us, BW: 2.54 GB/s (RDMA), 2.54 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 3, RDMA chunk 32, transmit: 7499.00 us, notify: 254.28 us, BW: 15.61 GB/s (RDMA), 15.60 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 4, RDMA chunk 12, transmit: 45771.00 us, notify: 260.03 us, BW: 2.56 GB/s (RDMA), 2.56 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 4, RDMA chunk 16, transmit: 7068.00 us, notify: 259.63 us, BW: 16.56 GB/s (RDMA), 16.55 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 4, RDMA chunk 20, transmit: 47681.00 us, notify: 261.92 us, BW: 2.46 GB/s (RDMA), 2.45 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 4, RDMA chunk 24, transmit: 32831.00 us, notify: 349.06 us, BW: 3.57 GB/s (RDMA), 3.56 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 4, RDMA chunk 28, transmit: 46013.00 us, notify: 257.64 us, BW: 2.54 GB/s (RDMA), 2.54 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 4, RDMA chunk 32, transmit: 7443.00 us, notify: 255.04 us, BW: 15.73 GB/s (RDMA), 15.72 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 5, RDMA chunk 12, transmit: 45802.00 us, notify: 258.88 us, BW: 2.56 GB/s (RDMA), 2.55 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 5, RDMA chunk 16, transmit: 6915.00 us, notify: 262.49 us, BW: 16.93 GB/s (RDMA), 16.92 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 5, RDMA chunk 20, transmit: 47684.00 us, notify: 258.06 us, BW: 2.46 GB/s (RDMA), 2.45 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 5, RDMA chunk 24, transmit: 32782.00 us, notify: 397.32 us, BW: 3.57 GB/s (RDMA), 3.57 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 5, RDMA chunk 28, transmit: 46038.00 us, notify: 263.88 us, BW: 2.54 GB/s (RDMA), 2.54 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 5, RDMA chunk 32, transmit: 7262.00 us, notify: 256.50 us, BW: 16.12 GB/s (RDMA), 16.11 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 6, RDMA chunk 12, transmit: 45772.00 us, notify: 258.22 us, BW: 2.56 GB/s (RDMA), 2.56 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 6, RDMA chunk 16, transmit: 6842.00 us, notify: 259.76 us, BW: 17.11 GB/s (RDMA), 17.10 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 6, RDMA chunk 20, transmit: 47709.00 us, notify: 259.62 us, BW: 2.45 GB/s (RDMA), 2.45 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 6, RDMA chunk 24, transmit: 32776.00 us, notify: 351.23 us, BW: 3.57 GB/s (RDMA), 3.57 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 6, RDMA chunk 28, transmit: 46039.00 us, notify: 259.23 us, BW: 2.54 GB/s (RDMA), 2.54 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 6, RDMA chunk 32, transmit: 7307.00 us, notify: 257.74 us, BW: 16.02 GB/s (RDMA), 16.01 GB/s (NVL) 
+Timeout (0:00:45)!
+Thread 0x0000ffffb11f7d00 (most recent call first):
+  File "/home/f00955680/metax_dev/venv-maca-py312/lib/python3.12/site-packages/torch/cuda/__init__.py", line 1058 in synchronize
+  File "/home/f00955680/uccl-ep-xpu-integration/ep/bench/utils.py", line 488 in bench_kineto
+  File "test_internode.py", line 503 in test_main
+  File "test_internode.py", line 578 in test_loop
+  File "test_internode.py", line 680 in <module>
+  File "<frozen runpy>", line 88 in _run_code
+  File "<frozen runpy>", line 98 in _run_module_code
+  File "<frozen runpy>", line 287 in run_path
+  File "/home/f00955680/metax_dev/urma_after_kernel_20261029/diag/bench_pair_2274e1bc/launcher.py", line 78 in <module>
+[tuning] SMs 24, NVL chunk 7, RDMA chunk 12, transmit: 45805.00 us, notify: 256.49 us, BW: 2.56 GB/s (RDMA), 2.55 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 7, RDMA chunk 16, transmit: 6762.00 us, notify: 256.19 us, BW: 17.31 GB/s (RDMA), 17.30 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 7, RDMA chunk 20, transmit: 47693.00 us, notify: 258.15 us, BW: 2.45 GB/s (RDMA), 2.45 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 7, RDMA chunk 24, transmit: 32837.00 us, notify: 312.65 us, BW: 3.57 GB/s (RDMA), 3.56 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 7, RDMA chunk 28, transmit: 46027.00 us, notify: 257.19 us, BW: 2.54 GB/s (RDMA), 2.54 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 7, RDMA chunk 32, transmit: 7204.00 us, notify: 257.36 us, BW: 16.25 GB/s (RDMA), 16.24 GB/s (NVL) 
+[tuning] Best combine: SMs 24, NVL chunk 7, RDMA chunk 16, transmit: 6762.00 us, notify: 256.19 us, BW: 17.31 GB/s (RDMA), 17.30 GB/s (NVL)
+
+
+PHASE=SKIP_SHARED_BARRIER_SWEEP RANK=1
+worker1:284151:284151 [0] MCCL INFO comm 0xaaacf4a2eff0 rank 1 nranks 2 macaDev 0 busId a1000 - Destroy COMPLETE
+worker1:284151:284151 [0] MCCL INFO comm 0xaaacf77edfd0 rank 1 nranks 2 macaDev 0 busId a1000 - Destroy COMPLETE
+PHASE=BENCH_SCRIPT_DONE RANK=1
+worker1:284151:284151 [0] MCCL INFO user has destroyed the communicators
+UCCL_EXIT_ACK_OK node_rank=1

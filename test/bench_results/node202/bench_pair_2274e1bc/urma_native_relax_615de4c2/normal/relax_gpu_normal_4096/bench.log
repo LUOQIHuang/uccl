@@ -1,0 +1,375 @@
+/home/f00955680/metax_dev/urma_after_kernel_20261029/diag/torchrun_cpu_exit_a9c40b17/torchrun_exit_guard.py:8: UserWarning: Could not find flash_attn package installed. Please try to install flash_attn whl pacakge using pip command and make sure it can be imported properly
+  from torch.distributed import run
+PHASE=PYTHON_LAUNCHER_BEGIN
+MCRUNTIME_PRELOAD_OK
+/home/f00955680/metax_dev/urma_after_kernel_20261029/diag/bench_safety_c2a74d91/launcher.py:9: UserWarning: Could not find flash_attn package installed. Please try to install flash_attn whl pacakge using pip command and make sure it can be imported properly
+  import torch
+EXTENSION: /home/f00955680/metax_dev/urma_after_kernel_20261029/diag/ep_native_relax_from_204_4f3b30a6/module/ep.abi3.so
+BUFFER_MODULE: /home/f00955680/uccl-ep-xpu-integration/ep/bench/buffer.py
+URMA_LIB_MAPS: ['/home/f00955680/metax_dev/urma_after_kernel_20261029/diag/umdk_private_618957c3/lib/liburma.so.0.0.3']
+BENCH_SAFE_UTILS_LOADED lazy_init=1
+RDMA_HINT_BYTES: 403243776
+PHASE=BENCH_SCRIPT_BEGIN RANK=0
+[buffer] num_nvlink_bytes=0.12 GB, num_rdma_bytes=0.48 GB
+PHASE=BUFFER_INIT_BEGIN RANK=0
+PHASE=ALL_GATHER_OBJECT_1_BEGIN RANK=0
+Wrong string: 
+Wrong string: 
+PHASE=ALL_GATHER_OBJECT_1_DONE RANK=0
+PHASE=ALL_GATHER_OBJECT_2_BEGIN RANK=0
+PHASE=ALL_GATHER_OBJECT_2_DONE RANK=0
+[DEBUG] IP distribution across 2 ranks:
+[DEBUG]   141.61.17.202: 1 ranks
+[DEBUG]   141.61.17.204: 1 ranks
+Registered proxies for device 0 (high-throughput mode)
+[URMA] rank=1 thread=3 using device 2/6: udmac0d1e2
+[URMA] rank=1 thread=0 using device 2/6: udmac0d1e2
+[URMA] rank=1 thread=1 using device 2/6: udmac0d1e2
+[URMA] rank=1 thread=2 using device 2/6: udmac0d1e2
+URMA_TRACE_BEGIN tid=152377 va=0xfffa68013000 mod4096=0 len=8192 access=6 gpu=0
+URMA_TRACE_DONE tid=152377 va=0xfffa68013000 access=6 ok=1 errno=0
+URMA_TRACE_BEGIN tid=152375 va=0xfffa7001e000 mod4096=0 len=8192 access=6 gpu=0
+URMA_TRACE_DONE tid=152375 va=0xfffa7001e000 access=6 ok=1 errno=0
+URMA_TRACE_BEGIN tid=152375 va=0xfffa70022000 mod4096=0 len=64 access=14 gpu=0
+URMA_TRACE_DONE tid=152375 va=0xfffa70022000 access=14 ok=1 errno=0
+[URMA] transport initialized (trans_mode=2)
+URMA_TRACE_BEGIN tid=152374 va=0xfffa78037000 mod4096=0 len=8192 access=6 gpu=0
+URMA_TRACE_DONE tid=152374 va=0xfffa78037000 access=6 ok=1 errno=0
+URMA_TRACE_BEGIN tid=152374 va=0xfffa7803a000 mod4096=0 len=64 access=14 gpu=0
+URMA_TRACE_DONE tid=152374 va=0xfffa7803a000 access=14 ok=1 errno=0
+[URMA] transport initialized (trans_mode=2)
+URMA_TRACE_BEGIN tid=152376 va=0xfffa74022000 mod4096=0 len=8192 access=6 gpu=0
+URMA_TRACE_DONE tid=152376 va=0xfffa74022000 access=6 ok=1 errno=0
+URMA_TRACE_BEGIN tid=152375 va=0xa04c00000 mod4096=0 len=483892608 access=6 gpu=1
+URMA_TRACE_DONE tid=152375 va=0xa04c00000 access=6 ok=1 errno=0
+URMA_TRACE_BEGIN tid=152377 va=0xfffa68026000 mod4096=0 len=64 access=14 gpu=0
+URMA_TRACE_DONE tid=152377 va=0xfffa68026000 access=14 ok=1 errno=0
+[URMA] transport initialized (trans_mode=2)
+URMA_TRACE_BEGIN tid=152374 va=0xa24a04000 mod4096=0 len=81960 access=14 gpu=1
+URMA_TRACE_DONE tid=152374 va=0xa24a04000 access=14 ok=1 errno=0
+URMA_TRACE_BEGIN tid=152376 va=0xfffa74026000 mod4096=0 len=64 access=14 gpu=0
+URMA_TRACE_DONE tid=152376 va=0xfffa74026000 access=14 ok=1 errno=0
+[URMA] transport initialized (trans_mode=2)
+[Proxy] UCCL_EP_TRANSPORT=urma initialized for rank 0 thread 2
+[Proxy] UCCL_EP_TRANSPORT=urma initialized for rank 0 thread 0
+[Proxy] UCCL_EP_TRANSPORT=urma initialized for rank 0 thread 3
+[Proxy] UCCL_EP_TRANSPORT=urma initialized for rank 0 thread 1
+PHASE=ALL_GATHER_OBJECT_3_BEGIN RANK=0
+PHASE=ALL_GATHER_OBJECT_3_DONE RANK=0
+PHASE=ALL_GATHER_OBJECT_4_BEGIN RANK=0
+PHASE=ALL_GATHER_OBJECT_4_DONE RANK=0
+PHASE=ALL_GATHER_OBJECT_5_BEGIN RANK=0
+PHASE=ALL_GATHER_OBJECT_5_DONE RANK=0
+PHASE=BUFFER_INIT_DONE RANK=0
+Testing with seed 0 ...
+[config] num_tokens=4096, hidden=7168, num_topk_groups=2, num_topk=8
+[layout] Kernel performance: 0.176 ms
+
+[testing] Running with BF16, without top-k (async=False, previous=False) ...
+Timeout (0:00:45)!
+Thread 0x0000ffffae3d9020 (most recent call first):
+  File "/home/f00955680/uccl-ep-xpu-integration/ep/bench/buffer.py", line 1638 in internode_dispatch
+  File "/home/f00955680/uccl-ep-xpu-integration/ep/bench/buffer.py", line 1022 in dispatch
+  File "test_internode.py", line 246 in test_main
+  File "test_internode.py", line 578 in test_loop
+  File "test_internode.py", line 680 in <module>
+  File "<frozen runpy>", line 88 in _run_code
+  File "<frozen runpy>", line 98 in _run_module_code
+  File "<frozen runpy>", line 287 in run_path
+  File "/home/f00955680/metax_dev/urma_after_kernel_20261029/diag/bench_safety_c2a74d91/launcher.py", line 59 in <module>
+Timeout (0:00:45)!
+Thread 0x0000ffffae3d9020 (most recent call first):
+  File "/home/f00955680/uccl-ep-xpu-integration/ep/bench/buffer.py", line 1723 in internode_dispatch
+  File "/home/f00955680/uccl-ep-xpu-integration/ep/bench/buffer.py", line 1022 in dispatch
+  File "test_internode.py", line 246 in test_main
+  File "test_internode.py", line 578 in test_loop
+  File "test_internode.py", line 680 in <module>
+  File "<frozen runpy>", line 88 in _run_code
+  File "<frozen runpy>", line 98 in _run_module_code
+  File "<frozen runpy>", line 287 in run_path
+  File "/home/f00955680/metax_dev/urma_after_kernel_20261029/diag/bench_safety_c2a74d91/launcher.py", line 59 in <module>
+Timeout (0:00:45)!
+Thread 0x0000ffffae3d9020 (most recent call first):
+  File "/home/f00955680/uccl-ep-xpu-integration/ep/bench/buffer.py", line 1533 in internode_dispatch
+  File "/home/f00955680/uccl-ep-xpu-integration/ep/bench/buffer.py", line 1022 in dispatch
+  File "test_internode.py", line 339 in test_main
+  File "test_internode.py", line 578 in test_loop
+  File "test_internode.py", line 680 in <module>
+  File "<frozen runpy>", line 88 in _run_code
+  File "<frozen runpy>", line 98 in _run_module_code
+  File "<frozen runpy>", line 287 in run_path
+  File "/home/f00955680/metax_dev/urma_after_kernel_20261029/diag/bench_safety_c2a74d91/launcher.py", line 59 in <module>
+[testing] Running with BF16, with top-k (async=False, previous=False) ...
+[testing] Running with BF16, without top-k (async=False, previous=False) ...
+[testing] Running with BF16, with top-k (async=False, previous=False) ...
+[testing] Running with FP8, without top-k (async=False, previous=False) ...
+[testing] Running with FP8, with top-k (async=False, previous=False) ...
+[testing] Running with BF16, without top-k (async=True, previous=False) ...
+[testing] Running with BF16, with top-k (async=True, previous=False) ...
+[testing] Running with BF16, without top-k (async=True, previous=False) ...
+[testing] Running with BF16, with top-k (async=True, previous=False) ...
+[testing] Running with FP8, without top-k (async=True, previous=False) ...
+[testing] Running with FP8, with top-k (async=True, previous=False) ...
+[testing] Running with BF16, without top-k (async=False, previous=True) ...
+[testing] Running with BF16, with top-k (async=False, previous=True) ...
+[testing] Running with BF16, without top-k (async=False, previous=True) ...
+[testing] Running with BF16, with top-k (async=False, previous=True) ...
+[testing] Running with FP8, without top-k (async=False, previous=True) ...
+[testing] Running with FP8, with top-k (async=False, previous=True) ...
+[testing] Running with BF16, without top-k (async=True, previous=True) ...
+[testing] Running with BF16, with top-k (async=True, previous=True) ...
+[testing] Running with BF16, without top-k (async=True, previous=True) ...
+[testing] Running with BF16, with top-k (async=True, previous=True) ...
+[testing] Running with FP8, without top-k (async=True, previous=True) ...
+[testing] Running with FP8, with top-k (async=True, previous=True) ...
+
+[rank0]:[W1030 21:07:00.774202330 ProcessGroupNCCL.cpp:4883] [PG ID 0 PG GUID 0 Rank 0]  using GPU 0 to perform barrier as devices used by this process are currently unknown. This can potentially cause a hang if this rank to GPU mapping is incorrect. Specify device_ids in barrier() to force use of a particular device, or call init_process_group() with a device_id.
+[tuning] SMs 24, NVL chunk 4, RDMA chunk 4, transmit: 5488.00 us, notify: 217.33 us, BW: 10.99 GB/s (RDMA), 10.99 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 4, RDMA chunk 8, transmit: 4160.00 us, notify: 211.93 us, BW: 14.49 GB/s (RDMA), 14.50 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 4, RDMA chunk 12, transmit: 4028.00 us, notify: 214.86 us, BW: 14.97 GB/s (RDMA), 14.97 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 4, RDMA chunk 16, transmit: 3890.00 us, notify: 217.58 us, BW: 15.50 GB/s (RDMA), 15.51 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 4, RDMA chunk 20, transmit: 3903.00 us, notify: 218.41 us, BW: 15.45 GB/s (RDMA), 15.45 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 4, RDMA chunk 24, transmit: 3886.00 us, notify: 218.13 us, BW: 15.51 GB/s (RDMA), 15.52 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 4, RDMA chunk 28, transmit: 3873.00 us, notify: 223.33 us, BW: 15.57 GB/s (RDMA), 15.57 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 4, RDMA chunk 32, transmit: 3800.00 us, notify: 260.43 us, BW: 15.87 GB/s (RDMA), 15.87 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 8, RDMA chunk 4, transmit: 5474.00 us, notify: 214.90 us, BW: 11.01 GB/s (RDMA), 11.02 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 8, RDMA chunk 8, transmit: 4164.00 us, notify: 215.15 us, BW: 14.48 GB/s (RDMA), 14.49 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 8, RDMA chunk 12, transmit: 4019.00 us, notify: 218.16 us, BW: 15.00 GB/s (RDMA), 15.01 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 8, RDMA chunk 16, transmit: 3899.00 us, notify: 221.38 us, BW: 15.46 GB/s (RDMA), 15.47 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 8, RDMA chunk 20, transmit: 3914.00 us, notify: 220.72 us, BW: 15.40 GB/s (RDMA), 15.41 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 8, RDMA chunk 24, transmit: 3887.00 us, notify: 222.81 us, BW: 15.51 GB/s (RDMA), 15.52 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 8, RDMA chunk 28, transmit: 3866.00 us, notify: 216.74 us, BW: 15.59 GB/s (RDMA), 15.60 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 8, RDMA chunk 32, transmit: 3798.00 us, notify: 245.11 us, BW: 15.87 GB/s (RDMA), 15.88 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 12, RDMA chunk 4, transmit: 5475.00 us, notify: 215.40 us, BW: 11.01 GB/s (RDMA), 11.02 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 12, RDMA chunk 8, transmit: 4175.00 us, notify: 216.48 us, BW: 14.44 GB/s (RDMA), 14.45 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 12, RDMA chunk 12, transmit: 4014.00 us, notify: 215.97 us, BW: 15.02 GB/s (RDMA), 15.03 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 12, RDMA chunk 16, transmit: 3896.00 us, notify: 225.34 us, BW: 15.47 GB/s (RDMA), 15.48 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 12, RDMA chunk 20, transmit: 3916.00 us, notify: 221.18 us, BW: 15.40 GB/s (RDMA), 15.40 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 12, RDMA chunk 24, transmit: 3884.00 us, notify: 224.80 us, BW: 15.52 GB/s (RDMA), 15.53 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 12, RDMA chunk 28, transmit: 3866.00 us, notify: 224.96 us, BW: 15.59 GB/s (RDMA), 15.60 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 12, RDMA chunk 32, transmit: 3816.00 us, notify: 241.61 us, BW: 15.80 GB/s (RDMA), 15.81 GB/s (NVL) 
+Timeout (0:00:45)!
+Thread 0x0000ffffae3d9020 (most recent call first):
+  File "/home/f00955680/metax_dev/venv-maca-py312/lib/python3.12/site-packages/torch/cuda/__init__.py", line 1058 in synchronize
+  File "/home/f00955680/metax_dev/urma_after_kernel_20261029/diag/bench_safety_c2a74d91/ep/bench/utils.py", line 496 in bench_kineto
+  File "test_internode.py", line 434 in test_main
+  File "test_internode.py", line 578 in test_loop
+  File "test_internode.py", line 680 in <module>
+  File "<frozen runpy>", line 88 in _run_code
+  File "<frozen runpy>", line 98 in _run_module_code
+  File "<frozen runpy>", line 287 in run_path
+  File "/home/f00955680/metax_dev/urma_after_kernel_20261029/diag/bench_safety_c2a74d91/launcher.py", line 59 in <module>
+[tuning] SMs 24, NVL chunk 16, RDMA chunk 4, transmit: 5486.00 us, notify: 215.95 us, BW: 10.99 GB/s (RDMA), 11.00 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 16, RDMA chunk 8, transmit: 4178.00 us, notify: 215.62 us, BW: 14.43 GB/s (RDMA), 14.44 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 16, RDMA chunk 12, transmit: 4003.00 us, notify: 216.91 us, BW: 15.06 GB/s (RDMA), 15.07 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 16, RDMA chunk 16, transmit: 3914.00 us, notify: 221.73 us, BW: 15.40 GB/s (RDMA), 15.41 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 16, RDMA chunk 20, transmit: 3921.00 us, notify: 221.79 us, BW: 15.38 GB/s (RDMA), 15.38 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 16, RDMA chunk 24, transmit: 3876.00 us, notify: 225.53 us, BW: 15.55 GB/s (RDMA), 15.56 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 16, RDMA chunk 28, transmit: 3855.00 us, notify: 228.12 us, BW: 15.64 GB/s (RDMA), 15.65 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 16, RDMA chunk 32, transmit: 3829.00 us, notify: 250.12 us, BW: 15.75 GB/s (RDMA), 15.75 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 20, RDMA chunk 4, transmit: 5468.00 us, notify: 214.74 us, BW: 11.03 GB/s (RDMA), 11.03 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 20, RDMA chunk 8, transmit: 4155.00 us, notify: 218.09 us, BW: 14.51 GB/s (RDMA), 14.52 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 20, RDMA chunk 12, transmit: 4021.00 us, notify: 215.26 us, BW: 14.99 GB/s (RDMA), 15.00 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 20, RDMA chunk 16, transmit: 3893.00 us, notify: 217.95 us, BW: 15.49 GB/s (RDMA), 15.49 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 20, RDMA chunk 20, transmit: 3915.00 us, notify: 220.49 us, BW: 15.40 GB/s (RDMA), 15.41 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 20, RDMA chunk 24, transmit: 3874.00 us, notify: 226.32 us, BW: 15.56 GB/s (RDMA), 15.57 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 20, RDMA chunk 28, transmit: 3855.00 us, notify: 229.01 us, BW: 15.64 GB/s (RDMA), 15.65 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 20, RDMA chunk 32, transmit: 3823.00 us, notify: 251.64 us, BW: 15.77 GB/s (RDMA), 15.78 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 24, RDMA chunk 4, transmit: 5485.00 us, notify: 215.53 us, BW: 10.99 GB/s (RDMA), 11.00 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 24, RDMA chunk 8, transmit: 4146.00 us, notify: 215.66 us, BW: 14.54 GB/s (RDMA), 14.55 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 24, RDMA chunk 12, transmit: 4007.00 us, notify: 215.53 us, BW: 15.05 GB/s (RDMA), 15.05 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 24, RDMA chunk 16, transmit: 3893.00 us, notify: 220.64 us, BW: 15.49 GB/s (RDMA), 15.49 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 24, RDMA chunk 20, transmit: 3919.00 us, notify: 216.78 us, BW: 15.38 GB/s (RDMA), 15.39 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 24, RDMA chunk 24, transmit: 3890.00 us, notify: 217.36 us, BW: 15.50 GB/s (RDMA), 15.51 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 24, RDMA chunk 28, transmit: 3873.00 us, notify: 222.99 us, BW: 15.57 GB/s (RDMA), 15.57 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 24, RDMA chunk 32, transmit: 3811.00 us, notify: 232.01 us, BW: 15.82 GB/s (RDMA), 15.83 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 28, RDMA chunk 4, transmit: 5469.00 us, notify: 215.44 us, BW: 11.02 GB/s (RDMA), 11.03 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 28, RDMA chunk 8, transmit: 4181.00 us, notify: 213.77 us, BW: 14.42 GB/s (RDMA), 14.43 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 28, RDMA chunk 12, transmit: 4020.00 us, notify: 217.20 us, BW: 15.00 GB/s (RDMA), 15.00 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 28, RDMA chunk 16, transmit: 3913.00 us, notify: 219.34 us, BW: 15.41 GB/s (RDMA), 15.41 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 28, RDMA chunk 20, transmit: 3916.00 us, notify: 219.60 us, BW: 15.40 GB/s (RDMA), 15.40 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 28, RDMA chunk 24, transmit: 3880.00 us, notify: 220.48 us, BW: 15.54 GB/s (RDMA), 15.55 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 28, RDMA chunk 28, transmit: 3865.00 us, notify: 228.81 us, BW: 15.60 GB/s (RDMA), 15.61 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 28, RDMA chunk 32, transmit: 3797.00 us, notify: 245.63 us, BW: 15.88 GB/s (RDMA), 15.89 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 32, RDMA chunk 4, transmit: 5465.00 us, notify: 215.77 us, BW: 11.03 GB/s (RDMA), 11.04 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 32, RDMA chunk 8, transmit: 4181.00 us, notify: 215.01 us, BW: 14.42 GB/s (RDMA), 14.43 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 32, RDMA chunk 12, transmit: 4024.00 us, notify: 215.48 us, BW: 14.98 GB/s (RDMA), 14.99 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 32, RDMA chunk 16, transmit: 3894.00 us, notify: 221.34 us, BW: 15.48 GB/s (RDMA), 15.49 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 32, RDMA chunk 20, transmit: 3908.00 us, notify: 223.58 us, BW: 15.43 GB/s (RDMA), 15.43 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 32, RDMA chunk 24, transmit: 3882.00 us, notify: 221.78 us, BW: 15.53 GB/s (RDMA), 15.54 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 32, RDMA chunk 28, transmit: 3877.00 us, notify: 218.62 us, BW: 15.55 GB/s (RDMA), 15.56 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 32, RDMA chunk 32, transmit: 3814.00 us, notify: 251.15 us, BW: 15.81 GB/s (RDMA), 15.82 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 36, RDMA chunk 4, transmit: 5489.00 us, notify: 217.99 us, BW: 10.98 GB/s (RDMA), 10.99 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 36, RDMA chunk 8, transmit: 4173.00 us, notify: 214.38 us, BW: 14.45 GB/s (RDMA), 14.45 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 36, RDMA chunk 12, transmit: 4023.00 us, notify: 214.98 us, BW: 14.99 GB/s (RDMA), 14.99 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 36, RDMA chunk 16, transmit: 3911.00 us, notify: 212.63 us, BW: 15.42 GB/s (RDMA), 15.42 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 36, RDMA chunk 20, transmit: 3905.00 us, notify: 217.35 us, BW: 15.44 GB/s (RDMA), 15.45 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 36, RDMA chunk 24, transmit: 3883.00 us, notify: 224.10 us, BW: 15.53 GB/s (RDMA), 15.53 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 36, RDMA chunk 28, transmit: 3866.00 us, notify: 220.94 us, BW: 15.59 GB/s (RDMA), 15.60 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 36, RDMA chunk 32, transmit: 3798.00 us, notify: 239.71 us, BW: 15.87 GB/s (RDMA), 15.88 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 40, RDMA chunk 4, transmit: 5464.00 us, notify: 216.81 us, BW: 11.03 GB/s (RDMA), 11.04 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 40, RDMA chunk 8, transmit: 4158.00 us, notify: 216.14 us, BW: 14.50 GB/s (RDMA), 14.51 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 40, RDMA chunk 12, transmit: 4028.00 us, notify: 214.65 us, BW: 14.97 GB/s (RDMA), 14.97 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 40, RDMA chunk 16, transmit: 3896.00 us, notify: 213.21 us, BW: 15.47 GB/s (RDMA), 15.48 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 40, RDMA chunk 20, transmit: 3905.00 us, notify: 218.54 us, BW: 15.44 GB/s (RDMA), 15.45 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 40, RDMA chunk 24, transmit: 3868.00 us, notify: 219.66 us, BW: 15.59 GB/s (RDMA), 15.59 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 40, RDMA chunk 28, transmit: 3870.00 us, notify: 221.30 us, BW: 15.58 GB/s (RDMA), 15.59 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 40, RDMA chunk 32, transmit: 3830.00 us, notify: 229.34 us, BW: 15.74 GB/s (RDMA), 15.75 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 44, RDMA chunk 4, transmit: 5491.00 us, notify: 215.96 us, BW: 10.98 GB/s (RDMA), 10.99 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 44, RDMA chunk 8, transmit: 4175.00 us, notify: 215.76 us, BW: 14.44 GB/s (RDMA), 14.45 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 44, RDMA chunk 12, transmit: 4019.00 us, notify: 215.95 us, BW: 15.00 GB/s (RDMA), 15.01 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 44, RDMA chunk 16, transmit: 3904.00 us, notify: 217.75 us, BW: 15.44 GB/s (RDMA), 15.45 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 44, RDMA chunk 20, transmit: 3891.00 us, notify: 219.20 us, BW: 15.49 GB/s (RDMA), 15.50 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 44, RDMA chunk 24, transmit: 3875.00 us, notify: 221.87 us, BW: 15.56 GB/s (RDMA), 15.57 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 44, RDMA chunk 28, transmit: 3855.00 us, notify: 218.05 us, BW: 15.64 GB/s (RDMA), 15.65 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 44, RDMA chunk 32, transmit: 3819.00 us, notify: 241.00 us, BW: 15.79 GB/s (RDMA), 15.79 GB/s (NVL) 
+[tuning] Best dispatch (FP8): SMs 24, NVL chunk 28, RDMA chunk 32, transmit: 3797.00 us, notify: 245.63 us, BW: 15.88 GB/s (RDMA), 15.89 GB/s (NVL)
+
+[tuning] SMs 24, NVL chunk 4, RDMA chunk 4, transmit: 8329.00 us, notify: 217.10 us, BW: 14.04 GB/s (RDMA), 14.05 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 4, RDMA chunk 8, transmit: 7572.00 us, notify: 215.66 us, BW: 15.44 GB/s (RDMA), 15.45 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 4, RDMA chunk 12, transmit: 7482.00 us, notify: 216.44 us, BW: 15.63 GB/s (RDMA), 15.64 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 4, RDMA chunk 16, transmit: 7265.00 us, notify: 222.34 us, BW: 16.09 GB/s (RDMA), 16.10 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 4, RDMA chunk 20, transmit: 7346.00 us, notify: 227.41 us, BW: 15.92 GB/s (RDMA), 15.92 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 4, RDMA chunk 24, transmit: 7222.00 us, notify: 249.12 us, BW: 16.19 GB/s (RDMA), 16.20 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 4, RDMA chunk 28, transmit: 7253.00 us, notify: 261.16 us, BW: 16.12 GB/s (RDMA), 16.13 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 4, RDMA chunk 32, transmit: 7072.00 us, notify: 252.95 us, BW: 16.53 GB/s (RDMA), 16.54 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 8, RDMA chunk 4, transmit: 8332.00 us, notify: 213.52 us, BW: 14.03 GB/s (RDMA), 14.04 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 8, RDMA chunk 8, transmit: 7553.00 us, notify: 216.65 us, BW: 15.48 GB/s (RDMA), 15.49 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 8, RDMA chunk 12, transmit: 7461.00 us, notify: 219.65 us, BW: 15.67 GB/s (RDMA), 15.68 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 8, RDMA chunk 16, transmit: 7282.00 us, notify: 230.93 us, BW: 16.06 GB/s (RDMA), 16.06 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 8, RDMA chunk 20, transmit: 7341.00 us, notify: 230.49 us, BW: 15.93 GB/s (RDMA), 15.94 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 8, RDMA chunk 24, transmit: 7217.00 us, notify: 253.62 us, BW: 16.20 GB/s (RDMA), 16.21 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 8, RDMA chunk 28, transmit: 7241.00 us, notify: 252.05 us, BW: 16.15 GB/s (RDMA), 16.16 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 8, RDMA chunk 32, transmit: 7106.00 us, notify: 249.19 us, BW: 16.45 GB/s (RDMA), 16.46 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 12, RDMA chunk 4, transmit: 8318.00 us, notify: 213.46 us, BW: 14.06 GB/s (RDMA), 14.06 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 12, RDMA chunk 8, transmit: 7567.00 us, notify: 214.73 us, BW: 15.45 GB/s (RDMA), 15.46 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 12, RDMA chunk 12, transmit: 7445.00 us, notify: 220.92 us, BW: 15.71 GB/s (RDMA), 15.71 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 12, RDMA chunk 16, transmit: 7283.00 us, notify: 227.00 us, BW: 16.05 GB/s (RDMA), 16.06 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 12, RDMA chunk 20, transmit: 7315.00 us, notify: 240.90 us, BW: 15.98 GB/s (RDMA), 15.99 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 12, RDMA chunk 24, transmit: 7257.00 us, notify: 247.42 us, BW: 16.11 GB/s (RDMA), 16.12 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 12, RDMA chunk 28, transmit: 7248.00 us, notify: 250.32 us, BW: 16.13 GB/s (RDMA), 16.14 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 12, RDMA chunk 32, transmit: 7086.00 us, notify: 244.28 us, BW: 16.50 GB/s (RDMA), 16.51 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 16, RDMA chunk 4, transmit: 8327.00 us, notify: 214.47 us, BW: 14.04 GB/s (RDMA), 14.05 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 16, RDMA chunk 8, transmit: 7552.00 us, notify: 214.16 us, BW: 15.48 GB/s (RDMA), 15.49 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 16, RDMA chunk 12, transmit: 7443.00 us, notify: 218.09 us, BW: 15.71 GB/s (RDMA), 15.72 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 16, RDMA chunk 16, transmit: 7275.00 us, notify: 230.78 us, BW: 16.07 GB/s (RDMA), 16.08 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 16, RDMA chunk 20, transmit: 7341.00 us, notify: 223.99 us, BW: 15.93 GB/s (RDMA), 15.94 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 16, RDMA chunk 24, transmit: 7221.00 us, notify: 261.56 us, BW: 16.19 GB/s (RDMA), 16.20 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 16, RDMA chunk 28, transmit: 7231.00 us, notify: 261.48 us, BW: 16.17 GB/s (RDMA), 16.18 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 16, RDMA chunk 32, transmit: 7119.00 us, notify: 236.08 us, BW: 16.42 GB/s (RDMA), 16.43 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 20, RDMA chunk 4, transmit: 8293.00 us, notify: 215.22 us, BW: 14.10 GB/s (RDMA), 14.11 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 20, RDMA chunk 8, transmit: 7556.00 us, notify: 216.22 us, BW: 15.47 GB/s (RDMA), 15.48 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 20, RDMA chunk 12, transmit: 7442.00 us, notify: 215.26 us, BW: 15.71 GB/s (RDMA), 15.72 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 20, RDMA chunk 16, transmit: 7292.00 us, notify: 227.01 us, BW: 16.03 GB/s (RDMA), 16.04 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 20, RDMA chunk 20, transmit: 7310.00 us, notify: 244.98 us, BW: 16.00 GB/s (RDMA), 16.00 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 20, RDMA chunk 24, transmit: 7219.00 us, notify: 262.60 us, BW: 16.20 GB/s (RDMA), 16.20 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 20, RDMA chunk 28, transmit: 7256.00 us, notify: 263.01 us, BW: 16.11 GB/s (RDMA), 16.12 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 20, RDMA chunk 32, transmit: 7118.00 us, notify: 243.05 us, BW: 16.43 GB/s (RDMA), 16.43 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 24, RDMA chunk 4, transmit: 8315.00 us, notify: 215.80 us, BW: 14.06 GB/s (RDMA), 14.07 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 24, RDMA chunk 8, transmit: 7573.00 us, notify: 215.51 us, BW: 15.44 GB/s (RDMA), 15.45 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 24, RDMA chunk 12, transmit: 7461.00 us, notify: 216.98 us, BW: 15.67 GB/s (RDMA), 15.68 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 24, RDMA chunk 16, transmit: 7251.00 us, notify: 228.91 us, BW: 16.13 GB/s (RDMA), 16.13 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 24, RDMA chunk 20, transmit: 7335.00 us, notify: 232.11 us, BW: 15.94 GB/s (RDMA), 15.95 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 24, RDMA chunk 24, transmit: 7221.00 us, notify: 264.81 us, BW: 16.19 GB/s (RDMA), 16.20 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 24, RDMA chunk 28, transmit: 7269.00 us, notify: 259.52 us, BW: 16.09 GB/s (RDMA), 16.09 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 24, RDMA chunk 32, transmit: 7102.00 us, notify: 252.19 us, BW: 16.46 GB/s (RDMA), 16.47 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 28, RDMA chunk 4, transmit: 8308.00 us, notify: 215.44 us, BW: 14.07 GB/s (RDMA), 14.08 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 28, RDMA chunk 8, transmit: 7578.00 us, notify: 215.46 us, BW: 15.43 GB/s (RDMA), 15.44 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 28, RDMA chunk 12, transmit: 7449.00 us, notify: 216.04 us, BW: 15.70 GB/s (RDMA), 15.70 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 28, RDMA chunk 16, transmit: 7275.00 us, notify: 224.12 us, BW: 16.07 GB/s (RDMA), 16.08 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 28, RDMA chunk 20, transmit: 7318.00 us, notify: 238.79 us, BW: 15.98 GB/s (RDMA), 15.99 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 28, RDMA chunk 24, transmit: 7267.00 us, notify: 244.29 us, BW: 16.09 GB/s (RDMA), 16.10 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 28, RDMA chunk 28, transmit: 7226.00 us, notify: 260.79 us, BW: 16.18 GB/s (RDMA), 16.19 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 28, RDMA chunk 32, transmit: 7090.00 us, notify: 239.77 us, BW: 16.49 GB/s (RDMA), 16.50 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 32, RDMA chunk 4, transmit: 8346.00 us, notify: 214.60 us, BW: 14.01 GB/s (RDMA), 14.02 GB/s (NVL) 
+Timeout (0:00:45)!
+Thread 0x0000ffffae3d9020 (most recent call first):
+  File "/home/f00955680/metax_dev/venv-maca-py312/lib/python3.12/site-packages/torch/cuda/__init__.py", line 1058 in synchronize
+  File "/home/f00955680/metax_dev/urma_after_kernel_20261029/diag/bench_safety_c2a74d91/ep/bench/utils.py", line 496 in bench_kineto
+  File "test_internode.py", line 434 in test_main
+  File "test_internode.py", line 578 in test_loop
+  File "test_internode.py", line 680 in <module>
+  File "<frozen runpy>", line 88 in _run_code
+  File "<frozen runpy>", line 98 in _run_module_code
+  File "<frozen runpy>", line 287 in run_path
+  File "/home/f00955680/metax_dev/urma_after_kernel_20261029/diag/bench_safety_c2a74d91/launcher.py", line 59 in <module>
+[tuning] SMs 24, NVL chunk 32, RDMA chunk 8, transmit: 7550.00 us, notify: 215.02 us, BW: 15.49 GB/s (RDMA), 15.49 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 32, RDMA chunk 12, transmit: 7449.00 us, notify: 217.26 us, BW: 15.70 GB/s (RDMA), 15.70 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 32, RDMA chunk 16, transmit: 7267.00 us, notify: 228.81 us, BW: 16.09 GB/s (RDMA), 16.10 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 32, RDMA chunk 20, transmit: 7315.00 us, notify: 230.55 us, BW: 15.98 GB/s (RDMA), 15.99 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 32, RDMA chunk 24, transmit: 7234.00 us, notify: 243.61 us, BW: 16.16 GB/s (RDMA), 16.17 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 32, RDMA chunk 28, transmit: 7232.00 us, notify: 256.47 us, BW: 16.17 GB/s (RDMA), 16.18 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 32, RDMA chunk 32, transmit: 7090.00 us, notify: 245.24 us, BW: 16.49 GB/s (RDMA), 16.50 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 36, RDMA chunk 4, transmit: 8328.00 us, notify: 214.55 us, BW: 14.04 GB/s (RDMA), 14.05 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 36, RDMA chunk 8, transmit: 7571.00 us, notify: 213.95 us, BW: 15.44 GB/s (RDMA), 15.45 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 36, RDMA chunk 12, transmit: 7455.00 us, notify: 215.74 us, BW: 15.68 GB/s (RDMA), 15.69 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 36, RDMA chunk 16, transmit: 7260.00 us, notify: 228.66 us, BW: 16.11 GB/s (RDMA), 16.11 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 36, RDMA chunk 20, transmit: 7344.00 us, notify: 233.25 us, BW: 15.92 GB/s (RDMA), 15.93 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 36, RDMA chunk 24, transmit: 7222.00 us, notify: 241.00 us, BW: 16.19 GB/s (RDMA), 16.20 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 36, RDMA chunk 28, transmit: 7250.00 us, notify: 244.37 us, BW: 16.13 GB/s (RDMA), 16.14 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 36, RDMA chunk 32, transmit: 7085.00 us, notify: 233.62 us, BW: 16.50 GB/s (RDMA), 16.51 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 40, RDMA chunk 4, transmit: 8356.00 us, notify: 214.00 us, BW: 13.99 GB/s (RDMA), 14.00 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 40, RDMA chunk 8, transmit: 7560.00 us, notify: 214.02 us, BW: 15.47 GB/s (RDMA), 15.47 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 40, RDMA chunk 12, transmit: 7441.00 us, notify: 215.32 us, BW: 15.71 GB/s (RDMA), 15.72 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 40, RDMA chunk 16, transmit: 7292.00 us, notify: 236.99 us, BW: 16.03 GB/s (RDMA), 16.04 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 40, RDMA chunk 20, transmit: 7328.00 us, notify: 229.32 us, BW: 15.96 GB/s (RDMA), 15.96 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 40, RDMA chunk 24, transmit: 7231.00 us, notify: 243.91 us, BW: 16.17 GB/s (RDMA), 16.18 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 40, RDMA chunk 28, transmit: 7242.00 us, notify: 262.98 us, BW: 16.15 GB/s (RDMA), 16.15 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 40, RDMA chunk 32, transmit: 7098.00 us, notify: 250.96 us, BW: 16.47 GB/s (RDMA), 16.48 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 44, RDMA chunk 4, transmit: 8316.00 us, notify: 230.78 us, BW: 14.06 GB/s (RDMA), 14.07 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 44, RDMA chunk 8, transmit: 7564.00 us, notify: 231.79 us, BW: 15.46 GB/s (RDMA), 15.47 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 44, RDMA chunk 12, transmit: 7465.00 us, notify: 232.24 us, BW: 15.66 GB/s (RDMA), 15.67 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 44, RDMA chunk 16, transmit: 7258.00 us, notify: 266.62 us, BW: 16.11 GB/s (RDMA), 16.12 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 44, RDMA chunk 20, transmit: 7334.00 us, notify: 272.90 us, BW: 15.94 GB/s (RDMA), 15.95 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 44, RDMA chunk 24, transmit: 7251.00 us, notify: 292.96 us, BW: 16.13 GB/s (RDMA), 16.13 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 44, RDMA chunk 28, transmit: 7254.00 us, notify: 317.01 us, BW: 16.12 GB/s (RDMA), 16.13 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 44, RDMA chunk 32, transmit: 7108.00 us, notify: 262.23 us, BW: 16.45 GB/s (RDMA), 16.46 GB/s (NVL) 
+[tuning] Best dispatch (BF16): SMs 24, NVL chunk 4, RDMA chunk 32, transmit: 7072.00 us, notify: 252.95 us, BW: 16.53 GB/s (RDMA), 16.54 GB/s (NVL)
+
+[tuning] SMs 24, NVL chunk 1, RDMA chunk 12, transmit: 8082.00 us, notify: 240.08 us, BW: 14.47 GB/s (RDMA), 14.47 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 1, RDMA chunk 16, transmit: 8375.00 us, notify: 243.00 us, BW: 13.96 GB/s (RDMA), 13.97 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 1, RDMA chunk 20, transmit: 8600.00 us, notify: 235.21 us, BW: 13.60 GB/s (RDMA), 13.60 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 1, RDMA chunk 24, transmit: 8695.00 us, notify: 233.34 us, BW: 13.45 GB/s (RDMA), 13.45 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 1, RDMA chunk 28, transmit: 8800.00 us, notify: 232.02 us, BW: 13.29 GB/s (RDMA), 13.29 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 1, RDMA chunk 32, transmit: 8876.00 us, notify: 223.52 us, BW: 13.17 GB/s (RDMA), 13.18 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 2, RDMA chunk 12, transmit: 7155.00 us, notify: 230.04 us, BW: 16.34 GB/s (RDMA), 16.35 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 2, RDMA chunk 16, transmit: 7353.00 us, notify: 225.01 us, BW: 15.90 GB/s (RDMA), 15.91 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 2, RDMA chunk 20, transmit: 7524.00 us, notify: 225.92 us, BW: 15.54 GB/s (RDMA), 15.55 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 2, RDMA chunk 24, transmit: 7630.00 us, notify: 221.92 us, BW: 15.32 GB/s (RDMA), 15.33 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 2, RDMA chunk 28, transmit: 7727.00 us, notify: 218.58 us, BW: 15.13 GB/s (RDMA), 15.14 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 2, RDMA chunk 32, transmit: 7797.00 us, notify: 232.69 us, BW: 15.00 GB/s (RDMA), 15.00 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 3, RDMA chunk 12, transmit: 7142.00 us, notify: 236.33 us, BW: 16.37 GB/s (RDMA), 16.38 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 3, RDMA chunk 16, transmit: 7098.00 us, notify: 242.71 us, BW: 16.47 GB/s (RDMA), 16.48 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 3, RDMA chunk 20, transmit: 7267.00 us, notify: 257.23 us, BW: 16.09 GB/s (RDMA), 16.10 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 3, RDMA chunk 24, transmit: 7284.00 us, notify: 231.23 us, BW: 16.05 GB/s (RDMA), 16.06 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 3, RDMA chunk 28, transmit: 7390.00 us, notify: 311.14 us, BW: 15.82 GB/s (RDMA), 15.83 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 3, RDMA chunk 32, transmit: 7436.00 us, notify: 246.54 us, BW: 15.72 GB/s (RDMA), 15.73 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 4, RDMA chunk 12, transmit: 7152.00 us, notify: 247.86 us, BW: 16.35 GB/s (RDMA), 16.36 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 4, RDMA chunk 16, transmit: 7072.00 us, notify: 247.12 us, BW: 16.53 GB/s (RDMA), 16.54 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 4, RDMA chunk 20, transmit: 7244.00 us, notify: 245.40 us, BW: 16.14 GB/s (RDMA), 16.15 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 4, RDMA chunk 24, transmit: 7251.00 us, notify: 255.31 us, BW: 16.13 GB/s (RDMA), 16.13 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 4, RDMA chunk 28, transmit: 7400.00 us, notify: 307.53 us, BW: 15.80 GB/s (RDMA), 15.81 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 4, RDMA chunk 32, transmit: 7404.00 us, notify: 255.18 us, BW: 15.79 GB/s (RDMA), 15.80 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 5, RDMA chunk 12, transmit: 7173.00 us, notify: 238.68 us, BW: 16.30 GB/s (RDMA), 16.31 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 5, RDMA chunk 16, transmit: 7115.00 us, notify: 262.71 us, BW: 16.43 GB/s (RDMA), 16.44 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 5, RDMA chunk 20, transmit: 7266.00 us, notify: 256.60 us, BW: 16.09 GB/s (RDMA), 16.10 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 5, RDMA chunk 24, transmit: 7253.00 us, notify: 272.27 us, BW: 16.12 GB/s (RDMA), 16.13 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 5, RDMA chunk 28, transmit: 7401.00 us, notify: 319.67 us, BW: 15.80 GB/s (RDMA), 15.81 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 5, RDMA chunk 32, transmit: 7337.00 us, notify: 331.30 us, BW: 15.94 GB/s (RDMA), 15.94 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 6, RDMA chunk 12, transmit: 7151.00 us, notify: 252.72 us, BW: 16.35 GB/s (RDMA), 16.36 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 6, RDMA chunk 16, transmit: 7084.00 us, notify: 261.02 us, BW: 16.51 GB/s (RDMA), 16.51 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 6, RDMA chunk 20, transmit: 7327.00 us, notify: 261.69 us, BW: 15.96 GB/s (RDMA), 15.97 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 6, RDMA chunk 24, transmit: 7255.00 us, notify: 268.84 us, BW: 16.12 GB/s (RDMA), 16.12 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 6, RDMA chunk 28, transmit: 7391.00 us, notify: 328.86 us, BW: 15.82 GB/s (RDMA), 15.83 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 6, RDMA chunk 32, transmit: 7380.00 us, notify: 330.97 us, BW: 15.84 GB/s (RDMA), 15.85 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 7, RDMA chunk 12, transmit: 7182.00 us, notify: 236.45 us, BW: 16.28 GB/s (RDMA), 16.29 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 7, RDMA chunk 16, transmit: 7149.00 us, notify: 259.48 us, BW: 16.36 GB/s (RDMA), 16.36 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 7, RDMA chunk 20, transmit: 7300.00 us, notify: 263.44 us, BW: 16.02 GB/s (RDMA), 16.02 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 7, RDMA chunk 24, transmit: 7308.00 us, notify: 269.53 us, BW: 16.00 GB/s (RDMA), 16.01 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 7, RDMA chunk 28, transmit: 7414.00 us, notify: 315.31 us, BW: 15.77 GB/s (RDMA), 15.78 GB/s (NVL) 
+[tuning] SMs 24, NVL chunk 7, RDMA chunk 32, transmit: 7359.00 us, notify: 357.21 us, BW: 15.89 GB/s (RDMA), 15.90 GB/s (NVL) 
+[tuning] Best combine: SMs 24, NVL chunk 4, RDMA chunk 16, transmit: 7072.00 us, notify: 247.12 us, BW: 16.53 GB/s (RDMA), 16.54 GB/s (NVL)
+
+
+PHASE=BENCH_SCRIPT_DONE RANK=0
+UCCL_EXIT_ACK_OK node_rank=0
