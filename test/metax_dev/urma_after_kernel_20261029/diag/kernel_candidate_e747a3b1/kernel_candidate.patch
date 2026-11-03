@@ -1,0 +1,112 @@
+--- a/drivers/iommu/hisilicon/ummu-core/core_matt.c
++++ b/drivers/iommu/hisilicon/ummu-core/core_matt.c
+@@ -151,9 +151,9 @@
+ 
+ 	iommu_prot = prot & ~IOMMU_CACHE;
+ 	iommu_prot |= IOMMU_MMIO;
+ 
+-	pr_info("[PHYS-SG] map begin: tid=%u domain=%px "
++	pr_debug("[PHYS-SG] map begin: tid=%u domain=%px "
+ 		"iova=0x%lx nents=%u prot=0x%x pgsize_bitmap=0x%lx\n",
+ 		tid, domain, addr, sgt->nents,
+ 		iommu_prot, domain->pgsize_bitmap);
+ 
+@@ -176,9 +176,9 @@
+ 			ret = -EINVAL;
+ 			goto rollback;
+ 		}
+ 
+-		pr_info("[PHYS-SG] map entry: tid=%u entry=%d "
++		pr_debug("[PHYS-SG] map entry: tid=%u entry=%d "
+ 			"iova=0x%lx pa=%pa len=0x%zx\n",
+ 			tid, i, cur_iova, &pa, len);
+ 
+ 		ret = iommu_map(domain, cur_iova, pa, len,
+@@ -189,12 +189,15 @@
+ 			       "pa=%pa len=0x%zx ret=%d\n",
+ 			       tid, i, cur_iova, &pa, len, ret);
+ 			goto rollback;
+ 		}
++
++		/* Include the just-mapped entry if verification fails. */
++		done += len;
+ 		  
+ 	        //TONG ADD FOR DEBUG
+                 translated = iommu_iova_to_phys(domain, cur_iova);
+-                pr_info("[PHYS-SG] verify: tid=%u domain=%px "
++                pr_debug("[PHYS-SG] verify: tid=%u domain=%px "
+                         "iova=0x%lx expected_pa=%pa translated_pa=%pa\n",
+                         tid, domain, cur_iova, &pa, &translated);
+ 
+                 if (translated != pa) {
+@@ -205,14 +208,13 @@
+                         goto rollback;
+                 }
+ 
+ 		cur_iova += len;
+-		done += len;
+ 	}
+ 
+ 	*mapped = done;
+ 
+-	pr_info("[PHYS-SG] map success: tid=%u "
++	pr_debug("[PHYS-SG] map success: tid=%u "
+ 		"iova=[0x%lx,0x%lx) mapped=0x%zx\n",
+ 		tid, addr, addr + done, done);
+ 
+ 	goto out;
+@@ -252,9 +254,9 @@
+ 		ret = -ENOENT;
+ 		goto out;
+ 	}
+ 
+-	pr_info("[PHYS-SG] unmap begin: tid=%u domain=%px "
++	pr_debug("[PHYS-SG] unmap begin: tid=%u domain=%px "
+ 		"iova=0x%lx size=0x%zx\n",
+ 		tid, domain, addr, size);
+ 
+ 	unmapped = iommu_unmap(domain, addr, size);
+@@ -263,9 +265,9 @@
+ 		       "iova=0x%lx expected=0x%zx actual=0x%zx\n",
+ 		       tid, addr, size, unmapped);
+ 		ret = -EFAULT;
+ 	} else {
+-		pr_info("[PHYS-SG] unmap success: tid=%u "
++		pr_debug("[PHYS-SG] unmap success: tid=%u "
+ 			"iova=[0x%lx,0x%lx) size=0x%zx\n",
+ 			tid, addr, addr + size, size);
+ 	}
+ 
+--- a/drivers/iommu/iommu.c
++++ b/drivers/iommu/iommu.c
+@@ -2688,13 +2688,11 @@
+ 				__GFP_HIGHMEM)))
+ 		return -EINVAL;
+ 
+ 	while (i <= nents) {
+-        
+ 		phys_addr_t s_phys = sg_phys(sg);
+-        pr_info("sg_phys = %lx\n",s_phys);
++
+ 		if (len && s_phys != start + len) {
+-            pr_info("__iommu_map:iova = %lx, phys = %lx\n",iova+mapped,start);
+ 			ret = __iommu_map(domain, iova + mapped, start,
+ 					len, prot, gfp);
+ 
+ 			if (ret)
+@@ -2703,13 +2701,10 @@
+ 			mapped += len;
+ 			len = 0;
+ 		}
+ 
+-		if (sg_dma_is_bus_address(sg)){
+-            pr_info("sg_dma_is_bus_address: DMA_ADDRESS = %lx\n",sg->dma_address);
+-            goto next;
+-        }
+-			
++		if (sg_dma_is_bus_address(sg))
++			goto next;
+ 
+ 		if (len) {
+ 			len += sg->length;
+ 		} else {

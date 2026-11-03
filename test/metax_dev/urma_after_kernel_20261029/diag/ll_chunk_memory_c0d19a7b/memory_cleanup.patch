@@ -1,0 +1,60 @@
+--- a/test_low_latency.py
++++ b/test_low_latency.py
+@@ -75,6 +75,13 @@
+     )
+ 
+ 
++class MemoryBoundBuffer(Buffer):
++    """Release completed test-only staging before the next configuration."""
++
++    def release_completed_staging(self) -> None:
++        self._next_low_latency_combine_buffer = None
++
++
+ def test_main(
+     num_tokens: int,
+     hidden: int,
+@@ -83,7 +90,7 @@
+     rank: int,
+     num_ranks: int,
+     group: dist.ProcessGroup,
+-    buffer: Buffer,
++    buffer: MemoryBoundBuffer,
+     use_logfmt: bool = False,
+     dispatch_use_fp8: bool = True,
+     seed: int = 0,
+@@ -167,8 +174,14 @@
+                                 f" use_ue8m0={use_ue8m0}",
+                                 flush=True,
+                             )
++                            if num_times:
++                                simulated_gemm_x = None
+                             num_times += 1
+                             for i in range((num_times % 2) + 1):
++                                if i:
++                                    torch.cuda.synchronize()
++                                    packed_recv_x = packed_recv_count = handle = None
++                                    event = hook = None
+                                 cumulative_local_expert_recv_stats = torch.zeros(
+                                     (num_local_experts,), dtype=torch.int, device="cuda"
+                                 )
+@@ -402,6 +415,10 @@
+                                         f"|logfmt={use_logfmt}"
+                                     )
+                                     _record_hash(f"combine_out|{tag}", combined_x)
++                            # Only correctness setup is synchronized; timed kernels below stay unchanged.
++                            torch.cuda.synchronize()
++                            buffer.release_completed_staging()
++                            packed_recv_x = recv_x = event = hook = None
+ 
+     # noinspection PyShadowingNames
+     def large_gemm_with_hook(hook):
+@@ -494,7 +511,7 @@
+         num_tokens, hidden, num_ranks, num_experts
+     )
+ 
+-    buffer = Buffer(
++    buffer = MemoryBoundBuffer(
+         group,
+         num_rdma_bytes=num_rdma_bytes,
+         low_latency_mode=True,

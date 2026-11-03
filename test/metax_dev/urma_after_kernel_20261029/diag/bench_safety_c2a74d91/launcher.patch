@@ -1,0 +1,51 @@
+--- a/launcher.py
++++ b/launcher.py
+@@ -13,6 +13,7 @@
+ from buffer import Buffer
+ module = pathlib.Path(os.environ['UCCL_EP_MODULE_ROOT']).resolve()
+ bench = pathlib.Path('/home/f00955680/uccl-ep-xpu-integration/ep/bench').resolve()
++safe = pathlib.Path(os.environ['UCCL_BENCH_SAFETY_DIR']).resolve()
+ extension = pathlib.Path(ep.__file__).resolve()
+ print('EXTENSION:', extension, flush=True)
+ print('BUFFER_MODULE:', pathlib.Path(__import__('buffer').__file__).resolve(), flush=True)
+@@ -21,36 +22,16 @@
+ assert hashlib.sha256(extension.read_bytes()).hexdigest() == os.environ['UCCL_EP_EXPECTED_SHA'], 'unexpected extension hash'
+ print('URMA_LIB_MAPS:', sorted({line.split()[-1] for line in pathlib.Path('/proc/self/maps').read_text().splitlines() if '/liburma.so' in line}), flush=True)
+ assert any(os.environ['UCCL_PRIVATE_UMDK'] in line and '/liburma.so' in line for line in pathlib.Path('/proc/self/maps').read_text().splitlines()), 'private liburma not loaded'
+-assert pathlib.Path(utils.__file__).resolve().is_relative_to(bench), 'unexpected utils path'
++assert pathlib.Path(utils.__file__).resolve().is_relative_to(safe), 'unexpected safe utils path'
++assert hashlib.sha256(pathlib.Path(utils.__file__).read_bytes()).hexdigest() == os.environ['UCCL_BENCH_UTILS_SHA'], 'unexpected safe utils hash'
++assert os.environ.get('UCCL_BENCH_LAZY_INIT') == '1', 'lazy initialization must be selected'
++print('BENCH_SAFE_UTILS_LOADED lazy_init=1', flush=True)
+ assert pathlib.Path(__import__('buffer').__file__).resolve().is_relative_to(bench), 'unexpected buffer path'
+ size = ep.Config(24, 8, 512, 16, 512).get_rdma_buffer_size_hint(7168 * 2, 2)
+ print('RDMA_HINT_BYTES:', size, flush=True)
+ assert size > 0, 'missing multi-node buffer hint'
+ def phase(name):
+     print(f"PHASE={name} RANK={os.environ.get('RANK', '?')}", flush=True)
+-def lazy_init(local_rank, num_local_ranks):
+-    phase('SET_DEVICE_BEGIN')
+-    torch.cuda.set_device(local_rank)
+-    phase('SET_DEVICE_DONE')
+-    dist.init_process_group(backend='nccl', timeout=timedelta(seconds=100))
+-    phase('PROCESS_GROUP_DONE')
+-    torch.set_default_dtype(torch.bfloat16)
+-    torch.set_default_device(f'cuda:{local_rank}')
+-    phase('NEW_GROUP_BEGIN')
+-    group = dist.new_group(list(range(dist.get_world_size())))
+-    phase('NEW_GROUP_DONE')
+-    return dist.get_rank(), dist.get_world_size(), group
+-utils.init_dist_under_torchrun = lazy_init
+-# The benchmark's broad /dev/shm sweep is unsafe on shared hosts. Do not
+-# remove any existing barrier files; the launcher rejects same-UID collisions.
+-import glob as _glob
+-_original_glob = _glob.glob
+-def _scoped_glob(pattern, *args, **kwargs):
+-    if isinstance(pattern, str) and pattern.startswith('/dev/shm/uccl_barrier_*'):
+-        phase('SKIP_SHARED_BARRIER_SWEEP')
+-        return []
+-    return _original_glob(pattern, *args, **kwargs)
+-_glob.glob = _scoped_glob
+ _original_all_gather_object = dist.all_gather_object
+ _gather_sequence = 0
+ def _traced_all_gather_object(*args, **kwargs):

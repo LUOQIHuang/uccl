@@ -1,0 +1,59 @@
+--- old
++++ new
+@@ -4,6 +4,8 @@
+ #include <cuda_runtime.h>
+ 
+ extern "C" int gpu_acquire_control(uint64_t*, uint64_t*);
++extern "C" int gpu_poll_start(uint64_t*, uint32_t const*, uint64_t, uint32_t);
++extern "C" int gpu_poll_finish();
+ 
+ #include <arpa/inet.h>
+ #include <chrono>
+@@ -140,6 +142,20 @@
+     transport.connect_peer(0, remote);
+     char ready = 1, peer_ready = 0;
+     exchange(fd, &ready, &peer_ready, 1);
++    int poll_start_rc = gpu_poll_start(
++        gpu_control,
++        reinterpret_cast<uint32_t const*>(static_cast<unsigned char*>(gpu) + 16384),
++        initial[0], expected);
++    if (poll_start_rc) throw std::runtime_error("GPU poll launch failed");
++    auto* words = reinterpret_cast<uint64_t*>(control);
++    auto start_deadline = std::chrono::steady_clock::now() + std::chrono::seconds(5);
++    while (__atomic_load_n(words + 2, __ATOMIC_ACQUIRE) != 1) {
++      if (std::chrono::steady_clock::now() > start_deadline)
++        throw std::runtime_error("GPU poll did not start");
++      std::this_thread::yield();
++    }
++    std::cout << "GPU_POLL_STARTED" << std::endl;
++    exchange(fd, &ready, &peer_ready, 1);
+     transport.post_write(0, 1, 0, 16384, 4096, false);
+     transport.post_atomic_add(0, 2, 0, 1, true);
+     transport.post_atomic_add(0, 3, 8, -3, true);
+@@ -164,6 +180,17 @@
+     }
+ 
+     exchange(fd, &ready, &peer_ready, 1);
++    int const poll_rc = gpu_poll_finish();
++    uint64_t const poll_state = __atomic_load_n(words + 6, __ATOMIC_ACQUIRE);
++    uint64_t const poll_value = words[3];
++    uint64_t const poll_mismatches = words[4];
++    uint64_t const poll_first = words[5];
++    std::cout << "GPU_POLL_FINISHED rc=" << poll_rc << " state=" << poll_state
++              << " value=" << poll_value << " mismatches=" << poll_mismatches
++              << " first=" << poll_first << std::endl;
++    if (poll_rc || poll_state != 1 || poll_value != initial[0] + 1 ||
++        poll_mismatches != 0 || poll_first != expected)
++      throw std::runtime_error("active GPU poll or ordered payload mismatch");
+     std::vector<uint32_t> received(1024);
+     uint64_t atomic_value[2] = {};
+     uint64_t gpu_value[2] = {};
+@@ -196,7 +223,7 @@
+               << " host_barrier=" << host_barrier << std::endl;
+     if (host_barrier != 7)
+       throw std::runtime_error("URMA host barrier FADD result mismatch");
+-    std::cout << "MAPPED_HOST_GPU_FADD_PASS" << std::endl;
++    std::cout << "MAPPED_HOST_GPU_ACTIVE_POLL_PASS" << std::endl;
+     std::cout << "URMA MetaX smoke passed: duplicate registration, "
+                  "bidirectional WRITE + positive/negative FADD\n";
+   } catch (std::exception const& e) {
