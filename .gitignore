@@ -112,3 +112,19 @@ thirdparty/gdrcopy/
 worktrees/
 *.csv
 *.egg-info/
+
+# test/ dev workspace: track only source/scripts, exclude large local artifacts
+test/**/venv*/
+test/**/venv-*/
+test/**/tree/
+test/**/current-test/
+test/**/python/cpython-*/
+test/**/tools/uv-*/
+test/**/*.log
+test/**/*.pid
+test/**/*.status
+test/**/._*
+test/**/*.o
+test/**/*.so
+test/**/*.a
+test/**/*.bin
