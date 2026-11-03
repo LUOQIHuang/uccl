@@ -5,15 +5,46 @@ import os
 from pathlib import Path
 import subprocess
 import tempfile
+import shutil
 
 p = argparse.ArgumentParser()
 p.add_argument('--sdk-include', required=True, type=Path,
                help='Directory containing the tested urma_api.h and urma_types.h')
 p.add_argument('--syntax-only', action='store_true')
+p.add_argument('--reference-sdk-fixture', action='store_true',
+               help='CPU simulation ONLY: add a placeholder GPU-segment field to upstream reference headers; does not validate the private SDK ABI')
 a = p.parse_args()
 ep = Path(__file__).resolve().parents[1]
 with tempfile.TemporaryDirectory(prefix='uccl-urma-test-') as tmp:
     tmp = Path(tmp)
+    protocol=(ep/'include/ring_buffer.cuh').read_text()
+    protocol=protocol[protocol.index('enum class CmdType'):protocol.index('struct CopyTask')]
+    (tmp/'transfer_protocol.inc').write_text(protocol)
+    proxy=(ep/'src/proxy.cpp').read_text()
+    begin=proxy.index('void Proxy::post_urma_commands(')
+    end=proxy.index('CxiTransport* Proxy::cxi_transport_for_rank',begin)
+    (tmp/'proxy_plan.inc').write_text(proxy[begin:end])
+    proxy_test=tmp/'proxy_plan_test'
+    subprocess.run([os.environ.get('CXX','c++'),'-std=c++17','-Wall','-Wextra','-Werror',
+                    '-I'+str(ep/'include'),'-I'+str(tmp),
+                    str(ep/'tests/urma_proxy_plan_test.cpp'),'-o',str(proxy_test)],check=True)
+    subprocess.run([str(proxy_test)],check=True)
+    # Preserve ordinary verbs-only builds: all added URMA entry points also
+    # need valid fail-fast stubs without requiring SDK declarations.
+    subprocess.run([os.environ.get('CXX','c++'),'-std=c++17','-Wall','-Wextra','-Werror',
+                    '-I'+str(ep/'tests/urma_support'),'-I'+str(ep/'include'),
+                    '-include',str(ep/'tests/urma_support/ep_shim.hpp'),
+                    '-fsyntax-only',str(ep/'src/urma_transport.cpp')],check=True)
+    if a.reference_sdk_fixture:
+        fixture = tmp/'reference-sdk-fixture'
+        shutil.copytree(str(a.sdk_include.resolve()),str(fixture))
+        types = fixture/'urma_types.h'
+        source = types.read_text()
+        if 'is_gpu_seg' not in source:
+            source = source.replace('} urma_seg_cfg_t;', '    uint8_t is_gpu_seg; /* CPU test placeholder; NOT vendor ABI */\n} urma_seg_cfg_t;')
+            types.write_text(source)
+        a.sdk_include = fixture
+        print('REFERENCE_SDK_FIXTURE: simulated GPU-segment field; no private ABI/hardware validation',flush=True)
     fake_metax = tmp / 'fake_mcruntime.cpp'
     fake_metax.write_text(r'''
 #include <cstdlib>
@@ -76,18 +107,18 @@ extern "C" int mcMemcpy(void* dst, void const* src, size_t bytes, int) {
     else:
         metax_test = tmp / 'metax_transport_test'
         subprocess.run([*metax_cmd, str(ep / 'tests/urma_transport_test.cpp'),
-                        '-o', str(metax_test)], check=True)
+                        '-ldl', '-o', str(metax_test)], check=True)
         metax_env = dict(os.environ,
                          UCCL_METAX_RUNTIME_LIB=str(fake_metax_lib))
         subprocess.run([str(metax_test)], check=True, env=metax_env)
 
         runtime_test = tmp / 'metax_runtime_test'
         subprocess.run([os.environ.get('CXX', 'c++'), '-std=c++17',
-                        '-Wall', '-Wextra', '-Werror', '-DUSE_METAX',
+                        '-pthread', '-Wall', '-Wextra', '-Werror', '-DUSE_METAX',
                         '-I' + str(ep / 'include'),
                         str(ep / 'src/gpu_p2p_runtime.cpp'),
                         str(ep / 'tests/gpu_p2p_runtime_test.cpp'),
-                        '-o', str(runtime_test)], check=True)
+                        '-ldl', '-o', str(runtime_test)], check=True)
         subprocess.run([str(runtime_test)], check=True, env=metax_env)
 
     for defines in ([], ['-DUSE_URMA'],

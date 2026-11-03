@@ -12,6 +12,15 @@
 #include <string>
 #include <thread>
 #include <tuple>
+
+void UrmaTransport::configure(bool normal, size_t channels) {
+#ifdef USE_URMA
+  if (init_acquired_) throw std::logic_error("configure URMA before init");
+#endif
+  UrmaMode requested{normal, normal ? channels : 1};
+  requested.validate();
+  mode_ = requested;
+}
 #ifndef USE_URMA
 // -----------------------------------------------------------------------
 // Stub build (USE_URMA not requested): every entry point throws.
@@ -30,6 +39,8 @@ void UrmaTransport::unavailable() {
   throw std::runtime_error("UrmaTransport requires building with USE_URMA=1");
 }
 void UrmaTransport::init(ProxyCtx&) { unavailable(); }
+size_t UrmaTransport::capacity() const { unavailable(); }
+void UrmaTransport::post_batch(int, std::vector<UrmaWorkRequest> const&) { unavailable(); }
 void UrmaTransport::register_main_buffer(void*, size_t, int) { unavailable(); }
 void UrmaTransport::register_atomic_buffer(void*, size_t, int) {
   unavailable();
@@ -127,7 +138,6 @@ void check_range(uint64_t offset, uint64_t bytes, uint64_t length) {
   if (offset > length || bytes > length - offset)
     throw std::out_of_range("URMA operation exceeds registered segment");
 }
-constexpr uint32_t kUrmaWireVersion = 1;
 // Address of |offset| inside a remotely imported segment.  Prefer the
 // driver-assigned mapping address (MVA) and fall back to the registered VA.
 inline uint64_t remote_seg_addr(urma_target_seg_t const* tseg,
@@ -151,6 +161,7 @@ void UrmaTransport::unavailable() {
 }
 void UrmaTransport::init(ProxyCtx& ctx) {
   if (init_acquired_) throw std::logic_error("URMA already initialized");
+  mode_.validate();
   (void)urma_trans_mode_from_env();
   ctx_ = &ctx;
   try {
@@ -276,13 +287,18 @@ void UrmaTransport::init(ProxyCtx& ctx) {
     jetty_cfg.jfs_cfg.jfc = jfc_;
     jetty_cfg.shared.jfr = jfr;
     jetty_cfg.shared.jfc = jfc_;
-    jetty_ = urma_create_jetty(urma_ctx_, &jetty_cfg);
-    if (!jetty_) {
-      throw std::runtime_error("urma_create_jetty failed");
+    jetties_.reserve(mode_.endpoint_count());
+    for (size_t lane = 0; lane < mode_.endpoint_count(); ++lane) {
+      auto* jetty = urma_create_jetty(urma_ctx_, &jetty_cfg);
+      if (!jetty) throw std::runtime_error("urma_create_jetty failed");
+      jetties_.push_back(jetty);
     }
     // Local scratch target for FADD old-value writeback.
-    atomic_operands_.assign(ProxyCtx::kMaxAtomicOps, 0);
-    atomic_operand_used_.assign(ProxyCtx::kMaxAtomicOps, 0);
+    free_contexts_.reserve(capacity());
+    op_contexts_.assign(capacity(), {});
+    for (size_t i = capacity(); i > 0; --i) free_contexts_.push_back(i-1);
+    prepared_.reserve(capacity());
+    atomic_operands_.assign(capacity(), 0);
     operand_tseg_ = register_segment(atomic_operands_.data(),
                                      atomic_operands_.size() * sizeof(uint64_t),
                                      false, false);
@@ -290,8 +306,10 @@ void UrmaTransport::init(ProxyCtx& ctx) {
     barrier_tseg_ =
         register_segment(barrier_words_.data(),
                          barrier_words_.size() * sizeof(uint64_t), false, true);
-    std::fprintf(stderr, "[URMA] transport initialized (trans_mode=%d)\n",
-                 static_cast<int>(jetty_cfg.jfs_cfg.trans_mode));
+    std::fprintf(stderr,
+        "[URMA] mode=%s channels=%zu endpoints=%zu batch=linked capacity=%zu wire=%u\n",
+        mode_.normal ? "normal" : "low_latency", mode_.channels,
+        jetties_.size(), capacity(), UrmaMode::kWireVersion);
   } catch (...) {
     destroy();
     throw;
@@ -408,19 +426,25 @@ void UrmaTransport::register_atomic_buffer(void* ptr, size_t len, int device) {
   local_info_.atomic_buffer_len = len;
 }
 LocalConnInfo UrmaTransport::local_info() const {
-  if (!jetty_ || !main_tseg_ || !atomic_tseg_ || !barrier_tseg_)
+  if (jetties_.empty() || !main_tseg_ || !atomic_tseg_ || !barrier_tseg_)
     throw std::logic_error("URMA local_info before registration");
   LocalConnInfo info = local_info_;
-  info.urma_wire_version = kUrmaWireVersion;
-  urma_rjetty_t rjetty{};
-  rjetty.jetty_id = jetty_->jetty_id;
-  rjetty.trans_mode = URMA_TM_RC;
-  rjetty.type = URMA_JETTY;
-  rjetty.tp_type = URMA_RTP;
-  static_assert(sizeof(rjetty) <= LocalConnInfo::kMaxUrmaBlob);
+  info.urma_wire_version = UrmaMode::kWireVersion;
+  info.urma_normal_mode = mode_.normal;
+  info.urma_channels = mode_.channels;
+  info.urma_jetty_count = jetties_.size();
+  static_assert(sizeof(urma_rjetty_t) * (UrmaMode::kMaxChannels + 1) <=
+                LocalConnInfo::kMaxUrmaJettyBlob);
   static_assert(sizeof(urma_seg_t) <= LocalConnInfo::kMaxUrmaBlob);
-  std::memcpy(info.urma_rjetty, &rjetty, sizeof(rjetty));
-  info.urma_rjetty_len = sizeof(rjetty);
+  for (size_t lane = 0; lane < jetties_.size(); ++lane) {
+    urma_rjetty_t rjetty{};
+    rjetty.jetty_id = jetties_[lane]->jetty_id;
+    rjetty.trans_mode = URMA_TM_RC;
+    rjetty.type = URMA_JETTY;
+    rjetty.tp_type = URMA_RTP;
+    std::memcpy(info.urma_rjetty + lane * sizeof(rjetty), &rjetty, sizeof(rjetty));
+  }
+  info.urma_rjetty_len = sizeof(urma_rjetty_t);
   std::memcpy(info.urma_main_seg, &main_tseg_->seg, sizeof(urma_seg_t));
   std::memcpy(info.urma_atomic_seg, &atomic_tseg_->seg, sizeof(urma_seg_t));
   std::memcpy(info.urma_barrier_seg, &barrier_tseg_->seg, sizeof(urma_seg_t));
@@ -429,25 +453,31 @@ LocalConnInfo UrmaTransport::local_info() const {
   return info;
 }
 void UrmaTransport::connect_peer(int peer, RemoteConnInfo const& remote) {
-  if (!jetty_ || peer < 0) throw std::invalid_argument("invalid URMA peer");
-  if (bound_)
+  if (jetties_.empty() || peer < 0) throw std::invalid_argument("invalid URMA peer");
+  if (bound_lanes_)
     throw std::logic_error("each RC transport binds exactly one peer");
-  if (remote.urma_wire_version != kUrmaWireVersion ||
+  if (remote.urma_wire_version != UrmaMode::kWireVersion ||
+      remote.urma_normal_mode != uint32_t(mode_.normal) ||
+      remote.urma_channels != mode_.channels ||
+      remote.urma_jetty_count != jetties_.size() ||
       remote.urma_rjetty_len != sizeof(urma_rjetty_t) ||
       remote.urma_main_seg_len != sizeof(urma_seg_t) ||
       remote.urma_atomic_seg_len != sizeof(urma_seg_t) ||
       remote.urma_barrier_seg_len != sizeof(urma_seg_t))
     throw std::invalid_argument("URMA descriptor ABI/version mismatch");
   // Copy into aligned native objects; the byte arrays need not be aligned.
-  urma_rjetty_t rjetty{};
+  std::vector<urma_rjetty_t> rjetties(jetties_.size());
   urma_seg_t segs[3]{};
-  std::memcpy(&rjetty, remote.urma_rjetty, sizeof(rjetty));
+  std::memcpy(rjetties.data(), remote.urma_rjetty,
+              rjetties.size() * sizeof(urma_rjetty_t));
   std::memcpy(&segs[0], remote.urma_main_seg, sizeof(urma_seg_t));
   std::memcpy(&segs[1], remote.urma_atomic_seg, sizeof(urma_seg_t));
   std::memcpy(&segs[2], remote.urma_barrier_seg, sizeof(urma_seg_t));
-  if (rjetty.trans_mode != URMA_TM_RC || rjetty.type != URMA_JETTY ||
-      rjetty.tp_type != URMA_RTP || rjetty.flag.bs.has_drv_ext)
-    throw std::invalid_argument("unsupported remote URMA jetty");
+  for (auto const& rjetty : rjetties) {
+    if (rjetty.trans_mode != URMA_TM_RC || rjetty.type != URMA_JETTY ||
+        rjetty.tp_type != URMA_RTP || rjetty.flag.bs.has_drv_ext)
+      throw std::invalid_argument("unsupported remote URMA jetty");
+  }
   for (int i = 0; i < 3; ++i) {
     uint32_t access = URMA_ACCESS_READ | URMA_ACCESS_WRITE;
     if (i != 0) access |= URMA_ACCESS_ATOMIC;
@@ -463,8 +493,12 @@ void UrmaTransport::connect_peer(int peer, RemoteConnInfo const& remote) {
   Peer& p = peers_[peer];
   urma_token_t token{};
   try {
-    p.tjetty = urma_import_jetty(urma_ctx_, &rjetty, &token);
-    if (!p.tjetty) throw std::runtime_error("urma_import_jetty failed");
+    p.tjetties.reserve(rjetties.size());
+    for (auto& rjetty : rjetties) {
+      auto* target = urma_import_jetty(urma_ctx_, &rjetty, &token);
+      if (!target) throw std::runtime_error("urma_import_jetty failed");
+      p.tjetties.push_back(target);
+    }
     urma_target_seg_t** targets[] = {&p.main_tseg, &p.atomic_tseg,
                                      &p.barrier_tseg};
     for (int i = 0; i < 3; ++i) {
@@ -476,216 +510,239 @@ void UrmaTransport::connect_peer(int peer, RemoteConnInfo const& remote) {
       *targets[i] = urma_import_seg(urma_ctx_, &segs[i], &token, 0, flag);
       if (!*targets[i]) throw std::runtime_error("urma_import_seg failed");
     }
-    check_urma(urma_bind_jetty(jetty_, p.tjetty), "urma_bind_jetty");
-    bound_ = true;
+    for (size_t lane = 0; lane < jetties_.size(); ++lane) {
+      check_urma(urma_bind_jetty(jetties_[lane], p.tjetties[lane]), "urma_bind_jetty");
+      ++bound_lanes_;
+    }
   } catch (...) {
+    while (bound_lanes_) {
+      --bound_lanes_;
+      check_urma(urma_unbind_jetty(jetties_[bound_lanes_]), "urma_unbind_jetty");
+    }
     if (p.barrier_tseg)
       check_urma(urma_unimport_seg(p.barrier_tseg), "unimport barrier");
     if (p.atomic_tseg)
       check_urma(urma_unimport_seg(p.atomic_tseg), "unimport control");
     if (p.main_tseg)
       check_urma(urma_unimport_seg(p.main_tseg), "unimport main");
-    if (p.tjetty) check_urma(urma_unimport_jetty(p.tjetty), "unimport jetty");
+    for (auto* target : p.tjetties)
+      check_urma(urma_unimport_jetty(target), "unimport jetty");
     p = {};
     throw;
   }
 }
+size_t UrmaTransport::capacity() const {
+  static_assert(kMaxOutstandingSends <= 65536 || ProxyCtx::kMaxAtomicOps <= 65536,
+                "URMA completion token has a 16-bit slot index");
+  return std::min<size_t>(kMaxOutstandingSends, ProxyCtx::kMaxAtomicOps);
+}
+size_t UrmaTransport::acquire_context(UrmaWorkRequest const& request) {
+  if (free_contexts_.empty()) throw std::runtime_error("URMA context capacity exhausted");
+  size_t index = free_contexts_.back();
+  auto& op = op_contexts_[index];
+  if (op.generation == (UINT64_MAX >> 16))
+    throw std::runtime_error("URMA completion generation exhausted");
+  free_contexts_.pop_back();
+  ++op.generation;
+  op.active = true;
+  op.wr_id = request.wr_id;
+  op.is_write = request.kind == UrmaWorkRequest::Kind::Write;
+  op.is_atomic = !op.is_write;
+  return index;
+}
+void UrmaTransport::release_context(size_t index) {
+  auto& op = op_contexts_[index];
+  if (!op.active) throw std::logic_error("double release of URMA context");
+  op.active = false;
+  free_contexts_.push_back(index);
+}
+void UrmaTransport::validate_request(Peer const& peer,
+                                     UrmaWorkRequest const& request) const {
+  if (request.kind != UrmaWorkRequest::Kind::Write &&
+      request.kind != UrmaWorkRequest::Kind::Atomic &&
+      request.kind != UrmaWorkRequest::Kind::Barrier)
+    throw std::invalid_argument("invalid URMA operation kind");
+  bool const write = request.kind == UrmaWorkRequest::Kind::Write;
+  auto* remote = write ? peer.main_tseg :
+      request.kind == UrmaWorkRequest::Kind::Atomic ? peer.atomic_tseg : peer.barrier_tseg;
+  if (!remote || !main_tseg_) throw std::runtime_error("URMA unregistered segment");
+  uint64_t bytes = write ? request.bytes : sizeof(uint64_t);
+  if (!bytes) throw std::invalid_argument("zero-length URMA write");
+  check_range(request.remote_offset, bytes, remote->seg.len);
+  if (write) check_range(request.local_offset, bytes, main_buffer_len_);
+  if (!write && remote_seg_addr(remote,request.remote_offset) % alignof(uint64_t))
+    throw std::invalid_argument("unaligned URMA atomic");
+}
+void UrmaTransport::prepare(PreparedWr& out, Peer& peer, size_t lane,
+                             UrmaWorkRequest const& request) {
+  bool const write = request.kind == UrmaWorkRequest::Kind::Write;
+  auto* remote = write ? peer.main_tseg :
+      request.kind == UrmaWorkRequest::Kind::Atomic ? peer.atomic_tseg : peer.barrier_tseg;
+  uint64_t bytes = write ? request.bytes : sizeof(uint64_t);
+  out.context = acquire_context(request);
+  auto const& op = op_contexts_[out.context];
+  out.dst.addr = remote_seg_addr(remote,request.remote_offset);
+  out.dst.len = bytes;
+  out.dst.tseg = remote;
+  out.wr.user_ctx = (op.generation << 16) | out.context;
+  out.wr.tjetty = peer.tjetties[lane];
+  out.wr.flag.bs.complete_enable = 1; // one CQE per logical operation, as verbs
+  if (write) {
+    out.src.addr = reinterpret_cast<uint64_t>(main_buffer_) + request.local_offset;
+    out.src.len = bytes;
+    out.src.tseg = main_tseg_;
+    out.wr.opcode = URMA_OPC_WRITE;
+    // Normal uses the tested relaxed data path. Notifying FADDs retain a
+    // strong fence on the SAME lane. LL keeps conservative WRITE ordering.
+    out.wr.flag.bs.place_order = mode_.normal ? URMA_RELAX_ORDER : URMA_STRONG_ORDER;
+    out.wr.rw.src.sge = &out.src;
+    out.wr.rw.src.num_sge = 1;
+    out.wr.rw.dst.sge = &out.dst;
+    out.wr.rw.dst.num_sge = 1;
+  } else {
+    atomic_operands_[out.context] = 0;
+    out.src.addr = reinterpret_cast<uint64_t>(&atomic_operands_[out.context]);
+    out.src.len = sizeof(uint64_t);
+    out.src.tseg = operand_tseg_;
+    out.wr.opcode = URMA_OPC_FADD;
+    out.wr.flag.bs.place_order = URMA_STRONG_ORDER;
+    out.wr.flag.bs.fence = request.fence ? URMA_FENCE_ENABLE : URMA_FENCE_DISABLE;
+    out.wr.faa.src = &out.src;
+    out.wr.faa.dst = &out.dst;
+    out.wr.faa.operand = static_cast<uint64_t>(request.value);
+  }
+}
+void UrmaTransport::submit_prepared(size_t lane) {
+  if (prepared_.empty()) return;
+  for (size_t i = 0; i < prepared_.size(); ++i)
+    prepared_[i].wr.next = i+1 < prepared_.size() ? &prepared_[i+1].wr : nullptr;
+  urma_jfs_wr_t* bad = nullptr;
+  int rc = urma_post_jetty_send_wr(jetties_[lane], &prepared_[0].wr, &bad);
+  if (rc == URMA_SUCCESS) return;
+  // The API specifies bad_wr as the first rejected request. Keep accepted
+  // contexts/scratch alive for DMA; release only the rejected suffix.
+  size_t first_bad = prepared_.size();
+  for (size_t i = 0; i < prepared_.size(); ++i)
+    if (bad == &prepared_[i].wr) { first_bad = i; break; }
+  if (first_bad == prepared_.size()) {
+    failed_ = true; // unknown acceptance: retain everything, teardown is fail-stop
+  } else {
+    for (size_t i = first_bad; i < prepared_.size(); ++i)
+      release_context(prepared_[i].context);
+    if (first_bad) failed_ = true;
+  }
+  check_urma(rc,"urma_post_jetty_send_wr(batch)");
+}
+void UrmaTransport::post_batch(int dst_rank,
+                               std::vector<UrmaWorkRequest> const& requests) {
+  if (requests.empty()) return;
+  if (failed_) throw std::runtime_error("URMA transport has failed");
+  if (dst_rank < 0 || size_t(dst_rank) >= peers_.size() ||
+      peers_[dst_rank].tjetties.size() != jetties_.size())
+    throw std::runtime_error("URMA destination not connected");
+  if (requests.size() > free_contexts_.size())
+    throw std::runtime_error("URMA batch exceeds available context capacity");
+  auto& peer = peers_[dst_rank];
+  // Reject malformed batches before any lane has posted a prefix.
+  for (auto const& request : requests) validate_request(peer,request);
+  for (size_t lane = 0; lane < jetties_.size(); ++lane) {
+    prepared_.clear();
+    try {
+      for (auto const& request : requests) {
+        size_t selected = request.kind == UrmaWorkRequest::Kind::Barrier ?
+            0 : mode_.data_lane(request.ring == UINT32_MAX ? request.wr_id :
+                                (uint64_t(request.ring) << 32));
+        if (selected != lane) continue;
+        prepared_.emplace_back();
+        try {
+          prepare(prepared_.back(),peer,lane,request);
+        } catch (...) {
+          prepared_.pop_back();
+          throw;
+        }
+      }
+    } catch (...) {
+      for (auto const& wr : prepared_) release_context(wr.context);
+      throw;
+    }
+    submit_prepared(lane);
+  }
+}
 void UrmaTransport::post_write(int dst_rank, uint64_t wr_id,
                                uint64_t local_offset, uint64_t remote_offset,
-                               uint32_t bytes, bool) {
-  if (dst_rank < 0 || static_cast<size_t>(dst_rank) >= peers_.size() ||
-      !peers_[dst_rank].tjetty) {
-    throw std::runtime_error("URMA peer is not connected");
-  }
-  if (!main_tseg_ || !main_buffer_) {
-    throw std::runtime_error("URMA main buffer MR is not registered");
-  }
-  check_range(local_offset, bytes, main_buffer_len_);
-  Peer& p = peers_[dst_rank];
-  if (!p.main_tseg) {
-    throw std::runtime_error("URMA peer main seg is not imported");
-  }
-  check_range(remote_offset, bytes, p.main_tseg->seg.len);
-  if (!bytes) throw std::invalid_argument("zero-length URMA write");
-  op_contexts_.push_back({});
-  OpContext& op = op_contexts_.back();
-  op.wr_id = wr_id;
-  op.is_write = true;
-  urma_sge_t src_sge = {};
-  src_sge.addr = reinterpret_cast<uint64_t>(main_buffer_) + local_offset;
-  src_sge.len = bytes;
-  src_sge.tseg = main_tseg_;
-  urma_sge_t dst_sge = {};
-  dst_sge.addr = remote_seg_addr(p.main_tseg, remote_offset);
-  dst_sge.len = bytes;
-  dst_sge.tseg = p.main_tseg;
-  urma_jfs_wr_t wr = {};
-  wr.opcode = URMA_OPC_WRITE;
-  wr.flag.bs.complete_enable = 1;
-  wr.flag.bs.place_order = URMA_STRONG_ORDER;
-  wr.tjetty = p.tjetty;
-  wr.user_ctx = reinterpret_cast<uint64_t>(&op);
-  wr.rw.src.sge = &src_sge;
-  wr.rw.src.num_sge = 1;
-  wr.rw.dst.sge = &dst_sge;
-  wr.rw.dst.num_sge = 1;
-  submit(wr);
-}
-bool UrmaTransport::allocate_operand_slot(size_t& slot) {
-  for (size_t i = 0; i < atomic_operand_used_.size(); ++i) {
-    if (!atomic_operand_used_[i]) {
-      atomic_operand_used_[i] = 1;
-      slot = i;
-      return true;
-    }
-  }
-  return false;
-}
-void UrmaTransport::release_operand_slot(size_t slot) {
-  if (slot < atomic_operand_used_.size()) {
-    atomic_operand_used_[slot] = 0;
-  }
+                               uint32_t bytes, bool low_latency) {
+  if (low_latency == mode_.normal)
+    throw std::invalid_argument("URMA WRITE mode does not match connection mode");
+  UrmaWorkRequest request;
+  request.wr_id = wr_id;
+  request.local_offset = local_offset;
+  request.remote_offset = remote_offset;
+  request.bytes = bytes;
+  post_batch(dst_rank,{request});
 }
 void UrmaTransport::post_atomic_add(int dst_rank, uint64_t wr_id,
-                                    uint64_t remote_atomic_offset,
-                                    int64_t value, bool fence) {
-  if (dst_rank < 0 || static_cast<size_t>(dst_rank) >= peers_.size() ||
-      !peers_[dst_rank].tjetty) {
-    throw std::runtime_error("URMA peer is not connected");
-  }
-  Peer& p = peers_[dst_rank];
-  if (!p.atomic_tseg) {
-    throw std::runtime_error("URMA peer atomic seg is not imported");
-  }
-  check_range(remote_atomic_offset, sizeof(uint64_t), p.atomic_tseg->seg.len);
-  if ((p.atomic_tseg->seg.ubva.va + remote_atomic_offset) % alignof(uint64_t))
-    throw std::invalid_argument("unaligned URMA atomic");
-  size_t slot = 0;
-  if (!allocate_operand_slot(slot)) {
-    throw std::runtime_error("no free URMA atomic operand slot");
-  }
-  atomic_operands_[slot] = 0;
-  op_contexts_.push_back({});
-  OpContext& op = op_contexts_.back();
-  op.wr_id = wr_id;
-  op.is_atomic = true;
-  op.operand_slot = slot;
-  urma_sge_t dst_sge = {};
-  dst_sge.addr = remote_seg_addr(p.atomic_tseg, remote_atomic_offset);
-  dst_sge.len = sizeof(uint64_t);
-  dst_sge.tseg = p.atomic_tseg;
-  urma_sge_t src_sge = {};
-  src_sge.addr = reinterpret_cast<uint64_t>(&atomic_operands_[slot]);
-  src_sge.len = sizeof(uint64_t);
-  src_sge.tseg = operand_tseg_;
-  urma_jfs_wr_t wr = {};
-  wr.opcode = URMA_OPC_FADD;
-  wr.flag.bs.complete_enable = 1;
-  wr.flag.bs.place_order = URMA_STRONG_ORDER;
-  wr.flag.bs.fence = fence ? URMA_FENCE_ENABLE : URMA_FENCE_DISABLE;
-  wr.tjetty = p.tjetty;
-  wr.user_ctx = reinterpret_cast<uint64_t>(&op);
-  wr.faa.dst = &dst_sge;
-  wr.faa.src = &src_sge;
-  wr.faa.operand = static_cast<uint64_t>(value);
-  submit(wr);
+                                    uint64_t offset, int64_t value, bool fence) {
+  UrmaWorkRequest request;
+  request.kind = UrmaWorkRequest::Kind::Atomic;
+  request.wr_id = wr_id;
+  request.remote_offset = offset;
+  request.value = value;
+  request.fence = fence;
+  post_batch(dst_rank,{request});
 }
 void UrmaTransport::post_barrier_atomic_add(int dst_rank, uint64_t wr_id,
                                             size_t slot, uint64_t value) {
-  if (dst_rank < 0 || static_cast<size_t>(dst_rank) >= peers_.size() ||
-      !peers_[dst_rank].tjetty) {
-    throw std::runtime_error("URMA peer is not connected");
-  }
-  Peer& p = peers_[dst_rank];
-  if (!p.barrier_tseg) {
-    throw std::runtime_error("URMA peer barrier seg is not imported");
-  }
-  if (slot * sizeof(uint64_t) >= p.barrier_tseg->seg.len) {
-    throw std::runtime_error("URMA barrier slot out of range");
-  }
-  size_t operand_slot = 0;
-  if (!allocate_operand_slot(operand_slot)) {
-    throw std::runtime_error("no free URMA barrier operand slot");
-  }
-  atomic_operands_[operand_slot] = 0;
-  op_contexts_.push_back({});
-  OpContext& op = op_contexts_.back();
-  op.wr_id = wr_id;
-  op.is_atomic = true;
-  op.operand_slot = operand_slot;
-  urma_sge_t dst_sge = {};
-  dst_sge.addr = remote_seg_addr(p.barrier_tseg, slot * sizeof(uint64_t));
-  dst_sge.len = sizeof(uint64_t);
-  dst_sge.tseg = p.barrier_tseg;
-  urma_sge_t src_sge = {};
-  src_sge.addr = reinterpret_cast<uint64_t>(&atomic_operands_[operand_slot]);
-  src_sge.len = sizeof(uint64_t);
-  src_sge.tseg = operand_tseg_;
-  urma_jfs_wr_t wr = {};
-  wr.opcode = URMA_OPC_FADD;
-  wr.flag.bs.complete_enable = 1;
-  wr.flag.bs.place_order = URMA_STRONG_ORDER;
-  wr.flag.bs.fence = URMA_FENCE_ENABLE;
-  wr.tjetty = p.tjetty;
-  wr.user_ctx = reinterpret_cast<uint64_t>(&op);
-  wr.faa.dst = &dst_sge;
-  wr.faa.src = &src_sge;
-  wr.faa.operand = value;
-  submit(wr);
+  if (slot >= kNumBarrierWords) throw std::out_of_range("invalid barrier slot");
+  UrmaWorkRequest request;
+  request.kind = UrmaWorkRequest::Kind::Barrier;
+  request.wr_id = wr_id;
+  request.remote_offset = slot * sizeof(uint64_t);
+  request.value = static_cast<int64_t>(value);
+  post_batch(dst_rank,{request});
 }
 uint64_t UrmaTransport::load_barrier_word(size_t slot) const {
-  if (slot >= barrier_words_.size()) {
-    throw std::runtime_error("URMA barrier slot out of range");
-  }
-  return __atomic_load_n(&barrier_words_[slot], __ATOMIC_ACQUIRE);
+  if (slot >= barrier_words_.size()) throw std::out_of_range("invalid barrier slot");
+  return __atomic_load_n(&barrier_words_[slot],__ATOMIC_ACQUIRE);
 }
 int UrmaTransport::poll(TransportCompletion* out, int max) {
   if (!jfc_ || max <= 0) return 0;
-  // urma_poll_jfc documents at most 16 CRs per call for RDMA devices.
-  if (max > 16) max = 16;
-  urma_cr_t crs[16]{};
-  int n = urma_poll_jfc(jfc_, max, crs);
-  if (n < 0) {
-    throw std::runtime_error("urma_poll_jfc failed");
-  }
-  for (int i = 0; i < n; ++i) {
-    auto* op = reinterpret_cast<OpContext*>(crs[i].user_ctx);
-    auto it = std::find_if(op_contexts_.begin(), op_contexts_.end(),
-                           [op](OpContext const& x) { return &x == op; });
-    if (it == op_contexts_.end()) {
-      failed_ = true;
-      throw std::runtime_error("unexpected URMA completion context");
+  int total = 0;
+  // SDK calls are limited to 16 CRs; drain several full batches without
+  // forcing a trip around the Proxy loop for every 16 completions.
+  while (total < max) {
+    int wanted = std::min(16,max-total);
+    urma_cr_t crs[16]{};
+    int n = urma_poll_jfc(jfc_,wanted,crs);
+    if (n < 0) throw std::runtime_error("urma_poll_jfc failed");
+    for (int i = 0; i < n; ++i) {
+      uint64_t token = crs[i].user_ctx;
+      size_t index = token & 0xffffULL;
+      uint64_t generation = token >> 16;
+      if (index >= op_contexts_.size() || !op_contexts_[index].active ||
+          op_contexts_[index].generation != generation) {
+        failed_ = true;
+        throw std::runtime_error("unexpected/stale URMA completion context");
+      }
+      auto const& op = op_contexts_[index];
+      auto& completion = out[total+i];
+      completion = {};
+      completion.wr_id = op.wr_id;
+      completion.is_write = op.is_write;
+      completion.is_atomic = op.is_atomic;
+      completion.data = crs[i].imm_data;
+      completion.status = crs[i].status == URMA_CR_SUCCESS ? 0 : int(crs[i].status);
+      if (completion.status) failed_ = true;
+      release_context(index);
     }
-    out[i] = {};
-    out[i].wr_id = it->wr_id;
-    out[i].is_write = it->is_write;
-    out[i].is_atomic = it->is_atomic;
-    if (it->operand_slot != static_cast<size_t>(-1))
-      release_operand_slot(it->operand_slot);
-    op_contexts_.erase(it);
-    if (crs[i].status != URMA_CR_SUCCESS) failed_ = true;
-    out[i].data = crs[i].imm_data;
-    out[i].is_recv_data = false;
-    out[i].status =
-        crs[i].status == URMA_CR_SUCCESS ? 0 : static_cast<int>(crs[i].status);
+    total += n;
+    if (n < wanted) break;
   }
-  return n;
-}
-void UrmaTransport::submit(urma_jfs_wr_t& wr) {
-  urma_jfs_wr_t* bad = nullptr;
-  int rc = failed_ ? URMA_EINVAL : urma_post_jetty_send_wr(jetty_, &wr, &bad);
-  if (rc != URMA_SUCCESS) {
-    auto& op = op_contexts_.back();
-    if (op.operand_slot != static_cast<size_t>(-1))
-      release_operand_slot(op.operand_slot);
-    op_contexts_.pop_back();
-    check_urma(rc, "urma_post_jetty_send_wr");
-  }
+  return total;
 }
 void UrmaTransport::drain() {
   auto deadline = std::chrono::steady_clock::now() + std::chrono::seconds(30);
   TransportCompletion out[16];
-  while (!op_contexts_.empty()) {
+  while (outstanding()) {
     poll(out, 16);
     if (std::chrono::steady_clock::now() >= deadline)
       throw std::runtime_error("URMA teardown timed out with in-flight DMA");
@@ -694,9 +751,9 @@ void UrmaTransport::drain() {
 }
 void UrmaTransport::destroy() {
   drain();
-  if (bound_) {
-    check_urma(urma_unbind_jetty(jetty_), "urma_unbind_jetty");
-    bound_ = false;
+  while (bound_lanes_) {
+    --bound_lanes_;
+    check_urma(urma_unbind_jetty(jetties_[bound_lanes_]), "urma_unbind_jetty");
   }
   for (auto& p : peers_) {
     if (p.main_tseg) {
@@ -711,16 +768,14 @@ void UrmaTransport::destroy() {
       check_urma(urma_unimport_seg(p.barrier_tseg), "unimport barrier");
       p.barrier_tseg = nullptr;
     }
-    if (p.tjetty) {
-      check_urma(urma_unimport_jetty(p.tjetty), "unimport jetty");
-      p.tjetty = nullptr;
-    }
+    for (auto* target : p.tjetties)
+      check_urma(urma_unimport_jetty(target), "unimport jetty");
+    p.tjetties.clear();
   }
   peers_.clear();
-  if (jetty_) {
-    check_urma(urma_delete_jetty(jetty_), "delete jetty");
-    jetty_ = nullptr;
-  }
+  for (auto* jetty : jetties_)
+    check_urma(urma_delete_jetty(jetty), "delete jetty");
+  jetties_.clear();
   if (jfr_) {
     check_urma(urma_delete_jfr(jfr_), "delete jfr");
     jfr_ = nullptr;
@@ -760,6 +815,11 @@ void UrmaTransport::destroy() {
     if (--g_urma_init_refcount == 0) check_urma(urma_uninit(), "urma_uninit");
     init_acquired_ = false;
   }
+  op_contexts_.clear();
+  free_contexts_.clear();
+  prepared_.clear();
+  atomic_operands_.clear();
+  barrier_words_.clear();
   failed_ = false;
 }
 #endif  // USE_URMA

@@ -245,6 +245,29 @@ class Buffer:
     def connect_atomic_buffer(self, proxy: "ep.UcclProxy"):
         ep.connect_atomic_buffer(proxy, self.runtime)
 
+    def validate_transport_mode(self, low_latency: bool):
+        """Fail before benchmarking if Buffer and CPU Proxy modes disagree."""
+        if self.low_latency_mode != low_latency:
+            raise RuntimeError("benchmark and Buffer transport modes disagree")
+        if not self.proxies or any(
+            bool(proxy.use_normal_mode()) != (not low_latency)
+            for proxy in self.proxies
+        ):
+            raise RuntimeError("benchmark and CPU Proxy transport modes disagree")
+        backend = os.environ.get("UCCL_EP_TRANSPORT", "verbs")
+        version = (
+            int(ep.get_urma_mode_version())
+            if hasattr(ep, "get_urma_mode_version") else 0
+        )
+        if backend == "urma" and version != 2:
+            raise RuntimeError("URMA mode parity requires the rebuilt wire-v2 extension")
+        print(
+            f"TRANSPORT_MODE_OK backend={backend} "
+            f"mode={'low_latency' if low_latency else 'normal'} "
+            f"urma_wire={version} proxies={len(self.proxies)}",
+            flush=True,
+        )
+
     def destroy(self):
         """
         Destroy the cpp runtime and release resources.

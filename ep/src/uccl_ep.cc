@@ -2480,6 +2480,13 @@ NB_MODULE(ep, m) {
   });
   m.def("is_sm90_compiled", is_sm90_compiled);
   m.def("get_num_proxy_threads", []() { return kNumProxyThs; });
+  m.def("get_urma_mode_version", []() {
+#ifdef USE_URMA
+    return UrmaMode::kWireVersion;
+#else
+    return uint32_t(0);
+#endif
+  });
   m.def(
       "stream_query",
       [](uintptr_t stream_ptr) {

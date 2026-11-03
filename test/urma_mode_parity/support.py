@@ -1,0 +1,60 @@
+"""Source provenance and explicit loading for freshly rebuilt extensions."""
+import ctypes
+import hashlib
+import importlib.util
+import json
+import os
+from pathlib import Path
+import sys
+import types
+
+REPO=Path(__file__).resolve().parents[2]
+def sha(path):
+    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+
+def digest(value):
+    return hashlib.sha256(json.dumps(value,sort_keys=True,separators=(',',':')).encode()).hexdigest()
+
+def source_manifest():
+    paths=[REPO/'ep/setup.py']
+    for directory in ('ep/src','ep/include','include'):
+        paths.extend(p for p in (REPO/directory).rglob('*') if p.is_file() and p.suffix in ('.h','.hpp','.cuh','.cpp','.cc','.cu','.py','.sh'))
+    return {p.relative_to(REPO).as_posix():sha(p) for p in sorted(set(paths))}
+
+def diagnostic_manifest():
+    paths=[]
+    for directory in ('ep/bench','ep/tests','test/urma_mode_parity','test/verbs_diag'):
+        paths.extend(p for p in (REPO/directory).rglob('*') if p.is_file() and p.suffix in ('.h','.hpp','.cuh','.cpp','.cc','.cu','.py','.sh'))
+    return {p.relative_to(REPO).as_posix():sha(p) for p in sorted(set(paths))}
+
+def load_extension(module):
+    runtime=Path(os.environ.get('MACA_PATH','/opt/maca-3.7.0'))/'lib/libmcruntime.so'
+    if runtime.is_file(): ctypes.CDLL(str(runtime),mode=os.RTLD_NOW|os.RTLD_GLOBAL)
+    import torch
+    package=types.ModuleType('uccl'); package.__path__=[]; sys.modules['uccl']=package
+    spec=importlib.util.spec_from_file_location('uccl.ep',str(module))
+    extension=importlib.util.module_from_spec(spec); sys.modules['uccl.ep']=extension
+    spec.loader.exec_module(extension)
+    package.ep=extension
+    if not hasattr(extension,'get_urma_mode_version') or extension.get_urma_mode_version()!=2:
+        raise RuntimeError('MODE_PARITY_V2_EXTENSION_REQUIRED: rebuild; historical private modules are unsupported')
+    loaded=sorted({line.split()[-1] for line in Path('/proc/self/maps').read_text().splitlines() if '.so' in line and '/' in line})
+    if os.environ.get('UCCL_EP_TRANSPORT')=='urma':
+        private=Path(os.environ['URMA_DIAG_LIBRARY_DIR']).resolve()
+        actual=[Path(p).resolve() for p in loaded if '/liburma.so' in p]
+        if not actual or not all(p.is_relative_to(private) for p in actual):
+            raise RuntimeError(f'PRIVATE_URMA_LIBRARY_REQUIRED: {actual}')
+    return extension,dict(module=str(Path(module).resolve()),module_sha=sha(module),wire=2,torch=torch.__version__,torch_file=torch.__file__,python=sys.executable,loaded_libraries=loaded)
+
+def read_build(directory):
+    data=json.loads((directory/'manifest.json').read_text())
+    module=directory/data['module']
+    if sha(module)!=data['module_sha']:
+        raise RuntimeError('BUILT_MODULE_SHA_MISMATCH')
+    if data['sources']!=source_manifest():
+        raise RuntimeError('SOURCE_CHANGED_SINCE_BUILD: build into a new --build-dir')
+    return module,data
+
+if __name__=='__main__':
+    _,info=load_extension(Path(sys.argv[1]))
+    print('MODE_PARITY_IMPORT_OK '+json.dumps(info),flush=True)

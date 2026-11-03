@@ -18,8 +18,10 @@ struct RDMAConnectionInfo {
   uint64_t atomic_buffer_len = 0;
   uint32_t urma_wire_version = 0;
   static constexpr uint32_t kMaxUrmaBlob = 2048;
+  static constexpr uint32_t kMaxUrmaJettyBlob = 4096;
+  uint32_t urma_normal_mode = 0, urma_channels = 0, urma_jetty_count = 0;
   uint32_t urma_rjetty_len = 0, urma_main_seg_len = 0;
   uint32_t urma_atomic_seg_len = 0, urma_barrier_seg_len = 0;
-  uint8_t urma_rjetty[2048]{}, urma_main_seg[2048]{};
+  uint8_t urma_rjetty[4096]{}, urma_main_seg[2048]{};
   uint8_t urma_atomic_seg[2048]{}, urma_barrier_seg[2048]{};
 };

@@ -485,6 +485,7 @@ def test_loop(local_rank: int, num_local_ranks: int, args: argparse.Namespace):
         explicitly_destroy=True,
         allow_mnnvl=args.allow_mnnvl,
     )
+    buffer.validate_transport_mode(low_latency=True)
 
     for seed in range(int(1e9)):
         if local_rank == 0:

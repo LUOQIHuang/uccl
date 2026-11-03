@@ -13,6 +13,9 @@ EPAdaptiveSleeper::EPAdaptiveSleeper()
 EPAdaptiveSleeper::~EPAdaptiveSleeper() { close(work_eventfd_); }
 
 void EPAdaptiveSleeper::maybe_sleep(ProxyCtx& proxy_ctx) {
+  // URMA/CXI do not own a verbs CQ or completion channel. Never enter the
+  // verbs notification path for those backends (including after 120s idle).
+  if (!is_adaptive_sleep_ || !proxy_ctx.cq || !proxy_ctx.comp_channel) return;
   int ret;
 
   if (std::chrono::steady_clock::now() - last_event_time_ >=

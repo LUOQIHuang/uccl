@@ -169,6 +169,7 @@ class Proxy {
   std::shared_ptr<void> urma_main_allocation_;
   UrmaTransport* urma_transport_ = nullptr;
   std::vector<std::unique_ptr<UrmaTransport>> urma_transports_by_rank_;
+  std::vector<std::vector<UrmaWorkRequest>> urma_batches_by_rank_;
   size_t urma_outstanding_ops_ = 0;
   std::vector<TransferCmd> postponed_atomics_;
   std::vector<uint64_t> postponed_wr_ids_;

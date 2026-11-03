@@ -2,6 +2,7 @@
 // transport.
 #include "urma_transport.hpp"
 #include <cassert>
+#include <algorithm>
 #include <cstring>
 #include <deque>
 #include <iostream>
@@ -10,12 +11,25 @@
 #include <stdexcept>
 #include <cuda.h>
 #include <cuda_runtime_api.h>
+#include <unistd.h>
 
 namespace {
 int resources = 0, init_count = 0, gpu_regs = 0, posts = 0;
 bool fail_context = false, fail_post = false, fail_register = false;
 bool fail_completion = false;
 int selected_device = -1;
+int fail_after = -1;
+int fail_jetty_after = -1, fail_bind_after = -1;
+std::vector<urma_jetty_t*> posted_jetties;
+std::vector<size_t> posted_sizes;
+int poll_calls = 0;
+struct Posted {
+  urma_jetty_t* jetty;
+  uint64_t token;
+  bool write;
+  unsigned order, fence;
+};
+std::vector<Posted> posted_ops;
 std::set<void const*> gpu_ptrs, host_ptrs, sync_ptrs;
 std::map<urma_jfc_t*, std::deque<urma_cr_t>> completions;
 urma_device_t device{};
@@ -140,9 +154,12 @@ urma_jfr_t* urma_create_jfr(urma_context_t*, urma_jfr_cfg_t*) {
 }
 urma_status_t urma_delete_jfr(urma_jfr_t* x) { return release(x); }
 urma_jetty_t* urma_create_jetty(urma_context_t*, urma_jetty_cfg_t* cfg) {
+  if(fail_jetty_after==0) { fail_jetty_after=-1; return nullptr; }
+  if(fail_jetty_after>0) --fail_jetty_after;
   auto* x = create<urma_jetty_t>();
   x->jetty_cfg = *cfg;
-  x->jetty_id.id = 42;
+  static uint32_t next_id = 42;
+  x->jetty_id.id = next_id++;
   return x;
 }
 urma_status_t urma_delete_jetty(urma_jetty_t* x) { return release(x); }
@@ -157,6 +174,7 @@ urma_target_seg_t* urma_register_seg(urma_context_t* c, urma_seg_cfg_t* cfg) {
   if (fail_register) return nullptr;
   if (!cfg->token_id || !cfg->flag.bs.token_id_valid) return nullptr;
   bool gpu = gpu_ptrs.count(reinterpret_cast<void*>(cfg->va));
+  if(!gpu) assert(cfg->va % uint64_t(sysconf(_SC_PAGESIZE))==0);
   if (gpu != bool(cfg->is_gpu_seg) || cfg->flag.bs.non_pin) return nullptr;
 #ifndef USE_METAX
   if (gpu && !sync_ptrs.count(reinterpret_cast<void*>(cfg->va))) return nullptr;
@@ -194,6 +212,9 @@ urma_target_jetty_t* urma_import_jetty(urma_context_t*, urma_rjetty_t* r,
 }
 urma_status_t urma_unimport_jetty(urma_target_jetty_t* t) { return release(t); }
 urma_status_t urma_bind_jetty(urma_jetty_t* j, urma_target_jetty_t* t) {
+  if(fail_bind_after==0) { fail_bind_after=-1; return URMA_EINVAL; }
+  if(fail_bind_after>0) --fail_bind_after;
+  assert(!j->remote_jetty);
   j->remote_jetty = t;
   return 0;
 }
@@ -202,10 +223,17 @@ urma_status_t urma_unbind_jetty(urma_jetty_t* j) {
   return 0;
 }
 urma_status_t urma_post_jetty_send_wr(urma_jetty_t* j, urma_jfs_wr_t* w,
-                                      urma_jfs_wr_t**) {
-  if (fail_post) return URMA_EINVAL;
+                                      urma_jfs_wr_t** bad) {
+  if (fail_post) { *bad = w; return URMA_EINVAL; }
   ++posts;
-  assert(w->flag.bs.place_order == URMA_STRONG_ORDER);
+  posted_jetties.push_back(j);
+  size_t batch_size = 0;
+  for (; w; w = w->next) {
+  if (fail_after == 0) { *bad = w; fail_after = -1; return URMA_EINVAL; }
+  if (fail_after > 0) --fail_after;
+  ++batch_size;
+  posted_ops.push_back({j,w->user_ctx,w->opcode==URMA_OPC_WRITE,
+                       unsigned(w->flag.bs.place_order),unsigned(w->flag.bs.fence)});
   if (w->opcode == URMA_OPC_WRITE) {
     std::memcpy(reinterpret_cast<void*>(w->rw.dst.sge->addr),
                 reinterpret_cast<void*>(w->rw.src.sge->addr),
@@ -220,9 +248,13 @@ urma_status_t urma_post_jetty_send_wr(urma_jetty_t* j, urma_jfs_wr_t* w,
   c.status = fail_completion ? URMA_CR_LOC_LEN_ERR : URMA_CR_SUCCESS;
   c.user_ctx = w->user_ctx;
   completions[j->jetty_cfg.jfs_cfg.jfc].push_back(c);
+  }
+  posted_sizes.push_back(batch_size);
   return 0;
 }
 int urma_poll_jfc(urma_jfc_t* j, int max, urma_cr_t* out) {
+  ++poll_calls;
+  assert(max <= 16);
   int n = 0;
   auto& q = completions[j];
   while (n < max && !q.empty()) {
@@ -243,8 +275,15 @@ int main() {
   }
   fail_context = false;
   assert(init_count == 0 && resources == 0);
+  fail_jetty_after=2;
+  {
+    UrmaTransport t; t.configure(true,8);
+    rejects([&] { t.init(ctx); });
+  }
+  assert(init_count==0 && resources==0);
   alignas(65536) uint64_t a[32]{}, b[32]{};
-  alignas(4096) uint64_t ac[8]{}, bc[8]{};
+  // Also cover ARM64 hosts built with 64KiB base pages.
+  alignas(65536) uint64_t ac[8]{}, bc[8]{};
 #ifdef USE_METAX
   gpu_ptrs = {a, b, ac, bc};
   host_ptrs.clear();
@@ -328,6 +367,114 @@ int main() {
     right.destroy();
   }
   assert(resources == 0 && init_count == 0 && gpu_regs == 0);
+  // Mode-specific endpoint routing and linked submission; same-ring WRITE
+  // and ATOMIC must stay together, including internal/sentinel WRITE IDs.
+  for (bool normal : {true,false}) {
+    UrmaTransport left,right;
+    left.configure(normal,normal ? 8 : 1);
+    right.configure(normal,normal ? 8 : 1);
+    left.init(ctx); right.init(ctx);
+    rejects([&] { left.configure(normal,1); });
+    left.register_main_buffer(a,sizeof(a),2); right.register_main_buffer(b,sizeof(b),2);
+    left.register_atomic_buffer(ac,sizeof(ac),2); right.register_atomic_buffer(bc,sizeof(bc),2);
+    auto li=left.local_info(), ri=right.local_info();
+    assert(li.urma_channels==(normal ? 8U : 1U));
+    assert(li.urma_jetty_count==(normal ? 9U : 1U));
+    auto bad=ri; bad.urma_normal_mode=!normal;
+    rejects([&] { left.connect_peer(1,bad); });
+    bad=ri; ++bad.urma_jetty_count;
+    rejects([&] { left.connect_peer(1,bad); });
+    if(normal) {
+      int before=resources; fail_bind_after=1;
+      rejects([&] { left.connect_peer(1,ri); });
+      assert(resources==before);
+    }
+    left.connect_peer(1,ri); right.connect_peer(0,li);
+    std::memset(b,0,sizeof(b)); std::memset(bc,0,sizeof(bc));
+    std::vector<UrmaWorkRequest> batch;
+    for (unsigned ring=0;ring<3;++ring) {
+      UrmaWorkRequest w;
+      w.wr_id=(uint64_t(ring)<<32)|20; w.bytes=8;
+      w.remote_offset=16+8*ring;
+      if (ring==2) { w.wr_id=UINT64_MAX; w.ring=2; }
+      batch.push_back(w);
+    }
+    for (unsigned ring=0;ring<3;++ring) {
+      UrmaWorkRequest w;
+      w.kind=UrmaWorkRequest::Kind::Atomic;
+      w.wr_id=(uint64_t(ring)<<32)|21; w.remote_offset=8*ring; w.value=5;
+      batch.push_back(w);
+    }
+    int before=posts;
+    size_t seen=posted_ops.size();
+    left.post_batch(1,batch);
+    assert(posts-before==(normal ? 3 : 1));
+    for (size_t i=seen;i<posted_ops.size();++i) {
+      auto const& op=posted_ops[i];
+      assert(op.order==unsigned(op.write && normal ? URMA_RELAX_ORDER : URMA_STRONG_ORDER));
+      if (!op.write) assert(op.fence==URMA_FENCE_ENABLE);
+    }
+    if (normal) {
+      assert(posted_ops[seen].jetty==posted_ops[seen+1].jetty);
+      assert(posted_ops[seen+2].jetty==posted_ops[seen+3].jetty);
+      assert(posted_ops[seen].jetty!=posted_ops[seen+2].jetty);
+      assert(posted_ops[seen+4].jetty!=posted_ops[seen].jetty);
+    }
+    assert(b[2]==a[0] && b[3]==a[0] && b[4]==a[0]);
+    assert(bc[0]==5 && bc[1]==5 && bc[2]==5);
+    TransportCompletion out[64];
+    assert(left.poll(out,64)==6);
+    assert(std::count_if(out,out+6,[](TransportCompletion const& c){return c.wr_id==UINT64_MAX;})==1);
+    auto* data_jetty=posted_jetties.back();
+    left.post_barrier_atomic_add(1,30,0,1);
+    assert((posted_jetties.back()!=data_jetty)==normal);
+    assert(left.poll(out,64)==1 && right.load_barrier_word(0)==1);
+    rejects([&] { left.post_write(1,31,0,0,8,normal); });
+    batch.assign(left.capacity(),{});
+    for (size_t i=0;i<batch.size();++i) {
+      batch[i].wr_id=(uint64_t(2)<<32)|i; batch[i].bytes=8;
+    }
+    left.post_batch(1,batch);
+    rejects([&] { left.post_write(1,32,0,0,8,!normal); });
+    auto* jetty=posted_jetties.back();
+    auto& cq=completions[jetty->jetty_cfg.jfs_cfg.jfc];
+    std::reverse(cq.begin(),cq.end());
+    int polls_before=poll_calls;
+    assert(left.poll(out,64)==int(left.capacity()));
+    assert(poll_calls-polls_before>=2);
+    // Successful pool reuse gets a different generation token.
+    uint64_t previous=posted_ops[posted_ops.size()-batch.size()].token;
+    left.post_write(1,33,0,0,8,!normal);
+    assert((posted_ops.back().token & 0xffffULL)==(previous & 0xffffULL));
+    assert(posted_ops.back().token!=previous);
+    assert(left.poll(out,64)==1);
+    urma_cr_t stale{}; stale.user_ctx=posted_ops.back().token;
+    stale.status=URMA_CR_SUCCESS;
+    cq.push_back(stale);
+    rejects([&] { left.poll(out,64); });
+    left.destroy(); right.destroy();
+    assert(resources==0 && init_count==0 && gpu_regs==0);
+  }
+  {
+    // Partial post failure: accepted prefix stays live, rejected suffix is
+    // released, and the transport refuses further submissions.
+    UrmaTransport left,right;
+    left.init(ctx); right.init(ctx);
+    left.register_main_buffer(a,sizeof(a),2); right.register_main_buffer(b,sizeof(b),2);
+    left.register_atomic_buffer(ac,sizeof(ac),2); right.register_atomic_buffer(bc,sizeof(bc),2);
+    left.connect_peer(1,right.local_info()); right.connect_peer(0,left.local_info());
+    std::vector<UrmaWorkRequest> batch(3);
+    for (size_t i=0;i<batch.size();++i) { batch[i].wr_id=40+i; batch[i].bytes=8; }
+    fail_after=1;
+    rejects([&] { left.post_batch(1,batch); });
+    TransportCompletion out[16];
+    assert(left.poll(out,16)==1 && out[0].wr_id==40);
+    rejects([&] { left.post_write(1,44,0,0,8,false); });
+    left.destroy(); right.destroy();
+    assert(resources==0 && init_count==0 && gpu_regs==0);
+  }
+  assert((UrmaMode{true,1}.atomic_value(7,true)==7));
+  assert((UrmaMode{false,1}.atomic_value(7,true)==1));
   // An owning proxy may stop before another proxy sharing its allocation.
   {
     auto main_owner = UrmaTransport::acquire_buffer_ownership(a, false, 2);
@@ -386,5 +533,5 @@ int main() {
   fail_register = false;
   assert(resources == 0 && init_count == 0);
   std::cout
-      << "URMA transport tests passed (simulated hardware, real SDK headers)\n";
+      << "URMA transport tests passed (simulated hardware; SDK types selected by runner)\n";
 }

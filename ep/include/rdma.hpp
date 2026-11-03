@@ -70,8 +70,12 @@ struct RDMAConnectionInfo {
   // required at both ends. Version rejects the previous opaque-blob format.
   uint32_t urma_wire_version = 0;
   static constexpr uint32_t kMaxUrmaBlob = 2048;
+  static constexpr uint32_t kMaxUrmaJettyBlob = 4096;
+  uint32_t urma_normal_mode = 0;
+  uint32_t urma_channels = 0;
+  uint32_t urma_jetty_count = 0;
   uint32_t urma_rjetty_len = 0;
-  uint8_t urma_rjetty[kMaxUrmaBlob] = {};
+  uint8_t urma_rjetty[kMaxUrmaJettyBlob] = {};
   uint32_t urma_main_seg_len = 0;
   uint8_t urma_main_seg[kMaxUrmaBlob] = {};
   uint32_t urma_atomic_seg_len = 0;

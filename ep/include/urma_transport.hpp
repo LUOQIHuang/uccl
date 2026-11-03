@@ -2,7 +2,9 @@
 
 #include "gpu_platform.hpp"
 #include "transport.hpp"
+#include "urma_mode.hpp"
 #ifdef USE_URMA
+#include "urma_host_page_allocator.hpp"
 #if __has_include(<urma_api.h>)
 #include <urma_api.h>
 #else
@@ -12,7 +14,6 @@
 
 #include <cstddef>
 #include <cstdint>
-#include <list>
 #include <memory>
 #include <stdexcept>
 #include <vector>
@@ -39,6 +40,12 @@ class UrmaTransport final : public EpTransport {
   UrmaTransport(UrmaTransport const&) = delete;
   UrmaTransport& operator=(UrmaTransport const&) = delete;
   void init(ProxyCtx& ctx) override;
+  void configure(bool normal, size_t channels);
+  UrmaMode mode() const { return mode_; }
+  size_t capacity() const;
+  // Input order is retained within each lane. All WRITE/FADD operations from
+  // one ring use its data lane; barrier messages use the control lane.
+  void post_batch(int dst_rank, std::vector<UrmaWorkRequest> const& requests);
   void register_main_buffer(void* ptr, size_t len, int gpu_device) override;
   void register_atomic_buffer(void* ptr, size_t len, int gpu_device) override;
   LocalConnInfo local_info() const override;
@@ -66,22 +73,22 @@ class UrmaTransport final : public EpTransport {
 
  private:
   [[noreturn]] static void unavailable();
+  UrmaMode mode_;
 #ifdef USE_URMA
   ProxyCtx* ctx_ = nullptr;
   bool init_acquired_ = false;
-  bool bound_ = false;
+  size_t bound_lanes_ = 0;
   bool failed_ = false;
   std::shared_ptr<urma_context_t> context_owner_;
   std::vector<std::shared_ptr<UrmaRegistration>> registrations_;
   urma_target_seg_t* register_segment(void* ptr, size_t len, bool gpu,
                                       bool atomic);
   void drain();
-  void submit(urma_jfs_wr_t& wr);
   urma_context_t* urma_ctx_ = nullptr;
   urma_jfce_t* jfce_ = nullptr;
   urma_jfc_t* jfc_ = nullptr;
   urma_jfr_t* jfr_ = nullptr;
-  urma_jetty_t* jetty_ = nullptr;
+  std::vector<urma_jetty_t*> jetties_;
   void* main_buffer_ = nullptr;
   void* atomic_buffer_ = nullptr;
   size_t main_buffer_len_ = 0;
@@ -90,16 +97,15 @@ class UrmaTransport final : public EpTransport {
   urma_target_seg_t* main_tseg_ = nullptr;
   urma_target_seg_t* atomic_tseg_ = nullptr;
   // Scratch buffer receiving the "old value" writeback of FADD ops.
-  std::vector<uint64_t> atomic_operands_;
-  std::vector<uint8_t> atomic_operand_used_;
+  std::vector<uint64_t,UrmaHostPageAllocator<uint64_t>> atomic_operands_;
   urma_target_seg_t* operand_tseg_ = nullptr;
   // Locally-owned barrier words; remote peers FADD into them.
-  std::vector<uint64_t> barrier_words_;
+  std::vector<uint64_t,UrmaHostPageAllocator<uint64_t>> barrier_words_;
   urma_target_seg_t* barrier_tseg_ = nullptr;
   LocalConnInfo local_info_{};
   // Per-peer imported objects.
   struct Peer {
-    urma_target_jetty_t* tjetty = nullptr;
+    std::vector<urma_target_jetty_t*> tjetties;
     urma_target_seg_t* main_tseg = nullptr;
     urma_target_seg_t* atomic_tseg = nullptr;
     urma_target_seg_t* barrier_tseg = nullptr;
@@ -108,12 +114,28 @@ class UrmaTransport final : public EpTransport {
   // In-flight op bookkeeping (mirrors the CXI OpContext pattern).
   struct OpContext {
     uint64_t wr_id = 0;
+    uint64_t generation = 0;
     bool is_write = false;
     bool is_atomic = false;
-    size_t operand_slot = static_cast<size_t>(-1);
+    bool active = false;
   };
-  std::list<OpContext> op_contexts_;
-  bool allocate_operand_slot(size_t& slot);
-  void release_operand_slot(size_t slot);
+  // Stable slots give O(1) completion lookup and O(1) FADD scratch allocation.
+  // user_ctx uses 48 generation bits + 16 index bits. Stale CQEs cannot retire
+  // reused slots, and sustained LL traffic does not exhaust a 32-bit epoch.
+  std::vector<OpContext> op_contexts_;
+  std::vector<size_t> free_contexts_;
+  size_t acquire_context(UrmaWorkRequest const& request);
+  void release_context(size_t index);
+  size_t outstanding() const { return op_contexts_.size() - free_contexts_.size(); }
+  struct PreparedWr {
+    urma_jfs_wr_t wr{};
+    urma_sge_t src{}, dst{};
+    size_t context = 0;
+  };
+  std::vector<PreparedWr> prepared_;
+  void validate_request(Peer const& peer, UrmaWorkRequest const& request) const;
+  void prepare(PreparedWr& out, Peer& peer, size_t lane,
+               UrmaWorkRequest const& request);
+  void submit_prepared(size_t lane);
 #endif
 };

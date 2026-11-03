@@ -33,4 +33,4 @@ else
 fi
 [ -x "$PYTHON_BIN" ] || { echo "PYTHON_NOT_EXECUTABLE=$PYTHON_BIN" >&2; exit 2; }
 printf 'DIAG_ROOT=%s\nDIAG_PYTHON=%s\n' "$TASK_ROOT" "$PYTHON_BIN"
-exec "$PYTHON_BIN" "$HERE/driver.py" "$@"
+exec "$PYTHON_BIN" "${VERBS_DIAG_ENTRYPOINT:-$HERE/driver.py}" "$@"

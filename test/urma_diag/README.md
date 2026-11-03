@@ -1,6 +1,6 @@
 # URMA Normal 初步定位
 
-当前优先运行最新的 [替换边界诊断](BOUNDARIES.zh-CN.md)：`run_boundaries.sh` 自动串联 4 个固定配置的无插桩对照与 WRITE/FADD/CQ API 诊断。它替代此前仅依赖 perf 热点的下一轮安排；下面保留首轮和旧 perf 方案以便复核。
+当前已进入生产实现对齐阶段，请使用 [Normal/LL v2 构建与验收](../urma_mode_parity/README.md)。下面及 [替换边界诊断](BOUNDARIES.zh-CN.md) 保留历史 v1 私有模块的诊断流程；这些流程要求匹配的旧 benchmark 源码，不能与当前 v2 benchmark 混用。
 
 本入口复用 test/verbs_diag 的 24 组正确性检查、22 个固定调优点、独立 API CUDA-event 计时、原始日志和线程快照。只在结果目录生成 benchmark/utils 副本，不修改原文件或私有二进制，不修改 WRITE/FADD/fence/quiet/barrier 的语义。
 

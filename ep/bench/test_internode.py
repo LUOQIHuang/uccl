@@ -566,6 +566,7 @@ def test_loop(
         num_qps_per_rank=num_qps_per_rank,
         explicitly_destroy=True,
     )
+    buffer.validate_transport_mode(low_latency=False)
 
     assert num_nodes > 1 and num_ranks > num_local_ranks
 
