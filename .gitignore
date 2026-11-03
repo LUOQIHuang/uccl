@@ -131,3 +131,8 @@ test/**/*.bin
 
 # Benchmark result logs (explicitly tracked, labeled by node)
 !test/bench_results/**/*.log
+
+# Verbs diagnostics: share small, selected results alongside logs.
+!test/bench_results/verbs_diag/**/*.json
+!test/bench_results/verbs_diag/**/*.jsonl
+!test/bench_results/verbs_diag/**/*.csv
