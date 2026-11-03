@@ -1,0 +1,43 @@
+--- a/test_low_latency.py
++++ b/test_low_latency.py
+@@ -200,14 +200,32 @@
+                                 if dispatch_use_fp8_case
+                                 else packed_recv_x
+                             )
+-                            simulated_gemm_x = (
+-                                per_token_cast_back(
+-                                    packed_recv_x[0].view(-1, hidden),
+-                                    packed_recv_x[1].view(-1, hidden // 128),
+-                                ).view(packed_recv_x[0].shape)
+-                                if dispatch_use_fp8_case
+-                                else packed_recv_x.clone()
+-                            )
++                            if dispatch_use_fp8_case:
++                                # Convert one expert at a time to bound the FP32
++                                # temporary. The resulting full BF16 tensor is
++                                # unchanged and used by the same combine test.
++                                simulated_gemm_x = torch.empty_like(
++                                    packed_recv_x[0], dtype=torch.bfloat16
++                                )
++                                for expert in range(packed_recv_x[0].size(0)):
++                                    simulated_gemm_x[expert] = per_token_cast_back(
++                                        packed_recv_x[0][expert],
++                                        packed_recv_x[1][expert],
++                                    )
++                                if os.getenv("UCCL_LL_VERIFY_CHUNK") == "1":
++                                    assert packed_recv_x[0].numel() <= (1 << 28)
++                                    reference = per_token_cast_back(
++                                        packed_recv_x[0].view(-1, hidden),
++                                        packed_recv_x[1].view(-1, hidden // 128),
++                                    ).view(packed_recv_x[0].shape)
++                                    assert torch.equal(
++                                        simulated_gemm_x.view(torch.int16),
++                                        reference.view(torch.int16),
++                                    ), "chunked conversion differs from reference"
++                                    del reference
++                                    print("CHUNK_CAST_BITWISE_PASS", flush=True)
++                            else:
++                                simulated_gemm_x = packed_recv_x.clone()
+                             all_topk_idx = torch.empty(
+                                 (num_ranks, num_tokens, num_topk),
+                                 dtype=topk_idx.dtype,

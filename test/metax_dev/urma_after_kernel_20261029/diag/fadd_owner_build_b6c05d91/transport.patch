@@ -1,0 +1,31 @@
+--- urma_transport.cpp
++++ urma_transport.cpp
+@@ -65,11 +65,13 @@
+   ~UrmaAllocation() {
+     if (!owned) return;
+     try {
++      std::fprintf(stderr, "OWNER_FREE_BEGIN ptr=%p device=%d host=%d\n", ptr, gpu_device, host);
+       uccl::gpu_p2p::release_memory(
+           ptr,
+           host ? uccl::gpu_p2p::MemoryKind::HostMapped
+                : uccl::gpu_p2p::MemoryKind::Device,
+           gpu_device);
++      std::fprintf(stderr, "OWNER_FREE_OK ptr=%p\n", ptr);
+     } catch (std::exception const& e) {
+       std::fprintf(stderr, "URMA failed to release %s allocation: %s\n",
+                    uccl::gpu_p2p::vendor_name(), e.what());
+@@ -663,8 +665,13 @@
+     out[i].wr_id = it->wr_id;
+     out[i].is_write = it->is_write;
+     out[i].is_atomic = it->is_atomic;
+-    if (it->operand_slot != static_cast<size_t>(-1))
++    if (it->operand_slot != static_cast<size_t>(-1)) {
++      std::fprintf(stderr, "FADD_OLD wr_id=%llu value=%llu cr_status=%d\n",
++                   static_cast<unsigned long long>(it->wr_id),
++                   static_cast<unsigned long long>(atomic_operands_[it->operand_slot]),
++                   static_cast<int>(crs[i].status));
+       release_operand_slot(it->operand_slot);
++    }
+     op_contexts_.erase(it);
+     if (crs[i].status != URMA_CR_SUCCESS) failed_ = true;
+     out[i].data = crs[i].imm_data;

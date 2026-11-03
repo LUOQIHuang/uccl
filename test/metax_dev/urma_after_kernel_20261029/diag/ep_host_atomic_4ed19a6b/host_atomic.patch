@@ -1,0 +1,161 @@
+--- a/ep/src/uccl_proxy.cpp
++++ b/ep/src/uccl_proxy.cpp
+@@ -72,33 +72,75 @@
+   if (thread_idx == 0) {
+     if (uses_urma_) {
+ #if defined(__MC_PLATFORM_MXCC__) || defined(__MCC__) || defined(__MXCC__)
+-      // The UMMU grant requires a page-aligned registration address and the
+-      // MetaX P2P bridge pins 8 KiB GPU pages. Retain the original allocation
+-      // for release, and expose an aligned range with enough padded backing.
+-      constexpr size_t alignment = 8192;
+-      constexpr size_t padded_bytes =
+-          (kAtomicBufferSize + alignment - 1) & ~(alignment - 1);
+-      void* allocation_base = nullptr;
+-      auto rc = mcExtMallocWithFlags(&allocation_base,
+-                                      padded_bytes + alignment - 1,
+-                                      mcDeviceMallocFinegrained);
+-      if (rc != 0 || !allocation_base)
+-        throw std::runtime_error("MetaX atomic buffer allocation failed");
+-      auto raw = reinterpret_cast<uintptr_t>(allocation_base);
+-      if (raw > std::numeric_limits<uintptr_t>::max() - (alignment - 1)) {
+-        mcFree(allocation_base);
+-        throw std::overflow_error("MetaX atomic buffer alignment overflow");
+-      }
+-      atomic_buffer_ptr_ = reinterpret_cast<void*>(
+-          (raw + alignment - 1) & ~(static_cast<uintptr_t>(alignment) - 1));
+-      atomic_buffer_is_host_allocated_ = false;
+-      try {
+-        urma_atomic_allocation_ = UrmaTransport::acquire_buffer_ownership(
+-            atomic_buffer_ptr_, false, device_index_, allocation_base);
+-      } catch (...) {
+-        mcFree(allocation_base);
+-        atomic_buffer_ptr_ = nullptr;
+-        throw;
++      if (!uccl::gpu_p2p::atomic_buffer_is_gpu_memory()) {
++        // The private diagnostic mode uses mapped host control memory: URMA
++        // FADD targets host memory and the GPU polls the same UVA. Payloads
++        // remain in device memory. Keep the base pointer for cudaFreeHost.
++        constexpr size_t alignment = 4096;
++        void* allocation_base = nullptr;
++        uccl::gpu_p2p::set_device(device_index_);
++        auto rc = cudaHostAlloc(&allocation_base,
++                                kAtomicBufferSize + alignment - 1,
++                                cudaHostAllocMapped);
++        if (rc != cudaSuccess || !allocation_base)
++          throw std::runtime_error("MetaX mapped atomic allocation failed");
++        void* gpu_base = nullptr;
++        rc = cudaHostGetDevicePointer(&gpu_base, allocation_base, 0);
++        auto raw = reinterpret_cast<uintptr_t>(allocation_base);
++        if (rc != cudaSuccess ||
++            raw > std::numeric_limits<uintptr_t>::max() - (alignment - 1)) {
++          cudaFreeHost(allocation_base);
++          throw std::runtime_error("MetaX mapped atomic address unavailable");
++        }
++        auto aligned = (raw + alignment - 1) &
++                       ~(static_cast<uintptr_t>(alignment) - 1);
++        auto gpu_raw = reinterpret_cast<uintptr_t>(gpu_base);
++        auto offset = aligned - raw;
++        if (gpu_raw > std::numeric_limits<uintptr_t>::max() - offset ||
++            gpu_raw + offset != aligned) {
++          cudaFreeHost(allocation_base);
++          throw std::runtime_error(
++              "MetaX mapped atomic control requires identical CPU/GPU UVA");
++        }
++        atomic_buffer_ptr_ = reinterpret_cast<void*>(aligned);
++        atomic_buffer_is_host_allocated_ = true;
++        try {
++          urma_atomic_allocation_ = UrmaTransport::acquire_buffer_ownership(
++              atomic_buffer_ptr_, true, device_index_, allocation_base);
++        } catch (...) {
++          cudaFreeHost(allocation_base);
++          atomic_buffer_ptr_ = nullptr;
++          throw;
++        }
++      } else {
++        // The UMMU grant requires a page-aligned registration address and the
++        // MetaX P2P bridge pins 8 KiB GPU pages. Retain the original allocation
++        // for release, and expose an aligned range with enough padded backing.
++        constexpr size_t alignment = 8192;
++        constexpr size_t padded_bytes =
++            (kAtomicBufferSize + alignment - 1) & ~(alignment - 1);
++        void* allocation_base = nullptr;
++        auto rc = mcExtMallocWithFlags(&allocation_base,
++                                        padded_bytes + alignment - 1,
++                                        mcDeviceMallocFinegrained);
++        if (rc != 0 || !allocation_base)
++          throw std::runtime_error("MetaX atomic buffer allocation failed");
++        auto raw = reinterpret_cast<uintptr_t>(allocation_base);
++        if (raw > std::numeric_limits<uintptr_t>::max() - (alignment - 1)) {
++          mcFree(allocation_base);
++          throw std::overflow_error("MetaX atomic buffer alignment overflow");
++        }
++        atomic_buffer_ptr_ = reinterpret_cast<void*>(
++            (raw + alignment - 1) & ~(static_cast<uintptr_t>(alignment) - 1));
++        atomic_buffer_is_host_allocated_ = false;
++        try {
++          urma_atomic_allocation_ = UrmaTransport::acquire_buffer_ownership(
++              atomic_buffer_ptr_, false, device_index_, allocation_base);
++        } catch (...) {
++          mcFree(allocation_base);
++          atomic_buffer_ptr_ = nullptr;
++          throw;
++        }
+       }
+ #else
+       atomic_buffer_ptr_ = uccl::gpu_p2p::allocate_atomic_buffer(
+--- a/ep/src/gpu_p2p_runtime.cpp
++++ b/ep/src/gpu_p2p_runtime.cpp
+@@ -12,6 +12,7 @@
+ 
+ #ifdef USE_METAX
+ #include <dlfcn.h>
++#include <cuda_runtime_api.h>
+ #else
+ #include <cuda.h>
+ #include <cuda_runtime_api.h>
+@@ -158,7 +159,13 @@
+ 
+ bool atomic_buffer_is_gpu_memory() {
+ #ifdef USE_METAX
+-  return true;
++  // Snapshot the setting once so allocation, registration and reset agree
++  // throughout the lifetime of an active transport.
++  static bool const use_host = [] {
++    auto const* value = std::getenv("UCCL_METAX_URMA_HOST_ATOMICS");
++    return value && std::strcmp(value, "1") == 0;
++  }();
++  return !use_host;
+ #else
+   return false;
+ #endif
+@@ -298,9 +305,14 @@
+ void release_memory(void* ptr, MemoryKind kind, int device) {
+   if (!ptr) return;
+ #ifdef USE_METAX
+-  if (kind != MemoryKind::Device)
+-    throw std::invalid_argument("MetaX URMA owns device allocations only");
+-  set_device(device);
++  set_device(device);
++  if (kind == MemoryKind::HostMapped) {
++    auto const rc = cudaFreeHost(ptr);
++    if (rc != cudaSuccess)
++      throw std::runtime_error("cudaFreeHost failed: rc=" +
++                               std::to_string(static_cast<int>(rc)));
++    return;
++  }
+   check_mc(metax().free(ptr), "mcFree");
+   std::lock_guard<std::mutex> lock(g_allocations_mutex);
+   g_allocations.erase(ptr);
+--- a/ep/src/uccl_ep.cc
++++ b/ep/src/uccl_ep.cc
+@@ -1636,7 +1636,9 @@
+                                  device_index);
+       if (atomic_buffer_ptr != nullptr)
+         uccl::gpu_p2p::zero_memory(atomic_buffer_ptr, kAtomicBufferSize,
+-                                   uccl::gpu_p2p::MemoryKind::Device,
++                                   uccl::gpu_p2p::atomic_buffer_is_gpu_memory()
++                                       ? uccl::gpu_p2p::MemoryKind::Device
++                                       : uccl::gpu_p2p::MemoryKind::HostMapped,
+                                    device_index);
+       return;
+     }

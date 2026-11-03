@@ -1,0 +1,74 @@
+--- a/perftest_parameters.h
++++ b/perftest_parameters.h
+@@ -13,6 +13,7 @@
+ 
+ #include <stdint.h>
+ #include <stdbool.h>
++#include <stdlib.h>
+ 
+ #include "ub_util.h"
+ #include "urma_types.h"
+@@ -157,7 +158,8 @@
+ static inline int perftest_cmd_is_gpu(perftest_cmd_type_t c)
+ {
+     return c == PERFTEST_READ_LAT_GPU || c == PERFTEST_WRITE_LAT_GPU ||
+-           c == PERFTEST_READ_BW_GPU || c == PERFTEST_WRITE_BW_GPU;
++           c == PERFTEST_READ_BW_GPU || c == PERFTEST_WRITE_BW_GPU ||
++           (c == PERFTEST_ATOMIC_LAT && getenv("PERFTEST_DIAG_ATOMIC_GPU_TARGET"));
+ }
+ 
+ typedef enum perftest_jetty_mode {
+--- a/perftest_run_test.c
++++ b/perftest_run_test.c
+@@ -1232,7 +1232,7 @@
+     } else {
+         wr->faa.dst = remote_sge;
+         wr->faa.src = local_sge;
+-        wr->faa.operand = *((uint64_t *)lva);
++        wr->faa.operand = 1;
+     }
+ }
+ 
+@@ -2202,7 +2202,41 @@
+ 
+ int run_atomic_lat(perftest_context_t *ctx, perftest_config_t *cfg)
+ {
+-    return run_read_lat(ctx, cfg);
++    bool server = cfg->comm.server_ip == NULL;
++    uint64_t initial = 11, value = 0, expected;
++    int ret;
++    if (cfg->size != 8 || cfg->jettys != 1 || cfg->jfs_post_list != 1 ||
++        cfg->iters == 0 || cfg->iters > 100 || !cfg->time_type.bs.iterations ||
++        cfg->atomic_type == PERFTEST_CAS) {
++        fprintf(stderr, "VENDOR_ATOMIC_INVALID_TEST_CONFIG\n");
++        return -1;
++    }
++    if (server) {
++        if (!ctx->gpu_bufs || !perftest_gpu_is_device_va(&ctx->gpu_bufs[0]) ||
++            perftest_validation_memcpy_h2d(ctx->local_buf[0], &initial, sizeof(initial))) {
++            fprintf(stderr, "VENDOR_ATOMIC_GPU_SETUP_FAILED\n");
++            return -1;
++        }
++        fprintf(stderr, "VENDOR_ATOMIC_GPU_TARGET_INIT=%lu\n", (unsigned long)initial);
++    } else {
++        value = UINT64_C(0xa5a5a5a5a5a5a5a5);
++        memcpy((char *)ctx->local_buf[0] + ctx->buf_size, &value, sizeof(value));
++    }
++    if (sync_time(cfg->comm.sock_fd[0], "atomic_gpu_ready")) return -1;
++    ret = run_read_lat(ctx, cfg);
++    if (sync_time(cfg->comm.sock_fd[0], "atomic_gpu_done")) return -1;
++    if (server) {
++        if (perftest_validation_memcpy_d2h(&value, ctx->local_buf[0], sizeof(value))) return -1;
++        expected = initial + cfg->iters;
++        fprintf(stderr, "VENDOR_ATOMIC_GPU_TARGET value=%lu expected=%lu match=%d\n",
++                (unsigned long)value, (unsigned long)expected, value == expected);
++    } else {
++        memcpy(&value, (char *)ctx->local_buf[0] + ctx->buf_size, sizeof(value));
++        expected = initial + cfg->iters - 1;
++        fprintf(stderr, "VENDOR_ATOMIC_HOST_RESULT value=%lu expected=%lu match=%d\n",
++                (unsigned long)value, (unsigned long)expected, value == expected);
++    }
++    return ret;
+ }
+ 
+ static int run_once_bw(perftest_context_t *ctx, perftest_config_t *cfg)
