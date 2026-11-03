@@ -1,0 +1,188 @@
+/home/h00918771/uccl-ep-xpu-integration-new/test/verbs_diag/exit_guard.py:8: UserWarning: Could not find flash_attn package installed. Please try to install flash_attn whl pacakge using pip command and make sure it can be imported properly
+  from torch.distributed import run
+/home/h00918771/uccl-ep-xpu-integration-new/test/verbs_diag/worker.py:20: UserWarning: Could not find flash_attn package installed. Please try to install flash_attn whl pacakge using pip command and make sure it can be imported properly
+  import torch
+DIAG_EXTENSION /home/h00918771/metax_dev/urma_after_kernel_20261029/diag/ep_host_atomic_from_204_4ed19a6b/module/ep.abi3.so
+DIAG_RDMA_HINT_BYTES 403243776
+DIAG_ENV {"UCCL_EP_TRANSPORT": "verbs", "UCCL_EP_VERBS_REG": "dmabuf", "UCCL_IB_HCA": "rocep40s0f0", "UCCL_EP_DISABLE_CPU_AFFINITY": "0", "MCCL_IB_DISABLE": "1", "MCCL_SOCKET_IFNAME": "enp33s0"}
+[buffer] num_nvlink_bytes=0.12 GB, num_rdma_bytes=0.48 GB
+Wrong string: 
+Wrong string: 
+[DEBUG] IP distribution across 2 ranks:
+[DEBUG]   141.61.17.202: 1 ranks
+[DEBUG]   141.61.17.204: 1 ranks
+Registered proxies for device 0 (high-throughput mode)
+[RDMA] Selected NIC rocep40s0f0 (index 0) for affinity rank 1, CUDA device 0, NUMA node 0
+[RDMA] Registered GPU memory via DMA-BUF (addr=0xa04c00000, len=483892608, fd_offset=0, rkey=0x126e8)
+[RDMA] GPU MR registration path=dmabuf requested=dmabuf addr=0xa04c00000 bytes=483892608
+[RDMA] Thread 1 sharing NIC rocep40s0f0 context with 1 other thread(s) for affinity rank 1
+[RDMA] Thread 0 sharing NIC rocep40s0f0 context with 2 other thread(s) for affinity rank 1
+[RDMA] Thread 3 sharing NIC rocep40s0f0 context with 3 other thread(s) for affinity rank 1
+Pinned to NUMA node 0, thread_idx: 2, local_rank: 1, running on CPU 6.
+Local CPU thread pinned to NUMA node 0, thread_idx: 2, local_rank: 1, running on CPU 6.
+Pinned to NUMA node 0, thread_idx: 0, local_rank: 1, running on CPU 4.
+Local CPU thread pinned to NUMA node 0, thread_idx: 0, local_rank: 1, running on CPU 4.
+Pinned to NUMA node 0, thread_idx: 3, local_rank: 1, running on CPU 7.
+Local CPU thread pinned to NUMA node 0, thread_idx: 3, local_rank: 1, running on CPU 7.
+Pinned to NUMA node 0, thread_idx: 1, local_rank: 1, running on CPU 5.
+Local CPU thread pinned to NUMA node 0, thread_idx: 1, local_rank: 1, running on CPU 5.
+[RDMA] Registered GPU memory via DMA-BUF (addr=0xa24a03600, len=81960, fd_offset=13824, rkey=0x1815d4)
+[RDMA] control MR registration requested=dmabuf addr=0xa24a03600 bytes=81960
+[Proxy] Registered atomic_buffer_ptr MR: addr=0xa24a03600, len=81960, rkey=0x1815d4
+[RDMA] Registered GPU memory via DMA-BUF (addr=0xa24a03600, len=81960, fd_offset=13824, rkey=0x1825e4)
+[RDMA] control MR registration requested=dmabuf addr=0xa24a03600 bytes=81960
+[Proxy] Registered atomic_buffer_ptr MR: addr=0xa24a03600, len=81960, rkey=0x1825e4
+[RDMA] Registered GPU memory via DMA-BUF (addr=0xa24a03600, len=81960, fd_offset=13824, rkey=0x181bde)
+[RDMA] control MR registration requested=dmabuf addr=0xa24a03600 bytes=81960
+[Proxy] Registered atomic_buffer_ptr MR: addr=0xa24a03600, len=81960, rkey=0x181bde
+[RDMA] Registered GPU memory via DMA-BUF (addr=0xa24a03600, len=81960, fd_offset=13824, rkey=0x180aca)
+[RDMA] control MR registration requested=dmabuf addr=0xa24a03600 bytes=81960
+[Proxy] Registered atomic_buffer_ptr MR: addr=0xa24a03600, len=81960, rkey=0x180aca
+[RDMA] Auto-detected GID index 3 for rocep40s0f0 (set UCCL_IB_GID_INDEX to override)
+[create_per_thread_qp] Populated atomic buffer info: addr=0xa24a03600, len=81960, rkey=0x1815d4
+[RDMA] Auto-detected GID index 3 for rocep40s0f0 (set UCCL_IB_GID_INDEX to override)
+[create_per_thread_qp] Populated atomic buffer info: addr=0xa24a03600, len=81960, rkey=0x181bde
+[RDMA] Auto-detected GID index 3 for rocep40s0f0 (set UCCL_IB_GID_INDEX to override)
+[create_per_thread_qp] Populated atomic buffer info: addr=0xa24a03600, len=81960, rkey=0x1825e4
+[RDMA] Auto-detected GID index 3 for rocep40s0f0 (set UCCL_IB_GID_INDEX to override)
+[create_per_thread_qp] Populated atomic buffer info: addr=0xa24a03600, len=81960, rkey=0x180aca
+QP modified to INIT state
+QP modified to INIT state
+QP modified to INIT state
+QP modified to INIT state
+RoCE detected (Ethernet)
+Remote LID: 0x0, QPN: 819, PSN: 0
+Verifying port state:
+  link_layer: Ethernet (RoCE)
+  port_state: ACTIVE
+  max_mtu: 5
+  active_mtu: 3
+  lid: 0x0
+RoCE detected (Ethernet)
+Remote LID: 0x0, QPN: 820, PSN: 0
+Verifying port state:
+  link_layer: Ethernet (RoCE)
+  port_state: ACTIVE
+  max_mtu: 5
+  active_mtu: 3
+  lid: 0x0
+RoCE detected (Ethernet)
+Remote LID: 0x0, QPN: 818, PSN: 0
+Verifying port state:
+  link_layer: Ethernet (RoCE)
+  port_state: ACTIVE
+  max_mtu: 5
+  active_mtu: 3
+  lid: 0x0
+RoCE detected (Ethernet)
+Remote LID: 0x0, QPN: 817, PSN: 0
+Verifying port state:
+  link_layer: Ethernet (RoCE)
+  port_state: ACTIVE
+  max_mtu: 5
+  active_mtu: 3
+  lid: 0x0
+QP modified to RTR state
+QP modified to RTR state
+QP modified to RTR state
+ACK-QP modified to RTR state
+ACK-QP modified to RTR state
+ACK-QP modified to RTR state
+QP modified to RTR state
+ACK-QP modified to RTR state
+QP modified to RTS state
+QP modified to RTS state
+QP modified to RTS state
+ACK-QP modified to RTS state
+[Proxy] Remote atomic buffer info for peer 1: addr=0xa24a03600, len=81960, rkey=0x1806c5
+ACK-QP modified to RTS state
+[Proxy] Remote atomic buffer info for peer 1: addr=0xa24a03600, len=81960, rkey=0x17fbba
+ACK-QP modified to RTS state
+[Proxy] Peer 1 has num_mr_chunks=0 (single MR: rkey=0x139f8)
+[Proxy] Remote atomic buffer info for peer 1: addr=0xa24a03600, len=81960, rkey=0x1810cf
+QP modified to RTS state
+ACK-QP modified to RTS state
+[Proxy] Remote atomic buffer info for peer 1: addr=0xa24a03600, len=81960, rkey=0x1817d7
+Testing with seed 0 ...
+[config] num_tokens=4096, hidden=7168, num_topk_groups=2, num_topk=8
+[layout] Kernel performance: 0.176 ms
+
+[testing] Running with BF16, without top-k (async=False, previous=False) ...
+[testing] Running with BF16, with top-k (async=False, previous=False) ...
+[testing] Running with BF16, without top-k (async=False, previous=False) ...
+[testing] Running with BF16, with top-k (async=False, previous=False) ...
+[testing] Running with FP8, without top-k (async=False, previous=False) ...
+[testing] Running with FP8, with top-k (async=False, previous=False) ...
+[testing] Running with BF16, without top-k (async=True, previous=False) ...
+[testing] Running with BF16, with top-k (async=True, previous=False) ...
+[testing] Running with BF16, without top-k (async=True, previous=False) ...
+[testing] Running with BF16, with top-k (async=True, previous=False) ...
+[testing] Running with FP8, without top-k (async=True, previous=False) ...
+[testing] Running with FP8, with top-k (async=True, previous=False) ...
+[testing] Running with BF16, without top-k (async=False, previous=True) ...
+[testing] Running with BF16, with top-k (async=False, previous=True) ...
+[testing] Running with BF16, without top-k (async=False, previous=True) ...
+[testing] Running with BF16, with top-k (async=False, previous=True) ...
+[testing] Running with FP8, without top-k (async=False, previous=True) ...
+[testing] Running with FP8, with top-k (async=False, previous=True) ...
+[testing] Running with BF16, without top-k (async=True, previous=True) ...
+[testing] Running with BF16, with top-k (async=True, previous=True) ...
+[testing] Running with BF16, without top-k (async=True, previous=True) ...
+[testing] Running with BF16, with top-k (async=True, previous=True) ...
+[testing] Running with FP8, without top-k (async=True, previous=True) ...
+[testing] Running with FP8, with top-k (async=True, previous=True) ...
+
+[rank0]:[W1104 00:41:16.085346280 ProcessGroupNCCL.cpp:4883] [PG ID 0 PG GUID 0 Rank 0]  using GPU 0 to perform barrier as devices used by this process are currently unknown. This can potentially cause a hang if this rank to GPU mapping is incorrect. Specify device_ids in barrier() to force use of a particular device, or call init_process_group() with a device_id.
+DIAG_METRIC {"op": "dispatch_fp8", "sm": 24, "nvl": 4, "rdma": 4, "transmit_us": 23140.0, "notify_us": 419.302, "api_cuda_event_us": 23633.858680725094, "api_min_us": 23463.680267333984, "api_max_us": 23712.81623840332}
+[tuning] SMs 24, NVL chunk 4, RDMA chunk 4, transmit: 23140.00 us, notify: 419.30 us, BW: 2.61 GB/s (RDMA), 2.61 GB/s (NVL) 
+DIAG_METRIC {"op": "dispatch_fp8", "sm": 24, "nvl": 4, "rdma": 8, "transmit_us": 16097.0, "notify_us": 377.873, "api_cuda_event_us": 16373.20600237165, "api_min_us": 16032.768249511719, "api_max_us": 16980.224609375}
+[tuning] SMs 24, NVL chunk 4, RDMA chunk 8, transmit: 16097.00 us, notify: 377.87 us, BW: 3.75 GB/s (RDMA), 3.75 GB/s (NVL) 
+DIAG_METRIC {"op": "dispatch_fp8", "sm": 24, "nvl": 4, "rdma": 12, "transmit_us": 23268.999999999996, "notify_us": 351.966, "api_cuda_event_us": 23717.37112317767, "api_min_us": 23657.49168395996, "api_max_us": 23812.618255615234}
+[tuning] SMs 24, NVL chunk 4, RDMA chunk 12, transmit: 23269.00 us, notify: 351.97 us, BW: 2.59 GB/s (RDMA), 2.59 GB/s (NVL) 
+DIAG_METRIC {"op": "dispatch_fp8", "sm": 24, "nvl": 4, "rdma": 16, "transmit_us": 3601.9999999999995, "notify_us": 248.943, "api_cuda_event_us": 3909.5039537974767, "api_min_us": 3824.1279125213623, "api_max_us": 3981.3120365142818}
+[tuning] SMs 24, NVL chunk 4, RDMA chunk 16, transmit: 3602.00 us, notify: 248.94 us, BW: 16.74 GB/s (RDMA), 16.75 GB/s (NVL) 
+DIAG_METRIC {"op": "dispatch_fp8", "sm": 24, "nvl": 4, "rdma": 20, "transmit_us": 22590.0, "notify_us": 2004.9999999999998, "api_cuda_event_us": 24672.828401838025, "api_min_us": 24148.542404174805, "api_max_us": 25153.23829650879}
+[tuning] SMs 24, NVL chunk 4, RDMA chunk 20, transmit: 22590.00 us, notify: 2005.00 us, BW: 2.67 GB/s (RDMA), 2.67 GB/s (NVL) 
+DIAG_METRIC {"op": "dispatch_fp8", "sm": 24, "nvl": 4, "rdma": 24, "transmit_us": 16870.0, "notify_us": 253.005, "api_cuda_event_us": 17077.96083177839, "api_min_us": 16458.240509033203, "api_max_us": 17580.28793334961}
+[tuning] SMs 24, NVL chunk 4, RDMA chunk 24, transmit: 16870.00 us, notify: 253.00 us, BW: 3.57 GB/s (RDMA), 3.58 GB/s (NVL) 
+DIAG_METRIC {"op": "dispatch_fp8", "sm": 24, "nvl": 4, "rdma": 28, "transmit_us": 23349.0, "notify_us": 362.931, "api_cuda_event_us": 23804.368564060744, "api_min_us": 23760.896682739258, "api_max_us": 23861.955642700195}
+[tuning] SMs 24, NVL chunk 4, RDMA chunk 28, transmit: 23349.00 us, notify: 362.93 us, BW: 2.58 GB/s (RDMA), 2.58 GB/s (NVL) 
+DIAG_METRIC {"op": "dispatch_fp8", "sm": 24, "nvl": 4, "rdma": 32, "transmit_us": 3500.0, "notify_us": 263.057, "api_cuda_event_us": 3825.042281832014, "api_min_us": 3676.4159202575684, "api_max_us": 3934.720039367676}
+[tuning] SMs 24, NVL chunk 4, RDMA chunk 32, transmit: 3500.00 us, notify: 263.06 us, BW: 17.23 GB/s (RDMA), 17.23 GB/s (NVL) 
+[tuning] Best dispatch (FP8): SMs 24, NVL chunk 4, RDMA chunk 32, transmit: 3500.00 us, notify: 263.06 us, BW: 17.23 GB/s (RDMA), 17.23 GB/s (NVL)
+
+DIAG_METRIC {"op": "dispatch_bf16", "sm": 24, "nvl": 4, "rdma": 4, "transmit_us": 45435.0, "notify_us": 272.469, "api_cuda_event_us": 45853.167942592074, "api_min_us": 45449.72610473633, "api_max_us": 46583.29772949219}
+[tuning] SMs 24, NVL chunk 4, RDMA chunk 4, transmit: 45435.00 us, notify: 272.47 us, BW: 2.57 GB/s (RDMA), 2.57 GB/s (NVL) 
+DIAG_METRIC {"op": "dispatch_bf16", "sm": 24, "nvl": 4, "rdma": 8, "transmit_us": 31668.0, "notify_us": 257.707, "api_cuda_event_us": 32329.312869480673, "api_min_us": 30816.511154174805, "api_max_us": 33222.145080566406}
+[tuning] SMs 24, NVL chunk 4, RDMA chunk 8, transmit: 31668.00 us, notify: 257.71 us, BW: 3.69 GB/s (RDMA), 3.69 GB/s (NVL) 
+DIAG_METRIC {"op": "dispatch_bf16", "sm": 24, "nvl": 4, "rdma": 12, "transmit_us": 45060.0, "notify_us": 549.734, "api_cuda_event_us": 45700.45961652482, "api_min_us": 45641.2353515625, "api_max_us": 45760.6086730957}
+[tuning] SMs 24, NVL chunk 4, RDMA chunk 12, transmit: 45060.00 us, notify: 549.73 us, BW: 2.59 GB/s (RDMA), 2.60 GB/s (NVL) 
+DIAG_METRIC {"op": "dispatch_bf16", "sm": 24, "nvl": 4, "rdma": 16, "transmit_us": 6332.0, "notify_us": 246.784, "api_cuda_event_us": 6632.758821759905, "api_min_us": 6508.543968200684, "api_max_us": 6841.856002807617}
+[tuning] SMs 24, NVL chunk 4, RDMA chunk 16, transmit: 6332.00 us, notify: 246.78 us, BW: 18.47 GB/s (RDMA), 18.47 GB/s (NVL) 
+DIAG_METRIC {"op": "dispatch_bf16", "sm": 24, "nvl": 4, "rdma": 20, "transmit_us": 43817.99999999999, "notify_us": 3482.0000000000005, "api_cuda_event_us": 47508.478982107976, "api_min_us": 47057.32345581055, "api_max_us": 47908.912658691406}
+[tuning] SMs 24, NVL chunk 4, RDMA chunk 20, transmit: 43818.00 us, notify: 3482.00 us, BW: 2.67 GB/s (RDMA), 2.67 GB/s (NVL) 
+DIAG_METRIC {"op": "dispatch_bf16", "sm": 24, "nvl": 4, "rdma": 24, "transmit_us": 32524.000000000004, "notify_us": 352.393, "api_cuda_event_us": 32970.78868321009, "api_min_us": 32316.417694091797, "api_max_us": 33230.3352355957}
+[tuning] SMs 24, NVL chunk 4, RDMA chunk 24, transmit: 32524.00 us, notify: 352.39 us, BW: 3.60 GB/s (RDMA), 3.60 GB/s (NVL) 
+DIAG_METRIC {"op": "dispatch_bf16", "sm": 24, "nvl": 4, "rdma": 28, "transmit_us": 45010.0, "notify_us": 561.314, "api_cuda_event_us": 45679.21284266881, "api_min_us": 45624.671936035156, "api_max_us": 45748.0583190918}
+[tuning] SMs 24, NVL chunk 4, RDMA chunk 28, transmit: 45010.00 us, notify: 561.31 us, BW: 2.60 GB/s (RDMA), 2.60 GB/s (NVL) 
+DIAG_METRIC {"op": "dispatch_bf16", "sm": 24, "nvl": 4, "rdma": 32, "transmit_us": 6280.0, "notify_us": 235.358, "api_cuda_event_us": 6516.516583306449, "api_min_us": 6300.415992736816, "api_max_us": 6785.53581237793}
+[tuning] SMs 24, NVL chunk 4, RDMA chunk 32, transmit: 6280.00 us, notify: 235.36 us, BW: 18.62 GB/s (RDMA), 18.63 GB/s (NVL) 
+[tuning] Best dispatch (BF16): SMs 24, NVL chunk 4, RDMA chunk 32, transmit: 6280.00 us, notify: 235.36 us, BW: 18.62 GB/s (RDMA), 18.63 GB/s (NVL)
+
+DIAG_METRIC {"op": "combine", "sm": 24, "nvl": 4, "rdma": 12, "transmit_us": 45206.0, "notify_us": 665.549, "api_cuda_event_us": 45972.21728733608, "api_min_us": 45809.18884277344, "api_max_us": 46076.072692871094}
+[tuning] SMs 24, NVL chunk 4, RDMA chunk 12, transmit: 45206.00 us, notify: 665.55 us, BW: 2.59 GB/s (RDMA), 2.59 GB/s (NVL) 
+DIAG_METRIC {"op": "combine", "sm": 24, "nvl": 4, "rdma": 16, "transmit_us": 7055.0, "notify_us": 291.294, "api_cuda_event_us": 7383.1314359392445, "api_min_us": 7305.471897125244, "api_max_us": 7468.031883239746}
+[tuning] SMs 24, NVL chunk 4, RDMA chunk 16, transmit: 7055.00 us, notify: 291.29 us, BW: 16.57 GB/s (RDMA), 16.58 GB/s (NVL) 
+DIAG_METRIC {"op": "combine", "sm": 24, "nvl": 4, "rdma": 20, "transmit_us": 44492.0, "notify_us": 3198.0, "api_cuda_event_us": 47896.25985281808, "api_min_us": 47748.78692626953, "api_max_us": 48082.4089050293}
+[tuning] SMs 24, NVL chunk 4, RDMA chunk 20, transmit: 44492.00 us, notify: 3198.00 us, BW: 2.63 GB/s (RDMA), 2.63 GB/s (NVL) 
+DIAG_METRIC {"op": "combine", "sm": 24, "nvl": 4, "rdma": 24, "transmit_us": 32815.0, "notify_us": 366.72, "api_cuda_event_us": 33180.74907575335, "api_min_us": 32812.801361083984, "api_max_us": 33610.2409362793}
+[tuning] SMs 24, NVL chunk 4, RDMA chunk 24, transmit: 32815.00 us, notify: 366.72 us, BW: 3.56 GB/s (RDMA), 3.56 GB/s (NVL) 
+DIAG_METRIC {"op": "combine", "sm": 24, "nvl": 4, "rdma": 28, "transmit_us": 45442.0, "notify_us": 652.902, "api_cuda_event_us": 46210.651942661825, "api_min_us": 46137.40921020508, "api_max_us": 46258.45718383789}
+[tuning] SMs 24, NVL chunk 4, RDMA chunk 28, transmit: 45442.00 us, notify: 652.90 us, BW: 2.57 GB/s (RDMA), 2.57 GB/s (NVL) 
+DIAG_METRIC {"op": "combine", "sm": 24, "nvl": 4, "rdma": 32, "transmit_us": 7392.999999999999, "notify_us": 285.175, "api_cuda_event_us": 7717.302901404244, "api_min_us": 7595.776081085205, "api_max_us": 7828.735828399658}
+[tuning] SMs 24, NVL chunk 4, RDMA chunk 32, transmit: 7393.00 us, notify: 285.18 us, BW: 15.82 GB/s (RDMA), 15.82 GB/s (NVL) 
+[tuning] Best combine: SMs 24, NVL chunk 4, RDMA chunk 16, transmit: 7055.00 us, notify: 291.29 us, BW: 16.57 GB/s (RDMA), 16.58 GB/s (NVL)
+
+
+DIAG_BENCH_DONE
+UCCL_EXIT_ACK_OK node_rank=0
