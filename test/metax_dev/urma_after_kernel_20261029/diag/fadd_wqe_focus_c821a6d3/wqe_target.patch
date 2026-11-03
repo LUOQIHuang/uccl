@@ -1,0 +1,30 @@
+--- a/urma_transport.cpp
++++ b/urma_transport.cpp
+@@ -13,6 +13,11 @@
+ #include <thread>
+ #include <tuple>
+ #include <poll.h>
++#ifdef UCCL_DIAG_WQE
++extern "C" void* diag_wqe_before(urma_jetty_t*, uint32_t*);
++extern "C" void diag_wqe_after(urma_jetty_t*, void*, uint32_t,
++                               urma_jfs_wr_t const*, uint64_t);
++#endif
+ #ifndef USE_URMA
+ // -----------------------------------------------------------------------
+ // Stub build (USE_URMA not requested): every entry point throws.
+@@ -742,7 +747,15 @@
+ }
+ void UrmaTransport::submit(urma_jfs_wr_t& wr) {
+   urma_jfs_wr_t* bad = nullptr;
++#ifdef UCCL_DIAG_WQE
++  uint32_t producer = 0;
++  void* entry = failed_ ? nullptr : diag_wqe_before(jetty_, &producer);
++#endif
+   int rc = failed_ ? URMA_EINVAL : urma_post_jetty_send_wr(jetty_, &wr, &bad);
++#ifdef UCCL_DIAG_WQE
++  if (rc == URMA_SUCCESS)
++    diag_wqe_after(jetty_, entry, producer, &wr, op_contexts_.back().wr_id);
++#endif
+   if (rc != URMA_SUCCESS) {
+     auto& op = op_contexts_.back();
+     if (op.operand_slot != static_cast<size_t>(-1))
