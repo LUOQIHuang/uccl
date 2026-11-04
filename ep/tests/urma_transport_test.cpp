@@ -1,9 +1,11 @@
 // Hardware-independent integration tests: real UMDK types + production
 // transport.
 #include "urma_transport.hpp"
+#include "urma_registration_probe.hpp"
 #include <cassert>
 #include <algorithm>
 #include <cstring>
+#include <cerrno>
 #include <deque>
 #include <iostream>
 #include <map>
@@ -16,6 +18,7 @@
 namespace {
 int resources = 0, init_count = 0, gpu_regs = 0, posts = 0;
 bool fail_context = false, fail_post = false, fail_register = false;
+bool fail_gpu_register = false;
 bool fail_completion = false;
 int selected_device = -1;
 int fail_after = -1;
@@ -169,9 +172,13 @@ urma_token_id_t* urma_alloc_token_id(urma_context_t* c) {
   t->token_id = 123;
   return t;
 }
-urma_status_t urma_free_token_id(urma_token_id_t* t) { return release(t); }
+urma_status_t urma_free_token_id(urma_token_id_t* t) {
+  errno = EINVAL;  // Cleanup must not overwrite the reported registration errno.
+  return release(t);
+}
 urma_target_seg_t* urma_register_seg(urma_context_t* c, urma_seg_cfg_t* cfg) {
   if (fail_register) return nullptr;
+  if (fail_gpu_register && cfg->is_gpu_seg) { errno = ENOSPC; return nullptr; }
   if (!cfg->token_id || !cfg->flag.bs.token_id_valid) return nullptr;
   bool gpu = gpu_ptrs.count(reinterpret_cast<void*>(cfg->va));
   if(!gpu) assert(cfg->va % uint64_t(sysconf(_SC_PAGESIZE))==0);
@@ -532,6 +539,31 @@ int main() {
   }
   fail_register = false;
   assert(resources == 0 && init_count == 0);
+  probe_urma_registration(a, sizeof(a), ac, sizeof(ac), 2, true, 8, 4);
+  assert(resources == 0 && init_count == 0 && gpu_regs == 0);
+  probe_urma_registration(a, sizeof(a), ac, sizeof(ac), 2, false, 1, 1);
+  assert(resources == 0 && init_count == 0 && gpu_regs == 0);
+  {
+    // Failed GPU registrations must preserve errno through cleanup and must
+    // not publish a cache entry; a later valid registration must really retry.
+    UrmaTransport t;
+    t.init(ctx);
+    fail_gpu_register = true;
+    try {
+      t.register_main_buffer(a, sizeof(a), 2);
+      assert(false);
+    } catch (std::runtime_error const& error) {
+      std::string message = error.what();
+      assert(message.find("errno=" + std::to_string(ENOSPC)) != std::string::npos);
+      assert(message.find("atomic=0") != std::string::npos);
+    }
+    fail_gpu_register = false;
+    assert(gpu_regs == 0);
+    t.register_main_buffer(a, sizeof(a), 2);
+    assert(gpu_regs == 1);
+    t.destroy();
+    assert(resources == 0 && init_count == 0 && gpu_regs == 0);
+  }
   std::cout
       << "URMA transport tests passed (simulated hardware; SDK types selected by runner)\n";
 }

@@ -69,7 +69,10 @@ def parser():
     root=Path(os.environ.get('VERBS_DIAG_HOME',str(Path.home())))
     dev=Path(os.environ.get('VERBS_DIAG_DEV_ROOT',str(root/'metax_dev')))
     p=argparse.ArgumentParser(description=__doc__)
-    p.add_argument('--action',choices=('build','check','run','collect'),default='check')
+    p.add_argument('--action',choices=('build','check','run','collect','probe'),default='check')
+    p.add_argument('--probe-transports',type=int,choices=(1,4),default=4)
+    p.add_argument('--probe-channels',type=int,choices=(1,8),default=8)
+    p.add_argument('--probe-bytes',type=int,default=117506432)
     p.add_argument('--job',required=True)
     p.add_argument('--node-rank',type=int,choices=(0,1),required=True)
     p.add_argument('--master-addr')
@@ -95,6 +98,8 @@ def parser():
     args=p.parse_args()
     if not re.fullmatch(r'[a-zA-Z0-9_-]+',args.job): p.error('invalid job')
     if args.action=='run' and not args.master_addr: p.error('--master-addr is required to run')
+    if args.action=='probe' and (args.backend!='urma' or args.mode=='both' or args.probe_bytes<1):
+        p.error('probe requires --backend urma --mode normal|low_latency and positive --probe-bytes')
     if not (1024<=args.port<65535) or not re.fullmatch(r'\d+,\d+,\d+',args.ubctl_selector): p.error('invalid port / UB selector')
     if args.hidden<=0 or args.hidden%128 or args.normal_tokens<=0 or args.ll_tokens<=0 or args.ll_tokens>8191 or args.experts%2 or not 1<=args.topk<=min(args.experts,16) or args.build_jobs<1:
         p.error('invalid benchmark shape / build jobs')
@@ -134,10 +139,39 @@ def collect(args):
         out=target/p.relative_to(source); out.parent.mkdir(parents=True,exist_ok=True); shutil.copy2(p,out)
     print('COLLECTED='+str(target),flush=True)
 
+def kernel_snapshot(root, name):
+    # Keep diagnostics failures from hiding the original registration failure.
+    try:
+        legacy.capture(root/name,['journalctl','-b','-k','-n','400','--no-pager'],timeout=20)
+    except Exception as exc:
+        (root/name).write_text('KERNEL_SNAPSHOT_FAILED: '+str(exc))
+
+def probe(args):
+    root=args.output/args.job/f'node{args.node_rank}'
+    root.mkdir(parents=True,exist_ok=False)
+    module,manifest,info=preflight(args)
+    (root/'preflight.json').write_text(json.dumps(info,indent=2))
+    (root/'build_manifest.json').write_text(json.dumps(manifest,indent=2))
+    legacy.snapshot_host(root,args.hca,args.backend,args.urma_device)
+    legacy.idle_check(root,args.hca,args)
+    kernel_snapshot(root,'kernel_before.txt')
+    command=[sys.executable,'-u',str(HERE/'probe.py'),'--module',str(module),
+             '--mode',args.mode,'--channels',str(args.probe_channels),
+             '--transports',str(args.probe_transports),'--bytes',str(args.probe_bytes)]
+    try:
+        with (root/'probe.log').open('w') as log:
+            result=subprocess.run(command,env=environment(args),stdout=log,stderr=subprocess.STDOUT,timeout=300)
+        (root/'status.json').write_text(json.dumps(dict(rc=result.returncode)))
+        if result.returncode: raise RuntimeError('REGISTRATION_PROBE_FAILED: '+str(root/'probe.log'))
+    finally:
+        kernel_snapshot(root,'kernel_after.txt')
+    print('REGISTRATION_PROBE_PASSED output='+str(root),flush=True)
+
 def main():
     args=parser()
     if args.action=='build': build(args); return
     if args.action=='collect': collect(args); return
+    if args.action=='probe': probe(args); return
     if args.action=='check':
         _,_,info=preflight(args)
         print(json.dumps(info,indent=2)); print('MODE_PARITY_CHECK_PASSED',flush=True); return
@@ -171,6 +205,7 @@ def main():
         for key in ('TMPDIR','XDG_CACHE_HOME'):
             directory=case/('tmpdir' if key=='TMPDIR' else 'cache'); directory.mkdir(); env[key]=str(directory)
         (case/'counters_before.json').write_text(json.dumps(urma_support.counters(args) if args.backend=='urma' else legacy.counters(args.hca)))
+        kernel_snapshot(case,'kernel_before.txt')
         command=[sys.executable,str(HERE.parent/'verbs_diag/exit_guard.py'),'--nnodes=2','--nproc_per_node=1',f'--node_rank={args.node_rank}',f'--master_addr={args.master_addr}',f'--master_port={args.port+1}','--no-python',sys.executable,'-u',str(HERE/'worker.py')]
         print('CASE_BEGIN '+mode,flush=True)
         with (case/'bench.log').open('w') as log:
@@ -179,6 +214,7 @@ def main():
             except subprocess.TimeoutExpired: legacy.terminate(process); rc=124
             except KeyboardInterrupt: legacy.terminate(process); raise
         text=(case/'bench.log').read_text(errors='replace')
+        kernel_snapshot(case,'kernel_after.txt')
         checks=dict(mode=f'TRANSPORT_MODE_OK backend={args.backend} mode={mode}' in text,done='MODE_PARITY_BENCH_DONE' in text,exit_ack=f'UCCL_EXIT_ACK_OK node_rank={args.node_rank}' in text,no_errors=not re.search(r'Traceback \(most recent call last\)|AssertionError|Failed CR status|Segmentation fault|ChildFailedError|\[WARNING\]',text))
         if mode=='normal': checks.update(correctness=text.count('[testing] Running with')==24,profiles=text.count('MODE_PARITY_PROFILE ')==4,tuning=text.count('[tuning] SMs ')==4)
         else: checks.update(correctness='All correctness tests passed!' in text,profiles=text.count('MODE_PARITY_PROFILE ')==2,bandwidth='Dispatch bandwidth:' in text,hook='Dispatch send/recv time:' in text)

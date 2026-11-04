@@ -3,6 +3,7 @@
 #include "gpu_p2p_runtime.hpp"
 #include <algorithm>
 #include <chrono>
+#include <cerrno>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -343,6 +344,9 @@ urma_target_seg_t* UrmaTransport::register_segment(void* ptr, size_t len,
   std::lock_guard<std::mutex> lock(g_resource_mutex);
   SegmentKey key{urma_ctx_, reinterpret_cast<uint64_t>(ptr), len, gpu, atomic};
   if (auto owner = g_segments[key].lock()) {
+    std::fprintf(stderr, "[URMA_REG] rank=%d thread=%d stage=cache_hit kind=%s va=0x%llx len=%zu atomic=%d\n",
+        ctx_->local_rank, ctx_->thread_idx, gpu ? "gpu" : "host",
+        static_cast<unsigned long long>(reinterpret_cast<uint64_t>(ptr)), len, atomic);
     registrations_.push_back(owner);
     return owner->seg;
   }
@@ -390,14 +394,31 @@ urma_target_seg_t* UrmaTransport::register_segment(void* ptr, size_t len,
   cfg.flag.bs.access = URMA_ACCESS_READ | URMA_ACCESS_WRITE;
   if (atomic) cfg.flag.bs.access |= URMA_ACCESS_ATOMIC;
   cfg.is_gpu_seg = gpu ? 1 : 0;
+  std::fprintf(stderr,
+      "[URMA_REG] rank=%d thread=%d stage=begin kind=%s va=0x%llx len=%zu atomic=%d cfg_size=%zu gpu_flag_offset=%zu access=%u\n",
+      ctx_->local_rank, ctx_->thread_idx, gpu ? "gpu" : "host",
+      static_cast<unsigned long long>(cfg.va), len, atomic, sizeof(cfg),
+      offsetof(urma_seg_cfg_t, is_gpu_seg), static_cast<unsigned>(cfg.flag.bs.access));
+  errno = 0;
   auto* seg = urma_register_seg(urma_ctx_, &cfg);
+  int const registration_errno = errno;  // Capture BEFORE token cleanup/logging.
   if (!seg) {
+    std::string const details = " rank=" + std::to_string(ctx_->local_rank) +
+        " thread=" + std::to_string(ctx_->thread_idx) +
+        " atomic=" + std::to_string(atomic) + " len=" + std::to_string(len) +
+        " errno=" + std::to_string(registration_errno) +
+        " (" + (registration_errno ? std::string(std::strerror(registration_errno)) :
+                  std::string("provider did not set errno")) + ")";
+    std::fprintf(stderr, "[URMA_REG] stage=failed%s\n", details.c_str());
     check_urma(urma_free_token_id(token), "urma_free_token_id");
     throw std::runtime_error(
-        gpu ? std::string("URMA ") + uccl::gpu_p2p::vendor_name() +
+        (gpu ? std::string("URMA ") + uccl::gpu_p2p::vendor_name() +
                   " P2P segment registration failed (no host fallback)"
-            : std::string("URMA host segment registration failed"));
+            : std::string("URMA host segment registration failed")) + details);
   }
+  std::fprintf(stderr, "[URMA_REG] rank=%d thread=%d stage=success kind=%s va=0x%llx len=%zu atomic=%d\n",
+      ctx_->local_rank, ctx_->thread_idx, gpu ? "gpu" : "host",
+      static_cast<unsigned long long>(cfg.va), len, atomic);
   owner->seg = seg;
   owner->token = token;
   registrations_.push_back(owner);

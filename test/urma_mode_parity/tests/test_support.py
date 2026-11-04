@@ -15,6 +15,13 @@ spec=importlib.util.spec_from_file_location('parity_driver',HERE/'driver.py')
 driver=importlib.util.module_from_spec(spec); spec.loader.exec_module(driver)
 
 class SupportTests(unittest.TestCase):
+    def test_kernel_snapshot_failure_is_saved_without_hiding_original_error(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root=Path(temporary)
+            with patch.object(driver.legacy,'capture',side_effect=RuntimeError('journal unavailable')):
+                driver.kernel_snapshot(root,'kernel_after.txt')
+            self.assertIn('journal unavailable',(root/'kernel_after.txt').read_text())
+
     def test_build_provenance_and_binary_changes_are_rejected(self):
         with tempfile.TemporaryDirectory() as temporary:
             root=Path(temporary); module=root/'module.so'; module.write_bytes(b'new binary')

@@ -10,6 +10,7 @@
 #include "ep_runtime.cuh"
 #include "ep_util.hpp"
 #include "gpu_p2p_runtime.hpp"
+#include "urma_registration_probe.hpp"
 #include "internode.cuh"
 #include "internode_ll.cuh"
 #include "intranode.cuh"
@@ -2480,6 +2481,14 @@ NB_MODULE(ep, m) {
   });
   m.def("is_sm90_compiled", is_sm90_compiled);
   m.def("get_num_proxy_threads", []() { return kNumProxyThs; });
+#ifdef USE_URMA
+  m.def("probe_urma_registration", [](uintptr_t main, size_t bytes,
+      uintptr_t control, size_t control_bytes, int device, bool normal,
+      size_t channels, size_t count) {
+    probe_urma_registration(reinterpret_cast<void*>(main), bytes,
+        reinterpret_cast<void*>(control), control_bytes, device, normal, channels, count);
+  });
+#endif
   m.def("get_urma_mode_version", []() {
 #ifdef USE_URMA
     return UrmaMode::kWireVersion;
