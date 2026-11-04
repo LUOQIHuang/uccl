@@ -599,6 +599,33 @@ int main() {
     t.destroy();
     assert(resources == 0 && init_count == 0 && gpu_regs == 0);
   }
+  // Exercise opt-in diagnostics through the real submission and completion
+  // code in both modes; existing tests above exercise the disabled path.
+  for (bool normal:{true,false}) {
+    UrmaTransport left,right;
+    left.configure(normal,normal ? 8 : 1); right.configure(normal,normal ? 8 : 1);
+    left.init(ctx); right.init(ctx);
+    left.register_main_buffer(a,sizeof(a),2); right.register_main_buffer(b,sizeof(b),2);
+    left.register_atomic_buffer(ac,sizeof(ac),2); right.register_atomic_buffer(bc,sizeof(bc),2);
+    left.connect_peer(1,right.local_info()); right.connect_peer(0,left.local_info());
+    uccl::urma_diag::enabled=true;
+    for (int i=0;i<64;++i) {
+      UrmaWorkRequest write,atomic;
+      write.wr_id=2*i; write.bytes=8;
+      atomic.kind=UrmaWorkRequest::Kind::Atomic; atomic.wr_id=2*i+1; atomic.value=1;
+      left.post_batch(1,{write,atomic});
+      TransportCompletion out[4]; assert(left.poll(out,4)==2);
+    }
+    uccl::urma_diag::enabled=false;
+    left.destroy(); right.destroy();
+    assert(resources==0 && init_count==0 && gpu_regs==0);
+  }
+  auto const& diagnostic=uccl::urma_diag::records.at(0)->metrics;
+  assert(diagnostic[uccl::urma_diag::Write].calls==128);
+  assert(diagnostic[uccl::urma_diag::Fadd].calls==128);
+  assert(diagnostic[uccl::urma_diag::SdkPost].calls==128);
+  assert(diagnostic[uccl::urma_diag::WriteToObservedCqe].calls==2);
+  assert(diagnostic[uccl::urma_diag::FaddToObservedCqe].calls==2);
   std::cout
       << "URMA transport tests passed (simulated hardware; SDK types selected by runner)\n";
 }

@@ -18,6 +18,7 @@ legacy_spec.loader.exec_module(legacy)
 import profile_support
 import urma_support
 import support
+import phase_support
 
 def sdk_directory(args):
     candidates=[args.urma_include_dir] if args.urma_include_dir else [args.urma_lib_dir.parent/'include',Path('/usr/include/ub/umdk/urma'),Path('/usr/include/umdk'),Path('/usr/include/urma'),Path('/usr/local/include'),Path('/usr/include')]
@@ -74,6 +75,12 @@ def parser():
     p.add_argument('--probe-channels',type=int,choices=(1,8),default=8)
     p.add_argument('--probe-control',choices=('production','torch'),default='production')
     p.add_argument('--probe-bytes',type=int,default=117506432)
+    p.add_argument('--phase-suite',action='store_true')
+    p.add_argument('--stage-profile',action='store_true')
+    p.add_argument('--save-traces',action='store_true')
+    p.add_argument('--warmups',type=int,default=50)
+    p.add_argument('--samples',type=int,default=50)
+    p.add_argument('--ll-hook-workload',choices=('gemm','immediate'),default='gemm')
     p.add_argument('--job',required=True)
     p.add_argument('--node-rank',type=int,choices=(0,1),required=True)
     p.add_argument('--master-addr')
@@ -99,6 +106,10 @@ def parser():
     args=p.parse_args()
     if not re.fullmatch(r'[a-zA-Z0-9_-]+',args.job): p.error('invalid job')
     if args.action=='run' and not args.master_addr: p.error('--master-addr is required to run')
+    if args.warmups<1 or args.samples<3: p.error('warmups >= 1 and samples >= 3 required')
+    if (args.stage_profile or args.save_traces or args.ll_hook_workload=='immediate') and not args.phase_suite:
+        p.error('stage/trace/immediate-hook options require --phase-suite')
+    if args.phase_suite and args.backend!='urma': p.error('phase suite currently supports URMA only')
     if args.action=='probe' and (args.backend!='urma' or args.mode=='both' or args.probe_bytes<1):
         p.error('probe requires --backend urma --mode normal|low_latency and positive --probe-bytes')
     if not (1024<=args.port<65535) or not re.fullmatch(r'\d+,\d+,\d+',args.ubctl_selector): p.error('invalid port / UB selector')
@@ -126,6 +137,8 @@ def preflight(args):
     probe=subprocess.run([sys.executable,str(HERE/'support.py'),str(module)],env=env,capture_output=True,text=True,timeout=90)
     if probe.returncode: raise RuntimeError(probe.stdout+probe.stderr)
     metadata=next(json.loads(line.split(' ',1)[1]) for line in probe.stdout.splitlines() if line.startswith('MODE_PARITY_IMPORT_OK '))
+    if args.phase_suite and not metadata.get('phase_diagnostics'):
+        raise RuntimeError('PHASE_DIAGNOSTICS_REQUIRES_REBUILD')
     return module,manifest,dict(libraries=libraries,hardware=hardware,import_log=probe.stdout+probe.stderr,runtime=metadata)
 
 def collect(args):
@@ -179,7 +192,9 @@ def main():
         print(json.dumps(info,indent=2)); print('MODE_PARITY_CHECK_PASSED',flush=True); return
     root=args.output/args.job/f'node{args.node_rank}'
     root.mkdir(parents=True,exist_ok=False)
-    error=None; fingerprint=dict(job=args.job,backend=args.backend,mode=args.mode,shape=[args.normal_tokens,args.ll_tokens,args.hidden,args.experts,args.topk],sources_hash=support.digest(support.source_manifest()),diagnostics_hash=support.digest(support.diagnostic_manifest()),ifname=args.ifname,kernel=os.uname().release)
+    error=None; fingerprint=dict(job=args.job,backend=args.backend,mode=args.mode,shape=[args.normal_tokens,args.ll_tokens,args.hidden,args.experts,args.topk],sources_hash=support.digest(support.source_manifest()),diagnostics_hash=support.digest(support.diagnostic_manifest()),ifname=args.ifname,kernel=os.uname().release,
+        phase_suite=args.phase_suite,stage_profile=args.stage_profile,save_traces=args.save_traces,
+        warmups=args.warmups,samples=args.samples,ll_hook_workload=args.ll_hook_workload)
     try:
         module,manifest,info=preflight(args)
         fingerprint.update(build_hash=support.digest({key:manifest[key] for key in ('sources','sdk','flags')}),libraries=info['libraries'],torch=info['runtime']['torch'])
@@ -189,6 +204,7 @@ def main():
         for mode,filename in [('normal','test_internode.py'),('low_latency','test_low_latency.py')]:
             source=(support.REPO/'ep/bench'/filename).read_text()
             if mode=='normal': source=profile_support.prepare_benchmark(source,'boundaries')
+            elif args.phase_suite and args.ll_hook_workload=='immediate': source=phase_support.immediate_hook_source(source)
             (root/(mode+'.py')).write_text(source)
     except Exception as exc: error=str(exc)
     (root/'setup.json').write_text(json.dumps(dict(fingerprint=fingerprint,error=error),indent=2))
@@ -204,6 +220,9 @@ def main():
         legacy.pair(args,dict(stage='ready',job=args.job,mode=mode,rc=rc))
         env=environment(args)
         env.update(PARITY_CASE=str(case),PARITY_MODULE=str(module),PARITY_MODULE_SHA=manifest['module_sha'],PARITY_MODE=mode,PARITY_TOKENS=str(args.normal_tokens if mode=='normal' else args.ll_tokens),PARITY_HIDDEN=str(args.hidden),PARITY_EXPERTS=str(args.experts),PARITY_TOPK=str(args.topk),UCCL_TORCHRUN_NODE_RANK=str(args.node_rank),UCCL_EXIT_GUARD='1')
+        env.update(PARITY_PHASE_SUITE=str(int(args.phase_suite)),PARITY_STAGE_PROFILE=str(int(args.stage_profile)),
+                   PARITY_SAVE_TRACES=str(int(args.save_traces)),PARITY_WARMUPS=str(args.warmups),
+                   PARITY_SAMPLES=str(args.samples),PARITY_LL_HOOK_WORKLOAD=args.ll_hook_workload)
         for key in ('TMPDIR','XDG_CACHE_HOME'):
             directory=case/('tmpdir' if key=='TMPDIR' else 'cache'); directory.mkdir(); env[key]=str(directory)
         (case/'counters_before.json').write_text(json.dumps(urma_support.counters(args) if args.backend=='urma' else legacy.counters(args.hca)))
@@ -223,6 +242,16 @@ def main():
         if args.backend=='urma':
             checks['native_mode']=f'[URMA] mode={mode} channels={8 if mode=="normal" else 1} endpoints={9 if mode=="normal" else 1} batch=linked' in text
             checks['device']=f': {args.urma_device}' in text
+        if args.phase_suite:
+            checks.update(phase_files=(case/'phases.jsonl').is_file() and (case/'api_samples.jsonl').is_file(),
+                          samples=text.count('MODE_PARITY_SAMPLES ')==(5 if mode=='normal' else (2 if args.ll_hook_workload=='immediate' else 1)))
+            if (case/'phases.jsonl').is_file() and args.stage_profile:
+                windows=[json.loads(line) for line in (case/'phases.jsonl').read_text().splitlines()]
+                checks['stage_activity']=any(r['metrics'].get('sdk_post',{}).get('calls',0)>0
+                    for w in windows for r in w['records'])
+            if args.save_traces:
+                checks['gpu_traces']=all((case/f'gpu_trace_{i}.json').is_file() and
+                    (case/f'gpu_trace_{i}.json').stat().st_size>0 for i in range(4 if mode=='normal' else 2))
         if rc==0 and not all(checks.values()): rc=90
         (case/'status.json').write_text(json.dumps(dict(rc=rc,checks=checks),indent=2))
         (case/'counters_after.json').write_text(json.dumps(urma_support.counters(args) if args.backend=='urma' else legacy.counters(args.hca)))

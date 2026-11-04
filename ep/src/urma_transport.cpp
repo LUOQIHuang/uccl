@@ -165,6 +165,7 @@ void UrmaTransport::init(ProxyCtx& ctx) {
   mode_.validate();
   (void)urma_trans_mode_from_env();
   ctx_ = &ctx;
+  uccl::urma_diag::identity(ctx.local_rank,ctx.thread_idx);
   try {
     {
       std::lock_guard<std::mutex> lock(g_urma_init_mutex);
@@ -583,6 +584,7 @@ void UrmaTransport::release_context(size_t index) {
   auto& op = op_contexts_[index];
   if (!op.active) throw std::logic_error("double release of URMA context");
   op.active = false;
+  op.diagnostic={};
   free_contexts_.push_back(index);
 }
 void UrmaTransport::validate_request(Peer const& peer,
@@ -605,6 +607,8 @@ void UrmaTransport::validate_request(Peer const& peer,
 void UrmaTransport::prepare(PreparedWr& out, Peer& peer, size_t lane,
                              UrmaWorkRequest const& request) {
   bool const write = request.kind == UrmaWorkRequest::Kind::Write;
+  uccl::urma_diag::count(write ? uccl::urma_diag::Write : uccl::urma_diag::Fadd,
+                         write ? request.bytes : 1);
   auto* remote = write ? peer.main_tseg :
       request.kind == UrmaWorkRequest::Kind::Atomic ? peer.atomic_tseg : peer.barrier_tseg;
   uint64_t bytes = write ? request.bytes : sizeof(uint64_t);
@@ -646,6 +650,12 @@ void UrmaTransport::submit_prepared(size_t lane) {
   for (size_t i = 0; i < prepared_.size(); ++i)
     prepared_[i].wr.next = i+1 < prepared_.size() ? &prepared_[i+1].wr : nullptr;
   urma_jfs_wr_t* bad = nullptr;
+  if (uccl::urma_diag::enabled.load(std::memory_order_relaxed))
+    for (auto const& wr:prepared_)
+      op_contexts_[wr.context].diagnostic=uccl::urma_diag::sample(
+          op_contexts_[wr.context].is_write ? uccl::urma_diag::WriteToObservedCqe :
+                                            uccl::urma_diag::FaddToObservedCqe);
+  uccl::urma_diag::Scope diagnostic(uccl::urma_diag::SdkPost,prepared_.size());
   int rc = urma_post_jetty_send_wr(jetties_[lane], &prepared_[0].wr, &bad);
   if (rc == URMA_SUCCESS) return;
   // The API specifies bad_wr as the first rejected request. Keep accepted
@@ -677,6 +687,7 @@ void UrmaTransport::post_batch(int dst_rank,
   for (size_t lane = 0; lane < jetties_.size(); ++lane) {
     prepared_.clear();
     try {
+      uccl::urma_diag::Scope diagnostic(uccl::urma_diag::GroupPrepare,requests.size());
       for (auto const& request : requests) {
         size_t selected = request.kind == UrmaWorkRequest::Kind::Barrier ?
             0 : mode_.data_lane(request.ring == UINT32_MAX ? request.wr_id :
@@ -761,6 +772,7 @@ int UrmaTransport::poll(TransportCompletion* out, int max) {
       completion.data = crs[i].imm_data;
       completion.status = crs[i].status == URMA_CR_SUCCESS ? 0 : int(crs[i].status);
       if (completion.status) failed_ = true;
+      uccl::urma_diag::complete(op_contexts_[index].diagnostic);
       release_context(index);
     }
     total += n;

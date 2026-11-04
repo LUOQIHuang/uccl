@@ -1,6 +1,7 @@
 // Compile the actual Proxy batching method with CPU recorders. The runner
 // extracts only the production TransferCmd protocol and method body; no GPU.
 #include "urma_mode.hpp"
+#include "urma_phase_diag.hpp"
 #include <algorithm>
 #include <cassert>
 #include <cstdint>

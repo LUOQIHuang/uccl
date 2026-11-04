@@ -8,6 +8,7 @@ import runpy
 import sys
 from datetime import timedelta
 import support
+from phase_runtime import Measurements
 
 faulthandler.enable()
 case=Path(os.environ['PARITY_CASE'])
@@ -20,6 +21,16 @@ assert info['module_sha']==os.environ['PARITY_MODULE_SHA'], 'module changed afte
 import torch
 import torch.distributed as dist
 import utils
+phase_suite=os.environ.get('PARITY_PHASE_SUITE')=='1'
+stage_profile=os.environ.get('PARITY_STAGE_PROFILE')=='1'
+if phase_suite and not all(hasattr(ep,n) for n in ('urma_phase_enable','urma_phase_snapshot')):
+    raise RuntimeError('PHASE_DIAGNOSTICS_REQUIRES_REBUILD')
+if hasattr(ep,'urma_phase_enable'): ep.urma_phase_enable(False)
+measurements=Measurements(torch,dist,ep,case,mode,stage_profile,
+    int(os.environ.get('PARITY_WARMUPS','50')),int(os.environ.get('PARITY_SAMPLES','50')))
+print('PHASE_CONFIGURATION '+json.dumps(dict(suite=phase_suite,instrumented=stage_profile,
+    warmups=measurements.warmups,samples=measurements.samples,
+    ll_hook_workload=os.environ.get('PARITY_LL_HOOK_WORKLOAD','gemm'))),flush=True)
 
 def lazy_init(local_rank,num_local_ranks):
     torch.cuda.set_device(local_rank)
@@ -44,7 +55,12 @@ def record(name,data):
 
 original_api=utils.bench
 def measured_api(fn,*args,**kwargs):
-    result=original_api(fn,*args,**kwargs)
+    if phase_suite:
+        if args or any(k not in ('num_warmups','num_tests','post_fn') for k in kwargs):
+            raise RuntimeError('unexpected benchmark arguments in phase suite')
+        result=measurements.api(fn,'layout' if mode=='normal' else 'll_no_hook_dispatch_combine',kwargs.get('post_fn'))
+    else:
+        result=original_api(fn,*args,**kwargs)
     record('MODE_PARITY_API',dict(mode=mode,avg_us=float(result[0])*1e6,min_us=float(result[1])*1e6,max_us=float(result[2])*1e6))
     return result
 utils.bench=measured_api
@@ -55,13 +71,20 @@ normal_plan=[('dispatch_fp8',32),('dispatch_bf16',32),('combine',12),('combine',
 def measured_profile(fn,kernel_names,*args,**kwargs):
     global count
     index=count; count+=1
-    result=original_profile(fn,kernel_names,*args,**kwargs)
+    label=(normal_plan[index][0]+'_chunk'+str(normal_plan[index][1])) if mode=='normal' else ('ll_no_hook' if index==0 else 'll_hook')
+    if os.environ.get('PARITY_SAVE_TRACES')=='1': kwargs['trace_path']=str(case/f'gpu_trace_{index}.json')
+    profile=lambda:original_profile(fn,kernel_names,*args,**kwargs)
+    result=measurements.window('profile_'+label,profile,60) if phase_suite else profile()
     data=dict(mode=mode,index=index,kernel_names=kernel_names,kernel_seconds=result)
     if mode=='normal':
         op,chunk=normal_plan[index]
-        avg,minimum,maximum=original_api(fn,num_warmups=5,num_tests=15)
+        avg,minimum,maximum=(measurements.api(fn,label) if phase_suite else
+                             original_api(fn,num_warmups=5,num_tests=15))
         data.update(op=op,rdma=chunk,nvl=4,sm=24,api_us=float(avg)*1e6,api_min_us=float(minimum)*1e6,api_max_us=float(maximum)*1e6)
     record('MODE_PARITY_PROFILE',data)
+    if phase_suite and mode=='low_latency' and index==1 and os.environ.get('PARITY_LL_HOOK_WORKLOAD')=='immediate':
+        avg,minimum,maximum=measurements.api(fn,'ll_immediate_hook_dispatch_combine')
+        record('MODE_PARITY_HOOK_API',dict(avg_us=avg*1e6,min_us=minimum*1e6,max_us=maximum*1e6))
     return result
 utils.bench_kineto=measured_profile
 

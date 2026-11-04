@@ -44,7 +44,8 @@ def load_extension(module):
         actual=[Path(p).resolve() for p in loaded if '/liburma.so' in p]
         if not actual or not all(p.is_relative_to(private) for p in actual):
             raise RuntimeError(f'PRIVATE_URMA_LIBRARY_REQUIRED: {actual}')
-    return extension,dict(module=str(Path(module).resolve()),module_sha=sha(module),wire=2,torch=torch.__version__,torch_file=torch.__file__,python=sys.executable,loaded_libraries=loaded)
+    return extension,dict(module=str(Path(module).resolve()),module_sha=sha(module),wire=2,torch=torch.__version__,torch_file=torch.__file__,python=sys.executable,loaded_libraries=loaded,
+                          phase_diagnostics=all(hasattr(extension,n) for n in ('urma_phase_enable','urma_phase_snapshot')))
 
 def read_build(directory):
     data=json.loads((directory/'manifest.json').read_text())

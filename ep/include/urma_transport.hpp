@@ -3,6 +3,7 @@
 #include "gpu_platform.hpp"
 #include "transport.hpp"
 #include "urma_mode.hpp"
+#include "urma_phase_diag.hpp"
 #ifdef USE_URMA
 #include "urma_host_page_allocator.hpp"
 #if __has_include(<urma_api.h>)
@@ -119,6 +120,7 @@ class UrmaTransport final : public EpTransport {
     bool is_write = false;
     bool is_atomic = false;
     bool active = false;
+    uccl::urma_diag::Sample diagnostic;
   };
   // Stable slots give O(1) completion lookup and O(1) FADD scratch allocation.
   // user_ctx uses 48 generation bits + 16 index bits. Stale CQEs cannot retire

@@ -2481,6 +2481,8 @@ NB_MODULE(ep, m) {
   });
   m.def("is_sm90_compiled", is_sm90_compiled);
   m.def("get_num_proxy_threads", []() { return kNumProxyThs; });
+  m.def("urma_phase_enable", [](bool enabled) { uccl::urma_diag::enabled.store(enabled); });
+  m.def("urma_phase_snapshot", []() { return uccl::urma_diag::snapshot(); });
 #ifdef USE_URMA
   m.def("probe_urma_registration", [](uintptr_t main, size_t bytes,
       uintptr_t control, size_t control_bytes, int device, bool normal,

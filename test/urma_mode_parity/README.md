@@ -1,5 +1,7 @@
 # URMA Normal / Low-latency 实现对齐与验收
 
+最新的性能定位入口：**[阶段时延与稳定性测试（phase_v1）](STAGE_TESTS.zh-CN.md)**。同一新构建交替运行3轮 baseline/埋点组，保存逐次时延、Proxy 阶段统计和首轮 GPU trace；LL hook 诊断不插入 GEMM。
+
 `v2_02` 已确认主数据段成功、未对齐的 GPU 原子控制段失败。本次修复和下一轮操作见 **[原子控制段对齐修复与 v2_03 复测](ATOMIC_ALIGNMENT_FIX.zh-CN.md)**；probe 默认已改为生产控制段分配路径。
 
 `v2_01` GPU 段注册失败的后续操作见 **[注册失败分析与单机隔离步骤](REGISTRATION_FAILURE.zh-CN.md)**。当前证据不能确定是主数据段还是原子控制段失败，也不能认定闭源库竞态；先用新增日志和探针定位。

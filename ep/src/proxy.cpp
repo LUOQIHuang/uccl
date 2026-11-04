@@ -1,4 +1,5 @@
 #include "proxy.hpp"
+#include "urma_phase_diag.hpp"
 #include "ep_backend.hpp"
 #include "bench_utils.hpp"
 #include "d2h_queue_host.hpp"
@@ -912,6 +913,7 @@ void Proxy::run_dual() {
 
 void Proxy::notify_gpu_completion(uint64_t& my_tail) {
   if (acked_wrs_.empty()) return;
+  uccl::urma_diag::Scope diagnostic(uccl::urma_diag::GpuAck,acked_wrs_.size());
 
     // Mark all acked command slots in each ring's bitmask
 #ifdef USE_MSCCLPP_FIFO_BACKEND
@@ -998,6 +1000,7 @@ void Proxy::post_gpu_command(uint64_t& my_tail, size_t& seen) {
       }
       auto trig = fifo->poll();
       if (trig.fst == 0) break;
+      uccl::urma_diag::Scope diagnostic(uccl::urma_diag::Collect,1);
       adaptive_sleeper_.update_timer();
       TransferCmd cmd = d2hq::decode_from_trigger(trig);
 
@@ -1057,6 +1060,8 @@ void Proxy::post_gpu_command(uint64_t& my_tail, size_t& seen) {
     // Batch processing for this ring buffer
     size_t batch_size = cur_head - ring_seen;
     if (batch_size == 0) continue;
+    uccl::urma_diag::Scope diagnostic(uccl::urma_diag::Collect,batch_size);
+    uccl::urma_diag::count(uccl::urma_diag::QueueDepth,cur_head-ring_tail);
 
     // Reserve space for new commands
     size_t current_size = wrs_to_post.size();
@@ -1248,6 +1253,7 @@ uint64_t Proxy::load_urma_barrier_word_sum(size_t slot) const {
 
 void Proxy::poll_urma_completions() {
   if (urma_outstanding_ops_ == 0) return;
+  uccl::urma_diag::Scope diagnostic(uccl::urma_diag::CqPoll);
   TransportCompletion completions[kMaxOutstandingSends];
   int const max_poll = static_cast<int>(std::min(
       urma_outstanding_ops_, static_cast<size_t>(kMaxOutstandingSends)));
@@ -1269,6 +1275,8 @@ void Proxy::poll_urma_completions() {
     throw std::runtime_error("URMA completion count exceeded outstanding ops");
   }
   urma_outstanding_ops_ -= static_cast<size_t>(ne);
+  diagnostic.items=static_cast<uint64_t>(ne);
+  if (!ne) uccl::urma_diag::count(uccl::urma_diag::EmptyPoll);
   if (ne > 0) adaptive_sleeper_.update_timer();
 }
 
@@ -1277,6 +1285,8 @@ void Proxy::ensure_urma_capacity(size_t count) {
       std::min<size_t>(kMaxOutstandingSends, ProxyCtx::kMaxAtomicOps);
   if (count > limit)
     throw std::runtime_error("URMA batch exceeds queue capacity");
+  uccl::urma_diag::Scope diagnostic(uccl::urma_diag::CapacityWait,count,
+                                    urma_outstanding_ops_ > limit-count);
   auto const deadline =
       std::chrono::steady_clock::now() + std::chrono::seconds(30);
   while (urma_outstanding_ops_ > limit - count) {
@@ -1291,6 +1301,17 @@ void Proxy::post_urma_commands(std::vector<uint64_t> const& wrs_to_post,
                                std::vector<TransferCmd> const& cmds_to_post) {
   if (wrs_to_post.size() != cmds_to_post.size())
     throw std::runtime_error("URMA command/wr_id size mismatch");
+  uccl::urma_diag::Scope diagnostic(uccl::urma_diag::ProxyBatch,cmds_to_post.size());
+  bool all_dispatch=false, all_combine=false;
+  if (uccl::urma_diag::enabled.load(std::memory_order_relaxed)) {
+    all_dispatch=!cmds_to_post.empty(); all_combine=all_dispatch;
+    for (auto const& cmd:cmds_to_post) {
+      all_dispatch &= !get_is_combine(cmd.cmd_type);
+      all_combine &= get_is_combine(cmd.cmd_type);
+    }
+  }
+  uccl::urma_diag::Scope operation(all_combine ? uccl::urma_diag::ProxyCombine :
+      uccl::urma_diag::ProxyDispatch,cmds_to_post.size(),all_dispatch || all_combine);
   size_t const limit = std::min<size_t>(kMaxOutstandingSends,ProxyCtx::kMaxAtomicOps);
   auto flush = [&](int peer) {
     auto& batch = urma_batches_by_rank_.at(peer);
@@ -1358,6 +1379,8 @@ void Proxy::post_urma_commands(std::vector<uint64_t> const& wrs_to_post,
   for (size_t i = 0; i < cmds_to_post.size(); ++i) {
     auto type = get_base_cmd(cmds_to_post[i].cmd_type);
     if (type == CmdType::QUIET || type == CmdType::BARRIER) {
+      uccl::urma_diag::count(type==CmdType::QUIET ? uccl::urma_diag::Quiet : uccl::urma_diag::Barrier);
+      uccl::urma_diag::Scope drain(uccl::urma_diag::BarrierDrain);
       ensure_urma_capacity(limit);
       if (type == CmdType::QUIET) acked_wrs_.insert(wrs_to_post[i]);
       else send_barrier(wrs_to_post[i]);

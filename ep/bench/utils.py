@@ -538,9 +538,14 @@ def bench_kineto(
 
     # Expand the kernels by periods
     if num_kernels_per_period > 1:
-        with tempfile.NamedTemporaryFile(suffix=".json") as tmp:
-            prof.export_chrome_trace(tmp.name)
-            profile_data = json.loads(Path(tmp.name).read_text())
+        if trace_path is not None:
+            # Kineto traces may only be exported once. Reuse the saved trace
+            # when also extracting LL send/recv periods.
+            profile_data = json.loads(Path(trace_path).read_text())
+        else:
+            with tempfile.NamedTemporaryFile(suffix=".json") as tmp:
+                prof.export_chrome_trace(tmp.name)
+                profile_data = json.loads(Path(tmp.name).read_text())
 
         for i, kernel_name in enumerate(kernel_names):
             events = [

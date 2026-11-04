@@ -6,6 +6,7 @@ from pathlib import Path
 import subprocess
 import tempfile
 import shutil
+import json
 
 p = argparse.ArgumentParser()
 p.add_argument('--sdk-include', required=True, type=Path,
@@ -17,6 +18,12 @@ a = p.parse_args()
 ep = Path(__file__).resolve().parents[1]
 with tempfile.TemporaryDirectory(prefix='uccl-urma-test-') as tmp:
     tmp = Path(tmp)
+    phase_test=tmp/'phase_test'
+    subprocess.run([os.environ.get('CXX','c++'),'-std=c++17','-pthread','-Wall','-Wextra','-Werror',
+                    '-I'+str(ep/'include'),str(ep/'tests/urma_phase_diag_test.cpp'),'-o',str(phase_test)],check=True)
+    phase_result=subprocess.run([str(phase_test)],check=True,stdout=subprocess.PIPE,stderr=subprocess.PIPE,universal_newlines=True)
+    assert len(json.loads(phase_result.stdout)['records'])==4
+    print('URMA concurrent phase diagnostics tests passed',flush=True)
     allocation=(ep/'src/uccl_proxy.cpp').read_text()
     begin=allocation.index('std::pair<void*, std::shared_ptr<void>> allocate_urma_atomic_control(')
     end=allocation.index('UcclProxy::UcclProxy(',begin)
