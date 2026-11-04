@@ -72,6 +72,7 @@ def parser():
     p.add_argument('--action',choices=('build','check','run','collect','probe'),default='check')
     p.add_argument('--probe-transports',type=int,choices=(1,4),default=4)
     p.add_argument('--probe-channels',type=int,choices=(1,8),default=8)
+    p.add_argument('--probe-control',choices=('production','torch'),default='production')
     p.add_argument('--probe-bytes',type=int,default=117506432)
     p.add_argument('--job',required=True)
     p.add_argument('--node-rank',type=int,choices=(0,1),required=True)
@@ -157,7 +158,8 @@ def probe(args):
     kernel_snapshot(root,'kernel_before.txt')
     command=[sys.executable,'-u',str(HERE/'probe.py'),'--module',str(module),
              '--mode',args.mode,'--channels',str(args.probe_channels),
-             '--transports',str(args.probe_transports),'--bytes',str(args.probe_bytes)]
+             '--transports',str(args.probe_transports),'--bytes',str(args.probe_bytes),
+             '--control',args.probe_control]
     try:
         with (root/'probe.log').open('w') as log:
             result=subprocess.run(command,env=environment(args),stdout=log,stderr=subprocess.STDOUT,timeout=300)

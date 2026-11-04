@@ -9,6 +9,10 @@
 #include <string>
 #include <thread>
 #include <vector>
+#include <utility>
+
+// Returns the registered view and its shared backing allocation lease.
+std::pair<void*, std::shared_ptr<void>> allocate_urma_atomic_control(int device);
 
 class UcclProxy {
  public:

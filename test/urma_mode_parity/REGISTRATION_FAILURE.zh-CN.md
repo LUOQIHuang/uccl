@@ -1,5 +1,7 @@
 # v2_01 注册失败：证据、改动与下一步操作
 
+后续 v2_02 结果已定位到未对齐的原子控制段，请优先按 [对齐修复与 v2_03 复测步骤](ATOMIC_ALIGNMENT_FIX.zh-CN.md) 操作。下文保留第一轮隔离背景；probe 现默认使用生产控制段分配函数，旧 torch 路径须显式指定 `--probe-control torch`。
+
 ## 已确认与尚未确认
 
 两端 `bench.log` 均显示 `URMA MetaX P2P segment registration failed`，随后 Proxy 线程异常导致进程 abort。失败发生在注册阶段，还没有进入 dispatch/combine 正确性或性能测量；因此这轮不能产生性能结论。

@@ -2,6 +2,7 @@
 // transport.
 #include "urma_transport.hpp"
 #include "urma_registration_probe.hpp"
+#include "gpu_aligned_allocation.hpp"
 #include <cassert>
 #include <algorithm>
 #include <cstring>
@@ -96,7 +97,9 @@ cudaError_t cudaMemcpy(void* dst, void const* src, std::size_t bytes, int) {
   std::memcpy(dst, src, bytes);
   return 0;
 }
-cudaError_t cudaFree(void*) {
+void* last_gpu_free = nullptr;
+cudaError_t cudaFree(void* ptr) {
+  last_gpu_free = ptr;
   ++gpu_frees;
   assert(gpu_regs == 0);
   return 0;
@@ -539,6 +542,38 @@ int main() {
   }
   fail_register = false;
   assert(resources == 0 && init_count == 0);
+  {
+    // Fine-grained allocations may start at 0x600 within a registration page.
+    // Keep the raw base alive until the final shared registration is released.
+    alignas(65536) unsigned char storage[98304]{};
+    void* raw = storage + 0x600;
+    void* view = uccl::gpu_p2p::aligned_allocation_view(raw, 4096);
+    assert(reinterpret_cast<uintptr_t>(view) % 4096 == 0);
+    assert(static_cast<unsigned char*>(view) + 81960 <=
+           static_cast<unsigned char*>(raw) + uccl::gpu_p2p::aligned_allocation_size(81960,4096));
+    gpu_ptrs.insert(view);
+    auto owner = UrmaTransport::acquire_buffer_ownership(view,false,2,raw);
+    rejects([&] { UrmaTransport::acquire_buffer_ownership(view,false,2,view); });
+    UrmaTransport first, last;
+    first.init(ctx); last.init(ctx);
+#ifdef USE_METAX
+    rejects([&] { first.register_atomic_buffer(raw,81960,2); });
+    first.register_atomic_buffer(view,81960,2);
+    last.register_atomic_buffer(view,81960,2);
+#else
+    first.register_main_buffer(view,81960,2);
+    last.register_main_buffer(view,81960,2);
+#endif
+    owner.reset();
+    first.destroy();
+    assert(gpu_regs==1);
+    last.destroy();
+#ifndef USE_METAX
+    assert(last_gpu_free==raw);
+#endif
+    gpu_ptrs.erase(view);
+    assert(resources==0 && init_count==0 && gpu_regs==0);
+  }
   probe_urma_registration(a, sizeof(a), ac, sizeof(ac), 2, true, 8, 4);
   assert(resources == 0 && init_count == 0 && gpu_regs == 0);
   probe_urma_registration(a, sizeof(a), ac, sizeof(ac), 2, false, 1, 1);

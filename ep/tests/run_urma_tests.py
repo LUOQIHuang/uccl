@@ -17,6 +17,16 @@ a = p.parse_args()
 ep = Path(__file__).resolve().parents[1]
 with tempfile.TemporaryDirectory(prefix='uccl-urma-test-') as tmp:
     tmp = Path(tmp)
+    allocation=(ep/'src/uccl_proxy.cpp').read_text()
+    begin=allocation.index('std::pair<void*, std::shared_ptr<void>> allocate_urma_atomic_control(')
+    end=allocation.index('UcclProxy::UcclProxy(',begin)
+    (tmp/'atomic_allocation.inc').write_text(allocation[begin:end])
+    allocation_test=tmp/'atomic_allocation_test'
+    subprocess.run([os.environ.get('CXX','c++'),'-std=c++17','-Wall','-Wextra','-Werror',
+                    '-I'+str(ep/'tests/urma_support'),'-I'+str(ep/'include'),'-I'+str(tmp),
+                    '-include',str(ep/'tests/urma_support/ep_shim.hpp'),
+                    str(ep/'tests/urma_atomic_allocation_test.cpp'),'-o',str(allocation_test)],check=True)
+    subprocess.run([str(allocation_test)],check=True)
     protocol=(ep/'include/ring_buffer.cuh').read_text()
     protocol=protocol[protocol.index('enum class CmdType'):protocol.index('struct CopyTask')]
     (tmp/'transfer_protocol.inc').write_text(protocol)

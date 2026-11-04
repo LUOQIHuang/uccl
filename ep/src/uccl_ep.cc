@@ -2488,6 +2488,15 @@ NB_MODULE(ep, m) {
     probe_urma_registration(reinterpret_cast<void*>(main), bytes,
         reinterpret_cast<void*>(control), control_bytes, device, normal, channels, count);
   });
+  m.def("probe_urma_registration_owned_control", [](uintptr_t main, size_t bytes,
+      int device, bool normal, size_t channels, size_t count) {
+    auto control = allocate_urma_atomic_control(device);
+    uccl::gpu_p2p::zero_memory(control.first, kAtomicBufferSize,
+        uccl::gpu_p2p::atomic_buffer_is_gpu_memory() ? uccl::gpu_p2p::MemoryKind::Device :
+            uccl::gpu_p2p::MemoryKind::HostMapped, device);
+    probe_urma_registration(reinterpret_cast<void*>(main), bytes,
+        control.first, kAtomicBufferSize, device, normal, channels, count);
+  });
 #endif
   m.def("get_urma_mode_version", []() {
 #ifdef USE_URMA

@@ -2,6 +2,7 @@
 #include "ep_backend.hpp"
 #include "common.hpp"
 #include "gpu_p2p_runtime.hpp"
+#include "gpu_aligned_allocation.hpp"
 #include "proxy_ctx.hpp"
 #include "rdma.hpp"
 #include "ring_buffer.cuh"
@@ -13,6 +14,34 @@
 #include <set>
 #include <stdexcept>
 #include <unordered_set>
+
+std::pair<void*, std::shared_ptr<void>> allocate_urma_atomic_control(int device) {
+  uccl::gpu_p2p::set_device(device);
+#if defined(__MC_PLATFORM_MXCC__) || defined(__MCC__) || defined(__MXCC__)
+  // Retain fine-grained GPU memory for CPU/GPU control-word visibility.
+  size_t const alignment = uccl::gpu_p2p::registration_alignment();
+  size_t const bytes = uccl::gpu_p2p::aligned_allocation_size(kAtomicBufferSize, alignment);
+  void* raw = nullptr;
+  auto status = mcExtMallocWithFlags(&raw, bytes, mcDeviceMallocFinegrained);
+  if (status != 0 || !raw)
+    throw std::runtime_error("mcExtMallocWithFlags(URMA control) failed: " +
+                             std::to_string(static_cast<int>(status)));
+  auto release = [device](void* ptr) {
+    uccl::gpu_p2p::release_memory(ptr, uccl::gpu_p2p::MemoryKind::Device, device);
+  };
+  std::unique_ptr<void, decltype(release)> guard(raw, release);
+  void* view = uccl::gpu_p2p::aligned_allocation_view(raw, alignment);
+  auto owner = UrmaTransport::acquire_buffer_ownership(view, false, device, raw);
+  guard.release();
+  std::fprintf(stderr, "[URMA_ALLOC] control raw=%p aligned=%p logical=%zu backing=%zu alignment=%zu finegrained=1\n",
+      raw, view, size_t(kAtomicBufferSize), bytes, alignment);
+  return {view, std::move(owner)};
+#else
+  void* ptr = uccl::gpu_p2p::allocate_atomic_buffer(kAtomicBufferSize, device);
+  bool const host = !uccl::gpu_p2p::atomic_buffer_is_gpu_memory();
+  return {ptr, UrmaTransport::acquire_buffer_ownership(ptr, host, device)};
+#endif
+}
 
 UcclProxy::UcclProxy(int thread_idx, uintptr_t gpu_buffer_addr,
                      size_t total_size, int rank, int node_idx, int local_rank,
@@ -70,18 +99,11 @@ UcclProxy::UcclProxy(int thread_idx, uintptr_t gpu_buffer_addr,
   uses_urma_ = ep_uses_urma();
   if (thread_idx == 0) {
     if (uses_urma_) {
-#if defined(__MC_PLATFORM_MXCC__) || defined(__MCC__) || defined(__MXCC__)
-      mcExtMallocWithFlags(&atomic_buffer_ptr_, kAtomicBufferSize,
-                           mcDeviceMallocFinegrained);
-      atomic_buffer_is_host_allocated_ = false;
-#else
-      atomic_buffer_ptr_ = uccl::gpu_p2p::allocate_atomic_buffer(
-          kAtomicBufferSize, device_index_);
+      auto allocation = allocate_urma_atomic_control(device_index_);
+      atomic_buffer_ptr_ = allocation.first;
+      urma_atomic_allocation_ = std::move(allocation.second);
       atomic_buffer_is_host_allocated_ =
           !uccl::gpu_p2p::atomic_buffer_is_gpu_memory();
-#endif
-      urma_atomic_allocation_ = UrmaTransport::acquire_buffer_ownership(
-          atomic_buffer_ptr_, atomic_buffer_is_host_allocated_, device_index_);
     } else {
 #ifdef USE_LIBFABRIC_CXI
       cudaMalloc(&atomic_buffer_ptr_, kAtomicBufferSize);

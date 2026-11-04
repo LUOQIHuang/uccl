@@ -69,7 +69,8 @@ class UrmaTransport final : public EpTransport {
   // The returned lease keeps the allocation alive; the final lease or
   // registration releases it after unregistering the segment.
   static std::shared_ptr<void> acquire_buffer_ownership(void* ptr, bool host,
-                                                        int gpu_device);
+                                               int gpu_device,
+                                               void* allocation_base = nullptr);
 
  private:
   [[noreturn]] static void unavailable();

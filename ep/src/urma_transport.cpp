@@ -62,7 +62,7 @@ uint64_t UrmaTransport::load_barrier_word(size_t) const { unavailable(); }
 int UrmaTransport::poll(TransportCompletion*, int) { unavailable(); }
 void UrmaTransport::destroy() {}
 std::shared_ptr<void> UrmaTransport::acquire_buffer_ownership(void*, bool,
-                                                              int) {
+                                                              int, void*) {
   unavailable();
 }
 #else  // USE_URMA
@@ -318,7 +318,8 @@ void UrmaTransport::init(ProxyCtx& ctx) {
 }
 std::shared_ptr<void> UrmaTransport::acquire_buffer_ownership(void* ptr,
                                                               bool host,
-                                                              int gpu_device) {
+                                                              int gpu_device,
+                                                              void* allocation_base) {
   if (!ptr || (!host && gpu_device < 0))
     throw std::invalid_argument("invalid URMA allocation ownership");
   std::lock_guard<std::mutex> lock(g_resource_mutex);
@@ -329,9 +330,13 @@ std::shared_ptr<void> UrmaTransport::acquire_buffer_ownership(void* ptr,
     g_allocations[ptr] = allocation;
   }
   if (allocation->owned &&
-      (allocation->host != host || allocation->gpu_device != gpu_device))
+      (allocation->host != host || allocation->gpu_device != gpu_device ||
+       allocation->ptr != (allocation_base ? allocation_base : ptr)))
     throw std::logic_error("conflicting URMA allocation ownership");
   allocation->owned = true;
+  // Registrations use the aligned view as their key; the allocator must only
+  // receive its original base when the final registration/owner releases it.
+  allocation->ptr = allocation_base ? allocation_base : ptr;
   allocation->host = host;
   allocation->gpu_device = gpu_device;
   return allocation;
@@ -438,6 +443,9 @@ void UrmaTransport::register_main_buffer(void* ptr, size_t len, int device) {
 void UrmaTransport::register_atomic_buffer(void* ptr, size_t len, int device) {
   if (!urma_ctx_ || atomic_tseg_)
     throw std::logic_error("invalid control registration state");
+  if (uccl::gpu_p2p::atomic_buffer_is_gpu_memory() &&
+      reinterpret_cast<uintptr_t>(ptr) % uccl::gpu_p2p::registration_alignment())
+    throw std::invalid_argument("URMA GPU atomic buffer is not registration-page aligned");
   uccl::gpu_p2p::prepare_atomic_buffer(ptr, len, device);
   atomic_tseg_ = register_segment(
       ptr, len, uccl::gpu_p2p::atomic_buffer_is_gpu_memory(), true);

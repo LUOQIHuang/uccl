@@ -10,6 +10,7 @@ p.add_argument('--mode', choices=('normal', 'low_latency'), default='normal')
 p.add_argument('--channels', type=int, choices=(1, 8), default=8)
 p.add_argument('--transports', type=int, choices=(1, 4), default=4)
 p.add_argument('--bytes', type=int, default=117506432)
+p.add_argument('--control', choices=('production','torch'), default='production')
 a = p.parse_args()
 if a.bytes < 1: p.error('--bytes must be positive')
 ep, runtime = support.load_extension(a.module)
@@ -19,11 +20,18 @@ import torch
 torch.cuda.set_device(0)
 main = torch.empty(a.bytes, dtype=torch.uint8, device='cuda:0')
 # Same logical control length as kAtomicBufferSize; allocation rounded to 4KiB.
-control = torch.empty(86016, dtype=torch.uint8, device='cuda:0')
+control = torch.empty(86016, dtype=torch.uint8, device='cuda:0') if a.control=='torch' else None
 torch.cuda.synchronize()
 print('REGISTRATION_PROBE_BEGIN ' + json.dumps(dict(
     runtime=runtime, mode=a.mode, channels=a.channels if a.mode=='normal' else 1,
-    transports=a.transports, bytes=a.bytes, main=main.data_ptr(), control=control.data_ptr())), flush=True)
-ep.probe_urma_registration(main.data_ptr(), a.bytes, control.data_ptr(), 81960,
-                          0, a.mode=='normal', a.channels, a.transports)
+    transports=a.transports, bytes=a.bytes, main=main.data_ptr(), control_source=a.control,
+    control=control.data_ptr() if control is not None else None)), flush=True)
+if a.control=='production':
+    if not hasattr(ep,'probe_urma_registration_owned_control'):
+        raise RuntimeError('PRODUCTION_CONTROL_PROBE_REQUIRES_REBUILD')
+    ep.probe_urma_registration_owned_control(main.data_ptr(),a.bytes,0,
+                                           a.mode=='normal',a.channels,a.transports)
+else:
+    ep.probe_urma_registration(main.data_ptr(), a.bytes, control.data_ptr(), 81960,
+                              0, a.mode=='normal', a.channels, a.transports)
 print('REGISTRATION_PROBE_PASSED', flush=True)
