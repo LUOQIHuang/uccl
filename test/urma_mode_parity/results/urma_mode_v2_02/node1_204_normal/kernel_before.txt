@@ -1,0 +1,400 @@
+11月 05 03:29:32 worker1 kernel: platform ummu_vdev.16.auto: Adding to iommu group 14
+11月 05 03:29:32 worker1 kernel: URMA|ubcore|278281|278281|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xaaacc3a5d000, cfg->len = 64, cfg->token_value.token = 0, udate = 0 
+11月 05 03:29:32 worker1 kernel: ubase 00007: UDMA: MATT START:kernel_mode=0
+11月 05 03:29:32 worker1 kernel: platform ummu_vdev.17.auto: Adding to iommu group 15
+11月 05 03:29:32 worker1 kernel: URMA|ubcore|278281|278281|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xa04c00000, cfg->len = 117506432, cfg->token_value.token = 0, udate = 0 
+11月 05 03:29:32 worker1 kernel: ubase 00007: UDMA: MATT START:kernel_mode=0
+11月 05 03:29:32 worker1 kernel: udma_metax_p2p_bridge: pin OK va=0xa04c00000->0xa04c00000 len=0x7010180->0x7011000 page=0x1000 bus_off=0x0 apply_off=0 nents=1 first_pa=0xa0000ce00000
+11月 05 03:29:32 worker1 kernel: ubase 00007: UDMA: [GPU-TRACE] pin OK provider=metax gpu_va=0xa04c00000 mapped=0x7011000 page_size=0x1000 bus_off=0x0 nents=1 first_pa=0xa0000ce00000
+11月 05 03:29:32 worker1 kernel: UDMA GPU map: l_tid=1048575 r_tid=258 mm=ffff0a00172b2100 current_mm=ffff0a00172b2100 iova=0xa04c00000 first_pa=0xa0000ce00000 nents=1
+11月 05 03:29:32 worker1 kernel: UDMA GPU map: l_tid=255 r_tid=1048575 mm=ffff0a00172b2100 current_mm=ffff0a00172b2100 iova=0xa04c00000 first_pa=0xa0000ce00000 nents=1
+11月 05 03:29:32 worker1 kernel: platform ummu_vdev.18.auto: Adding to iommu group 16
+11月 05 03:29:32 worker1 kernel: URMA|ubcore|278281|278281|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xa0c000000, cfg->len = 81960, cfg->token_value.token = 0, udate = 0 
+11月 05 03:29:32 worker1 kernel: ubase 00007: UDMA: MATT START:kernel_mode=0
+11月 05 03:29:32 worker1 kernel: udma_metax_p2p_bridge: pin OK va=0xa0c000000->0xa0c000000 len=0x14028->0x15000 page=0x1000 bus_off=0x0 apply_off=0 nents=1 first_pa=0xa0000c600000
+11月 05 03:29:32 worker1 kernel: ubase 00007: UDMA: [GPU-TRACE] pin OK provider=metax gpu_va=0xa0c000000 mapped=0x15000 page_size=0x1000 bus_off=0x0 nents=1 first_pa=0xa0000c600000
+11月 05 03:29:32 worker1 kernel: UDMA GPU map: l_tid=1048575 r_tid=259 mm=ffff0a00172b2100 current_mm=ffff0a00172b2100 iova=0xa0c000000 first_pa=0xa0000c600000 nents=1
+11月 05 03:29:32 worker1 kernel: UDMA GPU map: l_tid=255 r_tid=1048575 mm=ffff0a00172b2100 current_mm=ffff0a00172b2100 iova=0xa0c000000 first_pa=0xa0000c600000 nents=1
+11月 05 03:29:32 worker1 kernel: UDMA GPU unmap: l_tid=1048575 r_tid=258 mm=ffff0a00172b2100 current_mm=ffff0a00172b2100 iova=0xa04c00000 size=0x7011000
+11月 05 03:29:32 worker1 kernel: UDMA GPU unmap: l_tid=255 r_tid=1048575 mm=ffff0a00172b2100 current_mm=ffff0a00172b2100 iova=0xa04c00000 size=0x7011000
+11月 05 03:29:32 worker1 kernel: UDMA GPU unmap: l_tid=1048575 r_tid=259 mm=ffff0a00172b2100 current_mm=ffff0a00172b2100 iova=0xa0c000000 size=0x15000
+11月 05 03:29:32 worker1 kernel: UDMA GPU unmap: l_tid=255 r_tid=1048575 mm=ffff0a00172b2100 current_mm=ffff0a00172b2100 iova=0xa0c000000 size=0x15000
+11月 05 03:29:50 worker1 kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+11月 05 03:29:50 worker1 kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+11月 05 03:29:50 worker1 kernel: URMA|ubcore|278468|278468|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xaaaca844c000, cfg->len = 8192, cfg->token_value.token = 0, udate = 0 
+11月 05 03:29:50 worker1 kernel: ubase 00007: UDMA: MATT START:kernel_mode=0
+11月 05 03:29:50 worker1 kernel: platform ummu_vdev.16.auto: Adding to iommu group 14
+11月 05 03:29:50 worker1 kernel: URMA|ubcore|278468|278468|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xaaaca844f000, cfg->len = 64, cfg->token_value.token = 0, udate = 0 
+11月 05 03:29:50 worker1 kernel: ubase 00007: UDMA: MATT START:kernel_mode=0
+11月 05 03:29:50 worker1 kernel: platform ummu_vdev.17.auto: Adding to iommu group 15
+11月 05 03:29:50 worker1 kernel: URMA|ubcore|278468|278468|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xa04c00000, cfg->len = 117506432, cfg->token_value.token = 0, udate = 0 
+11月 05 03:29:50 worker1 kernel: ubase 00007: UDMA: MATT START:kernel_mode=0
+11月 05 03:29:50 worker1 kernel: udma_metax_p2p_bridge: pin OK va=0xa04c00000->0xa04c00000 len=0x7010180->0x7011000 page=0x1000 bus_off=0x0 apply_off=0 nents=1 first_pa=0xa0000ce00000
+11月 05 03:29:50 worker1 kernel: ubase 00007: UDMA: [GPU-TRACE] pin OK provider=metax gpu_va=0xa04c00000 mapped=0x7011000 page_size=0x1000 bus_off=0x0 nents=1 first_pa=0xa0000ce00000
+11月 05 03:29:50 worker1 kernel: UDMA GPU map: l_tid=1048575 r_tid=258 mm=ffff0a0031020000 current_mm=ffff0a0031020000 iova=0xa04c00000 first_pa=0xa0000ce00000 nents=1
+11月 05 03:29:50 worker1 kernel: UDMA GPU map: l_tid=255 r_tid=1048575 mm=ffff0a0031020000 current_mm=ffff0a0031020000 iova=0xa04c00000 first_pa=0xa0000ce00000 nents=1
+11月 05 03:29:50 worker1 kernel: platform ummu_vdev.18.auto: Adding to iommu group 16
+11月 05 03:29:50 worker1 kernel: URMA|ubcore|278468|278468|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xa0c000000, cfg->len = 81960, cfg->token_value.token = 0, udate = 0 
+11月 05 03:29:50 worker1 kernel: ubase 00007: UDMA: MATT START:kernel_mode=0
+11月 05 03:29:50 worker1 kernel: udma_metax_p2p_bridge: pin OK va=0xa0c000000->0xa0c000000 len=0x14028->0x15000 page=0x1000 bus_off=0x0 apply_off=0 nents=1 first_pa=0xa0000c600000
+11月 05 03:29:50 worker1 kernel: ubase 00007: UDMA: [GPU-TRACE] pin OK provider=metax gpu_va=0xa0c000000 mapped=0x15000 page_size=0x1000 bus_off=0x0 nents=1 first_pa=0xa0000c600000
+11月 05 03:29:50 worker1 kernel: UDMA GPU map: l_tid=1048575 r_tid=259 mm=ffff0a0031020000 current_mm=ffff0a0031020000 iova=0xa0c000000 first_pa=0xa0000c600000 nents=1
+11月 05 03:29:50 worker1 kernel: UDMA GPU map: l_tid=255 r_tid=1048575 mm=ffff0a0031020000 current_mm=ffff0a0031020000 iova=0xa0c000000 first_pa=0xa0000c600000 nents=1
+11月 05 03:29:50 worker1 kernel: UDMA GPU unmap: l_tid=1048575 r_tid=258 mm=ffff0a0031020000 current_mm=ffff0a0031020000 iova=0xa04c00000 size=0x7011000
+11月 05 03:29:50 worker1 kernel: UDMA GPU unmap: l_tid=255 r_tid=1048575 mm=ffff0a0031020000 current_mm=ffff0a0031020000 iova=0xa04c00000 size=0x7011000
+11月 05 03:29:50 worker1 kernel: UDMA GPU unmap: l_tid=1048575 r_tid=259 mm=ffff0a0031020000 current_mm=ffff0a0031020000 iova=0xa0c000000 size=0x15000
+11月 05 03:29:50 worker1 kernel: UDMA GPU unmap: l_tid=255 r_tid=1048575 mm=ffff0a0031020000 current_mm=ffff0a0031020000 iova=0xa0c000000 size=0x15000
+11月 05 03:30:07 worker1 kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+11月 05 03:30:07 worker1 kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+11月 05 03:30:07 worker1 kernel: URMA|ubcore|278662|278662|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xaaacaf1e5000, cfg->len = 8192, cfg->token_value.token = 0, udate = 0 
+11月 05 03:30:07 worker1 kernel: ubase 00007: UDMA: MATT START:kernel_mode=0
+11月 05 03:30:07 worker1 kernel: platform ummu_vdev.16.auto: Adding to iommu group 14
+11月 05 03:30:07 worker1 kernel: URMA|ubcore|278662|278662|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xaaacaf1e8000, cfg->len = 64, cfg->token_value.token = 0, udate = 0 
+11月 05 03:30:07 worker1 kernel: ubase 00007: UDMA: MATT START:kernel_mode=0
+11月 05 03:30:07 worker1 kernel: platform ummu_vdev.17.auto: Adding to iommu group 15
+11月 05 03:30:07 worker1 kernel: URMA|ubcore|278662|278662|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xa04c00000, cfg->len = 117506432, cfg->token_value.token = 0, udate = 0 
+11月 05 03:30:07 worker1 kernel: ubase 00007: UDMA: MATT START:kernel_mode=0
+11月 05 03:30:07 worker1 kernel: udma_metax_p2p_bridge: pin OK va=0xa04c00000->0xa04c00000 len=0x7010180->0x7011000 page=0x1000 bus_off=0x0 apply_off=0 nents=1 first_pa=0xa0000ce00000
+11月 05 03:30:07 worker1 kernel: ubase 00007: UDMA: [GPU-TRACE] pin OK provider=metax gpu_va=0xa04c00000 mapped=0x7011000 page_size=0x1000 bus_off=0x0 nents=1 first_pa=0xa0000ce00000
+11月 05 03:30:07 worker1 kernel: UDMA GPU map: l_tid=1048575 r_tid=258 mm=ffff0a0018056300 current_mm=ffff0a0018056300 iova=0xa04c00000 first_pa=0xa0000ce00000 nents=1
+11月 05 03:30:07 worker1 kernel: UDMA GPU map: l_tid=255 r_tid=1048575 mm=ffff0a0018056300 current_mm=ffff0a0018056300 iova=0xa04c00000 first_pa=0xa0000ce00000 nents=1
+11月 05 03:30:07 worker1 kernel: platform ummu_vdev.18.auto: Adding to iommu group 16
+11月 05 03:30:07 worker1 kernel: URMA|ubcore|278662|278662|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xa0c000000, cfg->len = 81960, cfg->token_value.token = 0, udate = 0 
+11月 05 03:30:07 worker1 kernel: ubase 00007: UDMA: MATT START:kernel_mode=0
+11月 05 03:30:07 worker1 kernel: udma_metax_p2p_bridge: pin OK va=0xa0c000000->0xa0c000000 len=0x14028->0x15000 page=0x1000 bus_off=0x0 apply_off=0 nents=1 first_pa=0xa0000c600000
+11月 05 03:30:07 worker1 kernel: ubase 00007: UDMA: [GPU-TRACE] pin OK provider=metax gpu_va=0xa0c000000 mapped=0x15000 page_size=0x1000 bus_off=0x0 nents=1 first_pa=0xa0000c600000
+11月 05 03:30:07 worker1 kernel: UDMA GPU map: l_tid=1048575 r_tid=259 mm=ffff0a0018056300 current_mm=ffff0a0018056300 iova=0xa0c000000 first_pa=0xa0000c600000 nents=1
+11月 05 03:30:07 worker1 kernel: UDMA GPU map: l_tid=255 r_tid=1048575 mm=ffff0a0018056300 current_mm=ffff0a0018056300 iova=0xa0c000000 first_pa=0xa0000c600000 nents=1
+11月 05 03:30:07 worker1 kernel: platform ummu_vdev.19.auto: Adding to iommu group 17
+11月 05 03:30:07 worker1 kernel: URMA|ubcore|278662|278662|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xaaacaf22e000, cfg->len = 8192, cfg->token_value.token = 0, udate = 0 
+11月 05 03:30:07 worker1 kernel: ubase 00007: UDMA: MATT START:kernel_mode=0
+11月 05 03:30:07 worker1 kernel: platform ummu_vdev.20.auto: Adding to iommu group 18
+11月 05 03:30:07 worker1 kernel: URMA|ubcore|278662|278662|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xaaacaf232000, cfg->len = 64, cfg->token_value.token = 0, udate = 0 
+11月 05 03:30:07 worker1 kernel: ubase 00007: UDMA: MATT START:kernel_mode=0
+11月 05 03:30:07 worker1 kernel: platform ummu_vdev.21.auto: Adding to iommu group 19
+11月 05 03:30:07 worker1 kernel: URMA|ubcore|278662|278662|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xaaacaf276000, cfg->len = 8192, cfg->token_value.token = 0, udate = 0 
+11月 05 03:30:07 worker1 kernel: ubase 00007: UDMA: MATT START:kernel_mode=0
+11月 05 03:30:07 worker1 kernel: platform ummu_vdev.22.auto: Adding to iommu group 20
+11月 05 03:30:07 worker1 kernel: URMA|ubcore|278662|278662|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xaaacaf27a000, cfg->len = 64, cfg->token_value.token = 0, udate = 0 
+11月 05 03:30:07 worker1 kernel: ubase 00007: UDMA: MATT START:kernel_mode=0
+11月 05 03:30:07 worker1 kernel: platform ummu_vdev.23.auto: Adding to iommu group 21
+11月 05 03:30:07 worker1 kernel: URMA|ubcore|278662|278662|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xaaacaf2be000, cfg->len = 8192, cfg->token_value.token = 0, udate = 0 
+11月 05 03:30:07 worker1 kernel: ubase 00007: UDMA: MATT START:kernel_mode=0
+11月 05 03:30:07 worker1 kernel: platform ummu_vdev.24.auto: Adding to iommu group 22
+11月 05 03:30:07 worker1 kernel: URMA|ubcore|278662|278662|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xaaacaf2c2000, cfg->len = 64, cfg->token_value.token = 0, udate = 0 
+11月 05 03:30:07 worker1 kernel: ubase 00007: UDMA: MATT START:kernel_mode=0
+11月 05 03:30:07 worker1 kernel: UDMA GPU unmap: l_tid=1048575 r_tid=258 mm=ffff0a0018056300 current_mm=ffff0a0018056300 iova=0xa04c00000 size=0x7011000
+11月 05 03:30:07 worker1 kernel: UDMA GPU unmap: l_tid=255 r_tid=1048575 mm=ffff0a0018056300 current_mm=ffff0a0018056300 iova=0xa04c00000 size=0x7011000
+11月 05 03:30:07 worker1 kernel: UDMA GPU unmap: l_tid=1048575 r_tid=259 mm=ffff0a0018056300 current_mm=ffff0a0018056300 iova=0xa0c000000 size=0x15000
+11月 05 03:30:07 worker1 kernel: UDMA GPU unmap: l_tid=255 r_tid=1048575 mm=ffff0a0018056300 current_mm=ffff0a0018056300 iova=0xa0c000000 size=0x15000
+11月 05 03:34:37 worker1 kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+11月 05 03:34:37 worker1 kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+11月 05 03:34:37 worker1 kernel: URMA|ubcore|282171|282171|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xa04400000, cfg->len = 8192, cfg->token_value.token = 11259375, udate = 0 
+11月 05 03:34:37 worker1 kernel: ubase 00007: UDMA: MATT START:kernel_mode=0
+11月 05 03:34:37 worker1 kernel: udma_metax_p2p_bridge: pin OK va=0xa04400000->0xa04400000 len=0x2000->0x2000 page=0x2000 bus_off=0x0 apply_off=0 nents=1 first_pa=0xa0000c600000
+11月 05 03:34:37 worker1 kernel: ubase 00007: UDMA: [GPU-TRACE] pin OK provider=metax gpu_va=0xa04400000 mapped=0x2000 page_size=0x2000 bus_off=0x0 nents=1 first_pa=0xa0000c600000
+11月 05 03:34:37 worker1 kernel: UDMA GPU map: l_tid=1048575 r_tid=256 mm=ffff09002f796300 current_mm=ffff09002f796300 iova=0xa04400000 first_pa=0xa0000c600000 nents=1
+11月 05 03:34:37 worker1 kernel: UDMA GPU map: l_tid=255 r_tid=1048575 mm=ffff09002f796300 current_mm=ffff09002f796300 iova=0xa04400000 first_pa=0xa0000c600000 nents=1
+11月 05 03:34:41 worker1 kernel: UDMA GPU unmap: l_tid=1048575 r_tid=256 mm=ffff09002f796300 current_mm=ffff09002f796300 iova=0xa04400000 size=0x2000
+11月 05 03:34:41 worker1 kernel: UDMA GPU unmap: l_tid=255 r_tid=1048575 mm=ffff09002f796300 current_mm=ffff09002f796300 iova=0xa04400000 size=0x2000
+11月 05 03:34:43 worker1 kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+11月 05 03:34:43 worker1 kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+11月 05 03:34:43 worker1 kernel: URMA|ubcore|282394|282394|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xa04400000, cfg->len = 8192, cfg->token_value.token = 11259375, udate = 0 
+11月 05 03:34:43 worker1 kernel: ubase 00007: UDMA: MATT START:kernel_mode=0
+11月 05 03:34:43 worker1 kernel: udma_metax_p2p_bridge: pin OK va=0xa04400000->0xa04400000 len=0x2000->0x2000 page=0x2000 bus_off=0x0 apply_off=0 nents=1 first_pa=0xa0000c600000
+11月 05 03:34:43 worker1 kernel: ubase 00007: UDMA: [GPU-TRACE] pin OK provider=metax gpu_va=0xa04400000 mapped=0x2000 page_size=0x2000 bus_off=0x0 nents=1 first_pa=0xa0000c600000
+11月 05 03:34:43 worker1 kernel: UDMA GPU map: l_tid=1048575 r_tid=256 mm=ffff09005d71b700 current_mm=ffff09005d71b700 iova=0xa04400000 first_pa=0xa0000c600000 nents=1
+11月 05 03:34:43 worker1 kernel: UDMA GPU map: l_tid=255 r_tid=1048575 mm=ffff09005d71b700 current_mm=ffff09005d71b700 iova=0xa04400000 first_pa=0xa0000c600000 nents=1
+11月 05 03:34:47 worker1 kernel: UDMA GPU unmap: l_tid=1048575 r_tid=256 mm=ffff09005d71b700 current_mm=ffff09005d71b700 iova=0xa04400000 size=0x2000
+11月 05 03:34:47 worker1 kernel: UDMA GPU unmap: l_tid=255 r_tid=1048575 mm=ffff09005d71b700 current_mm=ffff09005d71b700 iova=0xa04400000 size=0x2000
+11月 05 03:34:49 worker1 kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+11月 05 03:34:50 worker1 kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+11月 05 03:34:50 worker1 kernel: URMA|ubcore|282568|282568|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xa04400000, cfg->len = 8192, cfg->token_value.token = 11259375, udate = 0 
+11月 05 03:34:50 worker1 kernel: ubase 00007: UDMA: MATT START:kernel_mode=0
+11月 05 03:34:50 worker1 kernel: udma_metax_p2p_bridge: pin OK va=0xa04400000->0xa04400000 len=0x2000->0x2000 page=0x2000 bus_off=0x0 apply_off=0 nents=1 first_pa=0xa0000c600000
+11月 05 03:34:50 worker1 kernel: ubase 00007: UDMA: [GPU-TRACE] pin OK provider=metax gpu_va=0xa04400000 mapped=0x2000 page_size=0x2000 bus_off=0x0 nents=1 first_pa=0xa0000c600000
+11月 05 03:34:50 worker1 kernel: UDMA GPU map: l_tid=1048575 r_tid=256 mm=ffff090016b21b80 current_mm=ffff090016b21b80 iova=0xa04400000 first_pa=0xa0000c600000 nents=1
+11月 05 03:34:50 worker1 kernel: UDMA GPU map: l_tid=255 r_tid=1048575 mm=ffff090016b21b80 current_mm=ffff090016b21b80 iova=0xa04400000 first_pa=0xa0000c600000 nents=1
+11月 05 03:34:54 worker1 kernel: UDMA GPU unmap: l_tid=1048575 r_tid=256 mm=ffff090016b21b80 current_mm=ffff090016b21b80 iova=0xa04400000 size=0x2000
+11月 05 03:34:54 worker1 kernel: UDMA GPU unmap: l_tid=255 r_tid=1048575 mm=ffff090016b21b80 current_mm=ffff090016b21b80 iova=0xa04400000 size=0x2000
+11月 05 03:34:56 worker1 kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+11月 05 03:34:56 worker1 kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+11月 05 03:34:56 worker1 kernel: URMA|ubcore|282960|282960|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xa04400000, cfg->len = 8192, cfg->token_value.token = 11259375, udate = 0 
+11月 05 03:34:56 worker1 kernel: ubase 00007: UDMA: MATT START:kernel_mode=0
+11月 05 03:34:56 worker1 kernel: udma_metax_p2p_bridge: pin OK va=0xa04400000->0xa04400000 len=0x2000->0x2000 page=0x2000 bus_off=0x0 apply_off=0 nents=1 first_pa=0xa0000c600000
+11月 05 03:34:56 worker1 kernel: ubase 00007: UDMA: [GPU-TRACE] pin OK provider=metax gpu_va=0xa04400000 mapped=0x2000 page_size=0x2000 bus_off=0x0 nents=1 first_pa=0xa0000c600000
+11月 05 03:34:56 worker1 kernel: UDMA GPU map: l_tid=1048575 r_tid=256 mm=ffff09005a0bcd00 current_mm=ffff09005a0bcd00 iova=0xa04400000 first_pa=0xa0000c600000 nents=1
+11月 05 03:34:56 worker1 kernel: UDMA GPU map: l_tid=255 r_tid=1048575 mm=ffff09005a0bcd00 current_mm=ffff09005a0bcd00 iova=0xa04400000 first_pa=0xa0000c600000 nents=1
+11月 05 03:35:00 worker1 kernel: UDMA GPU unmap: l_tid=1048575 r_tid=256 mm=ffff09005a0bcd00 current_mm=ffff09005a0bcd00 iova=0xa04400000 size=0x2000
+11月 05 03:35:00 worker1 kernel: UDMA GPU unmap: l_tid=255 r_tid=1048575 mm=ffff09005a0bcd00 current_mm=ffff09005a0bcd00 iova=0xa04400000 size=0x2000
+11月 05 03:35:02 worker1 kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+11月 05 03:35:02 worker1 kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+11月 05 03:35:02 worker1 kernel: URMA|ubcore|283062|283062|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xa04400000, cfg->len = 8192, cfg->token_value.token = 11259375, udate = 0 
+11月 05 03:35:02 worker1 kernel: ubase 00007: UDMA: MATT START:kernel_mode=0
+11月 05 03:35:02 worker1 kernel: udma_metax_p2p_bridge: pin OK va=0xa04400000->0xa04400000 len=0x2000->0x2000 page=0x2000 bus_off=0x0 apply_off=0 nents=1 first_pa=0xa0000c600000
+11月 05 03:35:02 worker1 kernel: ubase 00007: UDMA: [GPU-TRACE] pin OK provider=metax gpu_va=0xa04400000 mapped=0x2000 page_size=0x2000 bus_off=0x0 nents=1 first_pa=0xa0000c600000
+11月 05 03:35:02 worker1 kernel: UDMA GPU map: l_tid=1048575 r_tid=256 mm=ffff090057169080 current_mm=ffff090057169080 iova=0xa04400000 first_pa=0xa0000c600000 nents=1
+11月 05 03:35:02 worker1 kernel: UDMA GPU map: l_tid=255 r_tid=1048575 mm=ffff090057169080 current_mm=ffff090057169080 iova=0xa04400000 first_pa=0xa0000c600000 nents=1
+11月 05 03:35:07 worker1 kernel: UDMA GPU unmap: l_tid=1048575 r_tid=256 mm=ffff090057169080 current_mm=ffff090057169080 iova=0xa04400000 size=0x2000
+11月 05 03:35:07 worker1 kernel: UDMA GPU unmap: l_tid=255 r_tid=1048575 mm=ffff090057169080 current_mm=ffff090057169080 iova=0xa04400000 size=0x2000
+11月 05 03:35:09 worker1 kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+11月 05 03:35:09 worker1 kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+11月 05 03:35:09 worker1 kernel: URMA|ubcore|283175|283175|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xa04400000, cfg->len = 8192, cfg->token_value.token = 11259375, udate = 0 
+11月 05 03:35:09 worker1 kernel: ubase 00007: UDMA: MATT START:kernel_mode=0
+11月 05 03:35:09 worker1 kernel: udma_metax_p2p_bridge: pin OK va=0xa04400000->0xa04400000 len=0x2000->0x2000 page=0x2000 bus_off=0x0 apply_off=0 nents=1 first_pa=0xa0000c600000
+11月 05 03:35:09 worker1 kernel: ubase 00007: UDMA: [GPU-TRACE] pin OK provider=metax gpu_va=0xa04400000 mapped=0x2000 page_size=0x2000 bus_off=0x0 nents=1 first_pa=0xa0000c600000
+11月 05 03:35:09 worker1 kernel: UDMA GPU map: l_tid=1048575 r_tid=256 mm=ffff09005a0ba100 current_mm=ffff09005a0ba100 iova=0xa04400000 first_pa=0xa0000c600000 nents=1
+11月 05 03:35:09 worker1 kernel: UDMA GPU map: l_tid=255 r_tid=1048575 mm=ffff09005a0ba100 current_mm=ffff09005a0ba100 iova=0xa04400000 first_pa=0xa0000c600000 nents=1
+11月 05 03:35:13 worker1 kernel: UDMA GPU unmap: l_tid=1048575 r_tid=256 mm=ffff09005a0ba100 current_mm=ffff09005a0ba100 iova=0xa04400000 size=0x2000
+11月 05 03:35:13 worker1 kernel: UDMA GPU unmap: l_tid=255 r_tid=1048575 mm=ffff09005a0ba100 current_mm=ffff09005a0ba100 iova=0xa04400000 size=0x2000
+11月 05 03:35:14 worker1 kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+11月 05 03:35:15 worker1 kernel: ubase 00007: UDMA: JFR sleep time = 1000 us.
+11月 05 03:35:15 worker1 kernel: ubase 00007: UDMA: current mm released.
+11月 05 03:35:15 worker1 kernel: ubase 00007: UDMA: current mm released.
+11月 05 03:35:15 worker1 kernel: ubase 00007: UDMA: current mm released.
+11月 05 03:35:15 worker1 kernel: ubase 00007: UDMA: current mm released.
+11月 05 03:35:17 worker1 kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+11月 05 03:35:17 worker1 kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+11月 05 03:35:17 worker1 kernel: URMA|ubcore|283374|283374|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xa04400000, cfg->len = 8192, cfg->token_value.token = 11259375, udate = 0 
+11月 05 03:35:17 worker1 kernel: ubase 00007: UDMA: MATT START:kernel_mode=0
+11月 05 03:35:17 worker1 kernel: udma_metax_p2p_bridge: pin OK va=0xa04400000->0xa04400000 len=0x2000->0x2000 page=0x2000 bus_off=0x0 apply_off=0 nents=1 first_pa=0xa0000c600000
+11月 05 03:35:17 worker1 kernel: ubase 00007: UDMA: [GPU-TRACE] pin OK provider=metax gpu_va=0xa04400000 mapped=0x2000 page_size=0x2000 bus_off=0x0 nents=1 first_pa=0xa0000c600000
+11月 05 03:35:17 worker1 kernel: UDMA GPU map: l_tid=1048575 r_tid=256 mm=ffff090015b52c00 current_mm=ffff090015b52c00 iova=0xa04400000 first_pa=0xa0000c600000 nents=1
+11月 05 03:35:17 worker1 kernel: UDMA GPU map: l_tid=255 r_tid=1048575 mm=ffff090015b52c00 current_mm=ffff090015b52c00 iova=0xa04400000 first_pa=0xa0000c600000 nents=1
+11月 05 03:35:19 worker1 kernel: METAX.PCI.INFO recycle mem reg 0x000000003cbd9838 bo 0x000000002ed3cd23
+11月 05 03:35:19 worker1 kernel: UDMA: GPU seg gpu_va=0xa04400000 force-freed by vendor (App freed GPU memory before unregister_seg) — segment now stale, TODO: propagate invalidation to ubcore
+11月 05 03:35:19 worker1 kernel: UDMA GPU unmap: l_tid=1048575 r_tid=256 mm=ffff090015b52c00 current_mm=0000000000000000 iova=0xa04400000 size=0x2000
+11月 05 03:35:19 worker1 kernel: UDMA GPU unmap: l_tid=255 r_tid=1048575 mm=ffff090015b52c00 current_mm=0000000000000000 iova=0xa04400000 size=0x2000
+11月 05 03:35:20 worker1 kernel: ubase 00007: UDMA: JFR sleep time = 1000 us.
+11月 05 03:35:20 worker1 kernel: ubase 00007: UDMA: current mm released.
+11月 05 03:35:20 worker1 kernel: ubase 00007: UDMA: current mm released.
+11月 05 03:35:20 worker1 kernel: ubase 00007: UDMA: current mm released.
+11月 05 03:35:20 worker1 kernel: ubase 00007: UDMA: current mm released.
+11月 05 03:35:20 worker1 kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+11月 05 03:35:21 worker1 kernel: ubase 00007: UDMA: JFR sleep time = 1000 us.
+11月 05 03:35:21 worker1 kernel: ubase 00007: UDMA: current mm released.
+11月 05 03:35:21 worker1 kernel: ubase 00007: UDMA: current mm released.
+11月 05 03:35:21 worker1 kernel: ubase 00007: UDMA: current mm released.
+11月 05 03:35:21 worker1 kernel: ubase 00007: UDMA: current mm released.
+11月 05 03:35:23 worker1 kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+11月 05 03:35:24 worker1 kernel: ubase 00007: UDMA: JFR sleep time = 1000 us.
+11月 05 03:35:24 worker1 kernel: ubase 00007: UDMA: current mm released.
+11月 05 03:35:24 worker1 kernel: ubase 00007: UDMA: current mm released.
+11月 05 03:35:24 worker1 kernel: ubase 00007: UDMA: current mm released.
+11月 05 03:35:24 worker1 kernel: ubase 00007: UDMA: current mm released.
+11月 05 03:35:25 worker1 kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+11月 05 03:35:26 worker1 kernel: ubase 00007: UDMA: JFR sleep time = 1000 us.
+11月 05 03:35:26 worker1 kernel: ubase 00007: UDMA: current mm released.
+11月 05 03:35:26 worker1 kernel: ubase 00007: UDMA: current mm released.
+11月 05 03:35:26 worker1 kernel: ubase 00007: UDMA: current mm released.
+11月 05 03:35:26 worker1 kernel: ubase 00007: UDMA: current mm released.
+11月 05 03:35:26 worker1 kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+11月 05 03:35:27 worker1 kernel: ubase 00007: UDMA: JFR sleep time = 1000 us.
+11月 05 03:35:27 worker1 kernel: ubase 00007: UDMA: current mm released.
+11月 05 03:35:27 worker1 kernel: ubase 00007: UDMA: current mm released.
+11月 05 03:35:27 worker1 kernel: ubase 00007: UDMA: current mm released.
+11月 05 03:35:27 worker1 kernel: ubase 00007: UDMA: current mm released.
+11月 05 03:35:29 worker1 kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+11月 05 03:35:30 worker1 kernel: ubase 00007: UDMA: JFR sleep time = 1000 us.
+11月 05 03:35:30 worker1 kernel: ubase 00007: UDMA: current mm released.
+11月 05 03:35:30 worker1 kernel: ubase 00007: UDMA: current mm released.
+11月 05 03:35:30 worker1 kernel: ubase 00007: UDMA: current mm released.
+11月 05 03:35:30 worker1 kernel: ubase 00007: UDMA: current mm released.
+11月 05 03:35:32 worker1 kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+11月 05 03:35:33 worker1 kernel: ubase 00007: UDMA: JFR sleep time = 1000 us.
+11月 05 03:35:33 worker1 kernel: ubase 00007: UDMA: current mm released.
+11月 05 03:35:33 worker1 kernel: ubase 00007: UDMA: current mm released.
+11月 05 03:35:33 worker1 kernel: ubase 00007: UDMA: current mm released.
+11月 05 03:35:33 worker1 kernel: ubase 00007: UDMA: current mm released.
+11月 05 03:35:35 worker1 kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+11月 05 03:35:36 worker1 kernel: ubase 00007: UDMA: JFR sleep time = 1000 us.
+11月 05 03:35:36 worker1 kernel: ubase 00007: UDMA: current mm released.
+11月 05 03:35:36 worker1 kernel: ubase 00007: UDMA: current mm released.
+11月 05 03:35:36 worker1 kernel: ubase 00007: UDMA: current mm released.
+11月 05 03:35:36 worker1 kernel: ubase 00007: UDMA: current mm released.
+11月 05 03:35:37 worker1 kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+11月 05 03:35:38 worker1 kernel: ubase 00007: UDMA: JFR sleep time = 1000 us.
+11月 05 03:35:38 worker1 kernel: ubase 00007: UDMA: current mm released.
+11月 05 03:35:38 worker1 kernel: ubase 00007: UDMA: current mm released.
+11月 05 03:35:38 worker1 kernel: ubase 00007: UDMA: current mm released.
+11月 05 03:35:38 worker1 kernel: ubase 00007: UDMA: current mm released.
+11月 05 03:35:40 worker1 kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+11月 05 03:35:40 worker1 kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+11月 05 03:35:40 worker1 kernel: URMA|ubcore|284322|284322|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xa04400000, cfg->len = 8192, cfg->token_value.token = 11259375, udate = 0 
+11月 05 03:35:40 worker1 kernel: ubase 00007: UDMA: MATT START:kernel_mode=0
+11月 05 03:35:40 worker1 kernel: udma_metax_p2p_bridge: pin OK va=0xa04400000->0xa04400000 len=0x2000->0x2000 page=0x2000 bus_off=0x0 apply_off=0 nents=1 first_pa=0xa0000c600000
+11月 05 03:35:40 worker1 kernel: ubase 00007: UDMA: [GPU-TRACE] pin OK provider=metax gpu_va=0xa04400000 mapped=0x2000 page_size=0x2000 bus_off=0x0 nents=1 first_pa=0xa0000c600000
+11月 05 03:35:40 worker1 kernel: UDMA GPU map: l_tid=1048575 r_tid=256 mm=ffff0800c41d0b00 current_mm=ffff0800c41d0b00 iova=0xa04400000 first_pa=0xa0000c600000 nents=1
+11月 05 03:35:40 worker1 kernel: UDMA GPU map: l_tid=255 r_tid=1048575 mm=ffff0800c41d0b00 current_mm=ffff0800c41d0b00 iova=0xa04400000 first_pa=0xa0000c600000 nents=1
+11月 05 03:35:41 worker1 kernel: UDMA GPU unmap: l_tid=1048575 r_tid=256 mm=ffff0800c41d0b00 current_mm=ffff0800c41d0b00 iova=0xa04400000 size=0x2000
+11月 05 03:35:41 worker1 kernel: UDMA GPU unmap: l_tid=255 r_tid=1048575 mm=ffff0800c41d0b00 current_mm=ffff0800c41d0b00 iova=0xa04400000 size=0x2000
+11月 05 03:35:43 worker1 kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+11月 05 03:35:43 worker1 kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+11月 05 03:35:43 worker1 kernel: URMA|ubcore|284624|284624|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xa04400000, cfg->len = 8192, cfg->token_value.token = 11259375, udate = 0 
+11月 05 03:35:43 worker1 kernel: ubase 00007: UDMA: MATT START:kernel_mode=0
+11月 05 03:35:43 worker1 kernel: udma_metax_p2p_bridge: pin OK va=0xa04400000->0xa04400000 len=0x2000->0x2000 page=0x2000 bus_off=0x0 apply_off=0 nents=1 first_pa=0xa0000c600000
+11月 05 03:35:43 worker1 kernel: ubase 00007: UDMA: [GPU-TRACE] pin OK provider=metax gpu_va=0xa04400000 mapped=0x2000 page_size=0x2000 bus_off=0x0 nents=1 first_pa=0xa0000c600000
+11月 05 03:35:43 worker1 kernel: UDMA GPU map: l_tid=1048575 r_tid=256 mm=ffff0800b5d2a100 current_mm=ffff0800b5d2a100 iova=0xa04400000 first_pa=0xa0000c600000 nents=1
+11月 05 03:35:43 worker1 kernel: UDMA GPU map: l_tid=255 r_tid=1048575 mm=ffff0800b5d2a100 current_mm=ffff0800b5d2a100 iova=0xa04400000 first_pa=0xa0000c600000 nents=1
+11月 05 03:35:45 worker1 kernel: UDMA GPU unmap: l_tid=1048575 r_tid=256 mm=ffff0800b5d2a100 current_mm=ffff0800b5d2a100 iova=0xa04400000 size=0x2000
+11月 05 03:35:45 worker1 kernel: UDMA GPU unmap: l_tid=255 r_tid=1048575 mm=ffff0800b5d2a100 current_mm=ffff0800b5d2a100 iova=0xa04400000 size=0x2000
+11月 05 03:35:47 worker1 kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+11月 05 03:35:47 worker1 kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+11月 05 03:35:47 worker1 kernel: URMA|ubcore|284707|284707|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xa04400000, cfg->len = 8192, cfg->token_value.token = 11259375, udate = 0 
+11月 05 03:35:47 worker1 kernel: ubase 00007: UDMA: MATT START:kernel_mode=0
+11月 05 03:35:47 worker1 kernel: udma_metax_p2p_bridge: pin OK va=0xa04400000->0xa04400000 len=0x2000->0x2000 page=0x2000 bus_off=0x0 apply_off=0 nents=1 first_pa=0xa0000c600000
+11月 05 03:35:47 worker1 kernel: ubase 00007: UDMA: [GPU-TRACE] pin OK provider=metax gpu_va=0xa04400000 mapped=0x2000 page_size=0x2000 bus_off=0x0 nents=1 first_pa=0xa0000c600000
+11月 05 03:35:47 worker1 kernel: UDMA GPU map: l_tid=1048575 r_tid=256 mm=ffff09004b112c00 current_mm=ffff09004b112c00 iova=0xa04400000 first_pa=0xa0000c600000 nents=1
+11月 05 03:35:47 worker1 kernel: UDMA GPU map: l_tid=255 r_tid=1048575 mm=ffff09004b112c00 current_mm=ffff09004b112c00 iova=0xa04400000 first_pa=0xa0000c600000 nents=1
+11月 05 03:35:48 worker1 kernel: UDMA GPU unmap: l_tid=1048575 r_tid=256 mm=ffff09004b112c00 current_mm=ffff09004b112c00 iova=0xa04400000 size=0x2000
+11月 05 03:35:48 worker1 kernel: UDMA GPU unmap: l_tid=255 r_tid=1048575 mm=ffff09004b112c00 current_mm=ffff09004b112c00 iova=0xa04400000 size=0x2000
+11月 05 03:35:50 worker1 kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+11月 05 03:35:50 worker1 kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+11月 05 03:35:50 worker1 kernel: URMA|ubcore|284796|284796|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xa04400000, cfg->len = 8192, cfg->token_value.token = 11259375, udate = 0 
+11月 05 03:35:50 worker1 kernel: ubase 00007: UDMA: MATT START:kernel_mode=0
+11月 05 03:35:50 worker1 kernel: udma_metax_p2p_bridge: pin OK va=0xa04400000->0xa04400000 len=0x2000->0x2000 page=0x2000 bus_off=0x0 apply_off=0 nents=1 first_pa=0xa0000c600000
+11月 05 03:35:50 worker1 kernel: ubase 00007: UDMA: [GPU-TRACE] pin OK provider=metax gpu_va=0xa04400000 mapped=0x2000 page_size=0x2000 bus_off=0x0 nents=1 first_pa=0xa0000c600000
+11月 05 03:35:50 worker1 kernel: UDMA GPU map: l_tid=1048575 r_tid=256 mm=ffff09002c9cee00 current_mm=ffff09002c9cee00 iova=0xa04400000 first_pa=0xa0000c600000 nents=1
+11月 05 03:35:50 worker1 kernel: UDMA GPU map: l_tid=255 r_tid=1048575 mm=ffff09002c9cee00 current_mm=ffff09002c9cee00 iova=0xa04400000 first_pa=0xa0000c600000 nents=1
+11月 05 03:35:51 worker1 kernel: UDMA GPU unmap: l_tid=1048575 r_tid=256 mm=ffff09002c9cee00 current_mm=ffff09002c9cee00 iova=0xa04400000 size=0x2000
+11月 05 03:35:51 worker1 kernel: UDMA GPU unmap: l_tid=255 r_tid=1048575 mm=ffff09002c9cee00 current_mm=ffff09002c9cee00 iova=0xa04400000 size=0x2000
+11月 05 03:35:53 worker1 kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+11月 05 03:35:53 worker1 kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+11月 05 03:35:53 worker1 kernel: URMA|ubcore|284886|284886|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xa04400000, cfg->len = 8192, cfg->token_value.token = 11259375, udate = 0 
+11月 05 03:35:53 worker1 kernel: ubase 00007: UDMA: MATT START:kernel_mode=0
+11月 05 03:35:53 worker1 kernel: udma_metax_p2p_bridge: pin OK va=0xa04400000->0xa04400000 len=0x2000->0x2000 page=0x2000 bus_off=0x0 apply_off=0 nents=1 first_pa=0xa0000c600000
+11月 05 03:35:54 worker1 kernel: ubase 00007: UDMA: [GPU-TRACE] pin OK provider=metax gpu_va=0xa04400000 mapped=0x2000 page_size=0x2000 bus_off=0x0 nents=1 first_pa=0xa0000c600000
+11月 05 03:35:54 worker1 kernel: UDMA GPU map: l_tid=1048575 r_tid=256 mm=ffff090016548b00 current_mm=ffff090016548b00 iova=0xa04400000 first_pa=0xa0000c600000 nents=1
+11月 05 03:35:54 worker1 kernel: UDMA GPU map: l_tid=255 r_tid=1048575 mm=ffff090016548b00 current_mm=ffff090016548b00 iova=0xa04400000 first_pa=0xa0000c600000 nents=1
+11月 05 03:35:55 worker1 kernel: UDMA GPU unmap: l_tid=1048575 r_tid=256 mm=ffff090016548b00 current_mm=ffff090016548b00 iova=0xa04400000 size=0x2000
+11月 05 03:35:55 worker1 kernel: UDMA GPU unmap: l_tid=255 r_tid=1048575 mm=ffff090016548b00 current_mm=ffff090016548b00 iova=0xa04400000 size=0x2000
+11月 05 03:35:57 worker1 kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+11月 05 03:35:57 worker1 kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+11月 05 03:35:57 worker1 kernel: URMA|ubcore|284968|284968|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xa04400000, cfg->len = 8192, cfg->token_value.token = 11259375, udate = 0 
+11月 05 03:35:57 worker1 kernel: ubase 00007: UDMA: MATT START:kernel_mode=0
+11月 05 03:35:57 worker1 kernel: udma_metax_p2p_bridge: pin OK va=0xa04400000->0xa04400000 len=0x2000->0x2000 page=0x2000 bus_off=0x0 apply_off=0 nents=1 first_pa=0xa0000c600000
+11月 05 03:35:57 worker1 kernel: ubase 00007: UDMA: [GPU-TRACE] pin OK provider=metax gpu_va=0xa04400000 mapped=0x2000 page_size=0x2000 bus_off=0x0 nents=1 first_pa=0xa0000c600000
+11月 05 03:35:57 worker1 kernel: UDMA GPU map: l_tid=1048575 r_tid=256 mm=ffff09002c92ac00 current_mm=ffff09002c92ac00 iova=0xa04400000 first_pa=0xa0000c600000 nents=1
+11月 05 03:35:57 worker1 kernel: UDMA GPU map: l_tid=255 r_tid=1048575 mm=ffff09002c92ac00 current_mm=ffff09002c92ac00 iova=0xa04400000 first_pa=0xa0000c600000 nents=1
+11月 05 03:35:58 worker1 kernel: UDMA GPU unmap: l_tid=1048575 r_tid=256 mm=ffff09002c92ac00 current_mm=ffff09002c92ac00 iova=0xa04400000 size=0x2000
+11月 05 03:35:58 worker1 kernel: UDMA GPU unmap: l_tid=255 r_tid=1048575 mm=ffff09002c92ac00 current_mm=ffff09002c92ac00 iova=0xa04400000 size=0x2000
+11月 05 03:36:00 worker1 kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+11月 05 03:36:00 worker1 kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+11月 05 03:36:00 worker1 kernel: URMA|ubcore|285060|285060|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xa04400000, cfg->len = 8192, cfg->token_value.token = 11259375, udate = 0 
+11月 05 03:36:00 worker1 kernel: ubase 00007: UDMA: MATT START:kernel_mode=0
+11月 05 03:36:00 worker1 kernel: udma_metax_p2p_bridge: pin OK va=0xa04400000->0xa04400000 len=0x2000->0x2000 page=0x2000 bus_off=0x0 apply_off=0 nents=1 first_pa=0xa0000c600000
+11月 05 03:36:00 worker1 kernel: ubase 00007: UDMA: [GPU-TRACE] pin OK provider=metax gpu_va=0xa04400000 mapped=0x2000 page_size=0x2000 bus_off=0x0 nents=1 first_pa=0xa0000c600000
+11月 05 03:36:00 worker1 kernel: UDMA GPU map: l_tid=1048575 r_tid=256 mm=ffff09002c964200 current_mm=ffff09002c964200 iova=0xa04400000 first_pa=0xa0000c600000 nents=1
+11月 05 03:36:00 worker1 kernel: UDMA GPU map: l_tid=255 r_tid=1048575 mm=ffff09002c964200 current_mm=ffff09002c964200 iova=0xa04400000 first_pa=0xa0000c600000 nents=1
+11月 05 03:36:02 worker1 kernel: UDMA GPU unmap: l_tid=1048575 r_tid=256 mm=ffff09002c964200 current_mm=ffff09002c964200 iova=0xa04400000 size=0x2000
+11月 05 03:36:02 worker1 kernel: UDMA GPU unmap: l_tid=255 r_tid=1048575 mm=ffff09002c964200 current_mm=ffff09002c964200 iova=0xa04400000 size=0x2000
+11月 05 03:36:04 worker1 kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+11月 05 03:36:04 worker1 kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+11月 05 03:36:04 worker1 kernel: URMA|ubcore|285159|285159|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xa04400000, cfg->len = 8192, cfg->token_value.token = 11259375, udate = 0 
+11月 05 03:36:04 worker1 kernel: ubase 00007: UDMA: MATT START:kernel_mode=0
+11月 05 03:36:04 worker1 kernel: udma_metax_p2p_bridge: pin OK va=0xa04400000->0xa04400000 len=0x2000->0x2000 page=0x2000 bus_off=0x0 apply_off=0 nents=1 first_pa=0xa0000c600000
+11月 05 03:36:04 worker1 kernel: ubase 00007: UDMA: [GPU-TRACE] pin OK provider=metax gpu_va=0xa04400000 mapped=0x2000 page_size=0x2000 bus_off=0x0 nents=1 first_pa=0xa0000c600000
+11月 05 03:36:04 worker1 kernel: UDMA GPU map: l_tid=1048575 r_tid=256 mm=ffff090016549080 current_mm=ffff090016549080 iova=0xa04400000 first_pa=0xa0000c600000 nents=1
+11月 05 03:36:04 worker1 kernel: UDMA GPU map: l_tid=255 r_tid=1048575 mm=ffff090016549080 current_mm=ffff090016549080 iova=0xa04400000 first_pa=0xa0000c600000 nents=1
+11月 05 03:36:05 worker1 kernel: UDMA GPU unmap: l_tid=1048575 r_tid=256 mm=ffff090016549080 current_mm=ffff090016549080 iova=0xa04400000 size=0x2000
+11月 05 03:36:05 worker1 kernel: UDMA GPU unmap: l_tid=255 r_tid=1048575 mm=ffff090016549080 current_mm=ffff090016549080 iova=0xa04400000 size=0x2000
+11月 05 03:36:07 worker1 kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+11月 05 03:36:07 worker1 kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+11月 05 03:36:07 worker1 kernel: URMA|ubcore|285332|285332|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xa04400000, cfg->len = 8192, cfg->token_value.token = 11259375, udate = 0 
+11月 05 03:36:07 worker1 kernel: ubase 00007: UDMA: MATT START:kernel_mode=0
+11月 05 03:36:07 worker1 kernel: udma_metax_p2p_bridge: pin OK va=0xa04400000->0xa04400000 len=0x2000->0x2000 page=0x2000 bus_off=0x0 apply_off=0 nents=1 first_pa=0xa0000c600000
+11月 05 03:36:07 worker1 kernel: ubase 00007: UDMA: [GPU-TRACE] pin OK provider=metax gpu_va=0xa04400000 mapped=0x2000 page_size=0x2000 bus_off=0x0 nents=1 first_pa=0xa0000c600000
+11月 05 03:36:07 worker1 kernel: UDMA GPU map: l_tid=1048575 r_tid=256 mm=ffff09005b772c00 current_mm=ffff09005b772c00 iova=0xa04400000 first_pa=0xa0000c600000 nents=1
+11月 05 03:36:07 worker1 kernel: UDMA GPU map: l_tid=255 r_tid=1048575 mm=ffff09005b772c00 current_mm=ffff09005b772c00 iova=0xa04400000 first_pa=0xa0000c600000 nents=1
+11月 05 03:36:08 worker1 kernel: UDMA GPU unmap: l_tid=1048575 r_tid=256 mm=ffff09005b772c00 current_mm=ffff09005b772c00 iova=0xa04400000 size=0x2000
+11月 05 03:36:08 worker1 kernel: UDMA GPU unmap: l_tid=255 r_tid=1048575 mm=ffff09005b772c00 current_mm=ffff09005b772c00 iova=0xa04400000 size=0x2000
+11月 05 03:36:10 worker1 kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+11月 05 03:36:10 worker1 kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+11月 05 03:36:10 worker1 kernel: URMA|ubcore|285419|285419|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xa04400000, cfg->len = 8192, cfg->token_value.token = 11259375, udate = 0 
+11月 05 03:36:10 worker1 kernel: ubase 00007: UDMA: MATT START:kernel_mode=0
+11月 05 03:36:11 worker1 kernel: udma_metax_p2p_bridge: pin OK va=0xa04400000->0xa04400000 len=0x2000->0x2000 page=0x2000 bus_off=0x0 apply_off=0 nents=1 first_pa=0xa0000c600000
+11月 05 03:36:11 worker1 kernel: ubase 00007: UDMA: [GPU-TRACE] pin OK provider=metax gpu_va=0xa04400000 mapped=0x2000 page_size=0x2000 bus_off=0x0 nents=1 first_pa=0xa0000c600000
+11月 05 03:36:11 worker1 kernel: UDMA GPU map: l_tid=1048575 r_tid=256 mm=ffff09002f507380 current_mm=ffff09002f507380 iova=0xa04400000 first_pa=0xa0000c600000 nents=1
+11月 05 03:36:11 worker1 kernel: UDMA GPU map: l_tid=255 r_tid=1048575 mm=ffff09002f507380 current_mm=ffff09002f507380 iova=0xa04400000 first_pa=0xa0000c600000 nents=1
+11月 05 03:36:12 worker1 kernel: UDMA GPU unmap: l_tid=1048575 r_tid=256 mm=ffff09002f507380 current_mm=ffff09002f507380 iova=0xa04400000 size=0x2000
+11月 05 03:36:12 worker1 kernel: UDMA GPU unmap: l_tid=255 r_tid=1048575 mm=ffff09002f507380 current_mm=ffff09002f507380 iova=0xa04400000 size=0x2000
+11月 05 03:36:14 worker1 kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+11月 05 03:36:14 worker1 kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+11月 05 03:36:14 worker1 kernel: URMA|ubcore|285529|285529|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xa04400000, cfg->len = 16384, cfg->token_value.token = 11259375, udate = 0 
+11月 05 03:36:14 worker1 kernel: ubase 00007: UDMA: MATT START:kernel_mode=0
+11月 05 03:36:14 worker1 kernel: udma_metax_p2p_bridge: pin OK va=0xa04400000->0xa04400000 len=0x4000->0x4000 page=0x4000 bus_off=0x0 apply_off=0 nents=1 first_pa=0xa0000c600000
+11月 05 03:36:14 worker1 kernel: ubase 00007: UDMA: [GPU-TRACE] pin OK provider=metax gpu_va=0xa04400000 mapped=0x4000 page_size=0x4000 bus_off=0x0 nents=1 first_pa=0xa0000c600000
+11月 05 03:36:14 worker1 kernel: UDMA GPU map: l_tid=1048575 r_tid=256 mm=ffff090075106300 current_mm=ffff090075106300 iova=0xa04400000 first_pa=0xa0000c600000 nents=1
+11月 05 03:36:14 worker1 kernel: UDMA GPU map: l_tid=255 r_tid=1048575 mm=ffff090075106300 current_mm=ffff090075106300 iova=0xa04400000 first_pa=0xa0000c600000 nents=1
+11月 05 03:36:15 worker1 kernel: UDMA GPU unmap: l_tid=1048575 r_tid=256 mm=ffff090075106300 current_mm=ffff090075106300 iova=0xa04400000 size=0x4000
+11月 05 03:36:15 worker1 kernel: UDMA GPU unmap: l_tid=255 r_tid=1048575 mm=ffff090075106300 current_mm=ffff090075106300 iova=0xa04400000 size=0x4000
+11月 05 03:36:17 worker1 kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+11月 05 03:36:17 worker1 kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+11月 05 03:36:17 worker1 kernel: URMA|ubcore|285618|285618|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xa04400000, cfg->len = 32768, cfg->token_value.token = 11259375, udate = 0 
+11月 05 03:36:17 worker1 kernel: ubase 00007: UDMA: MATT START:kernel_mode=0
+11月 05 03:36:17 worker1 kernel: udma_metax_p2p_bridge: pin OK va=0xa04400000->0xa04400000 len=0x8000->0x8000 page=0x8000 bus_off=0x0 apply_off=0 nents=1 first_pa=0xa0000c600000
+11月 05 03:36:17 worker1 kernel: ubase 00007: UDMA: [GPU-TRACE] pin OK provider=metax gpu_va=0xa04400000 mapped=0x8000 page_size=0x8000 bus_off=0x0 nents=1 first_pa=0xa0000c600000
+11月 05 03:36:17 worker1 kernel: UDMA GPU map: l_tid=1048575 r_tid=256 mm=ffff09004b112100 current_mm=ffff09004b112100 iova=0xa04400000 first_pa=0xa0000c600000 nents=1
+11月 05 03:36:17 worker1 kernel: UDMA GPU map: l_tid=255 r_tid=1048575 mm=ffff09004b112100 current_mm=ffff09004b112100 iova=0xa04400000 first_pa=0xa0000c600000 nents=1
+11月 05 03:36:19 worker1 kernel: UDMA GPU unmap: l_tid=1048575 r_tid=256 mm=ffff09004b112100 current_mm=ffff09004b112100 iova=0xa04400000 size=0x8000
+11月 05 03:36:19 worker1 kernel: UDMA GPU unmap: l_tid=255 r_tid=1048575 mm=ffff09004b112100 current_mm=ffff09004b112100 iova=0xa04400000 size=0x8000
+11月 05 03:36:21 worker1 kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+11月 05 03:36:21 worker1 kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+11月 05 03:36:21 worker1 kernel: URMA|ubcore|285797|285797|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xa04400000, cfg->len = 65536, cfg->token_value.token = 11259375, udate = 0 
+11月 05 03:36:21 worker1 kernel: ubase 00007: UDMA: MATT START:kernel_mode=0
+11月 05 03:36:21 worker1 kernel: udma_metax_p2p_bridge: pin OK va=0xa04400000->0xa04400000 len=0x10000->0x10000 page=0x10000 bus_off=0x0 apply_off=0 nents=1 first_pa=0xa0000c600000
+11月 05 03:36:21 worker1 kernel: ubase 00007: UDMA: [GPU-TRACE] pin OK provider=metax gpu_va=0xa04400000 mapped=0x10000 page_size=0x10000 bus_off=0x0 nents=1 first_pa=0xa0000c600000
+11月 05 03:36:21 worker1 kernel: UDMA GPU map: l_tid=1048575 r_tid=256 mm=ffff0900168e6e00 current_mm=ffff0900168e6e00 iova=0xa04400000 first_pa=0xa0000c600000 nents=1
+11月 05 03:36:21 worker1 kernel: UDMA GPU map: l_tid=255 r_tid=1048575 mm=ffff0900168e6e00 current_mm=ffff0900168e6e00 iova=0xa04400000 first_pa=0xa0000c600000 nents=1
+11月 05 03:36:22 worker1 kernel: UDMA GPU unmap: l_tid=1048575 r_tid=256 mm=ffff0900168e6e00 current_mm=ffff0900168e6e00 iova=0xa04400000 size=0x10000
+11月 05 03:36:22 worker1 kernel: UDMA GPU unmap: l_tid=255 r_tid=1048575 mm=ffff0900168e6e00 current_mm=ffff0900168e6e00 iova=0xa04400000 size=0x10000
+11月 05 03:36:24 worker1 kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+11月 05 03:36:24 worker1 kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+11月 05 03:36:24 worker1 kernel: URMA|ubcore|285893|285893|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xa04400000, cfg->len = 131072, cfg->token_value.token = 11259375, udate = 0 
+11月 05 03:36:24 worker1 kernel: ubase 00007: UDMA: MATT START:kernel_mode=0
+11月 05 03:36:24 worker1 kernel: udma_metax_p2p_bridge: pin OK va=0xa04400000->0xa04400000 len=0x20000->0x20000 page=0x20000 bus_off=0x0 apply_off=0 nents=1 first_pa=0xa0000c600000
+11月 05 03:36:24 worker1 kernel: ubase 00007: UDMA: [GPU-TRACE] pin OK provider=metax gpu_va=0xa04400000 mapped=0x20000 page_size=0x20000 bus_off=0x0 nents=1 first_pa=0xa0000c600000
+11月 05 03:36:24 worker1 kernel: UDMA GPU map: l_tid=1048575 r_tid=256 mm=ffff09005b84e300 current_mm=ffff09005b84e300 iova=0xa04400000 first_pa=0xa0000c600000 nents=1
+11月 05 03:36:24 worker1 kernel: UDMA GPU map: l_tid=255 r_tid=1048575 mm=ffff09005b84e300 current_mm=ffff09005b84e300 iova=0xa04400000 first_pa=0xa0000c600000 nents=1
+11月 05 03:36:26 worker1 kernel: UDMA GPU unmap: l_tid=1048575 r_tid=256 mm=ffff09005b84e300 current_mm=ffff09005b84e300 iova=0xa04400000 size=0x20000
+11月 05 03:36:26 worker1 kernel: UDMA GPU unmap: l_tid=255 r_tid=1048575 mm=ffff09005b84e300 current_mm=ffff09005b84e300 iova=0xa04400000 size=0x20000
+11月 05 03:36:28 worker1 kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+11月 05 03:36:28 worker1 kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+11月 05 03:36:28 worker1 kernel: URMA|ubcore|286009|286009|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xa04400000, cfg->len = 262144, cfg->token_value.token = 11259375, udate = 0 
+11月 05 03:36:28 worker1 kernel: ubase 00007: UDMA: MATT START:kernel_mode=0
+11月 05 03:36:28 worker1 kernel: udma_metax_p2p_bridge: pin OK va=0xa04400000->0xa04400000 len=0x40000->0x40000 page=0x40000 bus_off=0x0 apply_off=0 nents=1 first_pa=0xa0000c600000
+11月 05 03:36:28 worker1 kernel: ubase 00007: UDMA: [GPU-TRACE] pin OK provider=metax gpu_va=0xa04400000 mapped=0x40000 page_size=0x40000 bus_off=0x0 nents=1 first_pa=0xa0000c600000
+11月 05 03:36:28 worker1 kernel: UDMA GPU map: l_tid=1048575 r_tid=256 mm=ffff09005a2b4d00 current_mm=ffff09005a2b4d00 iova=0xa04400000 first_pa=0xa0000c600000 nents=1
+11月 05 03:36:28 worker1 kernel: UDMA GPU map: l_tid=255 r_tid=1048575 mm=ffff09005a2b4d00 current_mm=ffff09005a2b4d00 iova=0xa04400000 first_pa=0xa0000c600000 nents=1
+11月 05 03:36:30 worker1 kernel: UDMA GPU unmap: l_tid=1048575 r_tid=256 mm=ffff09005a2b4d00 current_mm=ffff09005a2b4d00 iova=0xa04400000 size=0x40000
+11月 05 03:36:30 worker1 kernel: UDMA GPU unmap: l_tid=255 r_tid=1048575 mm=ffff09005a2b4d00 current_mm=ffff09005a2b4d00 iova=0xa04400000 size=0x40000
+11月 05 03:36:32 worker1 kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+11月 05 03:36:32 worker1 kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+11月 05 03:36:32 worker1 kernel: URMA|ubcore|286185|286185|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xa04400000, cfg->len = 524288, cfg->token_value.token = 11259375, udate = 0 
+11月 05 03:36:32 worker1 kernel: ubase 00007: UDMA: MATT START:kernel_mode=0
+11月 05 03:36:32 worker1 kernel: udma_metax_p2p_bridge: pin OK va=0xa04400000->0xa04400000 len=0x80000->0x80000 page=0x80000 bus_off=0x0 apply_off=0 nents=1 first_pa=0xa0000c600000
+11月 05 03:36:32 worker1 kernel: ubase 00007: UDMA: [GPU-TRACE] pin OK provider=metax gpu_va=0xa04400000 mapped=0x80000 page_size=0x80000 bus_off=0x0 nents=1 first_pa=0xa0000c600000
+11月 05 03:36:32 worker1 kernel: UDMA GPU map: l_tid=1048575 r_tid=256 mm=ffff0900171ff900 current_mm=ffff0900171ff900 iova=0xa04400000 first_pa=0xa0000c600000 nents=1
+11月 05 03:36:33 worker1 kernel: UDMA GPU map: l_tid=255 r_tid=1048575 mm=ffff0900171ff900 current_mm=ffff0900171ff900 iova=0xa04400000 first_pa=0xa0000c600000 nents=1
+11月 05 03:36:36 worker1 kernel: UDMA GPU unmap: l_tid=1048575 r_tid=256 mm=ffff0900171ff900 current_mm=ffff0900171ff900 iova=0xa04400000 size=0x80000
+11月 05 03:36:36 worker1 kernel: UDMA GPU unmap: l_tid=255 r_tid=1048575 mm=ffff0900171ff900 current_mm=ffff0900171ff900 iova=0xa04400000 size=0x80000
+11月 05 03:36:38 worker1 kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+11月 05 03:36:38 worker1 kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+11月 05 03:36:38 worker1 kernel: URMA|ubcore|286280|286280|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xa04400000, cfg->len = 1048576, cfg->token_value.token = 11259375, udate = 0 
+11月 05 03:36:38 worker1 kernel: ubase 00007: UDMA: MATT START:kernel_mode=0
+11月 05 03:36:38 worker1 kernel: udma_metax_p2p_bridge: pin OK va=0xa04400000->0xa04400000 len=0x100000->0x100000 page=0x100000 bus_off=0x0 apply_off=0 nents=1 first_pa=0xa0000c600000
+11月 05 03:36:38 worker1 kernel: ubase 00007: UDMA: [GPU-TRACE] pin OK provider=metax gpu_va=0xa04400000 mapped=0x100000 page_size=0x100000 bus_off=0x0 nents=1 first_pa=0xa0000c600000
+11月 05 03:36:38 worker1 kernel: UDMA GPU map: l_tid=1048575 r_tid=256 mm=ffff0900565c0580 current_mm=ffff0900565c0580 iova=0xa04400000 first_pa=0xa0000c600000 nents=1
+11月 05 03:36:38 worker1 kernel: UDMA GPU map: l_tid=255 r_tid=1048575 mm=ffff0900565c0580 current_mm=ffff0900565c0580 iova=0xa04400000 first_pa=0xa0000c600000 nents=1
+11月 05 03:36:43 worker1 kernel: UDMA GPU unmap: l_tid=1048575 r_tid=256 mm=ffff0900565c0580 current_mm=ffff0900565c0580 iova=0xa04400000 size=0x100000
+11月 05 03:36:43 worker1 kernel: UDMA GPU unmap: l_tid=255 r_tid=1048575 mm=ffff0900565c0580 current_mm=ffff0900565c0580 iova=0xa04400000 size=0x100000
+11月 05 03:36:45 worker1 kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+11月 05 03:36:45 worker1 kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+11月 05 03:36:45 worker1 kernel: URMA|ubcore|286377|286377|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xa04400000, cfg->len = 2097152, cfg->token_value.token = 11259375, udate = 0 
+11月 05 03:36:45 worker1 kernel: ubase 00007: UDMA: MATT START:kernel_mode=0
+11月 05 03:36:45 worker1 kernel: udma_metax_p2p_bridge: pin OK va=0xa04400000->0xa04400000 len=0x200000->0x200000 page=0x200000 bus_off=0x0 apply_off=0 nents=1 first_pa=0xa0000c600000
+11月 05 03:36:45 worker1 kernel: ubase 00007: UDMA: [GPU-TRACE] pin OK provider=metax gpu_va=0xa04400000 mapped=0x200000 page_size=0x200000 bus_off=0x0 nents=1 first_pa=0xa0000c600000
+11月 05 03:36:45 worker1 kernel: UDMA GPU map: l_tid=1048575 r_tid=256 mm=ffff09002f7d5d80 current_mm=ffff09002f7d5d80 iova=0xa04400000 first_pa=0xa0000c600000 nents=1
+11月 05 03:36:45 worker1 kernel: UDMA GPU map: l_tid=255 r_tid=1048575 mm=ffff09002f7d5d80 current_mm=ffff09002f7d5d80 iova=0xa04400000 first_pa=0xa0000c600000 nents=1
+11月 05 03:36:54 worker1 kernel: UDMA GPU unmap: l_tid=1048575 r_tid=256 mm=ffff09002f7d5d80 current_mm=ffff09002f7d5d80 iova=0xa04400000 size=0x200000
+11月 05 03:36:54 worker1 kernel: UDMA GPU unmap: l_tid=255 r_tid=1048575 mm=ffff09002f7d5d80 current_mm=ffff09002f7d5d80 iova=0xa04400000 size=0x200000
