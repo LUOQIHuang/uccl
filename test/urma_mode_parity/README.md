@@ -1,5 +1,7 @@
 # URMA Normal / Low-latency 实现对齐与验收
 
+服务器按步骤操作请先读 **[双机运行手册（含完整命令与所需日志）](RUNBOOK.zh-CN.md)**，覆盖 URMA 构建验收及同环境 verbs 对照。
+
 本轮目标是修改生产实现，基准为当前 MetaX 上的非 EFA、原生原子 verbs 路径。此前 `urma_diag` 用于诊断旧私有模块，本入口用于**重新构建和验收当前源码**，两者不要混用。
 
 ## 已实现的对应关系
@@ -92,18 +94,9 @@ bash test/urma_mode_parity/run.sh --action run \
 
 这样两种后端使用相同源码构建、同一内核和 benchmark，避免拼接旧的不同环境数据。
 
-### 4. 回传
+### 4. 需要提供的日志
 
-```bash
-bash test/urma_mode_parity/run.sh --action collect \
-  --node-rank "$RANK" --job "$JOB"
-git add -- "test/bench_results/urma_mode_parity/$JOB/node$RANK"
-git commit -m "[test] Add URMA mode v2 validation"
-git pull --rebase https://github.com/LUOQIHuang/uccl.git codex/metax-urma-integration
-git push https://github.com/LUOQIHuang/uccl.git HEAD:refs/heads/codex/metax-urma-integration
-```
-
-结果默认在 `metax_dev/urma_mode_parity_results/$JOB/node$RANK`，包括构建清单、环境、两种模式的原始日志/结构化指标/status/计数器。失败也可以 collect；构建失败时请另外提供 `build.log / host_tests.log`。二进制和 GPU 数据不回传。
+提供两端 `metax_dev/urma_mode_parity_results/$JOB/node$RANK` 中的构建清单、环境、两种模式的原始日志、结构化指标、status 与计数器。构建失败时另提供 `build.log / host_tests.log`，检查失败时提供完整终端输出。具体文件清单与失败场景见 [运行手册第 9 节](RUNBOOK.zh-CN.md#9-需要提供哪些日志)。不需要二进制或 GPU 数据。
 
 ## 本地验证的范围
 
