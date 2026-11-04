@@ -1,0 +1,197 @@
+/home/h00918771/uccl-ep-xpu-integration-new/test/verbs_diag/exit_guard.py:8: UserWarning: Could not find flash_attn package installed. Please try to install flash_attn whl pacakge using pip command and make sure it can be imported properly
+  from torch.distributed import run
+/home/h00918771/uccl-ep-xpu-integration-new/test/urma_mode_parity/support.py:33: UserWarning: Could not find flash_attn package installed. Please try to install flash_attn whl pacakge using pip command and make sure it can be imported properly
+  import torch
+worker1:325070:325070 [0] MCCL INFO MCCL_SOCKET_IFNAME set by environment to enp33s0
+worker1:325070:325070 [0] MCCL INFO Bootstrap : Using enp33s0:141.61.17.204<0>
+worker1:325070:325214 [0] MCCL INFO MCCL_IB_DISABLE set by environment to 1.
+worker1:325070:325214 [0] MCCL INFO MCCL_SOCKET_IFNAME set by environment to enp33s0
+worker1:325070:325214 [0] MCCL INFO NET/Socket : Using [0]enp33s0:141.61.17.204<0>
+worker1:325070:325214 [0] MCCL INFO Using network Socket
+worker1:325070:325214 [0] MCCL INFO comm=0xaaace6055960, lastStream is initialized
+worker1:325070:325214 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:325070:325214 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:325070:325214 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:325070:325214 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:325070:325214 [0] MCCL INFO RAS client listening socket at ::1<28028>
+worker1:325070:325214 [0] MCCL INFO rank 1 cudeDev 0, local 0 socket 0 peer -1, fabricId 0 index 0 directLinkGroup 0 totalGpu 0, switchId 0
+worker1:325070:325214 [0] MCCL INFO type:0, uuid: local 0x282b6314, remote 0xd54f50f9 0x0, topology 0, isa: 10.0
+worker1:325070:325214 [0] MCCL INFO Setting affinity for GPU 0 to ffffffff,ffffffff,ffffffff,00000000,00000000,00000000,00000000,00000000,00000000
+worker1:325070:325214 [0] MCCL INFO MCCL pcie buffer mode 0, rcCount 1, nodeType 0x0, minAp 104
+worker1:325070:325214 [0] MCCL INFO Disabling clique-based kernels due to topology (ignore with CLIQUE_IGNORE_TOPO)
+worker1:325070:325214 [0] MCCL INFO CLIQUE InitRemoteReadToggle enable_read:0, isaVersion:1000, topologyId:0
+worker1:325070:325214 [0] MCCL INFO Clique kernels disabled
+worker1:325070:325214 [0] MCCL INFO Trees [0] -1/-1/-1->1->0 [1] 0/-1/-1->1->-1 [2] -1/-1/-1->1->0 [3] 0/-1/-1->1->-1 [4] -1/-1/-1->1->0 [5] 0/-1/-1->1->-1 [6] -1/-1/-1->1->0 [7] 0/-1/-1->1->-1 [8] -1/-1/-1->1->0 [9] 0/-1/-1->1->-1 [10] -1/-1/-1->1->0 [11] 0/-1/-1->1->-1 [12] -1/-1/-1->1->0 [13] 0/-1/-1->1->-1 [14] -1/-1/-1->1->0 [15] 0/-1/-1->1->-1 [16] -1/-1/-1->1->0 [17] 0/-1/-1->1->-1 [18] -1/-1/-1->1->0 [19] 0/-1/-1->1->-1 [20] -1/-1/-1->1->0 [21] 0/-1/-1->1->-1 [22] -1/-1/-1->1->0 [23] 0/-1/-1->1->-1 [24] -1/-1/-1->1->0 [25] 0/-1/-1->1->-1 [26] -1/-1/-1->1->0 [27] 0/-1/-1->1->-1 [28] -1/-1/-1->1->0 [29] 0/-1/-1->1->-1 [30] -1/-1/-1->1->0 [31] 0/-1/-1->1->-1 comm 0xaaace6055960 nRanks 02 busId a1000
+worker1:325070:325214 [0] MCCL INFO P2P Chunksize set to 131072
+worker1:325070:325214 [0] MCCL INFO disable groupWriteback
+worker1:325070:325214 [0] MCCL INFO threadThresholds 8/8/64 | 8/8/64 | 256 | 256
+worker1:325070:325214 [0] MCCL INFO 32 coll channels, 32 p2p channels, 32 p2p channels per peer
+worker1:325070:325214 [0] MCCL INFO comm 0xaaace6055960 rank 1 nranks 2 macaDev 0 busId a1000 localSize 0 used 67228512 bytes - Init COMPLETE
+worker1:325070:325219 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:325070:325318 [0] MCCL INFO Channel 00/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaace6055960 nRanks 02
+worker1:325070:325219 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:325070:325318 [0] MCCL INFO Channel 01/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaace6055960 nRanks 02
+worker1:325070:325219 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:325070:325318 [0] MCCL INFO Channel 02/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaace6055960 nRanks 02
+worker1:325070:325219 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:325070:325318 [0] MCCL INFO Channel 03/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaace6055960 nRanks 02
+worker1:325070:325219 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:325070:325318 [0] MCCL INFO Channel 04/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaace6055960 nRanks 02
+worker1:325070:325219 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:325070:325318 [0] MCCL INFO Channel 05/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaace6055960 nRanks 02
+worker1:325070:325219 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:325070:325318 [0] MCCL INFO Channel 06/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaace6055960 nRanks 02
+worker1:325070:325219 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:325070:325318 [0] MCCL INFO Channel 07/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaace6055960 nRanks 02
+worker1:325070:325219 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:325070:325318 [0] MCCL INFO Channel 08/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaace6055960 nRanks 02
+worker1:325070:325219 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:325070:325318 [0] MCCL INFO Channel 09/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaace6055960 nRanks 02
+worker1:325070:325219 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:325070:325318 [0] MCCL INFO Channel 10/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaace6055960 nRanks 02
+worker1:325070:325219 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:325070:325318 [0] MCCL INFO Channel 11/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaace6055960 nRanks 02
+worker1:325070:325219 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:325070:325318 [0] MCCL INFO Channel 12/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaace6055960 nRanks 02
+worker1:325070:325219 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:325070:325318 [0] MCCL INFO Channel 13/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaace6055960 nRanks 02
+worker1:325070:325219 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:325070:325318 [0] MCCL INFO Channel 14/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaace6055960 nRanks 02
+worker1:325070:325219 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:325070:325318 [0] MCCL INFO Channel 15/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaace6055960 nRanks 02
+worker1:325070:325219 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:325070:325318 [0] MCCL INFO Channel 16/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaace6055960 nRanks 02
+worker1:325070:325219 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:325070:325318 [0] MCCL INFO Channel 17/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaace6055960 nRanks 02
+worker1:325070:325219 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:325070:325318 [0] MCCL INFO Channel 18/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaace6055960 nRanks 02
+worker1:325070:325219 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:325070:325318 [0] MCCL INFO Channel 19/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaace6055960 nRanks 02
+worker1:325070:325219 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:325070:325318 [0] MCCL INFO Channel 20/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaace6055960 nRanks 02
+worker1:325070:325219 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:325070:325318 [0] MCCL INFO Channel 21/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaace6055960 nRanks 02
+worker1:325070:325219 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:325070:325318 [0] MCCL INFO Channel 22/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaace6055960 nRanks 02
+worker1:325070:325219 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:325070:325318 [0] MCCL INFO Channel 23/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaace6055960 nRanks 02
+worker1:325070:325219 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:325070:325318 [0] MCCL INFO Channel 24/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaace6055960 nRanks 02
+worker1:325070:325219 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:325070:325318 [0] MCCL INFO Channel 25/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaace6055960 nRanks 02
+worker1:325070:325219 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:325070:325318 [0] MCCL INFO Channel 26/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaace6055960 nRanks 02
+worker1:325070:325219 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:325070:325318 [0] MCCL INFO Channel 27/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaace6055960 nRanks 02
+worker1:325070:325219 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:325070:325318 [0] MCCL INFO Channel 28/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaace6055960 nRanks 02
+worker1:325070:325219 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:325070:325318 [0] MCCL INFO Channel 29/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaace6055960 nRanks 02
+worker1:325070:325219 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:325070:325318 [0] MCCL INFO Channel 30/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaace6055960 nRanks 02
+worker1:325070:325219 [0] MCCL INFO ip=141.61.17.204, port=0
+worker1:325070:325318 [0] MCCL INFO Channel 31/0 : 0[a1000] -> 1[a1000] [receive] via NET/Socket/0 comm 0xaaace6055960 nRanks 02
+worker1:325070:325318 [0] MCCL INFO Channel 00/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaace6055960 nRanks 02
+worker1:325070:325318 [0] MCCL INFO Channel 01/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaace6055960 nRanks 02
+worker1:325070:325318 [0] MCCL INFO Channel 02/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaace6055960 nRanks 02
+worker1:325070:325318 [0] MCCL INFO Channel 03/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaace6055960 nRanks 02
+worker1:325070:325318 [0] MCCL INFO Channel 04/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaace6055960 nRanks 02
+worker1:325070:325318 [0] MCCL INFO Channel 05/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaace6055960 nRanks 02
+worker1:325070:325318 [0] MCCL INFO Channel 06/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaace6055960 nRanks 02
+worker1:325070:325318 [0] MCCL INFO Channel 07/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaace6055960 nRanks 02
+worker1:325070:325318 [0] MCCL INFO Channel 08/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaace6055960 nRanks 02
+worker1:325070:325318 [0] MCCL INFO Channel 09/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaace6055960 nRanks 02
+worker1:325070:325318 [0] MCCL INFO Channel 10/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaace6055960 nRanks 02
+worker1:325070:325318 [0] MCCL INFO Channel 11/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaace6055960 nRanks 02
+worker1:325070:325318 [0] MCCL INFO Channel 12/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaace6055960 nRanks 02
+worker1:325070:325318 [0] MCCL INFO Channel 13/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaace6055960 nRanks 02
+worker1:325070:325318 [0] MCCL INFO Channel 14/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaace6055960 nRanks 02
+worker1:325070:325318 [0] MCCL INFO Channel 15/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaace6055960 nRanks 02
+worker1:325070:325318 [0] MCCL INFO Channel 16/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaace6055960 nRanks 02
+worker1:325070:325318 [0] MCCL INFO Channel 17/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaace6055960 nRanks 02
+worker1:325070:325318 [0] MCCL INFO Channel 18/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaace6055960 nRanks 02
+worker1:325070:325318 [0] MCCL INFO Channel 19/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaace6055960 nRanks 02
+worker1:325070:325318 [0] MCCL INFO Channel 20/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaace6055960 nRanks 02
+worker1:325070:325318 [0] MCCL INFO Channel 21/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaace6055960 nRanks 02
+worker1:325070:325318 [0] MCCL INFO Channel 22/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaace6055960 nRanks 02
+worker1:325070:325318 [0] MCCL INFO Channel 23/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaace6055960 nRanks 02
+worker1:325070:325318 [0] MCCL INFO Channel 24/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaace6055960 nRanks 02
+worker1:325070:325318 [0] MCCL INFO Channel 25/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaace6055960 nRanks 02
+worker1:325070:325318 [0] MCCL INFO Channel 26/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaace6055960 nRanks 02
+worker1:325070:325318 [0] MCCL INFO Channel 27/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaace6055960 nRanks 02
+worker1:325070:325318 [0] MCCL INFO Channel 28/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaace6055960 nRanks 02
+worker1:325070:325318 [0] MCCL INFO Channel 29/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaace6055960 nRanks 02
+worker1:325070:325318 [0] MCCL INFO Channel 30/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaace6055960 nRanks 02
+worker1:325070:325318 [0] MCCL INFO Channel 31/0 : 1[a1000] -> 0[a1000] [send] via NET/Socket/0 comm 0xaaace6055960 nRanks 02
+worker1:325070:325318 [0] MCCL INFO Connected all rings comm 0xaaace6055960 nRanks 02 busId a1000
+[URMA_ALLOC] control raw=0xa77e03600 aligned=0xa77e04000 logical=81960 backing=90112 alignment=4096 finegrained=1
+Registered proxies for device 0 (low-latency mode)
+worker1:325070:325330 [0] MCCL INFO Connected all trees
+[URMA] rank=1 thread=2 using device 0/6: udmac0d1e2
+[URMA] rank=1 thread=0 using device 0/6: udmac0d1e2
+[URMA] rank=1 thread=3 using device 0/6: udmac0d1e2
+[URMA] rank=1 thread=1 using device 0/6: udmac0d1e2
+[URMA_REG] rank=1 thread=2 stage=begin kind=host va=0xfffa74057000 len=8192 atomic=0 cfg_size=56 gpu_flag_offset=48 access=6
+[URMA_REG] rank=1 thread=2 stage=success kind=host va=0xfffa74057000 len=8192 atomic=0
+[URMA_REG] rank=1 thread=1 stage=begin kind=host va=0xfffa7004f000 len=8192 atomic=0 cfg_size=56 gpu_flag_offset=48 access=6
+[URMA_REG] rank=1 thread=1 stage=success kind=host va=0xfffa7004f000 len=8192 atomic=0
+[URMA_REG] rank=1 thread=0 stage=begin kind=host va=0xfffa78069000 len=8192 atomic=0 cfg_size=56 gpu_flag_offset=48 access=6
+[URMA_REG] rank=1 thread=0 stage=success kind=host va=0xfffa78069000 len=8192 atomic=0
+[URMA_REG] rank=1 thread=2 stage=begin kind=host va=0xfffa7405b000 len=64 atomic=1 cfg_size=56 gpu_flag_offset=48 access=14
+[URMA_REG] rank=1 thread=2 stage=success kind=host va=0xfffa7405b000 len=64 atomic=1
+[URMA] mode=low_latency channels=1 endpoints=1 batch=linked capacity=1024 wire=2
+[URMA_REG] rank=1 thread=1 stage=begin kind=host va=0xfffa70053000 len=64 atomic=1 cfg_size=56 gpu_flag_offset=48 access=14
+[URMA_REG] rank=1 thread=1 stage=success kind=host va=0xfffa70053000 len=64 atomic=1
+[URMA] mode=low_latency channels=1 endpoints=1 batch=linked capacity=1024 wire=2
+[URMA_REG] rank=1 thread=0 stage=begin kind=host va=0xfffa7806c000 len=64 atomic=1 cfg_size=56 gpu_flag_offset=48 access=14
+[URMA_REG] rank=1 thread=0 stage=success kind=host va=0xfffa7806c000 len=64 atomic=1
+[URMA] mode=low_latency channels=1 endpoints=1 batch=linked capacity=1024 wire=2
+[URMA_REG] rank=1 thread=3 stage=begin kind=host va=0xfffa6804f000 len=8192 atomic=0 cfg_size=56 gpu_flag_offset=48 access=6
+[URMA_REG] rank=1 thread=3 stage=success kind=host va=0xfffa6804f000 len=8192 atomic=0
+[URMA_REG] rank=1 thread=2 stage=begin kind=gpu va=0xa04c00000 len=1880098944 atomic=0 cfg_size=56 gpu_flag_offset=48 access=6
+[URMA_REG] rank=1 thread=2 stage=success kind=gpu va=0xa04c00000 len=1880098944 atomic=0
+[URMA_REG] rank=1 thread=1 stage=cache_hit kind=gpu va=0xa04c00000 len=1880098944 atomic=0
+[URMA_REG] rank=1 thread=1 stage=begin kind=gpu va=0xa77e04000 len=81960 atomic=1 cfg_size=56 gpu_flag_offset=48 access=14
+[URMA_REG] rank=1 thread=1 stage=success kind=gpu va=0xa77e04000 len=81960 atomic=1
+[URMA_REG] rank=1 thread=3 stage=begin kind=host va=0xfffa68053000 len=64 atomic=1 cfg_size=56 gpu_flag_offset=48 access=14
+[URMA_REG] rank=1 thread=3 stage=success kind=host va=0xfffa68053000 len=64 atomic=1
+[URMA] mode=low_latency channels=1 endpoints=1 batch=linked capacity=1024 wire=2
+[URMA_REG] rank=1 thread=2 stage=cache_hit kind=gpu va=0xa77e04000 len=81960 atomic=1
+[URMA_REG] rank=1 thread=0 stage=cache_hit kind=gpu va=0xa04c00000 len=1880098944 atomic=0
+[URMA_REG] rank=1 thread=0 stage=cache_hit kind=gpu va=0xa77e04000 len=81960 atomic=1
+[URMA_REG] rank=1 thread=3 stage=cache_hit kind=gpu va=0xa04c00000 len=1880098944 atomic=0
+[URMA_REG] rank=1 thread=3 stage=cache_hit kind=gpu va=0xa77e04000 len=81960 atomic=1
+[Proxy] UCCL_EP_TRANSPORT=urma initialized for rank 1 thread 2
+[Proxy] UCCL_EP_TRANSPORT=urma initialized for rank 1 thread 3
+[Proxy] UCCL_EP_TRANSPORT=urma initialized for rank 1 thread 0
+[Proxy] UCCL_EP_TRANSPORT=urma initialized for rank 1 thread 1
+TRANSPORT_MODE_OK backend=urma mode=low_latency urma_wire=2 proxies=4
+Testing with seed 0 ...
+Start experiment with settings: return_recv_hook=False dispatch_use_fp8=False round_scale=False use_ue8m0=False
+Start experiment with settings: return_recv_hook=False dispatch_use_fp8=True round_scale=False use_ue8m0=False
+Start experiment with settings: return_recv_hook=False dispatch_use_fp8=True round_scale=True use_ue8m0=False
+Start experiment with settings: return_recv_hook=False dispatch_use_fp8=True round_scale=True use_ue8m0=True
+Start experiment with settings: return_recv_hook=True dispatch_use_fp8=False round_scale=False use_ue8m0=False
+Start experiment with settings: return_recv_hook=True dispatch_use_fp8=True round_scale=False use_ue8m0=False
+Start experiment with settings: return_recv_hook=True dispatch_use_fp8=True round_scale=True use_ue8m0=False
+Start experiment with settings: return_recv_hook=True dispatch_use_fp8=True round_scale=True use_ue8m0=True
+Start experiment with settings: return_recv_hook=False dispatch_use_fp8=False round_scale=False use_ue8m0=False
+Start experiment with settings: return_recv_hook=False dispatch_use_fp8=True round_scale=False use_ue8m0=False
+Start experiment with settings: return_recv_hook=False dispatch_use_fp8=True round_scale=True use_ue8m0=False
+Start experiment with settings: return_recv_hook=False dispatch_use_fp8=True round_scale=True use_ue8m0=True
+Start experiment with settings: return_recv_hook=True dispatch_use_fp8=False round_scale=False use_ue8m0=False
+Start experiment with settings: return_recv_hook=True dispatch_use_fp8=True round_scale=False use_ue8m0=False
+Start experiment with settings: return_recv_hook=True dispatch_use_fp8=True round_scale=True use_ue8m0=False
+Start experiment with settings: return_recv_hook=True dispatch_use_fp8=True round_scale=True use_ue8m0=True
+✓ All correctness tests passed!
+MODE_PARITY_API {"mode": "low_latency", "avg_us": 21390.518889135245, "min_us": 19838.207244873047, "max_us": 22656.511306762695}
+[rank 1] Dispatch + combine bandwidth: 1.03 GB/s, avg_t=21390.52 us, min_t=19838.21 us, max_t=22656.51 us
+MODE_PARITY_PROFILE {"mode": "low_latency", "index": 0, "kernel_names": ["dispatch", "combine"], "kernel_seconds": [0.006725, 0.014612]}
+[rank 1] Dispatch bandwidth: 1.12 GB/s, avg_t=6725.00 us | Combine bandwidth: 0.99 GB/s, avg_t=14612.00 us
+MODE_PARITY_PROFILE {"mode": "low_latency", "index": 1, "kernel_names": ["dispatch", "combine"], "kernel_seconds": [[0.00021654186666666665, 3.50976e-05], [0.00021812906666666666, 3.5584000000000004e-05]]}
+[rank 1] Dispatch send/recv time: 216.54 + 35.10 us | Combine send/recv time: 218.13 + 35.58 us
+worker1:325070:325070 [0] MCCL INFO comm 0xaaace6055960 rank 1 nranks 2 macaDev 0 busId a1000 - Destroy COMPLETE
+worker1:325070:325070 [0] MCCL INFO comm 0xaaacfcb433d0 rank 1 nranks 2 macaDev 0 busId a1000 - Destroy COMPLETE
+MODE_PARITY_BENCH_DONE
+worker1:325070:325070 [0] MCCL INFO user has destroyed the communicators
+UCCL_EXIT_ACK_OK node_rank=1
