@@ -1263,18 +1263,28 @@ void Proxy::poll_urma_completions() {
     int const got = transport->poll(completions + ne, max_poll - ne);
     if (got > 0) ne += got;
   }
+  size_t retired_ops = 0;
   for (int i = 0; i < ne; ++i) {
     if (completions[i].status != 0) {
       throw std::runtime_error("URMA completion returned non-zero status");
     }
+    if (!completions[i].retired_ops || completions[i].retired_ops > 2)
+      throw std::runtime_error("URMA invalid logical completion count");
+    if (completions[i].has_secondary && (completions[i].retired_ops!=2 ||
+        completions[i].secondary_wr_id==kUrmaInternalWrId))
+      throw std::runtime_error("URMA invalid paired GPU acknowledgement");
     if (completions[i].wr_id != kUrmaInternalWrId) {
       acked_wrs_.insert(completions[i].wr_id);
     }
+    if (completions[i].has_secondary) {
+      acked_wrs_.insert(completions[i].secondary_wr_id);
+    }
+    retired_ops += completions[i].retired_ops;
   }
-  if (static_cast<size_t>(ne) > urma_outstanding_ops_) {
+  if (retired_ops > urma_outstanding_ops_) {
     throw std::runtime_error("URMA completion count exceeded outstanding ops");
   }
-  urma_outstanding_ops_ -= static_cast<size_t>(ne);
+  urma_outstanding_ops_ -= retired_ops;
   diagnostic.items=static_cast<uint64_t>(ne);
   if (!ne) uccl::urma_diag::count(uccl::urma_diag::EmptyPoll);
   if (ne > 0) adaptive_sleeper_.update_timer();
@@ -1338,6 +1348,9 @@ void Proxy::post_urma_commands(std::vector<uint64_t> const& wrs_to_post,
     if (get_base_cmd(cmd.cmd_type) != CmdType::WRITE) continue;
     int peer = static_cast<int>(cmd.dst_rank);
     bool signal = cfg_.use_normal_mode && cmd.atomic_offset > 0 && cmd.atomic_val > 0;
+    // Never split a notifying WRITE/FADD across SDK submissions, in either
+    // A/B variant. This makes the adjacency contract explicit and testable.
+    if (signal && urma_batches_by_rank_.at(peer).size()+2 > limit) flush(peer);
     UrmaWorkRequest request;
     request.wr_id = signal ? kUrmaInternalWrId : wrs_to_post[i];
     request.local_offset = decode_write_offset(cmd.req_lptr,!cfg_.use_normal_mode);
@@ -1347,6 +1360,7 @@ void Proxy::post_urma_commands(std::vector<uint64_t> const& wrs_to_post,
     // sentinel only affects GPU acknowledgement, not lane selection.
     if (signal) {
       request.ring = static_cast<uint32_t>(wrs_to_post[i] >> 32);
+      request.notify_pair = true;
     }
     enqueue(peer,request);
     if (signal) {

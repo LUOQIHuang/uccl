@@ -21,6 +21,7 @@ void UrmaTransport::configure(bool normal, size_t channels) {
   UrmaMode requested{normal, normal ? channels : 1};
   requested.validate();
   ll_relaxed_write_ = urma_ll_relaxed_write_from_env();
+  normal_completion_ = urma_normal_completion_from_env();
   mode_ = requested;
 }
 #ifndef USE_URMA
@@ -310,10 +311,11 @@ void UrmaTransport::init(ProxyCtx& ctx) {
         register_segment(barrier_words_.data(),
                          barrier_words_.size() * sizeof(uint64_t), false, true);
     std::fprintf(stderr,
-        "[URMA] mode=%s channels=%zu endpoints=%zu batch=linked capacity=%zu wire=%u write_order=%s atomic_fence=per_request\n",
+        "[URMA] mode=%s channels=%zu endpoints=%zu batch=linked capacity=%zu wire=%u write_order=%s atomic_fence=per_request normal_completion=%s\n",
         mode_.normal ? "normal" : "low_latency", mode_.channels,
         jetties_.size(), capacity(), UrmaMode::kWireVersion,
-        mode_.normal || ll_relaxed_write_ ? "relax" : "strong");
+        mode_.normal || ll_relaxed_write_ ? "relax" : "strong",
+        urma_normal_completion_name(normal_completion_));
   } catch (...) {
     destroy();
     throw;
@@ -580,11 +582,22 @@ size_t UrmaTransport::acquire_context(UrmaWorkRequest const& request) {
   op.wr_id = request.wr_id;
   op.is_write = request.kind == UrmaWorkRequest::Kind::Write;
   op.is_atomic = !op.is_write;
+  op.child = op.anchor = UINT32_MAX;
+  op.recovery = false;
   return index;
 }
 void UrmaTransport::release_context(size_t index) {
   auto& op = op_contexts_[index];
   if (!op.active) throw std::logic_error("double release of URMA context");
+  if (op.anchor != UINT32_MAX) {
+    auto& anchor = op_contexts_.at(op.anchor);
+    if (anchor.active && anchor.child == index) anchor.child = UINT32_MAX;
+  }
+  if (op.child != UINT32_MAX) {
+    auto& child = op_contexts_.at(op.child);
+    if (child.active && child.anchor == index) child.anchor = UINT32_MAX;
+  }
+  op.child = op.anchor = UINT32_MAX;
   op.active = false;
   op.diagnostic={};
   free_contexts_.push_back(index);
@@ -615,13 +628,16 @@ void UrmaTransport::prepare(PreparedWr& out, Peer& peer, size_t lane,
       request.kind == UrmaWorkRequest::Kind::Atomic ? peer.atomic_tseg : peer.barrier_tseg;
   uint64_t bytes = write ? request.bytes : sizeof(uint64_t);
   out.context = acquire_context(request);
+  out.notify_pair = request.notify_pair;
+  out.atomic_anchor = request.kind==UrmaWorkRequest::Kind::Atomic && request.fence;
+  out.ring = request.ring==UINT32_MAX ? static_cast<uint32_t>(request.wr_id>>32) : request.ring;
   auto const& op = op_contexts_[out.context];
   out.dst.addr = remote_seg_addr(remote,request.remote_offset);
   out.dst.len = bytes;
   out.dst.tseg = remote;
   out.wr.user_ctx = (op.generation << 16) | out.context;
   out.wr.tjetty = peer.tjetties[lane];
-  out.wr.flag.bs.complete_enable = 1; // one CQE per logical operation, as verbs
+  out.wr.flag.bs.complete_enable = 1; // default; eligible pairs may share the FADD CQE
   if (write) {
     out.src.addr = reinterpret_cast<uint64_t>(main_buffer_) + request.local_offset;
     out.src.len = bytes;
@@ -648,14 +664,39 @@ void UrmaTransport::prepare(PreparedWr& out, Peer& peer, size_t lane,
     out.wr.faa.operand = static_cast<uint64_t>(request.value);
   }
 }
-void UrmaTransport::submit_prepared(size_t lane) {
+void UrmaTransport::submit_prepared(size_t lane, Peer& peer) {
   if (prepared_.empty()) return;
+  for (size_t i=0; i<prepared_.size(); ++i) {
+    // Non-EFA Normal kernels publish WRITE and ATOMIC separately. Discover
+    // adjacent same-ring requests already present in this SAME submission;
+    // never wait for an atomic, reorder work, or change the GPU command stream.
+    if (mode_.normal && i+1<prepared_.size() &&
+        op_contexts_[prepared_[i].context].is_write && prepared_[i+1].atomic_anchor &&
+        prepared_[i].ring==prepared_[i+1].ring)
+      prepared_[i].notify_pair=true;
+    if (!prepared_[i].notify_pair) continue;
+    auto& write=prepared_[i];
+    auto& anchor=prepared_.at(i+1);
+    uccl::urma_diag::count(uccl::urma_diag::PairCandidates);
+    if (normal_completion_ == UrmaNormalCompletion::All) continue;
+    // Placement order is not local completion order. Explicit comp_order
+    // ensures the FADD cannot complete locally before the preceding WRITE.
+    // Preserve STRONG placement and the original FADD fence independently.
+    anchor.wr.flag.bs.comp_order=1;
+    if (normal_completion_ == UrmaNormalCompletion::Paired) {
+      write.wr.flag.bs.complete_enable=0;
+      op_contexts_[anchor.context].child=static_cast<uint32_t>(write.context);
+      op_contexts_[write.context].anchor=static_cast<uint32_t>(anchor.context);
+      uccl::urma_diag::count(uccl::urma_diag::WriteCqeSuppressed);
+    }
+  }
   for (size_t i = 0; i < prepared_.size(); ++i)
     prepared_[i].wr.next = i+1 < prepared_.size() ? &prepared_[i+1].wr : nullptr;
   urma_jfs_wr_t* bad = nullptr;
   if (uccl::urma_diag::enabled.load(std::memory_order_relaxed))
     for (auto const& wr:prepared_)
       op_contexts_[wr.context].diagnostic=uccl::urma_diag::sample(
+          op_contexts_[wr.context].anchor != UINT32_MAX ? uccl::urma_diag::PairedWriteToNotifyCqe :
           op_contexts_[wr.context].is_write ? uccl::urma_diag::WriteToObservedCqe :
                                             uccl::urma_diag::FaddToObservedCqe);
   uccl::urma_diag::Scope diagnostic(uccl::urma_diag::SdkPost,prepared_.size());
@@ -669,8 +710,32 @@ void UrmaTransport::submit_prepared(size_t lane) {
   if (first_bad == prepared_.size()) {
     failed_ = true; // unknown acceptance: retain everything, teardown is fail-stop
   } else {
-    for (size_t i = first_bad; i < prepared_.size(); ++i)
+    // If only the silent WRITE of a pair was accepted, its rejected FADD
+    // cannot retire it. Submit a fenced +0 into an existing HOST barrier
+    // word on the SAME data lane, with ordered completion. Do not publish
+    // the rejected GPU notification. All failures remain fail-stop.
+    auto& rejected=prepared_[first_bad];
+    bool const orphan=op_contexts_[rejected.context].child!=UINT32_MAX;
+    for (size_t i = first_bad+(orphan ? 1 : 0); i < prepared_.size(); ++i)
       release_context(prepared_[i].context);
+    if (orphan) {
+      auto& op=op_contexts_[rejected.context];
+      op.wr_id=UINT64_MAX;
+      op.recovery=true;
+      rejected.dst.addr=remote_seg_addr(peer.barrier_tseg,0);
+      rejected.dst.tseg=peer.barrier_tseg;
+      rejected.wr.faa.operand=0;
+      rejected.wr.flag.bs.comp_order=1;
+      rejected.wr.flag.bs.fence=URMA_FENCE_ENABLE;
+      rejected.wr.next=nullptr;
+      urma_jfs_wr_t* recovery_bad=nullptr;
+      uccl::urma_diag::count(uccl::urma_diag::RecoveryMarkers);
+      // If this also fails/has ambiguous acceptance, retain both slots and
+      // registrations. Teardown will fail closed instead of freeing DMA data.
+      int recovery_rc=urma_post_jetty_send_wr(jetties_[lane],&rejected.wr,&recovery_bad);
+      std::fprintf(stderr,"[URMA_RECOVERY] original_rc=%d rejected_index=%zu recovery_rc=%d contexts_retained_until_completion=1\n",
+                   rc,first_bad,recovery_rc);
+    }
     if (first_bad) failed_ = true;
   }
   check_urma(rc,"urma_post_jetty_send_wr(batch)");
@@ -686,7 +751,18 @@ void UrmaTransport::post_batch(int dst_rank,
     throw std::runtime_error("URMA batch exceeds available context capacity");
   auto& peer = peers_[dst_rank];
   // Reject malformed batches before any lane has posted a prefix.
-  for (auto const& request : requests) validate_request(peer,request);
+  for (size_t i=0; i<requests.size(); ++i) {
+    auto const& request=requests[i];
+    validate_request(peer,request);
+    if (!request.notify_pair) continue;
+    if (!mode_.normal || request.kind!=UrmaWorkRequest::Kind::Write ||
+        request.wr_id!=UINT64_MAX || request.ring==UINT32_MAX || i+1==requests.size())
+      throw std::invalid_argument("invalid URMA notifying WRITE pair");
+    auto const& anchor=requests[i+1];
+    if (anchor.kind!=UrmaWorkRequest::Kind::Atomic || !anchor.fence ||
+        anchor.wr_id==UINT64_MAX || (anchor.wr_id>>32)!=request.ring)
+      throw std::invalid_argument("URMA WRITE pair requires adjacent fenced FADD on same ring");
+  }
   for (size_t lane = 0; lane < jetties_.size(); ++lane) {
     prepared_.clear();
     try {
@@ -708,7 +784,12 @@ void UrmaTransport::post_batch(int dst_rank,
       for (auto const& wr : prepared_) release_context(wr.context);
       throw;
     }
-    submit_prepared(lane);
+    try {
+      submit_prepared(lane,peer);
+    } catch (...) {
+      if (outstanding()) failed_=true;
+      throw;
+    }
   }
 }
 void UrmaTransport::post_write(int dst_rank, uint64_t wr_id,
@@ -775,7 +856,23 @@ int UrmaTransport::poll(TransportCompletion* out, int max) {
       completion.data = crs[i].imm_data;
       completion.status = crs[i].status == URMA_CR_SUCCESS ? 0 : int(crs[i].status);
       if (completion.status) failed_ = true;
+      uccl::urma_diag::count(uccl::urma_diag::ObservedCqes);
       uccl::urma_diag::complete(op_contexts_[index].diagnostic);
+      if (op.child != UINT32_MAX) {
+        auto child=op.child;
+        if (!op_contexts_[child].active || op_contexts_[child].anchor!=index) {
+          failed_=true;
+          throw std::runtime_error("invalid URMA paired completion ownership");
+        }
+        uccl::urma_diag::complete(op_contexts_[child].diagnostic);
+        if (!op.recovery && op_contexts_[child].wr_id!=UINT64_MAX) {
+          completion.has_secondary=true;
+          completion.secondary_wr_id=op_contexts_[child].wr_id;
+        }
+        release_context(child);
+        completion.retired_ops=2;
+      }
+      uccl::urma_diag::count(uccl::urma_diag::RetiredOps,completion.retired_ops);
       release_context(index);
     }
     total += n;

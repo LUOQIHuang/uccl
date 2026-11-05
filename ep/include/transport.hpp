@@ -16,6 +16,11 @@ struct TransportCompletion {
   bool is_atomic = false;
   bool is_recv_data = false;
   int status = 0;
+  // Usually one logical WR per CQE. URMA paired completion can retire an
+  // eligible WRITE and its FADD together; poll() still returns physical CQEs.
+  uint32_t retired_ops = 1;
+  uint64_t secondary_wr_id = 0;
+  bool has_secondary = false;
 };
 
 class EpTransport {

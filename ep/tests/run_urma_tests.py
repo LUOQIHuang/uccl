@@ -46,6 +46,15 @@ with tempfile.TemporaryDirectory(prefix='uccl-urma-test-') as tmp:
                     '-I'+str(ep/'include'),'-I'+str(tmp),
                     str(ep/'tests/urma_proxy_plan_test.cpp'),'-o',str(proxy_test)],check=True)
     subprocess.run([str(proxy_test)],check=True)
+    begin=proxy.index('void Proxy::poll_urma_completions()')
+    end=proxy.index('void Proxy::post_urma_commands(',begin)
+    (tmp/'proxy_completion.inc').write_text(proxy[begin:end])
+    completion_test=tmp/'proxy_completion_test'
+    subprocess.run([os.environ.get('CXX','c++'),'-std=c++17','-pthread','-Wall','-Wextra','-Werror',
+                    '-I'+str(ep/'include'),'-I'+str(tmp),
+                    '-include',str(ep/'tests/urma_support/ep_shim.hpp'),
+                    str(ep/'tests/urma_proxy_completion_test.cpp'),'-o',str(completion_test)],check=True)
+    subprocess.run([str(completion_test)],check=True)
     # Preserve ordinary verbs-only builds: all added URMA entry points also
     # need valid fail-fast stubs without requiring SDK declarations.
     subprocess.run([os.environ.get('CXX','c++'),'-std=c++17','-Wall','-Wextra','-Werror',

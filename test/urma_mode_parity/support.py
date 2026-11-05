@@ -47,7 +47,8 @@ def load_extension(module):
             raise RuntimeError(f'PRIVATE_URMA_LIBRARY_REQUIRED: {actual}')
     return extension,dict(module=str(Path(module).resolve()),module_sha=sha(module),wire=2,torch=torch.__version__,torch_file=torch.__file__,python=sys.executable,loaded_libraries=loaded,
                           phase_diagnostics=all(hasattr(extension,n) for n in ('urma_phase_enable','urma_phase_snapshot')),
-                          ll_write_order=extension.get_urma_ll_write_order() if hasattr(extension,'get_urma_ll_write_order') else None)
+                          ll_write_order=extension.get_urma_ll_write_order() if hasattr(extension,'get_urma_ll_write_order') else None,
+                          normal_completion=extension.get_urma_normal_completion() if hasattr(extension,'get_urma_normal_completion') else None)
 
 def read_build(directory):
     data=json.loads((directory/'manifest.json').read_text())

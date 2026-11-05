@@ -1,6 +1,8 @@
 # URMA Normal / Low-latency 实现对齐与验收
 
-最新结果见 **[verbs与URMA阶段复测分析](results/urma_phase_v1/ANALYSIS.zh-CN.md)**；下一轮入口为 **[LL WRITE排序A/B与Normal纯基线](ORDER_AB.zh-CN.md)**：同一新模块对照STRONG/RELAX，保留原子fence，正式计时跳过GPU profiler。仅在已协调到URMA环境时运行。
+当前只关注Normal时，请按 **[URMA Normal完成合并A/B运行步骤](NORMAL_AB.zh-CN.md)** 操作：同一模块比较all/paired完成路径，三轮纯API基线，独立CQE诊断，不运行verbs或LL。
+
+已有结果见 **[verbs与URMA阶段复测分析](results/urma_phase_v1/ANALYSIS.zh-CN.md)**；此前 **[LL WRITE排序A/B与Normal纯基线](ORDER_AB.zh-CN.md)** 保留供后续使用，本次无需执行LL测试。
 
 此前的 **[阶段时延与稳定性测试（phase_v1）](STAGE_TESTS.zh-CN.md)** 保留，用于理解已有GPU trace和Proxy阶段数据。
 

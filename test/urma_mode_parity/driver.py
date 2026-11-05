@@ -38,6 +38,7 @@ def build(args):
     env=os.environ.copy()
     env.pop('LD_PRELOAD',None); env.pop('UMDK_HOME',None)
     env['UCCL_URMA_LL_WRITE_ORDER']='default'
+    env['UCCL_URMA_NORMAL_COMPLETION']='all'
     flags=dict(USE_METAX='1',USE_URMA='1',USE_URMA_METAX='0',USE_LIBFABRIC_CXI='0',USE_DMABUF='1',MAX_NUM_GPUS='1',NUM_MAX_NVL_PEERS='1',PER_EXPERT_BATCHING=str(args.per_expert_batching),MAX_JOBS=str(args.build_jobs),URMA_INCLUDE_DIR=str(include),URMA_LIBRARY_DIR=str(args.urma_lib_dir.resolve()))
     env.update(flags)
     stable_flags={key:value for key,value in flags.items() if key not in ('URMA_INCLUDE_DIR','URMA_LIBRARY_DIR','MAX_JOBS')}
@@ -79,6 +80,7 @@ def parser():
     p.add_argument('--phase-suite',action='store_true')
     p.add_argument('--api-only',action='store_true',help='phase suite: skip Kineto and retain whole-call samples only')
     p.add_argument('--ll-write-order',choices=('default','strong','relax'),default='default',help='diagnostic LL WRITE ordering; FADD fences unchanged')
+    p.add_argument('--normal-completion',choices=('all','ordered','paired'),default='all',help='Normal-only completion A/B; paired suppresses eligible WRITE CQEs')
     p.add_argument('--stage-profile',action='store_true')
     p.add_argument('--save-traces',action='store_true')
     p.add_argument('--warmups',type=int,default=50)
@@ -116,6 +118,8 @@ def parser():
     if args.phase_suite and args.backend!='urma': p.error('phase suite currently supports URMA only')
     if args.api_only and (not args.phase_suite or args.save_traces): p.error('--api-only requires --phase-suite and excludes --save-traces')
     if args.ll_write_order!='default' and args.backend!='urma': p.error('LL WRITE order diagnostics require URMA')
+    if args.normal_completion!='all' and (args.backend!='urma' or args.mode!='normal'):
+        p.error('normal completion diagnostics require --backend urma --mode normal')
     if args.collect_suite and args.action!='collect': p.error('--collect-suite requires --action collect')
     if args.action=='probe' and (args.backend!='urma' or args.mode=='both' or args.probe_bytes<1):
         p.error('probe requires --backend urma --mode normal|low_latency and positive --probe-bytes')
@@ -134,6 +138,7 @@ def environment(args):
     if args.backend=='urma':
         env.pop('UCCL_EP_VERBS_REG',None); env.pop('UCCL_IB_HCA',None)
     env['UCCL_URMA_LL_WRITE_ORDER']=args.ll_write_order
+    env['UCCL_URMA_NORMAL_COMPLETION']=args.normal_completion
     env['LD_LIBRARY_PATH']=str(args.urma_lib_dir)+':'+env.get('LD_LIBRARY_PATH','')
     return env
 
@@ -149,6 +154,8 @@ def preflight(args):
         raise RuntimeError('PHASE_DIAGNOSTICS_REQUIRES_REBUILD')
     if args.ll_write_order!='default' and metadata.get('ll_write_order')!=args.ll_write_order:
         raise RuntimeError('LL_WRITE_ORDER_DIAGNOSTICS_REQUIRES_REBUILD')
+    if args.normal_completion!='all' and metadata.get('normal_completion')!=args.normal_completion:
+        raise RuntimeError('NORMAL_COMPLETION_DIAGNOSTICS_REQUIRES_REBUILD')
     return module,manifest,dict(libraries=libraries,hardware=hardware,import_log=probe.stdout+probe.stderr,runtime=metadata)
 
 def collect(args):
@@ -210,7 +217,7 @@ def main():
     error=None; fingerprint=dict(job=args.job,backend=args.backend,mode=args.mode,shape=[args.normal_tokens,args.ll_tokens,args.hidden,args.experts,args.topk],sources_hash=support.digest(support.source_manifest()),diagnostics_hash=support.digest(support.diagnostic_manifest()),ifname=args.ifname,kernel=os.uname().release,
         phase_suite=args.phase_suite,stage_profile=args.stage_profile,save_traces=args.save_traces,
         warmups=args.warmups,samples=args.samples,ll_hook_workload=args.ll_hook_workload,
-        api_only=args.api_only,ll_write_order=args.ll_write_order)
+        api_only=args.api_only,ll_write_order=args.ll_write_order,normal_completion=args.normal_completion)
     try:
         module,manifest,info=preflight(args)
         fingerprint.update(build_hash=support.digest({key:manifest[key] for key in ('sources','sdk','flags')}),libraries=info['libraries'],torch=info['runtime']['torch'])
@@ -267,6 +274,8 @@ def main():
             if args.ll_write_order!='default':
                 expected_order='relax' if mode=='normal' else args.ll_write_order
                 checks['write_order']=text.count('write_order='+expected_order+' atomic_fence=per_request')>=1
+            if mode=='normal' and info['runtime'].get('normal_completion') is not None:
+                checks['normal_completion']=text.count('normal_completion='+args.normal_completion)>=1
         if args.phase_suite:
             checks.update(phase_files=(case/'phases.jsonl').is_file() and (case/'api_samples.jsonl').is_file(),
                           samples=text.count('MODE_PARITY_SAMPLES ')==(5 if mode=='normal' else (2 if args.ll_hook_workload=='immediate' else 1)))
@@ -274,6 +283,9 @@ def main():
                 windows=[json.loads(line) for line in (case/'phases.jsonl').read_text().splitlines()]
                 checks['stage_activity']=any(r['metrics'].get('sdk_post',{}).get('calls',0)>0
                     for w in windows for r in w['records'])
+                if args.normal_completion=='paired':
+                    checks['pair_activity']=any(r['metrics'].get('write_cqe_suppressed',{}).get('calls',0)>0
+                        for w in windows for r in w['records'])
             if args.save_traces:
                 checks['gpu_traces']=all((case/f'gpu_trace_{i}.json').is_file() and
                     (case/f'gpu_trace_{i}.json').stat().st_size>0 for i in range(4 if mode=='normal' else 2))

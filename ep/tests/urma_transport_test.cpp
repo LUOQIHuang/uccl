@@ -32,6 +32,7 @@ struct Posted {
   uint64_t token;
   bool write;
   unsigned order, fence;
+  unsigned complete, comp_order;
 };
 std::vector<Posted> posted_ops;
 std::set<void const*> gpu_ptrs, host_ptrs, sync_ptrs;
@@ -243,7 +244,8 @@ urma_status_t urma_post_jetty_send_wr(urma_jetty_t* j, urma_jfs_wr_t* w,
   if (fail_after > 0) --fail_after;
   ++batch_size;
   posted_ops.push_back({j,w->user_ctx,w->opcode==URMA_OPC_WRITE,
-                       unsigned(w->flag.bs.place_order),unsigned(w->flag.bs.fence)});
+                       unsigned(w->flag.bs.place_order),unsigned(w->flag.bs.fence),
+                       unsigned(w->flag.bs.complete_enable),unsigned(w->flag.bs.comp_order)});
   if (w->opcode == URMA_OPC_WRITE) {
     std::memcpy(reinterpret_cast<void*>(w->rw.dst.sge->addr),
                 reinterpret_cast<void*>(w->rw.src.sge->addr),
@@ -257,7 +259,8 @@ urma_status_t urma_post_jetty_send_wr(urma_jetty_t* j, urma_jfs_wr_t* w,
   urma_cr_t c{};
   c.status = fail_completion ? URMA_CR_LOC_LEN_ERR : URMA_CR_SUCCESS;
   c.user_ctx = w->user_ctx;
-  completions[j->jetty_cfg.jfs_cfg.jfc].push_back(c);
+  if (w->flag.bs.complete_enable || fail_completion)
+    completions[j->jetty_cfg.jfs_cfg.jfc].push_back(c);
   }
   posted_sizes.push_back(batch_size);
   return 0;
@@ -275,6 +278,7 @@ int urma_poll_jfc(urma_jfc_t* j, int max, urma_cr_t* out) {
 }
 }
 int main() {
+  unsetenv("UCCL_URMA_NORMAL_COMPLETION");
   ProxyCtx ctx;
   // Failure before a context exists must release global initialization
   // ownership.
@@ -599,6 +603,89 @@ int main() {
     t.destroy();
     assert(resources == 0 && init_count == 0 && gpu_regs == 0);
   }
+  // Paired CQE suppression: exercise actual SDK flags and context accounting,
+  // including a rejected FADD after an already-accepted silent WRITE.
+  for (auto const* policy : {"all","ordered","paired"}) {
+    for (bool inline_notify:{true,false}) {
+    for (int failure : {-1,0,1,2,3}) {
+      // 3 injects error CQEs, including one for the unsignaled WRITE.
+      setenv("UCCL_URMA_NORMAL_COMPLETION",policy,1);
+      UrmaTransport left,right;
+      left.configure(true,8); right.configure(true,8);
+      unsetenv("UCCL_URMA_NORMAL_COMPLETION");
+      left.init(ctx); right.init(ctx);
+      left.register_main_buffer(a,sizeof(a),2); right.register_main_buffer(b,sizeof(b),2);
+      left.register_atomic_buffer(ac,sizeof(ac),2); right.register_atomic_buffer(bc,sizeof(bc),2);
+      left.connect_peer(1,right.local_info()); right.connect_peer(0,left.local_info());
+      UrmaWorkRequest write,atomic,extra;
+      write.wr_id=inline_notify ? UINT64_MAX : (2ULL<<32)|98;
+      write.ring=2; write.bytes=8; write.notify_pair=inline_notify;
+      atomic.kind=UrmaWorkRequest::Kind::Atomic; atomic.wr_id=(2ULL<<32)|99; atomic.value=3;
+      extra.wr_id=(3ULL<<32)|100; extra.bytes=8;
+      int64_t old=static_cast<int64_t>(bc[0]);
+      if (failure>=0 && failure<=2) fail_after=failure;
+      fail_completion=failure==3;
+      size_t seen=posted_ops.size();
+      if (failure>=0 && failure<=2) rejects([&]{left.post_batch(1,{write,atomic,extra});});
+      else left.post_batch(1,{write,atomic,extra});
+      fail_completion=false;
+      TransportCompletion out[16];
+      if (failure==-1 && std::string(policy)=="paired") {
+        auto& live=completions[posted_ops[seen].jetty->jetty_cfg.jfs_cfg.jfc];
+        auto saved=live; live.clear();
+        assert(left.poll(out,16)==0);
+        std::vector<UrmaWorkRequest> too_many(left.capacity()-2,extra);
+        rejects([&]{left.post_batch(1,too_many);}); // all THREE logical slots live
+        live=saved;
+      }
+      int n=left.poll(out,16);
+      unsigned retired=0; for(int i=0;i<n;++i) retired+=out[i].retired_ops;
+      assert(retired==unsigned(failure==0 ? 0 : failure==1 && std::string(policy)!="paired" ? 1 : failure==1 || failure==2 ? 2 : 3));
+      if (failure==1 && std::string(policy)=="paired") {
+        assert(n==1 && out[0].wr_id==UINT64_MAX && out[0].retired_ops==2);
+        assert(!out[0].has_secondary);
+        assert(bc[0]==uint64_t(old)); // recovery +0 never publishes original notify
+        assert(right.load_barrier_word(0)==0);
+      }
+      if (failure==-1) {
+        assert(posted_ops[seen].complete==unsigned(std::string(policy)!="paired"));
+        assert(posted_ops[seen+1].complete==1);
+        assert(posted_ops[seen+1].comp_order==unsigned(std::string(policy)!="all"));
+        assert(posted_ops[seen+1].fence==URMA_FENCE_ENABLE);
+        assert(n==(std::string(policy)=="paired" ? 2 : 3));
+        if (std::string(policy)=="paired") {
+          assert(out[0].has_secondary==!inline_notify);
+          if (!inline_notify) assert(out[0].secondary_wr_id==write.wr_id);
+        }
+        assert(bc[0]==uint64_t(old+3));
+        // Pool is fully reusable after the anchor retires both slots.
+        std::vector<UrmaWorkRequest> full(left.capacity(),extra);
+        left.post_batch(1,full); assert(left.poll(out,16)==16);
+        // Never pair across submissions or across different rings sharing
+        // a lane, and never use an unfenced atomic as completion anchor.
+        auto standalone=write;standalone.notify_pair=false;
+        standalone.wr_id=(2ULL<<32)|98;
+        left.post_batch(1,{standalone});assert(left.poll(out,16)==1 && out[0].retired_ops==1);
+        auto unfenced=atomic;unfenced.fence=false;
+        left.post_batch(1,{standalone,unfenced});
+        assert(left.poll(out,16)==2 && out[0].retired_ops==1 && out[1].retired_ops==1);
+        auto other_ring=atomic;other_ring.wr_id=(10ULL<<32)|99;
+        left.post_batch(1,{standalone,other_ring});
+        assert(left.poll(out,16)==2 && out[0].retired_ops==1 && out[1].retired_ops==1);
+      }
+      if (failure==3) {
+        assert(n==3);
+        for(int i=0;i<n;++i) assert(out[i].status!=0 && out[i].retired_ops==1);
+      }
+      if (inline_notify) rejects([&]{left.post_batch(1,{write});});
+      auto wrong=atomic;wrong.wr_id=(10ULL<<32)|99; // same lane, DIFFERENT ring
+      if (inline_notify) rejects([&]{left.post_batch(1,{write,wrong});});
+      left.destroy();right.destroy();
+      assert(resources==0 && init_count==0 && gpu_regs==0);
+    }
+    }
+  }
+  unsetenv("UCCL_URMA_NORMAL_COMPLETION");
   // Exercise opt-in diagnostics through the real submission and completion
   // code in both modes; existing tests above exercise the disabled path.
   // A/B changes only LL WRITE ordering. Verify the actual submitted SDK WRs,

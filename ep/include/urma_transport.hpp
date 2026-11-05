@@ -77,6 +77,7 @@ class UrmaTransport final : public EpTransport {
   [[noreturn]] static void unavailable();
   UrmaMode mode_;
   bool ll_relaxed_write_ = false;
+  UrmaNormalCompletion normal_completion_ = UrmaNormalCompletion::All;
 #ifdef USE_URMA
   ProxyCtx* ctx_ = nullptr;
   bool init_acquired_ = false;
@@ -121,6 +122,9 @@ class UrmaTransport final : public EpTransport {
     bool is_write = false;
     bool is_atomic = false;
     bool active = false;
+    bool recovery = false;
+    uint32_t child = UINT32_MAX;
+    uint32_t anchor = UINT32_MAX;
     uccl::urma_diag::Sample diagnostic;
   };
   // Stable slots give O(1) completion lookup and O(1) FADD scratch allocation.
@@ -135,11 +139,14 @@ class UrmaTransport final : public EpTransport {
     urma_jfs_wr_t wr{};
     urma_sge_t src{}, dst{};
     size_t context = 0;
+    bool notify_pair = false;
+    bool atomic_anchor = false;
+    uint32_t ring = 0;
   };
   std::vector<PreparedWr> prepared_;
   void validate_request(Peer const& peer, UrmaWorkRequest const& request) const;
   void prepare(PreparedWr& out, Peer& peer, size_t lane,
                UrmaWorkRequest const& request);
-  void submit_prepared(size_t lane);
+  void submit_prepared(size_t lane, Peer& peer);
 #endif
 };

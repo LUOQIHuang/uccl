@@ -16,14 +16,18 @@ namespace uccl::urma_diag {
 enum Stage { Collect, ProxyBatch, ProxyDispatch, ProxyCombine, GpuAck,
              CapacityWait, BarrierDrain, GroupPrepare, SdkPost, CqPoll,
              Write, Fadd, Quiet, Barrier, QueueDepth, EmptyPoll,
-             SubmitToObservedCqe, WriteToObservedCqe, FaddToObservedCqe, Count };
+             SubmitToObservedCqe, WriteToObservedCqe, FaddToObservedCqe,
+             PairCandidates, WriteCqeSuppressed, ObservedCqes, RetiredOps,
+             RecoveryMarkers, PairedWriteToNotifyCqe, Count };
 inline char const* names[] = {"collect_ready_commands", "proxy_batch",
     "proxy_dispatch_batch", "proxy_combine_batch", "gpu_ack_update",
     "capacity_wait", "quiet_barrier_drain", "group_prepare", "sdk_post",
     "cq_poll_reclaim", "write_requests", "fadd_requests", "quiet_commands",
     "barrier_commands", "queue_depth_observation", "empty_cq_poll",
     "submit_to_observed_cqe_sampled", "write_to_observed_cqe_sampled",
-    "fadd_to_observed_cqe_sampled"};
+    "fadd_to_observed_cqe_sampled", "paired_write_candidates",
+    "write_cqe_suppressed", "observed_cqes", "retired_logical_ops",
+    "pair_recovery_markers", "paired_write_to_notify_cqe_sampled"};
 static_assert(sizeof(names)/sizeof(names[0])==Count,"diagnostic metric names mismatch");
 struct Metric {
   std::atomic<uint64_t> calls{0}, ns{0}, items{0};
@@ -40,7 +44,7 @@ inline std::mutex mutex;
 inline std::vector<std::shared_ptr<Record>> records;
 inline thread_local std::shared_ptr<Record> local;
 inline thread_local int rank=-1, proxy=-1;
-inline thread_local uint64_t sample_sequence[3]={};
+inline thread_local uint64_t sample_sequence[4]={};
 inline void identity(int r,int p) { rank=r; proxy=p; }
 inline uint64_t now() {
   return std::chrono::duration_cast<std::chrono::nanoseconds>(
@@ -81,17 +85,19 @@ struct Sample {
   Stage stage=SubmitToObservedCqe;
 };
 inline Sample sample(Stage stage=SubmitToObservedCqe) {
-  unsigned index=stage==WriteToObservedCqe ? 1 : stage==FaddToObservedCqe ? 2 : 0;
+  unsigned index=stage==WriteToObservedCqe ? 1 : stage==FaddToObservedCqe ? 2 : stage==PairedWriteToNotifyCqe ? 3 : 0;
   if (!enabled.load(std::memory_order_relaxed) || (++sample_sequence[index] % 64)) return {};
   return {current(),now(),stage};
 }
 inline void complete(Sample& s) {
   if (s.record) {
     uint64_t ns=now()-s.start;
-    add(s.record,SubmitToObservedCqe,ns,1);
     unsigned bucket=0;
     for (uint64_t us=ns/1000; us>1 && bucket<31; us>>=1) ++bucket;
-    s.record->metrics[SubmitToObservedCqe].histogram[bucket].fetch_add(1,std::memory_order_relaxed);
+    if (s.stage!=PairedWriteToNotifyCqe) {
+      add(s.record,SubmitToObservedCqe,ns,1);
+      s.record->metrics[SubmitToObservedCqe].histogram[bucket].fetch_add(1,std::memory_order_relaxed);
+    }
     if (s.stage!=SubmitToObservedCqe) {
       add(s.record,s.stage,ns,1);
       s.record->metrics[s.stage].histogram[bucket].fetch_add(1,std::memory_order_relaxed);

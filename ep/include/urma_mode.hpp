@@ -17,6 +17,19 @@ inline bool urma_ll_relaxed_write_from_env() {
   throw std::invalid_argument("UCCL_URMA_LL_WRITE_ORDER must be default|strong|relax");
 }
 
+enum class UrmaNormalCompletion { All, Ordered, Paired };
+inline UrmaNormalCompletion urma_normal_completion_from_env() {
+  auto const* value=std::getenv("UCCL_URMA_NORMAL_COMPLETION");
+  if (!value || !*value || !std::strcmp(value,"all")) return UrmaNormalCompletion::All;
+  if (!std::strcmp(value,"ordered")) return UrmaNormalCompletion::Ordered;
+  if (!std::strcmp(value,"paired")) return UrmaNormalCompletion::Paired;
+  throw std::invalid_argument("UCCL_URMA_NORMAL_COMPLETION must be all|ordered|paired");
+}
+inline char const* urma_normal_completion_name(UrmaNormalCompletion mode) {
+  return mode==UrmaNormalCompletion::Paired ? "paired" :
+      mode==UrmaNormalCompletion::Ordered ? "ordered" : "all";
+}
+
 // Normal mirrors verbs' per-ring data QPs, with a separate control endpoint.
 // LL mirrors verbs' single data queue per peer. WRITE and its notifying FADD
 // must select the same lane; GPU ring IDs occupy the high 32 bits of wr_id.
@@ -51,4 +64,7 @@ struct UrmaWorkRequest {
   uint32_t bytes = 0;
   int64_t value = 0;
   bool fence = true;
+  // Explicit adjacency contract: this internal WRITE is immediately followed
+  // by its original, fenced notifying FADD on the SAME ring and peer.
+  bool notify_pair = false;
 };

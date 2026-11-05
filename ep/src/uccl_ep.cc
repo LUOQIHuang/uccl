@@ -2511,6 +2511,9 @@ NB_MODULE(ep, m) {
   m.def("get_urma_ll_write_order", []() {
     return std::string(urma_ll_relaxed_write_from_env() ? "relax" : "strong");
   });
+  m.def("get_urma_normal_completion", []() {
+    return std::string(urma_normal_completion_name(urma_normal_completion_from_env()));
+  });
   m.def(
       "stream_query",
       [](uintptr_t stream_ptr) {

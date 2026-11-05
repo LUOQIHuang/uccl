@@ -69,9 +69,19 @@ int main() {
     p.post_urma_commands({(2ULL<<32)|9},{write});
     auto const& batch=p.transport.batches[0];
     assert(batch.size()==2 && batch[0].wr_id==kUrmaInternalWrId && batch[0].ring==2);
+    assert(batch[0].notify_pair && !batch[1].notify_pair);
     UrmaMode mode{true,8};
     assert(mode.data_lane(uint64_t(batch[0].ring)<<32)==mode.data_lane(batch[1].wr_id));
     assert(batch[1].value==3);
+    // An odd-length batch must flush BEFORE a pair, never between its WRs.
+    p.transport.batches.clear();
+    std::vector<TransferCmd> cmds(8,write);std::vector<uint64_t> ids(8);
+    cmds[0].atomic_offset=0;
+    for(size_t i=0;i<ids.size();++i) ids[i]=(2ULL<<32)|i;
+    cmds.push_back(write);ids.push_back((2ULL<<32)|99);
+    p.post_urma_commands(ids,cmds);
+    assert(p.transport.batches.size()==2);
+    assert(p.transport.batches[0].size()==15 && p.transport.batches[1].size()==2);
   }
   {
     Proxy p; p.cfg_.use_normal_mode=false;
