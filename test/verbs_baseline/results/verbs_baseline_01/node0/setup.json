@@ -1,0 +1,63 @@
+{
+  "fingerprint": {
+    "job": "verbs_baseline_01",
+    "variant": "original",
+    "identity": {
+      "kind": "historical_validated_binary",
+      "module_sha": "144f1fca126eb8971a5278c3baf0b44e1a29fb7b03ce51c928feb7abc19af798"
+    },
+    "benchmark": {
+      "variant": "original",
+      "benchmark_revision": "41443b64f4fa1a689fb974f205f756f311efd4c3",
+      "input_hashes": {
+        "test_internode.py": "d679e4bdad167251dbc9d2c2f12634501b0f72db33231e1f1ce26d06ebac1b5f",
+        "test_low_latency.py": "f29b0c21c95f62efa810e20b879f10f4e482472547b9d50bec4178d8d95d88e3",
+        "buffer.py": "606d5a088fe5656aa6052862520c45a9092ca08bd1b7b3bd273683f9b549188c",
+        "utils.py": "5d9a7be095a3851ed300e67936bbad91ea75ef8c5ecf6e5bb87b0944441a5199"
+      },
+      "prepared_hashes": {
+        "test_internode.py": "b04ae157bba2f3d83c1085e655b6cbdf662f4d62a44c8361fc97c840d628a303",
+        "test_low_latency.py": "d9e4cdb3e14a3b80f45e504b57489f9d45137e98eba5dca0614eaa3563ab713c",
+        "profile_adapter.py": "7e3db3e30e1358b4c149ba697ed0e4e6a63dda46e32911baadfae1450fa62ba5",
+        "utils.py": "5d9a7be095a3851ed300e67936bbad91ea75ef8c5ecf6e5bb87b0944441a5199",
+        "buffer.py": "606d5a088fe5656aa6052862520c45a9092ca08bd1b7b3bd273683f9b549188c"
+      },
+      "changes": [
+        "fixed Normal tuning points",
+        "LL hook immediately invokes receive hook",
+        "profiler trace-export fix; timed callables unchanged"
+      ]
+    },
+    "diagnostics": {
+      "test/verbs_baseline/common.py": "2d0b9a107e3f8fda71d2b4029bc8173207d176cc9ee524e4d98a363f00834f39",
+      "test/verbs_baseline/worker.py": "e77ddd45fefc660f64ce305cdbc04d992b3ef8d53fb6edeedda8e6b2276cfd40",
+      "test/verbs_baseline/driver.py": "6a2cec9a7411545c6a76ddad6e7933d393ed89a964b19d0452a2fb535c44947a",
+      "test/verbs_baseline/summarize.py": "ac9bd14586a37b802aa8482b5032f34b46e382548a2e6562d18c563400de81d3",
+      "test/verbs_baseline/run.sh": "1695d7e60078444c381f3694e824f3e91fccfc605cab50aae741a8f22c5fd85c",
+      "test/verbs_diag/driver.py": "cf02080510ae306e7941bedc711f50db3106d9eb9b31c3c0c85993aeb1e66d48",
+      "test/verbs_diag/exit_guard.py": "9cba31fe18074bbf5b6fbe2345b570100663a3ed9da95cf6e118eedb409740c7",
+      "test/verbs_diag/run.sh": "d1293daa6bafaa9ad81914217bc66ce4f429d532f8d0c5d377343efab76dc5fa",
+      "test/verbs_diag/profile_support.py": "42c5ad17ae18f2697e958cc91e050cbabe3225b6a537dd833d2df048da5f7f63",
+      "test/urma_mode_parity/phase_support.py": "bfc1062297006da98d418100fb0717a9b192c697b066c9f192e8b6cc67d73047",
+      "ep/bench/utils.py": "c8b5f033722339883d468ac8ae762573d521c1140cd931203e77ffb693565dde"
+    },
+    "kernel": "6.6.0-145.3.22.153.oe2403sp3.aarch64",
+    "torch": "2.6.0+metax3.7.0.7",
+    "libraries": {
+      "liburma.so.0": "56d6374553c2843c13eb7f7bc98a5bb65fa2fa4eb5f3b4a331f56cf126fb1f22",
+      "liburma_common.so.0": "c159fffbce1c82944ceccc98555d8e181fe405414384ed671e9ce3fb0b437fad",
+      "libmcruntime.so": "20935386e054c5eed3c1cd0683c5f83cf9c8f33b7bcb4fcffcd0c6ca8ec1bcc6",
+      "libibverbs.so.1.14.50.0": "699c20b05cb69ad7ebe17b9efe4508b0f506b2d427e40d82e3e3f57d14ce1135"
+    },
+    "mode": "both",
+    "repeats": 3,
+    "warmups": 50,
+    "samples": 50,
+    "no_profile": false,
+    "profile_only": false,
+    "hca": "rocep40s0f0",
+    "ifname": "enp33s0",
+    "gpu": "0"
+  },
+  "error": null
+}

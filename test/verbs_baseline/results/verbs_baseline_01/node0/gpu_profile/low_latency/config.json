@@ -1,0 +1,36 @@
+{
+  "tag": "gpu_profile",
+  "mode": "low_latency",
+  "profile": true,
+  "warmups": 50,
+  "samples": 50,
+  "shape": {
+    "tokens": 128,
+    "hidden": 7168,
+    "experts": 256,
+    "topk": 8
+  },
+  "env": {
+    "UCCL_EP_TRANSPORT": "verbs",
+    "UCCL_EP_VERBS_REG": "dmabuf",
+    "UCCL_IB_HCA": "rocep40s0f0",
+    "UCCL_EP_DISABLE_CPU_AFFINITY": "1",
+    "UCCL_RDMA_ADAPTIVE_SLEEP": "0",
+    "MCCL_IB_DISABLE": "1",
+    "NCCL_IB_DISABLE": "1",
+    "MCCL_SOCKET_IFNAME": "enp33s0",
+    "NCCL_SOCKET_IFNAME": "enp33s0",
+    "MCCL_DEBUG": "INFO",
+    "NCCL_DEBUG": "INFO",
+    "UCCL_METAX_URMA_HOST_ATOMICS": "1",
+    "VB_CASE": "/home/h00918771/metax_dev/verbs_baseline_results/verbs_baseline_01/node0/gpu_profile/low_latency",
+    "VB_MODULE": "/home/h00918771/metax_dev/urma_after_kernel_20261029/diag/ep_host_atomic_4ed19a6b/module/ep.abi3.so",
+    "VB_SHA": "144f1fca126eb8971a5278c3baf0b44e1a29fb7b03ce51c928feb7abc19af798",
+    "VB_MODE": "low_latency",
+    "VB_PROFILE": "1",
+    "VB_WARMUPS": "50",
+    "VB_SAMPLES": "50",
+    "UCCL_TORCHRUN_NODE_RANK": "0",
+    "UCCL_EXIT_GUARD": "1"
+  }
+}
