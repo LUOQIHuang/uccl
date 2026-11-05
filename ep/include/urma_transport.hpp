@@ -76,6 +76,7 @@ class UrmaTransport final : public EpTransport {
  private:
   [[noreturn]] static void unavailable();
   UrmaMode mode_;
+  bool ll_relaxed_write_ = false;
 #ifdef USE_URMA
   ProxyCtx* ctx_ = nullptr;
   bool init_acquired_ = false;

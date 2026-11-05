@@ -2,7 +2,20 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <cstdlib>
+#include <cstring>
 #include <stdexcept>
+
+// Diagnostic A/B only. Default transport semantics remain unchanged. Parse
+// once per transport, never getenv in the WR hot path. Atomic fences are not
+// controlled by this switch.
+inline bool urma_ll_relaxed_write_from_env() {
+  auto const* value = std::getenv("UCCL_URMA_LL_WRITE_ORDER");
+  if (!value || !*value || !std::strcmp(value,"default") || !std::strcmp(value,"strong"))
+    return false;
+  if (!std::strcmp(value,"relax")) return true;
+  throw std::invalid_argument("UCCL_URMA_LL_WRITE_ORDER must be default|strong|relax");
+}
 
 // Normal mirrors verbs' per-ring data QPs, with a separate control endpoint.
 // LL mirrors verbs' single data queue per peer. WRITE and its notifying FADD

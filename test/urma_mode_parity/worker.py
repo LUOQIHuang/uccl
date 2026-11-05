@@ -6,6 +6,8 @@ import os
 from pathlib import Path
 import runpy
 import sys
+import subprocess
+import time
 from datetime import timedelta
 import support
 from phase_runtime import Measurements
@@ -23,6 +25,7 @@ import torch.distributed as dist
 import utils
 phase_suite=os.environ.get('PARITY_PHASE_SUITE')=='1'
 stage_profile=os.environ.get('PARITY_STAGE_PROFILE')=='1'
+api_only=os.environ.get('PARITY_API_ONLY')=='1'
 if phase_suite and not all(hasattr(ep,n) for n in ('urma_phase_enable','urma_phase_snapshot')):
     raise RuntimeError('PHASE_DIAGNOSTICS_REQUIRES_REBUILD')
 if hasattr(ep,'urma_phase_enable'): ep.urma_phase_enable(False)
@@ -74,17 +77,36 @@ def measured_profile(fn,kernel_names,*args,**kwargs):
     label=(normal_plan[index][0]+'_chunk'+str(normal_plan[index][1])) if mode=='normal' else ('ll_no_hook' if index==0 else 'll_hook')
     if os.environ.get('PARITY_SAVE_TRACES')=='1': kwargs['trace_path']=str(case/f'gpu_trace_{index}.json')
     profile=lambda:original_profile(fn,kernel_names,*args,**kwargs)
-    result=measurements.window('profile_'+label,profile,60) if phase_suite else profile()
-    data=dict(mode=mode,index=index,kernel_names=kernel_names,kernel_seconds=result)
+    if api_only:
+        # Nonzero Normal notify keeps the benchmark's best-config selection
+        # alive. These placeholders are never exported as GPU measurements.
+        result=(1e-12,1e-12) if mode=='normal' else ((0.0,0.0) if index==0 else ([0.0,0.0],[0.0,0.0]))
+        print('MODE_PARITY_GPU_PROFILE_SKIPPED '+label,flush=True)
+    else:
+        result=measurements.window('profile_'+label,profile,60) if phase_suite else profile()
+    data=dict(mode=mode,index=index,kernel_names=kernel_names,kernel_seconds=None if api_only else result,gpu_profiled=not api_only)
     if mode=='normal':
         op,chunk=normal_plan[index]
         avg,minimum,maximum=(measurements.api(fn,label) if phase_suite else
                              original_api(fn,num_warmups=5,num_tests=15))
         data.update(op=op,rdma=chunk,nvl=4,sm=24,api_us=float(avg)*1e6,api_min_us=float(minimum)*1e6,api_max_us=float(maximum)*1e6)
-    record('MODE_PARITY_PROFILE',data)
+        if api_only: result=(avg,1e-12)
+    record('MODE_PARITY_API_ONLY_POINT' if api_only else 'MODE_PARITY_PROFILE',data)
     if phase_suite and mode=='low_latency' and index==1 and os.environ.get('PARITY_LL_HOOK_WORKLOAD')=='immediate':
         avg,minimum,maximum=measurements.api(fn,'ll_immediate_hook_dispatch_combine')
         record('MODE_PARITY_HOOK_API',dict(avg_us=avg*1e6,min_us=minimum*1e6,max_us=maximum*1e6))
+    if api_only and index==(3 if mode=='normal' else 1):
+        # Capture BEFORE the benchmark returns and tears down GPU registrations,
+        # outside all timed windows, to distinguish runtime from teardown AEs.
+        begin=time.time_ns()
+        try:
+            snapshot=subprocess.run(['journalctl','-b','-k','-n','400','--no-pager'],capture_output=True,text=True,timeout=20)
+            (case/'kernel_after_measurements.txt').write_text(snapshot.stdout+snapshot.stderr)
+            rc=snapshot.returncode
+        except Exception as exc:
+            (case/'kernel_after_measurements.txt').write_text(str(exc)); rc=-1
+        (case/'measurement_boundary.json').write_text(json.dumps(dict(begin_realtime_ns=begin,end_realtime_ns=time.time_ns(),rc=rc,note='after all timing windows, before benchmark teardown')))
+        dist.barrier()  # Neither peer tears down before BOTH snapshots finish.
     return result
 utils.bench_kineto=measured_profile
 

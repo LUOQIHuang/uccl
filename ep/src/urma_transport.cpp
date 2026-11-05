@@ -20,6 +20,7 @@ void UrmaTransport::configure(bool normal, size_t channels) {
 #endif
   UrmaMode requested{normal, normal ? channels : 1};
   requested.validate();
+  ll_relaxed_write_ = urma_ll_relaxed_write_from_env();
   mode_ = requested;
 }
 #ifndef USE_URMA
@@ -309,9 +310,10 @@ void UrmaTransport::init(ProxyCtx& ctx) {
         register_segment(barrier_words_.data(),
                          barrier_words_.size() * sizeof(uint64_t), false, true);
     std::fprintf(stderr,
-        "[URMA] mode=%s channels=%zu endpoints=%zu batch=linked capacity=%zu wire=%u\n",
+        "[URMA] mode=%s channels=%zu endpoints=%zu batch=linked capacity=%zu wire=%u write_order=%s atomic_fence=per_request\n",
         mode_.normal ? "normal" : "low_latency", mode_.channels,
-        jetties_.size(), capacity(), UrmaMode::kWireVersion);
+        jetties_.size(), capacity(), UrmaMode::kWireVersion,
+        mode_.normal || ll_relaxed_write_ ? "relax" : "strong");
   } catch (...) {
     destroy();
     throw;
@@ -626,8 +628,9 @@ void UrmaTransport::prepare(PreparedWr& out, Peer& peer, size_t lane,
     out.src.tseg = main_tseg_;
     out.wr.opcode = URMA_OPC_WRITE;
     // Normal uses the tested relaxed data path. Notifying FADDs retain a
-    // strong fence on the SAME lane. LL keeps conservative WRITE ordering.
-    out.wr.flag.bs.place_order = mode_.normal ? URMA_RELAX_ORDER : URMA_STRONG_ORDER;
+    // strong fence on the SAME lane. LL defaults to conservative ordering;
+    // only the explicit diagnostic A/B can select relaxed LL WRITEs.
+    out.wr.flag.bs.place_order = mode_.normal || ll_relaxed_write_ ? URMA_RELAX_ORDER : URMA_STRONG_ORDER;
     out.wr.rw.src.sge = &out.src;
     out.wr.rw.src.num_sge = 1;
     out.wr.rw.dst.sge = &out.dst;

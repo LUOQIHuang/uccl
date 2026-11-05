@@ -11,6 +11,7 @@
 #include "ep_util.hpp"
 #include "gpu_p2p_runtime.hpp"
 #include "urma_registration_probe.hpp"
+#include "urma_mode.hpp"
 #include "internode.cuh"
 #include "internode_ll.cuh"
 #include "intranode.cuh"
@@ -2506,6 +2507,9 @@ NB_MODULE(ep, m) {
 #else
     return uint32_t(0);
 #endif
+  });
+  m.def("get_urma_ll_write_order", []() {
+    return std::string(urma_ll_relaxed_write_from_env() ? "relax" : "strong");
   });
   m.def(
       "stream_query",

@@ -37,6 +37,7 @@ def build(args):
     args.build_dir.mkdir(parents=True,exist_ok=True)
     env=os.environ.copy()
     env.pop('LD_PRELOAD',None); env.pop('UMDK_HOME',None)
+    env['UCCL_URMA_LL_WRITE_ORDER']='default'
     flags=dict(USE_METAX='1',USE_URMA='1',USE_URMA_METAX='0',USE_LIBFABRIC_CXI='0',USE_DMABUF='1',MAX_NUM_GPUS='1',NUM_MAX_NVL_PEERS='1',PER_EXPERT_BATCHING=str(args.per_expert_batching),MAX_JOBS=str(args.build_jobs),URMA_INCLUDE_DIR=str(include),URMA_LIBRARY_DIR=str(args.urma_lib_dir.resolve()))
     env.update(flags)
     stable_flags={key:value for key,value in flags.items() if key not in ('URMA_INCLUDE_DIR','URMA_LIBRARY_DIR','MAX_JOBS')}
@@ -76,12 +77,15 @@ def parser():
     p.add_argument('--probe-control',choices=('production','torch'),default='production')
     p.add_argument('--probe-bytes',type=int,default=117506432)
     p.add_argument('--phase-suite',action='store_true')
+    p.add_argument('--api-only',action='store_true',help='phase suite: skip Kineto and retain whole-call samples only')
+    p.add_argument('--ll-write-order',choices=('default','strong','relax'),default='default',help='diagnostic LL WRITE ordering; FADD fences unchanged')
     p.add_argument('--stage-profile',action='store_true')
     p.add_argument('--save-traces',action='store_true')
     p.add_argument('--warmups',type=int,default=50)
     p.add_argument('--samples',type=int,default=50)
     p.add_argument('--ll-hook-workload',choices=('gemm','immediate'),default='gemm')
     p.add_argument('--job',required=True)
+    p.add_argument('--collect-suite',action='store_true',help='collect --job_* jobs under --output into one shared results folder')
     p.add_argument('--node-rank',type=int,choices=(0,1),required=True)
     p.add_argument('--master-addr')
     p.add_argument('--port',type=int,default=31280)
@@ -110,6 +114,9 @@ def parser():
     if (args.stage_profile or args.save_traces or args.ll_hook_workload=='immediate') and not args.phase_suite:
         p.error('stage/trace/immediate-hook options require --phase-suite')
     if args.phase_suite and args.backend!='urma': p.error('phase suite currently supports URMA only')
+    if args.api_only and (not args.phase_suite or args.save_traces): p.error('--api-only requires --phase-suite and excludes --save-traces')
+    if args.ll_write_order!='default' and args.backend!='urma': p.error('LL WRITE order diagnostics require URMA')
+    if args.collect_suite and args.action!='collect': p.error('--collect-suite requires --action collect')
     if args.action=='probe' and (args.backend!='urma' or args.mode=='both' or args.probe_bytes<1):
         p.error('probe requires --backend urma --mode normal|low_latency and positive --probe-bytes')
     if not (1024<=args.port<65535) or not re.fullmatch(r'\d+,\d+,\d+',args.ubctl_selector): p.error('invalid port / UB selector')
@@ -126,6 +133,7 @@ def environment(args):
     env.update(UCCL_EP_TRANSPORT=args.backend,UCCL_URMA_TM='rc',UCCL_URMA_DEV_NAME=args.urma_device,URMA_DIAG_LIBRARY_DIR=str(args.urma_lib_dir),CUDA_VISIBLE_DEVICES=args.gpu,MCCL_IB_DISABLE='1',NCCL_IB_DISABLE='1',MCCL_SOCKET_IFNAME=args.ifname,NCCL_SOCKET_IFNAME=args.ifname,MCCL_DEBUG='INFO',NCCL_DEBUG='INFO',UCCL_RDMA_ADAPTIVE_SLEEP='0',UCCL_EP_DISABLE_CPU_AFFINITY='1',PYTHONUNBUFFERED='1',PYTHONDONTWRITEBYTECODE='1',UCCL_EP_VERBS_REG='dmabuf',UCCL_IB_HCA=args.hca)
     if args.backend=='urma':
         env.pop('UCCL_EP_VERBS_REG',None); env.pop('UCCL_IB_HCA',None)
+    env['UCCL_URMA_LL_WRITE_ORDER']=args.ll_write_order
     env['LD_LIBRARY_PATH']=str(args.urma_lib_dir)+':'+env.get('LD_LIBRARY_PATH','')
     return env
 
@@ -139,18 +147,25 @@ def preflight(args):
     metadata=next(json.loads(line.split(' ',1)[1]) for line in probe.stdout.splitlines() if line.startswith('MODE_PARITY_IMPORT_OK '))
     if args.phase_suite and not metadata.get('phase_diagnostics'):
         raise RuntimeError('PHASE_DIAGNOSTICS_REQUIRES_REBUILD')
+    if args.ll_write_order!='default' and metadata.get('ll_write_order')!=args.ll_write_order:
+        raise RuntimeError('LL_WRITE_ORDER_DIAGNOSTICS_REQUIRES_REBUILD')
     return module,manifest,dict(libraries=libraries,hardware=hardware,import_log=probe.stdout+probe.stderr,runtime=metadata)
 
 def collect(args):
-    source=args.output/args.job/f'node{args.node_rank}'
-    target=support.REPO/'test/bench_results/urma_mode_parity'/args.job/f'node{args.node_rank}'
-    files=[p for p in source.rglob('*') if p.is_file() and p.suffix in ('.json','.jsonl','.log','.txt','.csv','.py') and 'tmpdir' not in p.parts and 'cache' not in p.parts]
+    suite=getattr(args,'collect_suite',False)
+    sources=sorted(args.output.glob(args.job+f'_*/node{args.node_rank}')) if suite else [args.output/args.job/f'node{args.node_rank}']
+    target=support.REPO/'test/urma_mode_parity/results'/args.job if suite else support.REPO/'test/bench_results/urma_mode_parity'/args.job/f'node{args.node_rank}'
+    files=[]
+    for source in sources:
+        for p in source.rglob('*'):
+            if p.is_file() and p.suffix in ('.json','.jsonl','.log','.txt','.csv','.py') and 'tmpdir' not in p.parts and 'cache' not in p.parts:
+                relative=Path(source.parent.name)/source.name/p.relative_to(source) if suite else p.relative_to(source)
+                files.append((p,target/relative))
     if not files: raise RuntimeError('NO_RESULTS_TO_COLLECT')
-    for p in files:
-        out=target/p.relative_to(source)
+    for p,out in files:
         if out.exists() and out.read_bytes()!=p.read_bytes(): raise RuntimeError('RESULT_CONFLICT: '+str(out))
-    for p in files:
-        out=target/p.relative_to(source); out.parent.mkdir(parents=True,exist_ok=True); shutil.copy2(p,out)
+    for p,out in files:
+        out.parent.mkdir(parents=True,exist_ok=True); shutil.copy2(p,out)
     print('COLLECTED='+str(target),flush=True)
 
 def kernel_snapshot(root, name):
@@ -194,7 +209,8 @@ def main():
     root.mkdir(parents=True,exist_ok=False)
     error=None; fingerprint=dict(job=args.job,backend=args.backend,mode=args.mode,shape=[args.normal_tokens,args.ll_tokens,args.hidden,args.experts,args.topk],sources_hash=support.digest(support.source_manifest()),diagnostics_hash=support.digest(support.diagnostic_manifest()),ifname=args.ifname,kernel=os.uname().release,
         phase_suite=args.phase_suite,stage_profile=args.stage_profile,save_traces=args.save_traces,
-        warmups=args.warmups,samples=args.samples,ll_hook_workload=args.ll_hook_workload)
+        warmups=args.warmups,samples=args.samples,ll_hook_workload=args.ll_hook_workload,
+        api_only=args.api_only,ll_write_order=args.ll_write_order)
     try:
         module,manifest,info=preflight(args)
         fingerprint.update(build_hash=support.digest({key:manifest[key] for key in ('sources','sdk','flags')}),libraries=info['libraries'],torch=info['runtime']['torch'])
@@ -221,6 +237,7 @@ def main():
         env=environment(args)
         env.update(PARITY_CASE=str(case),PARITY_MODULE=str(module),PARITY_MODULE_SHA=manifest['module_sha'],PARITY_MODE=mode,PARITY_TOKENS=str(args.normal_tokens if mode=='normal' else args.ll_tokens),PARITY_HIDDEN=str(args.hidden),PARITY_EXPERTS=str(args.experts),PARITY_TOPK=str(args.topk),UCCL_TORCHRUN_NODE_RANK=str(args.node_rank),UCCL_EXIT_GUARD='1')
         env.update(PARITY_PHASE_SUITE=str(int(args.phase_suite)),PARITY_STAGE_PROFILE=str(int(args.stage_profile)),
+                   PARITY_API_ONLY=str(int(args.api_only)),
                    PARITY_SAVE_TRACES=str(int(args.save_traces)),PARITY_WARMUPS=str(args.warmups),
                    PARITY_SAMPLES=str(args.samples),PARITY_LL_HOOK_WORKLOAD=args.ll_hook_workload)
         for key in ('TMPDIR','XDG_CACHE_HOME'):
@@ -237,11 +254,19 @@ def main():
         text=(case/'bench.log').read_text(errors='replace')
         kernel_snapshot(case,'kernel_after.txt')
         checks=dict(mode=f'TRANSPORT_MODE_OK backend={args.backend} mode={mode}' in text,done='MODE_PARITY_BENCH_DONE' in text,exit_ack=f'UCCL_EXIT_ACK_OK node_rank={args.node_rank}' in text,no_errors=not re.search(r'Traceback \(most recent call last\)|AssertionError|Failed CR status|Segmentation fault|ChildFailedError|\[WARNING\]',text))
-        if mode=='normal': checks.update(correctness=text.count('[testing] Running with')==24,profiles=text.count('MODE_PARITY_PROFILE ')==4,tuning=text.count('[tuning] SMs ')==4)
-        else: checks.update(correctness='All correctness tests passed!' in text,profiles=text.count('MODE_PARITY_PROFILE ')==2,bandwidth='Dispatch bandwidth:' in text,hook='Dispatch send/recv time:' in text)
+        expected_points=4 if mode=='normal' else 2
+        point_marker='MODE_PARITY_API_ONLY_POINT ' if args.api_only else 'MODE_PARITY_PROFILE '
+        if mode=='normal': checks.update(correctness=text.count('[testing] Running with')==24,profiles=text.count(point_marker)==4,tuning=text.count('[tuning] SMs ')==4)
+        else: checks.update(correctness='All correctness tests passed!' in text,profiles=text.count(point_marker)==2,bandwidth=args.api_only or 'Dispatch bandwidth:' in text,hook=args.api_only or 'Dispatch send/recv time:' in text)
+        if args.api_only:
+            checks['no_gpu_profiler']=text.count('MODE_PARITY_GPU_PROFILE_SKIPPED ')==expected_points and not list(case.glob('gpu_trace_*.json'))
+            checks['measurement_boundary']=(case/'measurement_boundary.json').is_file() and (case/'kernel_after_measurements.txt').is_file()
         if args.backend=='urma':
             checks['native_mode']=f'[URMA] mode={mode} channels={8 if mode=="normal" else 1} endpoints={9 if mode=="normal" else 1} batch=linked' in text
             checks['device']=f': {args.urma_device}' in text
+            if args.ll_write_order!='default':
+                expected_order='relax' if mode=='normal' else args.ll_write_order
+                checks['write_order']=text.count('write_order='+expected_order+' atomic_fence=per_request')>=1
         if args.phase_suite:
             checks.update(phase_files=(case/'phases.jsonl').is_file() and (case/'api_samples.jsonl').is_file(),
                           samples=text.count('MODE_PARITY_SAMPLES ')==(5 if mode=='normal' else (2 if args.ll_hook_workload=='immediate' else 1)))

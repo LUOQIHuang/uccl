@@ -24,14 +24,15 @@ def summarize(roots,output):
         status=read(case/'status.json')
         if status['rc']!=0 or not all(status['checks'].values()):
             raise ValueError('failed/incomplete case: '+str(case))
-        identity=dict(case=str(case),host=host,job=config['job'])
+        identity=dict(case=str(case),host=host,job=config['job'],ll_write_order=config.get('ll_write_order','default'),api_only=config.get('api_only',False))
         for row in rows(path):
             runs.append(dict(**identity,**row))
             # Never pool sample iterations or both ranks as independent runs.
             key=(host,row['mode'],row['label'],str(config['shape']),config['kernel'],
                  config['build_hash'],config['ll_hook_workload'],row['warmups'],row['measured'],
                  config.get('diagnostics_hash',''),machine.get('boot_id','unknown'),
-                 json.dumps(config.get('libraries',{}),sort_keys=True),config.get('torch','unknown'))
+                 json.dumps(config.get('libraries',{}),sort_keys=True),config.get('torch','unknown'),
+                 config.get('ll_write_order','default'),config.get('api_only',False))
             groups.setdefault(key,{False:[],True:[]})[row['enabled']].append(row['mean_us'])
         for window in rows(case/'phases.jsonl'):
             totals={}
@@ -58,6 +59,7 @@ def summarize(roots,output):
         comparisons.append(dict(host=key[0],mode=key[1],label=key[2],shape=key[3],kernel=key[4],
             build_hash=key[5],hook_workload=key[6],warmups=key[7],measured=key[8],
             diagnostics_hash=key[9],boot_id=key[10],libraries=key[11],torch=key[12],
+            ll_write_order=key[13],api_only=key[14],
             baseline_runs=len(off),instrumented_runs=len(on),
             baseline_median_us=baseline,instrumented_median_us=instrumented,
             baseline_run_min_us=min(off) if off else '',baseline_run_max_us=max(off) if off else '',
