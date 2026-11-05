@@ -1,0 +1,24 @@
+DIAG_ROOT=/home/h00918771
+DIAG_PYTHON=/home/h00918771/metax_dev/venv-maca-py312/bin/python
+usage: driver.py [-h] [--action {build,check,run,collect,probe}]
+                 [--probe-transports {1,4}] [--probe-channels {1,8}]
+                 [--probe-control {production,torch}]
+                 [--probe-bytes PROBE_BYTES] [--phase-suite] [--api-only]
+                 [--ll-write-order {default,strong,relax}]
+                 [--normal-completion {all,ordered,paired}] [--stage-profile]
+                 [--save-traces] [--warmups WARMUPS] [--samples SAMPLES]
+                 [--ll-hook-workload {gemm,immediate}] --job JOB
+                 [--collect-suite] --node-rank {0,1}
+                 [--master-addr MASTER_ADDR] [--port PORT]
+                 [--build-dir BUILD_DIR] [--output OUTPUT]
+                 [--backend {urma,verbs}] [--mode {both,normal,low_latency}]
+                 [--normal-tokens NORMAL_TOKENS] [--ll-tokens LL_TOKENS]
+                 [--hidden HIDDEN] [--experts EXPERTS] [--topk TOPK]
+                 [--build-jobs BUILD_JOBS] [--per-expert-batching {0,1}]
+                 [--urma-include-dir URMA_INCLUDE_DIR]
+                 [--urma-lib-dir URMA_LIB_DIR] [--ifname IFNAME] [--hca HCA]
+                 [--gpu GPU] [--case-timeout CASE_TIMEOUT]
+                 [--expected-kernel EXPECTED_KERNEL]
+                 [--urma-device URMA_DEVICE] [--gpu-pci GPU_PCI]
+                 [--atomic-port ATOMIC_PORT] [--ubctl-selector UBCTL_SELECTOR]
+driver.py: error: --master-addr is required to run
