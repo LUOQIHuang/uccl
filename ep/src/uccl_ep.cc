@@ -12,6 +12,8 @@
 #include "gpu_p2p_runtime.hpp"
 #include "urma_registration_probe.hpp"
 #include "urma_mode.hpp"
+#include "urma_layout_diag.hpp"
+#include "urma_micro.hpp"
 #include "internode.cuh"
 #include "internode_ll.cuh"
 #include "intranode.cuh"
@@ -2484,7 +2486,28 @@ NB_MODULE(ep, m) {
   m.def("get_num_proxy_threads", []() { return kNumProxyThs; });
   m.def("urma_phase_enable", [](bool enabled) { uccl::urma_diag::enabled.store(enabled); });
   m.def("urma_phase_snapshot", []() { return uccl::urma_diag::snapshot(); });
+  m.def("urma_layout_begin", [](){uccl::urma_layout::begin();});
+  m.def("urma_layout_end", [](){return uccl::urma_layout::end();});
 #ifdef USE_URMA
+  nb::class_<UrmaMicroSession>(m,"UrmaMicroSession")
+      .def(nb::init<int,size_t,size_t>())
+      .def("descriptors",[](UrmaMicroSession const& self,size_t count){
+        nb::list result;
+        for(size_t i=0;i<count;++i){auto info=self.descriptor(i);result.append(nb::bytes(reinterpret_cast<char const*>(&info),sizeof(info)));}
+        return result;
+      })
+      .def("connect",[](UrmaMicroSession& self,nb::list const& descriptors){
+        std::vector<RemoteConnInfo> remote;
+        for(auto item:descriptors){auto blob=nb::borrow<nb::bytes>(item);
+          if(nb::len(blob)!=sizeof(RemoteConnInfo))throw std::invalid_argument("invalid micro descriptor size");
+          RemoteConnInfo info{};std::memcpy(&info,blob.c_str(),sizeof(info));remote.push_back(info);}
+        self.connect(remote);
+      })
+      .def("prepare",&UrmaMicroSession::prepare)
+      .def("arm",&UrmaMicroSession::arm)
+      .def("step",[](UrmaMicroSession& self,size_t seq,bool fadd,size_t messages){nb::gil_scoped_release release;return self.step(seq,fadd,messages);})
+      .def("validate",&UrmaMicroSession::validate)
+      .def("close",[](UrmaMicroSession& self){nb::gil_scoped_release release;self.close();});
   m.def("probe_urma_registration", [](uintptr_t main, size_t bytes,
       uintptr_t control, size_t control_bytes, int device, bool normal,
       size_t channels, size_t count) {

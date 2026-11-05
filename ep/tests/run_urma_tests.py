@@ -118,6 +118,13 @@ extern "C" int mcMemcpy(void* dst, void const* src, size_t bytes, int) {
     subprocess.run(cmd, check=True)
     if not a.syntax_only:
         subprocess.run([str(tmp / 'test')], check=True)
+        micro_cmd=cmd[:]
+        # Replace the existing output and enable an alternate main in the
+        # same SDK test boundary; compile the REAL micro implementation.
+        micro_cmd=micro_cmd[:micro_cmd.index('-o')]
+        micro_cmd+=['-DUCCL_URMA_MICRO_TEST',str(ep/'src/urma_micro.cpp'),'-o',str(tmp/'micro_test')]
+        subprocess.run(micro_cmd,check=True)
+        subprocess.run([str(tmp/'micro_test')],check=True)
 
     metax_cmd = [os.environ.get('CXX', 'c++'), '-std=c++17', '-pthread',
                  '-Wall', '-Wextra', '-Werror', '-DUSE_URMA',

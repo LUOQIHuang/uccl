@@ -1,6 +1,7 @@
 #include "urma_transport.hpp"
 #include "common.hpp"
 #include "gpu_p2p_runtime.hpp"
+#include "urma_layout_diag.hpp"
 #include <algorithm>
 #include <chrono>
 #include <cerrno>
@@ -642,6 +643,7 @@ void UrmaTransport::prepare(PreparedWr& out, Peer& peer, size_t lane,
     out.src.addr = reinterpret_cast<uint64_t>(main_buffer_) + request.local_offset;
     out.src.len = bytes;
     out.src.tseg = main_tseg_;
+    if(mode_.normal)uccl::urma_layout::record(request.bytes,out.src.addr,out.dst.addr,lane);
     out.wr.opcode = URMA_OPC_WRITE;
     // Normal uses the tested relaxed data path. Notifying FADDs retain a
     // strong fence on the SAME lane. LL defaults to conservative ordering;

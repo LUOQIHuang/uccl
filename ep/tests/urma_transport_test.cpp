@@ -21,7 +21,12 @@ int resources = 0, init_count = 0, gpu_regs = 0, posts = 0;
 bool fail_context = false, fail_post = false, fail_register = false;
 bool fail_gpu_register = false;
 bool fail_completion = false;
-int selected_device = -1;
+thread_local int selected_device = -1;
+#ifdef UCCL_URMA_MICRO_TEST
+std::mutex micro_wire_mutex;
+std::map<void*,void*> micro_allocations;
+std::map<void*,int> micro_registrations;
+#endif
 int fail_after = -1;
 int fail_jetty_after = -1, fail_bind_after = -1;
 std::vector<urma_jetty_t*> posted_jetties;
@@ -78,15 +83,29 @@ cudaError_t cudaPointerGetAttributes(cudaPointerAttributes* a, void const* p) {
   return 1;
 }
 int gpu_frees = 0, host_frees = 0;
-cudaError_t cudaMalloc(void** ptr, std::size_t) {
+cudaError_t cudaMalloc(void** ptr, std::size_t bytes) {
+#ifdef UCCL_URMA_MICRO_TEST
+  // Match CUDA's independent 64 KiB registration pages; ordinary malloc
+  // allocations can otherwise share a simulated GPU registration page.
+  if(posix_memalign(ptr,65536,(bytes+65535)/65536*65536))return 1;
+  micro_allocations[*ptr]=*ptr;
+#else
+  (void)bytes;
   static std::uint64_t storage[16];
   *ptr = storage;
+#endif
   gpu_ptrs.insert(*ptr);
   return 0;
 }
-cudaError_t cudaHostAlloc(void** ptr, std::size_t, unsigned int) {
+cudaError_t cudaHostAlloc(void** ptr, std::size_t bytes, unsigned int) {
+#ifdef UCCL_URMA_MICRO_TEST
+  if(posix_memalign(ptr,4096,bytes))return 1;
+  micro_allocations[*ptr]=*ptr;
+#else
+  (void)bytes;
   static std::uint64_t storage[16];
   *ptr = storage;
+#endif
   host_ptrs.insert(*ptr);
   return 0;
 }
@@ -102,10 +121,19 @@ void* last_gpu_free = nullptr;
 cudaError_t cudaFree(void* ptr) {
   last_gpu_free = ptr;
   ++gpu_frees;
+#ifdef UCCL_URMA_MICRO_TEST
+  assert(micro_registrations[ptr]==0);std::free(micro_allocations.at(ptr));micro_allocations.erase(ptr);gpu_ptrs.erase(ptr);
+#else
   assert(gpu_regs == 0);
+#endif
   return 0;
 }
-cudaError_t cudaFreeHost(void*) {
+cudaError_t cudaFreeHost(void* ptr) {
+#ifdef UCCL_URMA_MICRO_TEST
+  assert(micro_registrations[ptr]==0);std::free(micro_allocations.at(ptr));micro_allocations.erase(ptr);host_ptrs.erase(ptr);
+#else
+  (void)ptr;
+#endif
   ++host_frees;
   return 0;
 }
@@ -191,6 +219,9 @@ urma_target_seg_t* urma_register_seg(urma_context_t* c, urma_seg_cfg_t* cfg) {
   if (gpu && !sync_ptrs.count(reinterpret_cast<void*>(cfg->va))) return nullptr;
 #endif
   if (gpu) ++gpu_regs;
+#ifdef UCCL_URMA_MICRO_TEST
+  ++micro_registrations[reinterpret_cast<void*>(cfg->va)];
+#endif
   auto* s = create<urma_target_seg_t>();
   s->urma_ctx = c;
   s->token_id = cfg->token_id;
@@ -201,6 +232,9 @@ urma_target_seg_t* urma_register_seg(urma_context_t* c, urma_seg_cfg_t* cfg) {
   return s;
 }
 urma_status_t urma_unregister_seg(urma_target_seg_t* s) {
+#ifdef UCCL_URMA_MICRO_TEST
+  --micro_registrations[reinterpret_cast<void*>(s->seg.ubva.va)];
+#endif
   if (gpu_ptrs.count(reinterpret_cast<void*>(s->seg.ubva.va))) --gpu_regs;
   return release(s);
 }
@@ -235,6 +269,9 @@ urma_status_t urma_unbind_jetty(urma_jetty_t* j) {
 }
 urma_status_t urma_post_jetty_send_wr(urma_jetty_t* j, urma_jfs_wr_t* w,
                                       urma_jfs_wr_t** bad) {
+#ifdef UCCL_URMA_MICRO_TEST
+  std::lock_guard<std::mutex> lock(micro_wire_mutex);
+#endif
   if (fail_post) { *bad = w; return URMA_EINVAL; }
   ++posts;
   posted_jetties.push_back(j);
@@ -266,6 +303,9 @@ urma_status_t urma_post_jetty_send_wr(urma_jetty_t* j, urma_jfs_wr_t* w,
   return 0;
 }
 int urma_poll_jfc(urma_jfc_t* j, int max, urma_cr_t* out) {
+#ifdef UCCL_URMA_MICRO_TEST
+  std::lock_guard<std::mutex> lock(micro_wire_mutex);
+#endif
   ++poll_calls;
   assert(max <= 16);
   int n = 0;
@@ -277,6 +317,7 @@ int urma_poll_jfc(urma_jfc_t* j, int max, urma_cr_t* out) {
   return n;
 }
 }
+#ifndef UCCL_URMA_MICRO_TEST
 int main() {
   unsetenv("UCCL_URMA_NORMAL_COMPLETION");
   ProxyCtx ctx;
@@ -747,3 +788,6 @@ int main() {
   std::cout
       << "URMA transport tests passed (simulated hardware; SDK types selected by runner)\n";
 }
+#else
+#include "urma_micro_test.inc"
+#endif

@@ -24,6 +24,7 @@ def summarize(roots,output,expected_repeats=3):
     if not setups: raise ValueError('no Normal A/B jobs found')
     for path in setups:
         setup=read(path);config=setup['fingerprint'];node=path.parent;case=node/'normal'
+        if config.get('capture_layout'):raise ValueError('layout capture is not a performance baseline: '+str(node))
         if setup.get('error'): raise ValueError('failed setup: '+str(node))
         if config.get('mode')!='normal' or not config.get('api_only') or config.get('ll_write_order','default')!='default':
             raise ValueError('expected Normal-only API-only fixed WRITE ordering: '+str(node))

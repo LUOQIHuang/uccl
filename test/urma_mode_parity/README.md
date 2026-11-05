@@ -1,6 +1,8 @@
 # URMA Normal / Low-latency 实现对齐与验收
 
-当前只关注Normal时，请按 **[URMA Normal完成合并A/B运行步骤](NORMAL_AB.zh-CN.md)** 操作：同一模块比较all/paired完成路径，三轮纯API基线，独立CQE诊断，不运行verbs或LL。
+当前下一轮请按 **[URMA Normal数据路径分解测试](DATA_PATH.zh-CN.md)** 操作：重新编译后，采集实际WRITE形状，并运行三轮WRITE/FADD/CQE与GPU观察边界的微测，只使用URMA环境。
+
+此前 **[URMA Normal完成合并A/B运行步骤](NORMAL_AB.zh-CN.md)** 保留供查阅；最新结果表明减少CQE尚未带来明显端到端收益，本轮无需重复该套件。
 
 已有结果见 **[verbs与URMA阶段复测分析](results/urma_phase_v1/ANALYSIS.zh-CN.md)**；此前 **[LL WRITE排序A/B与Normal纯基线](ORDER_AB.zh-CN.md)** 保留供后续使用，本次无需执行LL测试。
 

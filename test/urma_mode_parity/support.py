@@ -24,7 +24,7 @@ def source_manifest():
 def diagnostic_manifest():
     paths=[]
     for directory in ('ep/bench','ep/tests','test/urma_mode_parity','test/verbs_diag'):
-        paths.extend(p for p in (REPO/directory).rglob('*') if p.is_file() and p.suffix in ('.h','.hpp','.cuh','.cpp','.cc','.cu','.py','.sh')
+        paths.extend(p for p in (REPO/directory).rglob('*') if p.is_file() and p.suffix in ('.h','.hpp','.cuh','.cpp','.cc','.cu','.inc','.py','.sh')
                      and not any(part in ('results','bench_results','cache','tmpdir','__pycache__') for part in p.relative_to(REPO/directory).parts))
     return {p.relative_to(REPO).as_posix():sha(p) for p in sorted(set(paths))}
 
@@ -48,7 +48,9 @@ def load_extension(module):
     return extension,dict(module=str(Path(module).resolve()),module_sha=sha(module),wire=2,torch=torch.__version__,torch_file=torch.__file__,python=sys.executable,loaded_libraries=loaded,
                           phase_diagnostics=all(hasattr(extension,n) for n in ('urma_phase_enable','urma_phase_snapshot')),
                           ll_write_order=extension.get_urma_ll_write_order() if hasattr(extension,'get_urma_ll_write_order') else None,
-                          normal_completion=extension.get_urma_normal_completion() if hasattr(extension,'get_urma_normal_completion') else None)
+                          normal_completion=extension.get_urma_normal_completion() if hasattr(extension,'get_urma_normal_completion') else None,
+                          micro_diagnostics=hasattr(extension,'UrmaMicroSession'),
+                          layout_diagnostics=all(hasattr(extension,n) for n in ('urma_layout_begin','urma_layout_end')))
 
 def read_build(directory):
     data=json.loads((directory/'manifest.json').read_text())

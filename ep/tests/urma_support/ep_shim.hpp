@@ -6,6 +6,9 @@
 #include <cstddef>
 #include <cstdint>
 constexpr int kMaxOutstandingSends = 16;
+#ifdef UCCL_URMA_MICRO_TEST
+constexpr size_t kAtomicBufferSize = 81960;
+#endif
 struct ProxyCtx {
   int local_rank = 0;
   int thread_idx = 0;
