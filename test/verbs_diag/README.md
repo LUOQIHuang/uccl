@@ -1,6 +1,6 @@
 # verbs Normal 定位测试（可迁移用户目录）
 
-当前新实现的对照请使用 [Normal/LL v2 构建与验收](../urma_mode_parity/README.md)，可用同一新模块分别选择 verbs/URMA。本页保留历史模块与匹配旧 benchmark 源码的诊断流程。
+当前只有 RDMA 内核可用时，请使用 [verbs Normal/LL 基线与 GPU 阶段分析](../verbs_baseline/README.zh-CN.md)：三轮独立基线、一次单独 profiler，并支持可选的当前源码纯 verbs 构建。URMA 的验收入口见 [Normal/LL v2 构建与验收](../urma_mode_parity/README.md)。verbs 和 URMA 分别使用各自可用的内核。本页保留历史 Normal chunk/绑核诊断流程。
 
 所有用户路径默认从 $HOME 推导，也可设置 VERBS_DIAG_HOME。以 h00918771 为例，从 Git 仓库直接运行 /home/h00918771/uccl-ep-xpu-integration/test/verbs_diag/ 下的脚本即可。
 

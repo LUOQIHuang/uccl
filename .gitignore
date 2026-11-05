@@ -150,3 +150,9 @@ test/**/*.bin
 # Mode/stage results shared at the team's established results location.
 !test/urma_mode_parity/results/**/*.log
 !test/urma_mode_parity/results/**/*.csv
+
+# Fixed verbs Normal/LL baselines and separate GPU traces.
+!test/verbs_baseline/results/**/*.log
+!test/verbs_baseline/results/**/*.json
+!test/verbs_baseline/results/**/*.jsonl
+!test/verbs_baseline/results/**/*.csv
