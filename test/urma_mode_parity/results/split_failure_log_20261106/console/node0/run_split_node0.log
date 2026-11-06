@@ -1,0 +1,15 @@
+DIAG_ROOT=/home/h00918771
+DIAG_PYTHON=/home/h00918771/metax_dev/venv-maca-py312/bin/python
+URMA_MICRO_BEGIN log=/home/h00918771/metax_dev/urma_split_results/urma_normal_split_05/urma_normal_split_05_r01_t1/node0/micro/bench.log
+URMA_MICRO_END rc=1 checks={'done': False, 'points': False, 'raw': False, 'layout_verified': False, 'boundary': False, 'no_errors': False}
+Traceback (most recent call last):
+  File "/home/h00918771/uccl-ep-xpu-integration-new/test/urma_mode_parity/driver.py", line 318, in <module>
+    if __name__=='__main__': main()
+                             ^^^^^^
+  File "/home/h00918771/uccl-ep-xpu-integration-new/test/urma_mode_parity/driver.py", line 227, in main
+    micro_driver.run(args,preflight,environment,kernel_snapshot)
+  File "/home/h00918771/uccl-ep-xpu-integration-new/test/urma_mode_parity/micro_driver.py", line 75, in run
+    legacy.pair(args,dict(stage='micro_done',job=args.job,rc=rc))
+  File "/home/h00918771/uccl-ep-xpu-integration-new/test/verbs_diag/driver.py", line 53, in pair
+    raise RuntimeError(f'PAIR_STOP local={payload!r} peer={peer!r}')
+RuntimeError: PAIR_STOP local={'stage': 'micro_done', 'job': 'urma_normal_split_05_r01_t1', 'rc': 1} peer={'stage': 'micro_done', 'job': 'urma_normal_split_05_r01_t1', 'rc': 1}

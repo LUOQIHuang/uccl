@@ -1,0 +1,18 @@
+/home/h00918771/uccl-ep-xpu-integration-new/test/urma_mode_parity/support.py:34: UserWarning: Could not find flash_attn package installed. Please try to install flash_attn whl pacakge using pip command and make sure it can be imported properly
+  import torch
+[URMA_ALLOC] control raw=0xa07c00000 aligned=0xa07c00000 logical=81960 backing=90112 alignment=4096 finegrained=1
+[URMA] rank=0 thread=0 using device 5/6: udmac0d1e2
+[URMA_REG] rank=0 thread=0 stage=begin kind=host va=0xaaacd2437000 len=8192 atomic=0 cfg_size=56 gpu_flag_offset=48 access=6
+[URMA_REG] rank=0 thread=0 stage=success kind=host va=0xaaacd2437000 len=8192 atomic=0
+[URMA_REG] rank=0 thread=0 stage=begin kind=host va=0xaaacd243a000 len=64 atomic=1 cfg_size=56 gpu_flag_offset=48 access=14
+[URMA_REG] rank=0 thread=0 stage=success kind=host va=0xaaacd243a000 len=64 atomic=1
+[URMA] mode=normal channels=8 endpoints=9 batch=linked capacity=1024 wire=2 write_order=relax atomic_fence=per_request normal_completion=all
+[URMA_REG] rank=0 thread=0 stage=begin kind=gpu va=0xa04c00000 len=46227456 atomic=0 cfg_size=56 gpu_flag_offset=48 access=6
+[URMA_REG] rank=0 thread=0 stage=success kind=gpu va=0xa04c00000 len=46227456 atomic=0
+[URMA_REG] rank=0 thread=0 stage=begin kind=gpu va=0xa07c00000 len=81960 atomic=1 cfg_size=56 gpu_flag_offset=48 access=14
+[URMA_REG] rank=0 thread=0 stage=success kind=gpu va=0xa07c00000 len=81960 atomic=1
+Traceback (most recent call last):
+  File "/home/h00918771/uccl-ep-xpu-integration-new/test/urma_mode_parity/split_worker.py", line 58, in <module>
+    sample=json.loads(session.local_scan(sequence) if point['local'] else session.step(sequence,point['fadd'],point['messages']))
+                                                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: micro completion error
