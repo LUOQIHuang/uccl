@@ -76,6 +76,8 @@ def parser():
     p.add_argument('--capture-layout',action='store_true')
     p.add_argument('--micro-layout',type=Path)
     p.add_argument('--micro-threads',type=int,choices=(1,4),default=4)
+    p.add_argument('--micro-suite',choices=('legacy','split'),default='legacy')
+    p.add_argument('--micro-cpus',default='auto',help='split suite: four distinct CPU IDs, or auto on GPU NUMA node')
     p.add_argument('--probe-transports',type=int,choices=(1,4),default=4)
     p.add_argument('--probe-channels',type=int,choices=(1,8),default=8)
     p.add_argument('--probe-control',choices=('production','torch'),default='production')
@@ -128,6 +130,7 @@ def parser():
         p.error('--capture-layout requires URMA Normal API-only')
     if args.action=='micro' and (args.backend!='urma' or args.mode!='normal' or args.normal_completion!='all' or not args.master_addr or not args.micro_layout):
         p.error('micro requires URMA Normal all, master address and --micro-layout')
+    if args.micro_cpus!='auto' and not re.fullmatch(r'\d+,\d+,\d+,\d+',args.micro_cpus):p.error('--micro-cpus requires four comma-separated CPU IDs')
     if args.action=='probe' and (args.backend!='urma' or args.mode=='both' or args.probe_bytes<1):
         p.error('probe requires --backend urma --mode normal|low_latency and positive --probe-bytes')
     if not (1024<=args.port<65535) or not re.fullmatch(r'\d+,\d+,\d+',args.ubctl_selector): p.error('invalid port / UB selector')
@@ -165,6 +168,7 @@ def preflight(args):
         raise RuntimeError('NORMAL_COMPLETION_DIAGNOSTICS_REQUIRES_REBUILD')
     if args.capture_layout and not metadata.get('layout_diagnostics'):raise RuntimeError('LAYOUT_DIAGNOSTICS_REQUIRES_REBUILD')
     if args.action=='micro' and not metadata.get('micro_diagnostics'):raise RuntimeError('MICRO_DIAGNOSTICS_REQUIRES_REBUILD')
+    if args.micro_suite=='split' and metadata.get('micro_version')!=2:raise RuntimeError('MICRO_SPLIT_REQUIRES_REBUILD_V2')
     return module,manifest,dict(libraries=libraries,hardware=hardware,import_log=probe.stdout+probe.stderr,runtime=metadata)
 
 def collect(args):

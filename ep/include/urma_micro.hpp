@@ -11,7 +11,8 @@ struct UrmaMicroGeometry {
 // GPU helpers are defined in a separate CUDA/cu-bridge compilation unit.
 void urma_micro_gpu_prepare(void*,UrmaMicroGeometry const&,int);
 bool urma_micro_gpu_validate(void*,void*,UrmaMicroGeometry const&,int,int,uint64_t);
-void* urma_micro_observer_start(void*,void*,UrmaMicroGeometry const&,int,int,uint64_t);
+void* urma_micro_observer_start(void*,void*,UrmaMicroGeometry const&,int,int,uint64_t,bool scan=true);
+std::string urma_micro_gpu_local_scan(void*,UrmaMicroGeometry const&,int,int);
 bool urma_micro_observer_done(void*,size_t,size_t);
 void urma_micro_observer_finish(void*);
 
@@ -25,6 +26,8 @@ class UrmaMicroSession {
   LocalConnInfo descriptor(size_t) const;
   void connect(std::vector<RemoteConnInfo> const&);
   void prepare(size_t bytes,size_t src_mod,size_t dst_mod,size_t window,int rank);
+  void experiment(bool send,bool receive,bool scan,std::vector<int> const& cpus);
+  std::string local_scan(size_t sequence);
   void arm(size_t sequence,bool visible,bool with_fadd,size_t messages);
   std::string step(size_t sequence,bool with_fadd,size_t messages);
   void validate(size_t sequence,bool with_fadd,size_t messages);

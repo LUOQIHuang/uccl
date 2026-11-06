@@ -50,6 +50,7 @@ def load_extension(module):
                           ll_write_order=extension.get_urma_ll_write_order() if hasattr(extension,'get_urma_ll_write_order') else None,
                           normal_completion=extension.get_urma_normal_completion() if hasattr(extension,'get_urma_normal_completion') else None,
                           micro_diagnostics=hasattr(extension,'UrmaMicroSession'),
+                          micro_version=extension.get_urma_micro_version() if hasattr(extension,'get_urma_micro_version') else 1,
                           layout_diagnostics=all(hasattr(extension,n) for n in ('urma_layout_begin','urma_layout_end')))
 
 def read_build(directory):

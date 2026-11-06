@@ -29,7 +29,7 @@ __global__ void validate_payload(unsigned char const* base,unsigned long long vo
 }
 struct Observer {int* host=nullptr;int* gpu=nullptr;cudaStream_t stream=nullptr;size_t lanes=0;};
 __global__ void observe(unsigned char const* base,unsigned long long volatile const* control,
-    UrmaMicroGeometry g,int rank,int parity,unsigned long long count,int volatile* flags,unsigned long long cycles) {
+    UrmaMicroGeometry g,int rank,int parity,unsigned long long count,int volatile* flags,unsigned long long cycles,bool scan) {
   size_t lane=blockIdx.x;__shared__ int error;
   if(threadIdx.x==0) {
     error=0;flags[lane*3]=1;__threadfence_system();auto start=clock64();
@@ -37,7 +37,7 @@ __global__ void observe(unsigned char const* base,unsigned long long volatile co
     __threadfence_system();
   }
   __syncthreads();
-  if(!error) {
+  if(!error && scan) {
     auto* data=reinterpret_cast<unsigned char volatile const*>(base+2*g.region+lane*g.stride+g.dst_pad);
     for(size_t i=threadIdx.x;i<g.bytes;i+=blockDim.x)
       if(data[i]!=pattern(rank,parity,lane))atomicExch(&error,2);
@@ -59,7 +59,7 @@ bool urma_micro_gpu_validate(void* base,void* control,UrmaMicroGeometry const& g
     checked(cudaMemcpy(&host,result,sizeof(int),cudaMemcpyDeviceToHost));checked(cudaFree(result));return host==0;
   }catch(...){cudaFree(result);throw;}
 }
-void* urma_micro_observer_start(void* base,void* control,UrmaMicroGeometry const& g,int rank,int parity,uint64_t count) {
+void* urma_micro_observer_start(void* base,void* control,UrmaMicroGeometry const& g,int rank,int parity,uint64_t count,bool scan) {
   auto* o=new Observer;o->lanes=g.threads*g.lanes;
   try {
     checked(cudaHostAlloc(reinterpret_cast<void**>(&o->host),o->lanes*3*sizeof(int),cudaHostAllocMapped));
@@ -68,7 +68,7 @@ void* urma_micro_observer_start(void* base,void* control,UrmaMicroGeometry const
     checked(cudaStreamCreateWithFlags(&o->stream,cudaStreamNonBlocking));
     int device=0;checked(cudaGetDevice(&device));cudaDeviceProp props{};checked(cudaGetDeviceProperties(&props,device));
     observe<<<o->lanes,256,0,o->stream>>>(static_cast<unsigned char*>(base),static_cast<unsigned long long*>(control),g,rank,parity,count,o->gpu,
-        static_cast<unsigned long long>(props.clockRate)*1000*10);
+        static_cast<unsigned long long>(props.clockRate)*1000*10,scan);
     checked(cudaGetLastError());
     auto deadline=std::chrono::steady_clock::now()+std::chrono::seconds(15);
     for(size_t i=0;i<o->lanes;++i)while(!__atomic_load_n(o->host+i*3,__ATOMIC_ACQUIRE)) {
@@ -77,6 +77,34 @@ void* urma_micro_observer_start(void* base,void* control,UrmaMicroGeometry const
     }
     return o;
   }catch(...){if(o->stream){cudaStreamSynchronize(o->stream);cudaStreamDestroy(o->stream);}if(o->host)cudaFreeHost(o->host);delete o;throw;}
+}
+namespace {
+__global__ void scan_local(unsigned char const* base,UrmaMicroGeometry g,int rank,int parity,int* result) {
+  size_t lane=blockIdx.x;
+  auto* data=reinterpret_cast<unsigned char volatile const*>(base+2*g.region+lane*g.stride+g.dst_pad);
+  for(size_t i=threadIdx.x;i<g.bytes;i+=blockDim.x)
+    if(data[i]!=pattern(rank,parity,lane))atomicExch(result,1);
+}
+}
+std::string urma_micro_gpu_local_scan(void* base,UrmaMicroGeometry const& g,int rank,int parity) {
+  auto* b=static_cast<unsigned char*>(base);
+  // Populate the same receive slots before measuring the same volatile byte scan.
+  for(size_t lane=0;lane<g.slots;++lane)
+    checked(cudaMemcpy(b+2*g.region+lane*g.stride+g.dst_pad,b+parity*g.region+lane*g.stride+g.src_pad,g.bytes,cudaMemcpyDeviceToDevice));
+  int* error=nullptr;cudaEvent_t begin=nullptr,end=nullptr;
+  try {
+    checked(cudaMalloc(reinterpret_cast<void**>(&error),sizeof(int)));checked(cudaMemset(error,0,sizeof(int)));
+    checked(cudaEventCreate(&begin));checked(cudaEventCreate(&end));
+    auto start=std::chrono::steady_clock::now();checked(cudaEventRecord(begin));
+    scan_local<<<g.slots,256>>>(b,g,rank,parity,error);
+    checked(cudaGetLastError());checked(cudaEventRecord(end));checked(cudaEventSynchronize(end));
+    auto host_ns=std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::steady_clock::now()-start).count();
+    float ms=0;checked(cudaEventElapsedTime(&ms,begin,end));int bad=1;
+    checked(cudaMemcpy(&bad,error,sizeof(int),cudaMemcpyDeviceToHost));
+    if(bad)throw std::runtime_error("local GPU scan payload mismatch");
+    checked(cudaEventDestroy(begin));begin=nullptr;checked(cudaEventDestroy(end));end=nullptr;checked(cudaFree(error));error=nullptr;
+    return "{\"span_ns\":"+std::to_string(host_ns)+",\"gpu_us\":"+std::to_string(ms*1000)+",\"write_bytes\":0,\"cqes\":0,\"retired\":0}";
+  }catch(...){if(begin)cudaEventDestroy(begin);if(end)cudaEventDestroy(end);if(error)cudaFree(error);throw;}
 }
 bool urma_micro_observer_done(void* handle,size_t first,size_t lanes) {
   auto* o=static_cast<Observer*>(handle);

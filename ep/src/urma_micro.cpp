@@ -10,6 +10,8 @@
 #include <mutex>
 #include <sstream>
 #include <thread>
+#include <pthread.h>
+#include <sched.h>
 
 std::pair<void*,std::shared_ptr<void>> allocate_urma_atomic_control(int);
 namespace {
@@ -27,6 +29,8 @@ struct UrmaMicroSession::Impl {
   std::vector<std::unique_ptr<UrmaTransport>> transports;
   UrmaMicroGeometry geometry;
   bool connected=false,prepared=false,armed=false,visible=false,with_fadd=false,closed=false;
+  bool send=true,receive=true,scan=true;
+  std::vector<int> cpus;
   size_t expected_sequence=0,armed_messages=0;
   uint64_t expected_counter=0;
   uintptr_t remote_main=0;
@@ -90,7 +94,7 @@ void UrmaMicroSession::arm(size_t sequence,bool visible,bool with_fadd,size_t me
     throw std::invalid_argument("invalid micro step");
   if(p.observer){urma_micro_observer_finish(p.observer);p.observer=nullptr;}
   p.visible=visible;p.with_fadd=with_fadd;p.armed_messages=messages;
-  if(visible)p.observer=urma_micro_observer_start(p.main,p.control,p.geometry,1-p.rank,int(sequence%2),p.expected_counter+1);
+  if(visible && p.receive)p.observer=urma_micro_observer_start(p.main,p.control,p.geometry,1-p.rank,int(sequence%2),p.expected_counter+1,p.scan);
   p.armed=true;
 }
 std::string UrmaMicroSession::step(size_t sequence,bool with_fadd,size_t messages) {
@@ -103,7 +107,16 @@ std::string UrmaMicroSession::step(size_t sequence,bool with_fadd,size_t message
   std::vector<std::thread> workers;
   auto worker=[&](size_t t){
     auto& r=result[t];
-    try{uccl::gpu_p2p::set_device(p.device);}catch(...){r.error=std::current_exception();cancel=true;}
+    try{
+      if(!p.cpus.empty()) {
+        cpu_set_t mask;CPU_ZERO(&mask);CPU_SET(p.cpus[t],&mask);
+        if(pthread_setaffinity_np(pthread_self(),sizeof(mask),&mask))throw std::runtime_error("micro thread affinity failed");
+        cpu_set_t actual;CPU_ZERO(&actual);
+        if(pthread_getaffinity_np(pthread_self(),sizeof(actual),&actual) || CPU_COUNT(&actual)!=1 || !CPU_ISSET(p.cpus[t],&actual))
+          throw std::runtime_error("micro thread affinity verification failed");
+      }
+      uccl::gpu_p2p::set_device(p.device);
+    }catch(...){r.error=std::current_exception();cancel=true;}
     ++ready;while(!go.load(std::memory_order_acquire))std::this_thread::yield();
     if(cancel)return;
     try {
@@ -111,7 +124,7 @@ std::string UrmaMicroSession::step(size_t sequence,bool with_fadd,size_t message
       auto& transport=*p.transports[t];auto const& g=p.geometry;
       r.begin=micro_now();uint64_t deadline=r.begin+15000000000ULL;
       size_t sent=0;
-      while(sent<messages) {
+      while(p.send && sent<messages) {
         uint64_t mark=micro_now();
         size_t n=std::min({size_t(g.lanes*g.window),messages-sent,transport.capacity()/(with_fadd?2:1)});
         std::vector<UrmaWorkRequest> batch;batch.reserve(n*(with_fadd?2:1));
@@ -140,7 +153,7 @@ std::string UrmaMicroSession::step(size_t sequence,bool with_fadd,size_t message
         r.retired+=done;sent+=n;
       }
       auto mark=micro_now();
-      if(p.visible)while(!urma_micro_observer_done(p.observer,t*8,8)) {
+      if(p.visible && p.receive)while(!urma_micro_observer_done(p.observer,t*8,8)) {
         if(micro_now()>deadline)throw std::runtime_error("micro GPU observation timeout");
         std::this_thread::yield();
       }
@@ -153,12 +166,12 @@ std::string UrmaMicroSession::step(size_t sequence,bool with_fadd,size_t message
   while(ready.load()!=p.threads)std::this_thread::yield();
   go.store(true,std::memory_order_release);for(auto& t:workers)t.join();
   for(auto const& r:result)if(r.error)std::rethrow_exception(r.error);
-  p.armed=false;++p.expected_sequence;if(with_fadd)p.expected_counter+=messages/8;
+  p.armed=false;++p.expected_sequence;if(with_fadd && p.receive)p.expected_counter+=messages/8;
   uint64_t begin=UINT64_MAX,end=0,cqes=0,retired=0,build=0,post=0,poll=0,observe=0;
   for(auto const& r:result){begin=std::min(begin,r.begin);end=std::max(end,r.end);cqes+=r.cqes;retired+=r.retired;
     build+=r.build;post+=r.post;poll+=r.poll;observe+=r.observe;}
   std::ostringstream out;out<<"{\"span_ns\":"<<end-begin<<",\"cqes\":"<<cqes<<",\"retired\":"<<retired
-      <<",\"write_bytes\":"<<p.threads*messages*p.geometry.bytes<<",\"build_ns_sum\":"<<build
+      <<",\"write_bytes\":"<<(p.send?p.threads*messages*p.geometry.bytes:0)<<",\"build_ns_sum\":"<<build
       <<",\"post_ns_sum\":"<<post<<",\"poll_ns_sum\":"<<poll<<",\"observe_ns_sum\":"<<observe<<",\"threads\":[";
   for(size_t i=0;i<result.size();++i){if(i)out<<',';out<<result[i].end-result[i].begin;}
   out<<"]}";return out.str();
@@ -167,8 +180,19 @@ void UrmaMicroSession::validate(size_t sequence,bool with_fadd,size_t messages) 
   auto& p=*impl_;std::lock_guard<std::mutex> lock(p.mutex);
   if(p.closed || p.armed || sequence+1!=p.expected_sequence || messages!=p.armed_messages || with_fadd!=p.with_fadd)
     throw std::invalid_argument("invalid micro validation boundary");
-  if(!urma_micro_gpu_validate(p.main,p.control,p.geometry,1-p.rank,int(sequence%2),p.expected_counter))
+  if(p.receive && !urma_micro_gpu_validate(p.main,p.control,p.geometry,1-p.rank,int(sequence%2),p.expected_counter))
     throw std::runtime_error("micro received payload/control validation failed");
+}
+void UrmaMicroSession::experiment(bool send,bool receive,bool scan,std::vector<int> const& cpus) {
+  auto& p=*impl_;std::lock_guard<std::mutex> lock(p.mutex);
+  if(p.closed || p.armed || (cpus.size()!=p.threads && !cpus.empty()))throw std::invalid_argument("invalid micro experiment");
+  for(int cpu:cpus)if(cpu<0 || cpu>=CPU_SETSIZE)throw std::invalid_argument("micro CPU outside affinity mask range");
+  p.send=send;p.receive=receive;p.scan=scan;p.cpus=cpus;
+}
+std::string UrmaMicroSession::local_scan(size_t sequence) {
+  auto& p=*impl_;std::lock_guard<std::mutex> lock(p.mutex);
+  if(p.closed || !p.prepared || p.armed || p.geometry.window!=1)throw std::invalid_argument("invalid local scan");
+  return urma_micro_gpu_local_scan(p.main,p.geometry,p.rank,int(sequence%2));
 }
 void UrmaMicroSession::close() {
   if(!impl_)return;

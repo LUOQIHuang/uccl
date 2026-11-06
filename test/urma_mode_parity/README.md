@@ -1,6 +1,8 @@
 # URMA Normal / Low-latency 实现对齐与验收
 
-当前下一轮请按 **[URMA Normal数据路径分解测试](DATA_PATH.zh-CN.md)** 操作：重新编译后，采集实际WRITE形状，并运行三轮WRITE/FADD/CQE与GPU观察边界的微测，只使用URMA环境。
+当前下一轮请按 **[URMA Normal单向WRITE与GPU观察成本分解](SPLIT.zh-CN.md)** 操作：重新编译v2微测模块，复用上一轮采集，固定CPU亲和性，运行单向/双向、1/4线程及通知/扫描分解，只使用URMA环境。
+
+上一轮 **[URMA Normal数据路径分解测试](DATA_PATH.zh-CN.md)** 保留供查阅，本轮无需重复其完整套件。
 
 此前 **[URMA Normal完成合并A/B运行步骤](NORMAL_AB.zh-CN.md)** 保留供查阅；最新结果表明减少CQE尚未带来明显端到端收益，本轮无需重复该套件。
 

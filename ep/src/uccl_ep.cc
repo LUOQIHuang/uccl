@@ -2504,10 +2504,13 @@ NB_MODULE(ep, m) {
         self.connect(remote);
       })
       .def("prepare",&UrmaMicroSession::prepare)
+      .def("experiment",&UrmaMicroSession::experiment)
+      .def("local_scan",&UrmaMicroSession::local_scan)
       .def("arm",&UrmaMicroSession::arm)
       .def("step",[](UrmaMicroSession& self,size_t seq,bool fadd,size_t messages){nb::gil_scoped_release release;return self.step(seq,fadd,messages);})
       .def("validate",&UrmaMicroSession::validate)
       .def("close",[](UrmaMicroSession& self){nb::gil_scoped_release release;self.close();});
+  m.def("get_urma_micro_version",[](){return 2;});
   m.def("probe_urma_registration", [](uintptr_t main, size_t bytes,
       uintptr_t control, size_t control_bytes, int device, bool normal,
       size_t channels, size_t count) {

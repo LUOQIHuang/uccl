@@ -3,6 +3,7 @@
 #include "gpu_p2p_runtime.hpp"
 #include "urma_layout_diag.hpp"
 #include <future>
+#include <sched.h>
 std::pair<void*,std::shared_ptr<void>> allocate_urma_atomic_control(int device) {
   void* p=uccl::gpu_p2p::allocate_atomic_buffer(81960,device);
   return {p,UrmaTransport::acquire_buffer_ownership(p,true,device)};
@@ -28,7 +29,7 @@ bool urma_micro_gpu_validate(void* base,void* control,UrmaMicroGeometry const& g
   return true;
 }
 struct FakeObserver {void* base;void* control;UrmaMicroGeometry g;int rank,parity;uint64_t count;};
-void* urma_micro_observer_start(void* b,void* c,UrmaMicroGeometry const& g,int rank,int parity,uint64_t count) {
+void* urma_micro_observer_start(void* b,void* c,UrmaMicroGeometry const& g,int rank,int parity,uint64_t count,bool) {
   return new FakeObserver{b,c,g,rank,parity,count};
 }
 bool urma_micro_observer_done(void* p,size_t first,size_t lanes) {
@@ -39,6 +40,7 @@ bool urma_micro_observer_done(void* p,size_t first,size_t lanes) {
   return true;
 }
 void urma_micro_observer_finish(void* p){delete static_cast<FakeObserver*>(p);}
+std::string urma_micro_gpu_local_scan(void*,UrmaMicroGeometry const&,int,int){return "{\"gpu_us\":1}";}
 int main() {
   unsetenv("UCCL_URMA_NORMAL_COMPLETION");unsetenv("UCCL_URMA_LL_WRITE_ORDER");
   for(size_t threads:{1U,4U}) {
@@ -65,6 +67,23 @@ int main() {
         }
       }
     }
+    cpu_set_t available;CPU_ZERO(&available);assert(sched_getaffinity(0,sizeof(available),&available)==0);
+    std::vector<int> cpus;
+    for(int cpu=0;cpu<CPU_SETSIZE && cpus.size()<threads;++cpu)if(CPU_ISSET(cpu,&available))cpus.push_back(cpu);
+    assert(cpus.size()==threads);
+    for(int direction:{0,1,2})for(int kind:{0,1,2}) {
+      bool send_a=direction!=1,send_b=direction!=0,fadd=kind!=0;
+      size_t messages=fadd?8:128/threads,window=fadd?1:4;
+      a.prepare(128,12,20,window,0);b.prepare(128,12,20,window,1);
+      a.experiment(send_a,send_b,kind==2,cpus);b.experiment(send_b,send_a,kind==2,cpus);
+      for(size_t seq=0;seq<2;++seq) {
+        a.arm(seq,fadd,fadd,messages);b.arm(seq,fadd,fadd,messages);
+        auto left=std::async(std::launch::async,[&]{return a.step(seq,fadd,messages);});
+        auto right=std::async(std::launch::async,[&]{return b.step(seq,fadd,messages);});
+        left.get();right.get();a.validate(seq,fadd,messages);b.validate(seq,fadd,messages);
+      }
+    }
+    a.prepare(128,12,20,1,0);assert(a.local_scan(0).find("gpu_us")!=std::string::npos);
     a.close();b.close();
     assert(resources==0 && gpu_regs==0 && micro_allocations.empty());
   }
