@@ -1,0 +1,40 @@
+{
+  "fingerprint": {
+    "job": "urma_normal_data_01_layout",
+    "backend": "urma",
+    "mode": "normal",
+    "shape": [
+      4096,
+      128,
+      7168,
+      256,
+      8
+    ],
+    "sources_hash": "25461746f31805f2e679be3d9c5810f8af806bf93f7ed13ad9601f49aea6369c",
+    "diagnostics_hash": "0520d63c344f84c9a5000f59b2b54f9a714a73089fab56ee65063bff835f1864",
+    "ifname": "enp33s0",
+    "kernel": "6.6.0-gdr_f00955680_diag",
+    "phase_suite": true,
+    "stage_profile": false,
+    "save_traces": false,
+    "warmups": 5,
+    "samples": 5,
+    "ll_hook_workload": "gemm",
+    "api_only": true,
+    "ll_write_order": "default",
+    "normal_completion": "all",
+    "capture_layout": true,
+    "build_hash": "b3ded56b09eed066389fc0766f7550224a388bbabe289b9b1b288ec8090cc2b8",
+    "libraries": {
+      "libummu.so.1": "ad8bb0e5153549f4b76f1a8eeffcab62f503a1114e2373ceed8784c45e88105a",
+      "liburma.so": "56d6374553c2843c13eb7f7bc98a5bb65fa2fa4eb5f3b4a331f56cf126fb1f22",
+      "liburma.so.0": "56d6374553c2843c13eb7f7bc98a5bb65fa2fa4eb5f3b4a331f56cf126fb1f22",
+      "liburma.so.0.0.3": "56d6374553c2843c13eb7f7bc98a5bb65fa2fa4eb5f3b4a331f56cf126fb1f22",
+      "liburma_common.so": "c159fffbce1c82944ceccc98555d8e181fe405414384ed671e9ce3fb0b437fad",
+      "liburma_common.so.0": "c159fffbce1c82944ceccc98555d8e181fe405414384ed671e9ce3fb0b437fad",
+      "liburma_common.so.0.0.1": "c159fffbce1c82944ceccc98555d8e181fe405414384ed671e9ce3fb0b437fad"
+    },
+    "torch": "2.6.0+metax3.7.0.7"
+  },
+  "error": null
+}

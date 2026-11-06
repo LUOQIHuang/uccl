@@ -1,0 +1,13 @@
+boot_id,bytes,change_pct,comparison,difference_us,dst_mod,first_median_run_mean_us,host,label,node,second_median_run_mean_us,src_mod,threads,window
+cc1ccd96-f2d3-4204-9397-5d76d3cfba04,459264,-11.398674958829258,fadd_vs_write_only,-707.3577551020417,0,6205.613877551021,master,dispatch_bf16_chunk32_batch_w1_write_only,node0,5498.256122448979,0,4,1
+cc1ccd96-f2d3-4204-9397-5d76d3cfba04,459264,14.046885266554066,fadd_vs_write_only,694.4928571428572,0,4944.105714285714,master,dispatch_bf16_chunk32_batch_w4_write_only,node0,5638.598571428572,0,4,4
+cc1ccd96-f2d3-4204-9397-5d76d3cfba04,459264,70.87490224071314,gpu_observed_round_vs_cqe_round,1008.7034693877551,0,1423.2167346938775,master,dispatch_bf16_chunk32_step_cqe_completed,node0,2431.9202040816326,0,4,1
+cc1ccd96-f2d3-4204-9397-5d76d3cfba04,237056,-5.876591171213475,fadd_vs_write_only,-196.896326530612,0,3350.519387755102,master,dispatch_fp8_chunk32_batch_w1_write_only,node0,3153.62306122449,0,4,1
+cc1ccd96-f2d3-4204-9397-5d76d3cfba04,237056,19.125492398613673,fadd_vs_write_only,529.6908163265307,0,2769.5538775510204,master,dispatch_fp8_chunk32_batch_w4_write_only,node0,3299.244693877551,0,4,4
+cc1ccd96-f2d3-4204-9397-5d76d3cfba04,237056,54.08962502448631,gpu_observed_round_vs_cqe_round,428.2706122448981,0,791.7795918367347,master,dispatch_fp8_chunk32_step_cqe_completed,node0,1220.0502040816327,0,4,1
+c5835b41-466e-478e-bffc-ccc3479aafbb,459264,0.1481778808035905,fadd_vs_write_only,9.896530612244533,0,6678.817755102041,worker1,dispatch_bf16_chunk32_batch_w1_write_only,node1,6688.714285714285,0,4,1
+c5835b41-466e-478e-bffc-ccc3479aafbb,459264,0.4224506471003142,fadd_vs_write_only,27.4551020408162,0,6499.008163265306,worker1,dispatch_bf16_chunk32_batch_w4_write_only,node1,6526.463265306123,0,4,4
+c5835b41-466e-478e-bffc-ccc3479aafbb,459264,22.56926780195092,gpu_observed_round_vs_cqe_round,369.7595918367349,0,1638.332244897959,worker1,dispatch_bf16_chunk32_step_cqe_completed,node1,2008.091836734694,0,4,1
+c5835b41-466e-478e-bffc-ccc3479aafbb,237056,2.2118730167652645,fadd_vs_write_only,73.23897959183705,0,3311.174693877551,worker1,dispatch_fp8_chunk32_batch_w1_write_only,node1,3384.413673469388,0,4,1
+c5835b41-466e-478e-bffc-ccc3479aafbb,237056,0.7433811526756484,fadd_vs_write_only,24.94489795918389,0,3355.6,worker1,dispatch_fp8_chunk32_batch_w4_write_only,node1,3380.544897959184,0,4,4
+c5835b41-466e-478e-bffc-ccc3479aafbb,237056,25.583013843168544,gpu_observed_round_vs_cqe_round,216.73224489795905,0,847.1724489795919,worker1,dispatch_fp8_chunk32_step_cqe_completed,node1,1063.904693877551,0,4,1

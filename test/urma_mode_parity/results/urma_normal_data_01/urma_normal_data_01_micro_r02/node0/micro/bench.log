@@ -1,0 +1,50 @@
+/home/h00918771/uccl-ep-xpu-integration-new/test/urma_mode_parity/support.py:34: UserWarning: Could not find flash_attn package installed. Please try to install flash_attn whl pacakge using pip command and make sure it can be imported properly
+  import torch
+[URMA_ALLOC] control raw=0xa0fc00000 aligned=0xa0fc00000 logical=81960 backing=90112 alignment=4096 finegrained=1
+[URMA] rank=0 thread=0 using device 3/6: udmac0d1e2
+[URMA_REG] rank=0 thread=0 stage=begin kind=host va=0xaaacab374000 len=8192 atomic=0 cfg_size=56 gpu_flag_offset=48 access=6
+[URMA_REG] rank=0 thread=0 stage=success kind=host va=0xaaacab374000 len=8192 atomic=0
+[URMA_REG] rank=0 thread=0 stage=begin kind=host va=0xaaacab377000 len=64 atomic=1 cfg_size=56 gpu_flag_offset=48 access=14
+[URMA_REG] rank=0 thread=0 stage=success kind=host va=0xaaacab377000 len=64 atomic=1
+[URMA] mode=normal channels=8 endpoints=9 batch=linked capacity=1024 wire=2 write_order=relax atomic_fence=per_request normal_completion=all
+[URMA_REG] rank=0 thread=0 stage=begin kind=gpu va=0xa04c00000 len=180707328 atomic=0 cfg_size=56 gpu_flag_offset=48 access=6
+[URMA_REG] rank=0 thread=0 stage=success kind=gpu va=0xa04c00000 len=180707328 atomic=0
+[URMA_REG] rank=0 thread=0 stage=begin kind=gpu va=0xa0fc00000 len=81960 atomic=1 cfg_size=56 gpu_flag_offset=48 access=14
+[URMA_REG] rank=0 thread=0 stage=success kind=gpu va=0xa0fc00000 len=81960 atomic=1
+[URMA] rank=0 thread=1 using device 3/6: udmac0d1e2
+[URMA_REG] rank=0 thread=1 stage=begin kind=host va=0xaaacab404000 len=8192 atomic=0 cfg_size=56 gpu_flag_offset=48 access=6
+[URMA_REG] rank=0 thread=1 stage=success kind=host va=0xaaacab404000 len=8192 atomic=0
+[URMA_REG] rank=0 thread=1 stage=begin kind=host va=0xaaacab407000 len=64 atomic=1 cfg_size=56 gpu_flag_offset=48 access=14
+[URMA_REG] rank=0 thread=1 stage=success kind=host va=0xaaacab407000 len=64 atomic=1
+[URMA] mode=normal channels=8 endpoints=9 batch=linked capacity=1024 wire=2 write_order=relax atomic_fence=per_request normal_completion=all
+[URMA_REG] rank=0 thread=1 stage=cache_hit kind=gpu va=0xa04c00000 len=180707328 atomic=0
+[URMA_REG] rank=0 thread=1 stage=cache_hit kind=gpu va=0xa0fc00000 len=81960 atomic=1
+[URMA] rank=0 thread=2 using device 3/6: udmac0d1e2
+[URMA_REG] rank=0 thread=2 stage=begin kind=host va=0xaaacab48e000 len=8192 atomic=0 cfg_size=56 gpu_flag_offset=48 access=6
+[URMA_REG] rank=0 thread=2 stage=success kind=host va=0xaaacab48e000 len=8192 atomic=0
+[URMA_REG] rank=0 thread=2 stage=begin kind=host va=0xaaacab492000 len=64 atomic=1 cfg_size=56 gpu_flag_offset=48 access=14
+[URMA_REG] rank=0 thread=2 stage=success kind=host va=0xaaacab492000 len=64 atomic=1
+[URMA] mode=normal channels=8 endpoints=9 batch=linked capacity=1024 wire=2 write_order=relax atomic_fence=per_request normal_completion=all
+[URMA_REG] rank=0 thread=2 stage=cache_hit kind=gpu va=0xa04c00000 len=180707328 atomic=0
+[URMA_REG] rank=0 thread=2 stage=cache_hit kind=gpu va=0xa0fc00000 len=81960 atomic=1
+[URMA] rank=0 thread=3 using device 3/6: udmac0d1e2
+[URMA_REG] rank=0 thread=3 stage=begin kind=host va=0xaaacab4a2000 len=8192 atomic=0 cfg_size=56 gpu_flag_offset=48 access=6
+[URMA_REG] rank=0 thread=3 stage=success kind=host va=0xaaacab4a2000 len=8192 atomic=0
+[URMA_REG] rank=0 thread=3 stage=begin kind=host va=0xaaacab51e000 len=64 atomic=1 cfg_size=56 gpu_flag_offset=48 access=14
+[URMA_REG] rank=0 thread=3 stage=success kind=host va=0xaaacab51e000 len=64 atomic=1
+[URMA] mode=normal channels=8 endpoints=9 batch=linked capacity=1024 wire=2 write_order=relax atomic_fence=per_request normal_completion=all
+[URMA_REG] rank=0 thread=3 stage=cache_hit kind=gpu va=0xa04c00000 len=180707328 atomic=0
+[URMA_REG] rank=0 thread=3 stage=cache_hit kind=gpu va=0xa0fc00000 len=81960 atomic=1
+URMA_MICRO_POINT {"label": "dispatch_fp8_chunk32_batch_w1_write_only", "bytes": 237056, "src_mod": 0, "dst_mod": 0, "window": 1, "messages": 32, "threads": 4, "fadd": false, "gpu_observed": false, "warmups": 20, "samples": 50, "tx_bytes_per_step": 30343168, "tx_GBps_at_mean": 9.103134506250933, "validation": true, "n": 49, "mean_us": 3333.265918367347, "median_us": 3311.62, "min_us": 3020.43, "max_us": 3566.07, "p90_us": 3544.0, "p95_us": 3553.022, "std_us": 146.68625856817002, "cv": 0.04400676758487298}
+URMA_MICRO_POINT {"label": "dispatch_fp8_chunk32_batch_w1_write_fadd", "bytes": 237056, "src_mod": 0, "dst_mod": 0, "window": 1, "messages": 32, "threads": 4, "fadd": true, "gpu_observed": false, "warmups": 20, "samples": 50, "tx_bytes_per_step": 30343168, "tx_GBps_at_mean": 9.621685093911745, "validation": true, "n": 49, "mean_us": 3153.62306122449, "median_us": 3136.33, "min_us": 2933.92, "max_us": 3371.24, "p90_us": 3306.822, "p95_us": 3318.0460000000003, "std_us": 113.3049853038715, "cv": 0.035928512413870226}
+URMA_MICRO_POINT {"label": "dispatch_fp8_chunk32_batch_w4_write_only", "bytes": 237056, "src_mod": 0, "dst_mod": 0, "window": 4, "messages": 32, "threads": 4, "fadd": false, "gpu_observed": false, "warmups": 20, "samples": 50, "tx_bytes_per_step": 30343168, "tx_GBps_at_mean": 10.950668817693412, "validation": true, "n": 49, "mean_us": 2770.8963265306124, "median_us": 2770.13, "min_us": 2760.77, "max_us": 2782.93, "p90_us": 2777.638, "p95_us": 2780.064, "std_us": 4.82545744638236, "cv": 0.0017414788854349613}
+URMA_MICRO_POINT {"label": "dispatch_fp8_chunk32_batch_w4_write_fadd", "bytes": 237056, "src_mod": 0, "dst_mod": 0, "window": 4, "messages": 32, "threads": 4, "fadd": true, "gpu_observed": false, "warmups": 20, "samples": 50, "tx_bytes_per_step": 30343168, "tx_GBps_at_mean": 9.175188909267703, "validation": true, "n": 49, "mean_us": 3307.0891836734695, "median_us": 3304.12, "min_us": 3271.8, "max_us": 3367.03, "p90_us": 3327.9460000000004, "p95_us": 3334.076, "std_us": 18.337175782004778, "cv": 0.005544808368801259}
+URMA_MICRO_POINT {"label": "dispatch_fp8_chunk32_step_cqe_completed", "bytes": 237056, "src_mod": 0, "dst_mod": 0, "window": 1, "messages": 8, "threads": 4, "fadd": true, "gpu_observed": false, "warmups": 20, "samples": 50, "tx_bytes_per_step": 7585792, "tx_GBps_at_mean": 9.57372771433134, "validation": true, "n": 49, "mean_us": 792.3551020408163, "median_us": 796.57, "min_us": 722.54, "max_us": 813.34, "p90_us": 804.884, "p95_us": 806.948, "std_us": 14.75707566330284, "cv": 0.01862432086989031}
+URMA_MICRO_POINT {"label": "dispatch_fp8_chunk32_step_gpu_observed", "bytes": 237056, "src_mod": 0, "dst_mod": 0, "window": 1, "messages": 8, "threads": 4, "fadd": true, "gpu_observed": true, "warmups": 20, "samples": 50, "tx_bytes_per_step": 7585792, "tx_GBps_at_mean": 6.23948862568152, "validation": true, "n": 49, "mean_us": 1215.7714285714285, "median_us": 1217.45, "min_us": 1170.15, "max_us": 1272.82, "p90_us": 1237.62, "p95_us": 1240.904, "std_us": 17.42587660665034, "cv": 0.014333184838145375}
+URMA_MICRO_POINT {"label": "dispatch_bf16_chunk32_batch_w1_write_only", "bytes": 459264, "src_mod": 0, "dst_mod": 0, "window": 1, "messages": 32, "threads": 4, "fadd": false, "gpu_observed": false, "warmups": 20, "samples": 50, "tx_bytes_per_step": 58785792, "tx_GBps_at_mean": 9.38732143948298, "validation": true, "n": 49, "mean_us": 6262.254081632653, "median_us": 6265.1, "min_us": 5905.5, "max_us": 6549.42, "p90_us": 6284.46, "p95_us": 6362.914, "std_us": 78.18234802385989, "cv": 0.012484697523399866}
+URMA_MICRO_POINT {"label": "dispatch_bf16_chunk32_batch_w1_write_fadd", "bytes": 459264, "src_mod": 0, "dst_mod": 0, "window": 1, "messages": 32, "threads": 4, "fadd": true, "gpu_observed": false, "warmups": 20, "samples": 50, "tx_bytes_per_step": 58785792, "tx_GBps_at_mean": 10.73813842864318, "validation": true, "n": 49, "mean_us": 5474.486326530612, "median_us": 5439.21, "min_us": 5367.31, "max_us": 5735.45, "p90_us": 5591.446, "p95_us": 5678.255999999999, "std_us": 90.67609958244346, "cv": 0.016563398677791257}
+URMA_MICRO_POINT {"label": "dispatch_bf16_chunk32_batch_w4_write_only", "bytes": 459264, "src_mod": 0, "dst_mod": 0, "window": 4, "messages": 32, "threads": 4, "fadd": false, "gpu_observed": false, "warmups": 20, "samples": 50, "tx_bytes_per_step": 58785792, "tx_GBps_at_mean": 11.917980110053225, "validation": true, "n": 49, "mean_us": 4932.529795918367, "median_us": 4928.45, "min_us": 4902.56, "max_us": 5069.25, "p90_us": 4953.48, "p95_us": 4960.284, "std_us": 24.19381372184486, "cv": 0.00490495034451998}
+URMA_MICRO_POINT {"label": "dispatch_bf16_chunk32_batch_w4_write_fadd", "bytes": 459264, "src_mod": 0, "dst_mod": 0, "window": 4, "messages": 32, "threads": 4, "fadd": true, "gpu_observed": false, "warmups": 20, "samples": 50, "tx_bytes_per_step": 58785792, "tx_GBps_at_mean": 10.460374653410897, "validation": true, "n": 49, "mean_us": 5619.855306122449, "median_us": 5619.23, "min_us": 5579.21, "max_us": 5713.16, "p90_us": 5644.678, "p95_us": 5658.872, "std_us": 24.649132459961702, "cv": 0.004386079554950134}
+URMA_MICRO_POINT {"label": "dispatch_bf16_chunk32_step_cqe_completed", "bytes": 459264, "src_mod": 0, "dst_mod": 0, "window": 1, "messages": 8, "threads": 4, "fadd": true, "gpu_observed": false, "warmups": 20, "samples": 50, "tx_bytes_per_step": 14696448, "tx_GBps_at_mean": 10.172241756416291, "validation": true, "n": 49, "mean_us": 1444.76, "median_us": 1423.24, "min_us": 1399.94, "max_us": 1583.6, "p90_us": 1530.49, "p95_us": 1535.828, "std_us": 46.70844629295691, "cv": 0.03232955390027195}
+URMA_MICRO_POINT {"label": "dispatch_bf16_chunk32_step_gpu_observed", "bytes": 459264, "src_mod": 0, "dst_mod": 0, "window": 1, "messages": 8, "threads": 4, "fadd": true, "gpu_observed": true, "warmups": 20, "samples": 50, "tx_bytes_per_step": 14696448, "tx_GBps_at_mean": 6.064849798261108, "validation": true, "n": 49, "mean_us": 2423.217142857143, "median_us": 2423.33, "min_us": 2389.83, "max_us": 2454.44, "p90_us": 2442.12, "p95_us": 2448.782, "std_us": 16.28833111808096, "cv": 0.006721779418775438}
+URMA_MICRO_ALL_PASSED
