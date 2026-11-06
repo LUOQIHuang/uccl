@@ -5,11 +5,12 @@ import phase_support
 
 
 class Measurements:
-    def __init__(self,torch,dist,ep,case,mode,enabled,warmups,samples,capture_layout=False):
+    def __init__(self,torch,dist,ep,case,mode,enabled,warmups,samples,capture_layout=False,dispatch_trial=False,dispatch_delay_us=0):
         self.torch,self.dist,self.ep=torch,dist,ep
         self.case,self.mode,self.enabled=case,mode,enabled
         self.warmups,self.samples=warmups,samples
         self.capture_layout=capture_layout
+        self.dispatch_trial=dispatch_trial;self.dispatch_delay_us=dispatch_delay_us
 
     def append(self,name,data):
         with (self.case/name).open('a') as stream: stream.write(json.dumps(data)+'\n')
@@ -41,6 +42,7 @@ class Measurements:
             self.dist.barrier()
 
     def api(self,fn,label,post_fn=None):
+        if self.dispatch_trial:return self.isolated_api(fn,label,post_fn)
         torch=self.torch
         torch.cuda.synchronize()
         cache=torch.empty(int(256e6//4),dtype=torch.int,device=f'cuda:{torch.cuda.current_device()}')
@@ -59,6 +61,36 @@ class Measurements:
             self.append('api_samples.jsonl',dict(label=label,mode=self.mode,index=i,us=value,used=i>0))
         summary=dict(label=label,mode=self.mode,enabled=self.enabled,warmups=self.warmups,
                      measured=self.samples,dropped=1,**phase_support.distribution(raw[1:]))
+        self.append('sample_summary.jsonl',summary)
+        print('MODE_PARITY_SAMPLES '+json.dumps(summary),flush=True)
+        return summary['mean_us']/1e6,summary['min_us']/1e6,summary['max_us']/1e6
+
+    def isolated_api(self,fn,label,post_fn=None):
+        torch=self.torch;target=label.startswith('dispatch_');raw=[]
+        def once(index=None):
+            torch.cuda.synchronize();self.dist.barrier()
+            start=torch.cuda.Event(enable_timing=True);end=torch.cuda.Event(enable_timing=True)
+            trace=target and self.enabled and index==0
+            detail=None;host_begin=time.perf_counter_ns();start.record()
+            if target:self.ep.urma_dispatch_trial_begin(self.dispatch_delay_us,trace)
+            try:
+                fn();end.record();torch.cuda.synchronize()
+                host_ns=time.perf_counter_ns()-host_begin
+            finally:
+                if target:detail=json.loads(self.ep.urma_dispatch_trial_end())
+            if post_fn is not None:post_fn()
+            if index is not None:
+                row=dict(label=label,mode=self.mode,index=index,used=index>0,us=start.elapsed_time(end)*1000,host_us=host_ns/1000,
+                    requested_delay_us=self.dispatch_delay_us if target else 0,trial=detail)
+                self.append('dispatch_trial_samples.jsonl',row);raw.append(row)
+                if trace:self.append('dispatch_trial_trace.jsonl',row)
+        for _ in range(self.warmups):once()
+        def timed():
+            for i in range(self.samples):once(i)
+        self.window(label,timed,self.samples)
+        for row in raw:self.append('api_samples.jsonl',{k:row[k] for k in ('label','mode','index','used','us')})
+        summary=dict(label=label,mode=self.mode,enabled=self.enabled,warmups=self.warmups,measured=self.samples,dropped=1,
+            **phase_support.distribution([r['us'] for r in raw if r['used']]))
         self.append('sample_summary.jsonl',summary)
         print('MODE_PARITY_SAMPLES '+json.dumps(summary),flush=True)
         return summary['mean_us']/1e6,summary['min_us']/1e6,summary['max_us']/1e6

@@ -1,6 +1,8 @@
 # URMA Normal / Low-latency 实现对齐与验收
 
-当前下一轮请按 **[URMA Normal单向WRITE与GPU观察成本分解](SPLIT.zh-CN.md)** 操作：重新编译v2微测模块，复用上一轮采集，固定CPU亲和性，运行单向/双向、1/4线程及通知/扫描分解，只使用URMA环境。
+当前下一轮请按 **[真实Normal Dispatch错峰因果实验](DISPATCH_TRIAL.zh-CN.md)** 操作：重新编译，在实际Dispatch中比较无延迟与204侧首条payload WRITE延后200µs；完整计时包含代价，诊断和性能分开，三轮双端A/B。
+
+上一轮 **[单向WRITE与GPU观察成本分解](SPLIT.zh-CN.md)** 已取得split_06完整结果，本轮不重复该微测矩阵。
 
 上一轮 **[URMA Normal数据路径分解测试](DATA_PATH.zh-CN.md)** 保留供查阅，本轮无需重复其完整套件。
 

@@ -2,6 +2,7 @@
 #include "urma_micro.hpp"
 #include "gpu_p2p_runtime.hpp"
 #include "urma_layout_diag.hpp"
+#include "urma_dispatch_trial.hpp"
 #include <future>
 #include <sched.h>
 std::pair<void*,std::shared_ptr<void>> allocate_urma_atomic_control(int device) {
@@ -44,7 +45,7 @@ std::string urma_micro_gpu_local_scan(void*,UrmaMicroGeometry const&,int,int){re
 int main() {
   unsetenv("UCCL_URMA_NORMAL_COMPLETION");unsetenv("UCCL_URMA_LL_WRITE_ORDER");
   for(size_t threads:{1U,4U}) {
-    UrmaMicroSession a(2,threads,128),b(2,threads,128);
+    UrmaMicroSession a(2,threads,8192),b(2,threads,8192);
     std::vector<RemoteConnInfo> ai,bi;
     for(size_t i=0;i<threads;++i){ai.push_back(a.descriptor(i));bi.push_back(b.descriptor(i));}
     a.connect(bi);b.connect(ai);
@@ -84,6 +85,16 @@ int main() {
       }
     }
     a.prepare(128,12,20,1,0);assert(a.local_scan(0).find("gpu_us")!=std::string::npos);
+    a.prepare(8192,12,20,1,0);b.prepare(8192,12,20,1,1);
+    a.experiment(true,true,true,cpus);b.experiment(true,true,true,cpus);
+    uccl::dispatch_trial::begin(200,true);
+    a.arm(0,false,true,8);b.arm(0,false,true,8);
+    auto left=std::async(std::launch::async,[&]{return a.step(0,true,8);});
+    auto right=std::async(std::launch::async,[&]{return b.step(0,true,8);});
+    left.get();right.get();
+    auto trial=uccl::dispatch_trial::end();assert(trial.find("\"proxy\":0")!=std::string::npos);
+    assert(!uccl::dispatch_trial::submits.empty());
+    a.validate(0,true,8);b.validate(0,true,8);
     a.close();b.close();
     assert(resources==0 && gpu_regs==0 && micro_allocations.empty());
   }

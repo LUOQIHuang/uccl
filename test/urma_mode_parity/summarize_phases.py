@@ -21,6 +21,7 @@ def summarize(roots,output):
     for path in paths:
         case=path.parent; run=case.parent
         config=read(run/'setup.json')['fingerprint']; machine=read(run/'host.json'); host=machine['host']
+        if config.get('dispatch_trial'):raise ValueError('dispatch trial requires summarize_dispatch_trial.py')
         status=read(case/'status.json')
         if status['rc']!=0 or not all(status['checks'].values()):
             raise ValueError('failed/incomplete case: '+str(case))

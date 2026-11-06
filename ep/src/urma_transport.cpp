@@ -2,6 +2,7 @@
 #include "common.hpp"
 #include "gpu_p2p_runtime.hpp"
 #include "urma_layout_diag.hpp"
+#include "urma_dispatch_trial.hpp"
 #include <algorithm>
 #include <chrono>
 #include <cerrno>
@@ -640,6 +641,7 @@ void UrmaTransport::prepare(PreparedWr& out, Peer& peer, size_t lane,
   out.wr.tjetty = peer.tjetties[lane];
   out.wr.flag.bs.complete_enable = 1; // default; eligible pairs may share the FADD CQE
   if (write) {
+    if(mode_.normal)uccl::dispatch_trial::payload(ctx_->thread_idx,dispatch_trial_epoch_,request.bytes);
     out.src.addr = reinterpret_cast<uint64_t>(main_buffer_) + request.local_offset;
     out.src.len = bytes;
     out.src.tseg = main_tseg_;
@@ -702,6 +704,11 @@ void UrmaTransport::submit_prepared(size_t lane, Peer& peer) {
           op_contexts_[wr.context].is_write ? uccl::urma_diag::WriteToObservedCqe :
                                             uccl::urma_diag::FaddToObservedCqe);
   uccl::urma_diag::Scope diagnostic(uccl::urma_diag::SdkPost,prepared_.size());
+  if(mode_.normal && uccl::dispatch_trial::active.load() && uccl::dispatch_trial::trace.load()) {
+    uint64_t bytes=0,writes=0,fadds=0;
+    for(auto const& w:prepared_)if(op_contexts_[w.context].is_write){++writes;bytes+=w.src.len;}else ++fadds;
+    uccl::dispatch_trial::submit(ctx_->thread_idx,lane,bytes,writes,fadds);
+  }
   int rc = urma_post_jetty_send_wr(jetties_[lane], &prepared_[0].wr, &bad);
   if (rc == URMA_SUCCESS) return;
   // The API specifies bad_wr as the first rejected request. Keep accepted
@@ -857,7 +864,12 @@ int UrmaTransport::poll(TransportCompletion* out, int max) {
       completion.is_atomic = op.is_atomic;
       completion.data = crs[i].imm_data;
       completion.status = crs[i].status == URMA_CR_SUCCESS ? 0 : int(crs[i].status);
-      if (completion.status) failed_ = true;
+      if (completion.status) {
+        failed_ = true;
+        std::fprintf(stderr,"[URMA_COMPLETION_ERROR] rank=%d proxy=%d status=%d token=%llu wr_id=%llu write=%d atomic=%d\n",
+            ctx_->local_rank,ctx_->thread_idx,completion.status,
+            static_cast<unsigned long long>(token),static_cast<unsigned long long>(op.wr_id),op.is_write,op.is_atomic);
+      }
       uccl::urma_diag::count(uccl::urma_diag::ObservedCqes);
       uccl::urma_diag::complete(op_contexts_[index].diagnostic);
       if (op.child != UINT32_MAX) {

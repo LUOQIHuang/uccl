@@ -74,6 +74,8 @@ def parser():
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument('--action',choices=('build','check','run','collect','probe','micro'),default='check')
     p.add_argument('--capture-layout',action='store_true')
+    p.add_argument('--dispatch-trial',action='store_true')
+    p.add_argument('--dispatch-delay-us',type=int,choices=(0,200),default=0)
     p.add_argument('--micro-layout',type=Path)
     p.add_argument('--micro-threads',type=int,choices=(1,4),default=4)
     p.add_argument('--micro-suite',choices=('legacy','split'),default='legacy')
@@ -128,6 +130,9 @@ def parser():
     if args.collect_suite and args.action!='collect': p.error('--collect-suite requires --action collect')
     if args.capture_layout and (args.mode!='normal' or not args.api_only or args.backend!='urma'):
         p.error('--capture-layout requires URMA Normal API-only')
+    if args.dispatch_trial and (args.backend!='urma' or args.mode!='normal' or not args.api_only or args.normal_completion!='all'):
+        p.error('dispatch trial requires URMA Normal API-only all')
+    if args.dispatch_delay_us and not args.dispatch_trial:p.error('--dispatch-delay-us requires --dispatch-trial')
     if args.action=='micro' and (args.backend!='urma' or args.mode!='normal' or args.normal_completion!='all' or not args.master_addr or not args.micro_layout):
         p.error('micro requires URMA Normal all, master address and --micro-layout')
     if args.micro_cpus!='auto' and not re.fullmatch(r'\d+,\d+,\d+,\d+',args.micro_cpus):p.error('--micro-cpus requires four comma-separated CPU IDs')
@@ -167,6 +172,7 @@ def preflight(args):
     if args.normal_completion!='all' and metadata.get('normal_completion')!=args.normal_completion:
         raise RuntimeError('NORMAL_COMPLETION_DIAGNOSTICS_REQUIRES_REBUILD')
     if args.capture_layout and not metadata.get('layout_diagnostics'):raise RuntimeError('LAYOUT_DIAGNOSTICS_REQUIRES_REBUILD')
+    if args.dispatch_trial and not metadata.get('dispatch_trial'):raise RuntimeError('DISPATCH_TRIAL_REQUIRES_REBUILD')
     if args.action=='micro' and not metadata.get('micro_diagnostics'):raise RuntimeError('MICRO_DIAGNOSTICS_REQUIRES_REBUILD')
     if args.micro_suite=='split' and metadata.get('micro_version')!=2:raise RuntimeError('MICRO_SPLIT_REQUIRES_REBUILD_V2')
     return module,manifest,dict(libraries=libraries,hardware=hardware,import_log=probe.stdout+probe.stderr,runtime=metadata)
@@ -234,7 +240,8 @@ def main():
     error=None; fingerprint=dict(job=args.job,backend=args.backend,mode=args.mode,shape=[args.normal_tokens,args.ll_tokens,args.hidden,args.experts,args.topk],sources_hash=support.digest(support.source_manifest()),diagnostics_hash=support.digest(support.diagnostic_manifest()),ifname=args.ifname,kernel=os.uname().release,
         phase_suite=args.phase_suite,stage_profile=args.stage_profile,save_traces=args.save_traces,
         warmups=args.warmups,samples=args.samples,ll_hook_workload=args.ll_hook_workload,
-        api_only=args.api_only,ll_write_order=args.ll_write_order,normal_completion=args.normal_completion,capture_layout=args.capture_layout)
+        api_only=args.api_only,ll_write_order=args.ll_write_order,normal_completion=args.normal_completion,capture_layout=args.capture_layout,
+        dispatch_trial=args.dispatch_trial,dispatch_delay_us=args.dispatch_delay_us,delay_node=1)
     try:
         module,manifest,info=preflight(args)
         fingerprint.update(build_hash=support.digest({key:manifest[key] for key in ('sources','sdk','flags')}),libraries=info['libraries'],torch=info['runtime']['torch'])
@@ -261,6 +268,7 @@ def main():
         env=environment(args)
         env.update(PARITY_CASE=str(case),PARITY_MODULE=str(module),PARITY_MODULE_SHA=manifest['module_sha'],PARITY_MODE=mode,PARITY_TOKENS=str(args.normal_tokens if mode=='normal' else args.ll_tokens),PARITY_HIDDEN=str(args.hidden),PARITY_EXPERTS=str(args.experts),PARITY_TOPK=str(args.topk),UCCL_TORCHRUN_NODE_RANK=str(args.node_rank),UCCL_EXIT_GUARD='1')
         env.update(PARITY_PHASE_SUITE=str(int(args.phase_suite)),PARITY_STAGE_PROFILE=str(int(args.stage_profile)),
+                   PARITY_DISPATCH_TRIAL=str(int(args.dispatch_trial)),PARITY_DISPATCH_DELAY_US=str(args.dispatch_delay_us if args.node_rank==1 else 0),
                    PARITY_API_ONLY=str(int(args.api_only)),
                    PARITY_CAPTURE_LAYOUT=str(int(args.capture_layout)),
                    PARITY_SAVE_TRACES=str(int(args.save_traces)),PARITY_WARMUPS=str(args.warmups),
@@ -287,6 +295,7 @@ def main():
             checks['no_gpu_profiler']=text.count('MODE_PARITY_GPU_PROFILE_SKIPPED ')==expected_points and not list(case.glob('gpu_trace_*.json'))
             checks['measurement_boundary']=(case/'measurement_boundary.json').is_file() and (case/'kernel_after_measurements.txt').is_file()
         if args.capture_layout:checks['layout_capture']=(case/'write_layout.jsonl').is_file()
+        if args.dispatch_trial:checks['dispatch_trial_samples']=(case/'dispatch_trial_samples.jsonl').is_file()
         if args.backend=='urma':
             checks['native_mode']=f'[URMA] mode={mode} channels={8 if mode=="normal" else 1} endpoints={9 if mode=="normal" else 1} batch=linked' in text
             checks['device']=f': {args.urma_device}' in text

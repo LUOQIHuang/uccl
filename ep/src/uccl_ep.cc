@@ -14,6 +14,7 @@
 #include "urma_mode.hpp"
 #include "urma_layout_diag.hpp"
 #include "urma_micro.hpp"
+#include "urma_dispatch_trial.hpp"
 #include "internode.cuh"
 #include "internode_ll.cuh"
 #include "intranode.cuh"
@@ -2488,6 +2489,8 @@ NB_MODULE(ep, m) {
   m.def("urma_phase_snapshot", []() { return uccl::urma_diag::snapshot(); });
   m.def("urma_layout_begin", [](){uccl::urma_layout::begin();});
   m.def("urma_layout_end", [](){return uccl::urma_layout::end();});
+  m.def("urma_dispatch_trial_begin",[](uint64_t us,bool detailed){uccl::dispatch_trial::begin(us,detailed);});
+  m.def("urma_dispatch_trial_end",[](){return uccl::dispatch_trial::end();});
 #ifdef USE_URMA
   nb::class_<UrmaMicroSession>(m,"UrmaMicroSession")
       .def(nb::init<int,size_t,size_t>())

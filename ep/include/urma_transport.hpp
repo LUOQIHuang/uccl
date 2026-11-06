@@ -77,6 +77,7 @@ class UrmaTransport final : public EpTransport {
   [[noreturn]] static void unavailable();
   UrmaMode mode_;
   bool ll_relaxed_write_ = false;
+  uint64_t dispatch_trial_epoch_ = 0;
   UrmaNormalCompletion normal_completion_ = UrmaNormalCompletion::All;
 #ifdef USE_URMA
   ProxyCtx* ctx_ = nullptr;
