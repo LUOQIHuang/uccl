@@ -1,0 +1,189 @@
+{
+  "geometries": [
+    {
+      "label": "dispatch_fp8_chunk32",
+      "bytes": 237056,
+      "src_mod": 0,
+      "dst_mod": 0,
+      "selected_count": 120,
+      "payload_writes": 660,
+      "size_histogram": {
+        "88896": 5,
+        "133344": 15,
+        "148160": 5,
+        "155568": 20,
+        "162976": 15,
+        "237056": 600
+      }
+    },
+    {
+      "label": "dispatch_bf16_chunk32",
+      "bytes": 459264,
+      "src_mod": 0,
+      "dst_mod": 0,
+      "selected_count": 120,
+      "payload_writes": 660,
+      "size_histogram": {
+        "172224": 5,
+        "258336": 15,
+        "287040": 5,
+        "301392": 20,
+        "315744": 15,
+        "459264": 600
+      }
+    }
+  ],
+  "points": [
+    {
+      "label": "dispatch_fp8_chunk32_write_bidir",
+      "geometry": {
+        "label": "dispatch_fp8_chunk32",
+        "bytes": 237056,
+        "src_mod": 0,
+        "dst_mod": 0,
+        "selected_count": 120,
+        "payload_writes": 660,
+        "size_histogram": {
+          "88896": 5,
+          "133344": 15,
+          "148160": 5,
+          "155568": 20,
+          "162976": 15,
+          "237056": 600
+        }
+      },
+      "direction": "bidir",
+      "window": 4,
+      "messages": 128,
+      "fadd": false,
+      "observation": "cqe",
+      "local": false
+    },
+    {
+      "label": "dispatch_fp8_chunk32_write_0to1",
+      "geometry": {
+        "label": "dispatch_fp8_chunk32",
+        "bytes": 237056,
+        "src_mod": 0,
+        "dst_mod": 0,
+        "selected_count": 120,
+        "payload_writes": 660,
+        "size_histogram": {
+          "88896": 5,
+          "133344": 15,
+          "148160": 5,
+          "155568": 20,
+          "162976": 15,
+          "237056": 600
+        }
+      },
+      "direction": "0to1",
+      "window": 4,
+      "messages": 128,
+      "fadd": false,
+      "observation": "cqe",
+      "local": false
+    },
+    {
+      "label": "dispatch_fp8_chunk32_write_1to0",
+      "geometry": {
+        "label": "dispatch_fp8_chunk32",
+        "bytes": 237056,
+        "src_mod": 0,
+        "dst_mod": 0,
+        "selected_count": 120,
+        "payload_writes": 660,
+        "size_histogram": {
+          "88896": 5,
+          "133344": 15,
+          "148160": 5,
+          "155568": 20,
+          "162976": 15,
+          "237056": 600
+        }
+      },
+      "direction": "1to0",
+      "window": 4,
+      "messages": 128,
+      "fadd": false,
+      "observation": "cqe",
+      "local": false
+    },
+    {
+      "label": "dispatch_bf16_chunk32_write_bidir",
+      "geometry": {
+        "label": "dispatch_bf16_chunk32",
+        "bytes": 459264,
+        "src_mod": 0,
+        "dst_mod": 0,
+        "selected_count": 120,
+        "payload_writes": 660,
+        "size_histogram": {
+          "172224": 5,
+          "258336": 15,
+          "287040": 5,
+          "301392": 20,
+          "315744": 15,
+          "459264": 600
+        }
+      },
+      "direction": "bidir",
+      "window": 4,
+      "messages": 128,
+      "fadd": false,
+      "observation": "cqe",
+      "local": false
+    },
+    {
+      "label": "dispatch_bf16_chunk32_write_0to1",
+      "geometry": {
+        "label": "dispatch_bf16_chunk32",
+        "bytes": 459264,
+        "src_mod": 0,
+        "dst_mod": 0,
+        "selected_count": 120,
+        "payload_writes": 660,
+        "size_histogram": {
+          "172224": 5,
+          "258336": 15,
+          "287040": 5,
+          "301392": 20,
+          "315744": 15,
+          "459264": 600
+        }
+      },
+      "direction": "0to1",
+      "window": 4,
+      "messages": 128,
+      "fadd": false,
+      "observation": "cqe",
+      "local": false
+    },
+    {
+      "label": "dispatch_bf16_chunk32_write_1to0",
+      "geometry": {
+        "label": "dispatch_bf16_chunk32",
+        "bytes": 459264,
+        "src_mod": 0,
+        "dst_mod": 0,
+        "selected_count": 120,
+        "payload_writes": 660,
+        "size_histogram": {
+          "172224": 5,
+          "258336": 15,
+          "287040": 5,
+          "301392": 20,
+          "315744": 15,
+          "459264": 600
+        }
+      },
+      "direction": "1to0",
+      "window": 4,
+      "messages": 128,
+      "fadd": false,
+      "observation": "cqe",
+      "local": false
+    }
+  ],
+  "geometry_source": "node0 actual Normal WRITE capture; not full trace replay"
+}
