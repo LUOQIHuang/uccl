@@ -132,6 +132,7 @@ __global__ void notify_dispatch(
     void* rdma_buffer_ptr, void** buffer_ptrs, int** barrier_signal_ptrs,
     int rank, uint64_t const* d2h_channel_addrs, int num_d2h_channel_addrs,
     void* atomic_buffer_ptr) {
+  uccl::gpu_stages::Span gpu_kernel_stage(d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),45);
   void* original_rdma_buffer_ptr = rdma_buffer_ptr;
   auto sm_id = static_cast<int>(blockIdx.x);
   auto thread_id = static_cast<int>(threadIdx.x),
@@ -307,8 +308,10 @@ __global__ void notify_dispatch(
       // know why. num_worst_tokens = 0, but somehow wrapping it with the
       // conditional will cause deadlock. Removing the ``if" is logically
       // redundant but harmless. if (num_worst_tokens == 0) {
-      while (ld_volatile_global(moe_recv_rdma_counter_mapped) != -1)
+      { uccl::gpu_stages::Span gpu_stage_0(d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),0);
+while (ld_volatile_global(moe_recv_rdma_counter_mapped) != -1)
         ;
+}
       *moe_recv_rdma_counter_mapped = sum;
       // }
     }
@@ -339,8 +342,10 @@ __global__ void notify_dispatch(
         recv_gbl_rank_prefix_sum[i] = sum;
       }
       // if (num_worst_tokens == 0) {
-      while (ld_volatile_global(moe_recv_counter_mapped) != -1)
+      { uccl::gpu_stages::Span gpu_stage_1(d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),1);
+while (ld_volatile_global(moe_recv_counter_mapped) != -1)
         ;
+}
       *moe_recv_counter_mapped = sum;
       // }
     }
@@ -351,9 +356,11 @@ __global__ void notify_dispatch(
         sum += nvl_recv_num_tokens_per_expert.buffer(i)[thread_id];
       sum = (sum + expert_alignment - 1) / expert_alignment * expert_alignment;
       // if (num_worst_tokens == 0) {
-      while (ld_volatile_global(moe_recv_expert_counter_mapped + thread_id) !=
+      { uccl::gpu_stages::Span gpu_stage_2(d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),2);
+while (ld_volatile_global(moe_recv_expert_counter_mapped + thread_id) !=
              -1)
         ;
+}
       // }
       moe_recv_expert_counter_mapped[thread_id] = sum;
     }
@@ -550,6 +557,7 @@ __global__ void __launch_bounds__(
              int num_max_nvl_chunked_recv_tokens, int rank, int num_ranks,
              uint64_t const* d2h_channel_addrs, int num_d2h_channel_addrs,
              void* atomic_buffer_ptr) {
+  uccl::gpu_stages::Span gpu_kernel_stage(d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),46);
   enum class WarpRole {
     kRDMASender,
     kRDMASenderCoordinator,
@@ -803,8 +811,10 @@ __global__ void __launch_bounds__(
       }
 
       // Acquire sequential lock
-      while (lane_id == 0 and rdma_send_next_token_idx != token_idx)
+      { uccl::gpu_stages::Span gpu_stage_3(d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),3);
+while (lane_id == 0 and rdma_send_next_token_idx != token_idx)
         ;
+}
       __syncwarp();
 
       // Acquire next tail
@@ -813,7 +823,8 @@ __global__ void __launch_bounds__(
       if (is_token_in_rank_uint64 != 0) {
         rdma_tail_idx = rdma_send_channel_next_tail[lane_id]++;
         // Wait the remote buffer to be released
-        while (rdma_tail_idx - cached_rdma_channel_head >=
+        { uccl::gpu_stages::Span gpu_stage_4(d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),4);
+while (rdma_tail_idx - cached_rdma_channel_head >=
                num_max_rdma_chunked_recv_tokens) {
           cached_rdma_channel_head =
               static_cast<int>(ld_acquire_sys_global<kUseAggressiveAtomic>(
@@ -829,6 +840,7 @@ __global__ void __launch_bounds__(
             trap();
           }
         }
+}
       }
       __syncwarp();
 
@@ -863,7 +875,8 @@ __global__ void __launch_bounds__(
 
       // Wait the remote buffer to be released
       auto start_time = clock64();
-      while (is_token_in_rank_uint64 != 0 and
+      { uccl::gpu_stages::Span gpu_stage_5(d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),5);
+while (is_token_in_rank_uint64 != 0 and
              rdma_tail_idx - cached_rdma_channel_head >=
                  num_max_rdma_chunked_recv_tokens) {
         cached_rdma_channel_head =
@@ -883,6 +896,7 @@ __global__ void __launch_bounds__(
           trap();
         }
       }
+}
 #endif
       __syncwarp();
 
@@ -982,7 +996,8 @@ __global__ void __launch_bounds__(
         auto latest_tail = rdma_send_channel_tail[lane_id];
         auto offset = rdma_tail_idx - latest_tail;
         auto window_spin_start = clock64();
-        while (offset >= WARP_SIZE) {
+        { uccl::gpu_stages::Span gpu_stage_6(d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),6);
+while (offset >= WARP_SIZE) {
           release_lock(rdma_send_channel_lock + lane_id);
           __nanosleep(
               NUM_WAIT_NANOSECONDS);  // yield to prevent warp starvation
@@ -998,6 +1013,7 @@ __global__ void __launch_bounds__(
           latest_tail = rdma_send_channel_tail[lane_id];
           offset = rdma_tail_idx - latest_tail;
         }
+}
 
         // Release the transaction slot
         // Add the bit and move the ones if possible
@@ -1022,8 +1038,10 @@ __global__ void __launch_bounds__(
     defined(__MC_PLATFORM_MXCC__) || defined(__MCC__) || defined(__MXCC__)
     // Epilogue
     // Acquire sequential lock
-    while (lane_id == 0 and rdma_send_next_token_idx != token_idx)
+    { uccl::gpu_stages::Span gpu_stage_7(d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),7);
+while (lane_id == 0 and rdma_send_next_token_idx != token_idx)
       ;
+}
     __syncwarp();
 
     // Update last token tail
@@ -1068,7 +1086,8 @@ __global__ void __launch_bounds__(
     // Iterate all RDMA ranks
     int last_issued_tail = 0;
     auto start_time = clock64();
-    while (__any_sync(WARP_MASK, num_tokens_to_send > 0)) {
+    { uccl::gpu_stages::Span gpu_stage_8(d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),8);
+while (__any_sync(WARP_MASK, num_tokens_to_send > 0)) {
       // Timeout check with sender progress for diagnostics
       if (clock64() - start_time > NUM_TIMEOUT_CYCLES and
           lane_id < kNumRDMARanks) {
@@ -1174,6 +1193,7 @@ __global__ void __launch_bounds__(
         __syncwarp();
       }
     }
+}
   } else if (warp_role == WarpRole::kRDMAAndNVLForwarder) {
     // RDMA consumers and NVL producers
     auto const dst_nvl_rank = target_rank;
@@ -1183,7 +1203,8 @@ __global__ void __launch_bounds__(
     EP_DEVICE_ASSERT(kNumRDMARanks <= WARP_SIZE);
     auto start_time = clock64();
     if (lane_id < kNumRDMARanks) {
-      while (true) {
+      { uccl::gpu_stages::Span gpu_stage_9(d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),9);
+while (true) {
         auto meta_0 = ld_volatile_global(
             rdma_channel_meta.recv_buffer(lane_id) + dst_nvl_rank);
         auto meta_1 =
@@ -1229,6 +1250,7 @@ __global__ void __launch_bounds__(
           trap();
         }
       }
+}
     }
     __syncwarp();
 
@@ -1244,7 +1266,8 @@ __global__ void __launch_bounds__(
     int cached_rdma_channel_head = 0, cached_rdma_channel_tail = 0;
     int cached_nvl_channel_head = 0, cached_nvl_channel_tail = 0,
         rdma_nvl_token_idx = 0;
-    while (__any_sync(WARP_MASK, num_tokens_to_recv_from_rdma > 0)) {
+    { uccl::gpu_stages::Span gpu_stage_10(d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),10);
+while (__any_sync(WARP_MASK, num_tokens_to_recv_from_rdma > 0)) {
       // Non-blocking NVL check: flush tail and refresh head if full
       {
         int const num_used_slots =
@@ -1265,7 +1288,8 @@ __global__ void __launch_bounds__(
 
       // Find next source RDMA rank (round-robin)
       start_time = clock64();
-      while (true) {
+      { uccl::gpu_stages::Span gpu_stage_11(d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),11);
+while (true) {
         src_rdma_rank = (src_rdma_rank + 1) % kNumRDMARanks;
         if (__shfl_sync(WARP_MASK, num_tokens_to_recv_from_rdma,
                         src_rdma_rank) > 0) {
@@ -1293,6 +1317,7 @@ __global__ void __launch_bounds__(
           trap();
         }
       }
+}
       auto src_rdma_head =
           __shfl_sync(WARP_MASK, cached_rdma_channel_head, src_rdma_rank);
       auto src_rdma_tail =
@@ -1319,7 +1344,8 @@ __global__ void __launch_bounds__(
             seen_bits = raw & 0xFF;
           } else {
             auto spin_start = clock64();
-            while (true) {
+            { uccl::gpu_stages::Span gpu_stage_12(d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),12);
+while (true) {
               __nanosleep(100);
               raw = ld_volatile_global(ptr);
               if ((raw & 0xFFFFFF00) == expected_tag) {
@@ -1335,6 +1361,7 @@ __global__ void __launch_bounds__(
                 trap();
               }
             }
+}
           }
         }
         if (seen_bits == 0) trap();
@@ -1351,7 +1378,8 @@ __global__ void __launch_bounds__(
         // Per-token NVL slot wait: block until at least 1 slot free
         {
           auto nvl_wait_start = clock64();
-          while (true) {
+          { uccl::gpu_stages::Span gpu_stage_13(d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),13);
+while (true) {
             int nvl_used = cached_nvl_channel_tail - cached_nvl_channel_head;
             if (nvl_used < num_max_nvl_chunked_recv_tokens) break;
             // Note(MaoZiming): st_release_sys_global below is a system-scope
@@ -1375,6 +1403,7 @@ __global__ void __launch_bounds__(
               trap();
             }
           }
+}
         }
 
         // Get an empty slot
@@ -1429,6 +1458,7 @@ __global__ void __launch_bounds__(
         st_release_sys_global<kUseAggressiveAtomic>(nvl_channel_tail.buffer(),
                                                     cached_nvl_channel_tail);
     }
+}
     // Retired
     __syncwarp();
     if (lane_id == 0) forward_channel_retired[dst_nvl_rank] = true;
@@ -1451,7 +1481,8 @@ __global__ void __launch_bounds__(
 
     int last_head = 0, target_rdma = lane_id < kNumRDMARanks ? lane_id : 0;
     auto coordinator_stall_start = clock64();
-    while (true) {
+    { uccl::gpu_stages::Span gpu_stage_14(d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),14);
+while (true) {
       // Find minimum head
       int min_head = std::numeric_limits<int>::max();
 #pragma unroll
@@ -1482,6 +1513,7 @@ __global__ void __launch_bounds__(
       // Nanosleep and let other warps work
       __nanosleep(NUM_WAIT_NANOSECONDS);
     }
+}
   } else {
     // NVL consumers
     // Retrieve rank offset from barrier results (each lane's register stores an
@@ -1500,7 +1532,8 @@ __global__ void __launch_bounds__(
     // Receive channel offsets
     int start_offset = 0, end_offset = 0, num_tokens_to_recv;
     auto start_time = clock64();
-    while (lane_id < kNumRDMARanks) {
+    { uccl::gpu_stages::Span gpu_stage_15(d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),15);
+while (lane_id < kNumRDMARanks) {
       start_offset =
           ld_volatile_global(nvl_channel_prefix_start.buffer() + lane_id);
       end_offset =
@@ -1521,6 +1554,7 @@ __global__ void __launch_bounds__(
         trap();
       }
     }
+}
     num_tokens_to_recv = warp_reduce_sum(end_offset - start_offset);
     auto num_tokens_to_recv_original = num_tokens_to_recv;
     // Save for combine usage
@@ -1533,10 +1567,12 @@ __global__ void __launch_bounds__(
 
     int cached_channel_head_idx = 0, cached_channel_tail_idx = 0;
     long long last_recv_token_idx = -1;
-    while (num_tokens_to_recv > 0) {
+    { uccl::gpu_stages::Span gpu_stage_16(d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),16);
+while (num_tokens_to_recv > 0) {
       // Check channel status by lane 0
       start_time = clock64();
-      while (true) {
+      { uccl::gpu_stages::Span gpu_stage_17(d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),17);
+while (true) {
         // Ready to copy
         if (cached_channel_head_idx != cached_channel_tail_idx) break;
 
@@ -1559,6 +1595,7 @@ __global__ void __launch_bounds__(
           trap();
         }
       }
+}
 
       // Copy data
       int num_recv_tokens = cached_channel_tail_idx - cached_channel_head_idx;
@@ -1662,6 +1699,7 @@ __global__ void __launch_bounds__(
         st_relaxed_sys_global(nvl_channel_head.buffer(),
                               cached_channel_head_idx);
     }
+}
   }
 
   // Clean unused `recv_topk_idx` as -1
@@ -1768,6 +1806,7 @@ __global__ void cached_notify(
     int** barrier_signal_ptrs, int rank, int num_ranks, bool is_cached_dispatch,
     uint64_t const* d2h_channel_addrs, int num_d2h_channel_addrs,
     void* atomic_buffer_ptr) {
+  uccl::gpu_stages::Span gpu_kernel_stage(d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),47);
   auto sm_id = static_cast<int>(blockIdx.x);
   auto thread_id = static_cast<int>(threadIdx.x);
   auto num_threads = static_cast<int>(blockDim.x);
@@ -2273,6 +2312,7 @@ __global__ void __launch_bounds__((kNumForwarders + 1) * WARP_SIZE, 1)
             int num_max_nvl_chunked_recv_tokens, int rank, int num_ranks,
             uint64_t const* d2h_channel_addrs, int num_d2h_channel_addrs,
             void* atomic_buffer_ptr) {
+  uccl::gpu_stages::Span gpu_kernel_stage(d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),48);
   enum class WarpRole {
     kNVLSender,
     kNVLAndRDMAForwarder,
@@ -2407,14 +2447,16 @@ __global__ void __launch_bounds__((kNumForwarders + 1) * WARP_SIZE, 1)
 
     // Iterate over all tokens and send by chunks
     int current_rdma_idx = channel_id % kNumRDMARanks;
-    while (true) {
+    { uccl::gpu_stages::Span gpu_stage_18(d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),18);
+while (true) {
       // Exit if possible
       if (__all_sync(WARP_MASK, token_start_idx >= token_end_idx)) break;
 
       // Decide the next RDMA buffer to send
       bool is_lane_ready = false;
       auto start_time = clock64();
-      while (true) {
+      { uccl::gpu_stages::Span gpu_stage_19(d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),19);
+while (true) {
         int num_used_slots = cached_channel_tail_idx - cached_channel_head_idx;
         is_lane_ready =
             lane_id < kNumRDMARanks and token_start_idx < token_end_idx and
@@ -2440,6 +2482,7 @@ __global__ void __launch_bounds__((kNumForwarders + 1) * WARP_SIZE, 1)
           trap();
         }
       }
+}
 
       // Sync token start index and count
       for (int i = 0; i < kNumRDMARanks; ++i) {
@@ -2541,6 +2584,7 @@ __global__ void __launch_bounds__((kNumForwarders + 1) * WARP_SIZE, 1)
         st_release_sys_global<kUseAggressiveAtomic>(
             nvl_channel_tail.buffer() + lane_id, cached_channel_tail_idx);
     }
+}
   } else {
     // Combiners and coordinators
     // RDMA symmetric layout
@@ -2711,7 +2755,8 @@ __global__ void __launch_bounds__((kNumForwarders + 1) * WARP_SIZE, 1)
         auto num_chunked_tokens = token_end_idx - token_start_idx;
         auto start_time = clock64();
         unsigned long long rdma_wait_start = clock64();
-        while (sub_warp_id == 0 and lane_id == 0) {
+        { uccl::gpu_stages::Span gpu_stage_20(d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),20);
+while (sub_warp_id == 0 and lane_id == 0) {
           // Inequality: `num_max_rdma_chunked_recv_tokens - (tail - head) >=
           // num_chunked_tokens` Here, `token_start_idx` is the actual tail
           int num_used_slots =
@@ -2734,6 +2779,7 @@ __global__ void __launch_bounds__((kNumForwarders + 1) * WARP_SIZE, 1)
             trap();
           }
         }
+}
         sync_large_warp();
         unsigned long long rdma_wait_end = clock64();
 
@@ -2760,7 +2806,8 @@ __global__ void __launch_bounds__((kNumForwarders + 1) * WARP_SIZE, 1)
 #endif
           // Wait lanes to be ready
           start_time = clock64();
-          while (cached_nvl_channel_tail_idx <= expected_head) {
+          { uccl::gpu_stages::Span gpu_stage_21(d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),21);
+while (cached_nvl_channel_tail_idx <= expected_head) {
             cached_nvl_channel_tail_idx =
                 ld_acquire_sys_global<kUseAggressiveAtomic>(
                     nvl_channel_tail.buffer(lane_id));
@@ -2778,6 +2825,7 @@ __global__ void __launch_bounds__((kNumForwarders + 1) * WARP_SIZE, 1)
               trap();
             }
           }
+}
 
           // Combine current token
           auto rdma_slot_idx = token_idx % num_max_rdma_chunked_recv_tokens;
@@ -2959,7 +3007,8 @@ __global__ void __launch_bounds__((kNumForwarders + 1) * WARP_SIZE, 1)
 
         // Wait lanes to be ready
         auto start_time = clock64();
-        while (cached_channel_tail_idx <= expected_head) {
+        { uccl::gpu_stages::Span gpu_stage_22(d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),22);
+while (cached_channel_tail_idx <= expected_head) {
           cached_channel_tail_idx =
               static_cast<int>(ld_acquire_sys_global<kUseAggressiveAtomic>(
                   rdma_channel_tail.buffer(lane_id)));
@@ -2974,6 +3023,7 @@ __global__ void __launch_bounds__((kNumForwarders + 1) * WARP_SIZE, 1)
             trap();
           }
         }
+}
         __syncwarp();
         // Combine current token
         auto get_addr_fn = [&](int src_rdma_rank, int slot_idx,
@@ -3021,7 +3071,8 @@ __global__ void __launch_bounds__((kNumForwarders + 1) * WARP_SIZE, 1)
       int dst_nvl_rank = lane_id < NUM_MAX_NVL_PEERS ? lane_id : 0;
       EP_STATIC_ASSERT(kNumCombineForwarderWarps <= WARP_SIZE,
                        "Invalid number of forwarder warps");
-      while (true) {
+      { uccl::gpu_stages::Span gpu_stage_23(d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),23);
+while (true) {
         // Retired
         if (not is_forwarder_sm and
             __all_sync(WARP_MASK, lane_id >= kNumRDMAReceivers or
@@ -3077,6 +3128,7 @@ __global__ void __launch_bounds__((kNumForwarders + 1) * WARP_SIZE, 1)
         // Nanosleep and let other warps work
         __nanosleep(NUM_WAIT_NANOSECONDS);
       }
+}
     }
   }
 }

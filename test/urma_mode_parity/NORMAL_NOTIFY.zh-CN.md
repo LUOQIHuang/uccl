@@ -118,7 +118,7 @@ bash test/urma_mode_parity/run_normal_notify.sh \
 
 `collect → prepare → post_begin → post_end → cqe → ack_slot → tail_published`
 
-collect是CPU读到命令；prepare是Proxy进入本批分类/准备；post_begin/end来自实际 `urma_post_jetty_send_wr`；cqe来自原生URMA完成上下文还原；ack_slot是ring槽清理并标记完成之后；tail_published是连续tail推进之后。共享JSON字段 `qp` 在URMA文件中表示实际endpoint索引（0为控制，1–8为数据lane），不是verbs QP；汇总CSV将其命名为lane。
+collect是CPU读到命令；prepare是Proxy进入本批分类/准备；post_begin/end来自实际 `urma_post_jetty_send_wr`；cqe来自原生URMA完成上下文还原；ack_slot在当前FIFO中表示pending命令退休，ring分支表示槽完成标记；tail_published记录实际队列推进。FIFO普通命令可在CPU收集时先pop，早于CQE/ack_slot；quiet/barrier可能延后pop。共享JSON字段 `qp` 在URMA文件中表示实际endpoint索引（0为控制，1–8为数据lane），不是verbs QP；汇总CSV将其命名为lane。
 
 原始事件保留内部/边界请求；汇总只对完整、单lane关联链输出相邻区间，并报告覆盖率。若WRITE使用内部wr_id、控制请求没有SDK post或存在窗口边界，不能凭空补齐。C/D的同lane通知依赖由原传输语义保证，本轮不放松fence追求数字。
 

@@ -5,6 +5,7 @@
 #define MSCCLPP_FIFO_DEVICE_HPP_
 
 #include "fifo_util.hpp"
+#include "gpu_stage_trace.cuh"
 #include <cstdint>
 
 namespace mscclpp {
@@ -127,6 +128,9 @@ struct FifoDeviceHandle {
     }
 
     ProxyTrigger* triggerPtr = &(triggers[prevHead % size]);
+#ifdef UCCL_GPU_STAGE_TRACE
+    if(stageTrace && stageTrace->enabled)stagePublications[prevHead%size]={clock64(),prevHead,static_cast<uint32_t>(blockIdx.x),static_cast<uint32_t>(threadIdx.x)};
+#endif
 
 #if defined(MSCCLPP_DEVICE_CUDA) && \
     !(defined(__MC_PLATFORM_MXCC__) || defined(__MCC__) || defined(__MXCC__))
@@ -181,6 +185,8 @@ struct FifoDeviceHandle {
   }
 #endif  // defined(MSCCLPP_DEVICE_COMPILE)
 
+  uccl::gpu_stages::State* stageTrace=nullptr;
+  uccl::gpu_stages::Publication* stagePublications=nullptr;
   /// FIFO buffer on host.
   ProxyTrigger* triggers;
   /// FIFO head on device.

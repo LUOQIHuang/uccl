@@ -18,6 +18,19 @@ a = p.parse_args()
 ep = Path(__file__).resolve().parents[1]
 with tempfile.TemporaryDirectory(prefix='uccl-urma-test-') as tmp:
     tmp = Path(tmp)
+    gpu_stage_test=tmp/'gpu_stage_test'
+    subprocess.run([os.environ.get('CXX','c++'),'-std=c++17','-Wall','-Wextra','-Werror','-I'+str(ep/'include'),str(ep/'tests/gpu_stage_trace_test.cpp'),'-o',str(gpu_stage_test)],check=True)
+    subprocess.run([str(gpu_stage_test)],check=True)
+    fifo_source=(ep/'src/fifo.cpp').read_text()
+    (tmp/'fifo_implementation.inc').write_text(fifo_source[fifo_source.index('namespace mscclpp {'):])
+    notify_source=(ep/'src/proxy.cpp').read_text()
+    begin=notify_source.index('void Proxy::notify_gpu_completion(');end=notify_source.index('void Proxy::post_gpu_command(',begin)
+    (tmp/'fifo_notify.inc').write_text(notify_source[begin:end].replace('  if (acked_wrs_.empty())','  (void)my_tail;\n  if (acked_wrs_.empty())',1))
+    for trace in (False,True):
+        fifo_test=tmp/('fifo_stage_'+str(trace))
+        extra=['-DUCCL_GPU_STAGE_TRACE'] if trace else []
+        subprocess.run([os.environ.get('CXX','c++'),'-std=c++17','-Wall','-Wextra','-Werror','-I'+str(ep/'include'),'-I'+str(tmp),*extra,str(ep/'tests/fifo_stage_test.cpp'),'-o',str(fifo_test)],check=True)
+        subprocess.run([str(fifo_test)],check=True)
     phase_test=tmp/'phase_test'
     subprocess.run([os.environ.get('CXX','c++'),'-std=c++17','-pthread','-Wall','-Wextra','-Werror',
                     '-I'+str(ep/'include'),str(ep/'tests/urma_phase_diag_test.cpp'),'-o',str(phase_test)],check=True)

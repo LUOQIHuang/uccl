@@ -632,6 +632,10 @@ void UrmaTransport::prepare(PreparedWr& out, Peer& peer, size_t lane,
   uint64_t bytes = write ? request.bytes : sizeof(uint64_t);
   out.context = acquire_context(request);
   op_contexts_[out.context].lane=static_cast<uint32_t>(lane);
+  if(uccl::transport_timeline::active.load(std::memory_order_relaxed)){
+    uccl::transport_timeline::record("remote_offset",request.wr_id,lane,request.remote_offset);
+    uccl::transport_timeline::record(write?"payload_bytes":"atomic_value",request.wr_id,lane,write?request.bytes:static_cast<uint64_t>(request.value));
+  }
   out.notify_pair = request.notify_pair;
   out.atomic_anchor = request.kind==UrmaWorkRequest::Kind::Atomic && request.fence;
   out.ring = request.ring==UINT32_MAX ? static_cast<uint32_t>(request.wr_id>>32) : request.ring;

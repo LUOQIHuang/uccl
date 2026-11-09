@@ -30,6 +30,7 @@ __device__ __forceinline__ void nvshmemi_ibgda_put_nbi_warp(
     uint64_t const* d2h_channel_addrs, int num_d2h_channel_addrs,
     bool is_combine, int low_latency_buffer_idx = 0, uint64_t atomic_offset = 0,
     uint64_t atomic_val = 0, int num_tokens = 1) {
+  uccl::gpu_stages::Span gpu_operator_stage(d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),41);
   // NOTE(MaoZiming): different from the nvshmemi_ibgda_put_nbi_warp in
   // ibgda_device.cuh, we don't do warp-cooperation.
   if (lane_id != 0) return;
@@ -182,6 +183,7 @@ __device__ __forceinline__ void nvshmemi_ibgda_amo_nonfetch_add(
     uint64_t const* d2h_channel_addrs = nullptr, int num_d2h_channel_addrs = 0,
     bool is_combine = true, int low_latency_buffer_idx = 0,
     bool skip_remote = false) {
+  uccl::gpu_stages::Span gpu_operator_stage(d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),42);
   if (is_local_copy) {
     atomicAdd(reinterpret_cast<unsigned long long*>(rptr),
               static_cast<unsigned long long>(value));
@@ -322,6 +324,7 @@ __device__ static __forceinline__ void wait_until_cmd_consumed(
 __device__ static __forceinline__ void nvshmemi_ibgda_quiet(
     uint64_t const* d2h_channel_addrs, int num_d2h_channel_addrs,
     int nvl_rank = -1, int label = -1) {
+  uccl::gpu_stages::Span gpu_operator_stage(d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),43);
   EP_DEVICE_ASSERT(
       num_d2h_channel_addrs % kChannelPerProxy == 0 &&
       "num_d2h_channel_addrs must be multiple of kChannelPerProxy");
@@ -384,6 +387,7 @@ __device__ static __forceinline__ void nvshmemi_ibgda_quiet(
 __forceinline__ __device__ void nvshmem_sync_with_same_gpu_idx(
     uint64_t const* d2h_channel_addrs, int num_d2h_channel_addrs,
     int nvl_rank = -1, int label = -1) {
+  uccl::gpu_stages::Span gpu_operator_stage(d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),44);
   EP_DEVICE_ASSERT(
       num_d2h_channel_addrs % kChannelPerProxy == 0 &&
       "num_d2h_channel_addrs must be multiple of kChannelPerProxy");

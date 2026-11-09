@@ -39,7 +39,7 @@ def build(args):
     env.pop('LD_PRELOAD',None); env.pop('UMDK_HOME',None)
     env['UCCL_URMA_LL_WRITE_ORDER']='default'
     env['UCCL_URMA_NORMAL_COMPLETION']='all'
-    flags=dict(USE_METAX='1',USE_URMA='1',USE_URMA_METAX='0',USE_LIBFABRIC_CXI='0',USE_DMABUF='1',MAX_NUM_GPUS='1',NUM_MAX_NVL_PEERS='1',PER_EXPERT_BATCHING=str(args.per_expert_batching),MAX_JOBS=str(args.build_jobs),URMA_INCLUDE_DIR=str(include),URMA_LIBRARY_DIR=str(args.urma_lib_dir.resolve()))
+    flags=dict(UCCL_GPU_STAGE_TRACE=str(int(getattr(args,'gpu_stage_build',False))),USE_METAX='1',USE_URMA='1',USE_URMA_METAX='0',USE_LIBFABRIC_CXI='0',USE_DMABUF='1',MAX_NUM_GPUS='1',NUM_MAX_NVL_PEERS='1',PER_EXPERT_BATCHING=str(args.per_expert_batching),MAX_JOBS=str(args.build_jobs),URMA_INCLUDE_DIR=str(include),URMA_LIBRARY_DIR=str(args.urma_lib_dir.resolve()))
     env.update(flags)
     stable_flags={key:value for key,value in flags.items() if key not in ('URMA_INCLUDE_DIR','URMA_LIBRARY_DIR','MAX_JOBS')}
     if (args.build_dir/'manifest.json').exists():
@@ -76,6 +76,8 @@ def parser():
     p.add_argument('--capture-layout',action='store_true')
     p.add_argument('--notification-check',action='store_true')
     p.add_argument('--timeline',action='store_true')
+    p.add_argument('--gpu-stages',action='store_true')
+    p.add_argument('--gpu-stage-build',action='store_true')
     p.add_argument('--micro-repeat',type=int,choices=(1,2,3),default=1)
     p.add_argument('--dispatch-trial',action='store_true')
     p.add_argument('--dispatch-delay-us',type=int,choices=(0,200),default=0)
@@ -136,6 +138,7 @@ def parser():
     if args.dispatch_trial and (args.backend!='urma' or args.mode!='normal' or not args.api_only or args.normal_completion!='all'):
         p.error('dispatch trial requires URMA Normal API-only all')
     if args.timeline and (args.backend!='urma' or args.mode!='normal' or not args.api_only or not args.stage_profile or args.dispatch_trial or args.normal_completion!='all'):p.error('timeline requires URMA Normal API-only stage profile all; excludes delay trial')
+    if args.gpu_stages and (not args.timeline or not args.capture_layout):p.error('--gpu-stages requires --timeline --capture-layout')
     if args.micro_suite=='notify' and args.micro_threads!=4:p.error('notification micro requires four threads')
     if args.dispatch_delay_us and not args.dispatch_trial:p.error('--dispatch-delay-us requires --dispatch-trial')
     if args.action=='micro' and (args.backend!='urma' or args.mode!='normal' or args.normal_completion!='all' or not args.master_addr or not args.micro_layout):
@@ -183,6 +186,7 @@ def preflight(args):
     if args.action=='micro' and not metadata.get('micro_diagnostics'):raise RuntimeError('MICRO_DIAGNOSTICS_REQUIRES_REBUILD')
     if (getattr(args,'notification_check',False) or getattr(args,'timeline',False) or args.micro_suite=='notify') and metadata.get('notify_version')!=1:raise RuntimeError('URMA_NOTIFICATION_SUITE_REQUIRES_REBUILD')
     if args.micro_suite=='split' and metadata.get('micro_version')!=2:raise RuntimeError('MICRO_SPLIT_REQUIRES_REBUILD_V2')
+    if getattr(args,'gpu_stages',False) and metadata.get('gpu_stage_version')!=1:raise RuntimeError('GPU_STAGE_REQUIRES_REBUILD')
     return module,manifest,dict(libraries=libraries,hardware=hardware,import_log=probe.stdout+probe.stderr,runtime=metadata)
 
 def collect(args):
@@ -249,13 +253,14 @@ def main():
         phase_suite=args.phase_suite,stage_profile=args.stage_profile,save_traces=args.save_traces,
         warmups=args.warmups,samples=args.samples,ll_hook_workload=args.ll_hook_workload,
         api_only=args.api_only,ll_write_order=args.ll_write_order,normal_completion=args.normal_completion,capture_layout=args.capture_layout,
-        dispatch_trial=args.dispatch_trial,dispatch_delay_us=args.dispatch_delay_us,delay_node=1,timeline=getattr(args,'timeline',False),device=args.urma_device,gpu=args.gpu)
+        dispatch_trial=args.dispatch_trial,dispatch_delay_us=args.dispatch_delay_us,delay_node=1,timeline=getattr(args,'timeline',False),gpu_stages=getattr(args,'gpu_stages',False),device=args.urma_device,gpu=args.gpu)
     try:
         module,manifest,info=preflight(args)
         fingerprint.update(build_hash=support.digest({key:manifest[key] for key in ('sources','sdk','flags')}),libraries=info['libraries'],torch=info['runtime']['torch'])
         (root/'preflight.json').write_text(json.dumps(info,indent=2))
         (root/'build_manifest.json').write_text(json.dumps(manifest,indent=2))
         legacy.snapshot_host(root,args.hca,args.backend,args.urma_device)
+        if getattr(args,'gpu_stages',False):shutil.copy2(HERE/'gpu_stage_sites.json',root/'gpu_stage_sites.json')
         for mode,filename in [('normal','test_internode.py'),('low_latency','test_low_latency.py')]:
             source=(support.REPO/'ep/bench'/filename).read_text()
             if mode=='normal': source=profile_support.prepare_benchmark(source,'boundaries')
@@ -277,7 +282,7 @@ def main():
         env.update(PARITY_CASE=str(case),PARITY_MODULE=str(module),PARITY_MODULE_SHA=manifest['module_sha'],PARITY_MODE=mode,PARITY_TOKENS=str(args.normal_tokens if mode=='normal' else args.ll_tokens),PARITY_HIDDEN=str(args.hidden),PARITY_EXPERTS=str(args.experts),PARITY_TOPK=str(args.topk),UCCL_TORCHRUN_NODE_RANK=str(args.node_rank),UCCL_EXIT_GUARD='1')
         env.update(PARITY_PHASE_SUITE=str(int(args.phase_suite)),PARITY_STAGE_PROFILE=str(int(args.stage_profile)),
                    PARITY_DISPATCH_TRIAL=str(int(args.dispatch_trial)),PARITY_DISPATCH_DELAY_US=str(args.dispatch_delay_us if args.node_rank==1 else 0),
-                   PARITY_API_ONLY=str(int(args.api_only)), PARITY_TIMELINE=str(int(getattr(args,'timeline',False))),
+                   PARITY_GPU_STAGES=str(int(getattr(args,'gpu_stages',False))), PARITY_API_ONLY=str(int(args.api_only)), PARITY_TIMELINE=str(int(getattr(args,'timeline',False))),
                    PARITY_CAPTURE_LAYOUT=str(int(args.capture_layout)),
                    PARITY_SAVE_TRACES=str(int(args.save_traces)),PARITY_WARMUPS=str(args.warmups),
                    PARITY_SAMPLES=str(args.samples),PARITY_LL_HOOK_WORKLOAD=args.ll_hook_workload)
@@ -303,6 +308,7 @@ def main():
             checks['no_gpu_profiler']=text.count('MODE_PARITY_GPU_PROFILE_SKIPPED ')==expected_points and not list(case.glob('gpu_trace_*.json'))
             checks['measurement_boundary']=(case/'measurement_boundary.json').is_file() and (case/'kernel_after_measurements.txt').is_file()
         if args.capture_layout:checks['layout_capture']=(case/'write_layout.jsonl').is_file()
+        if getattr(args,'gpu_stages',False):checks['gpu_stages']=(case/'gpu_stages.jsonl').is_file()
         if getattr(args,'timeline',False):checks['timeline']=(case/'urma_timeline.jsonl').is_file()
         if args.dispatch_trial:checks['dispatch_trial_samples']=(case/'dispatch_trial_samples.jsonl').is_file()
         if args.backend=='urma':

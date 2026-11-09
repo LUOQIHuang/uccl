@@ -930,6 +930,7 @@ void Proxy::notify_gpu_completion(uint64_t& my_tail) {
       if (acked_wrs_.find(front_wr) == acked_wrs_.end()) break;
       acked_wrs_.erase(front_wr);  // consume this completion
       pend.pop_front();            // retire pending entry
+      uccl::transport_timeline::record("ack_slot",front_wr);
 
       if (front_bytes) {
         current_inflight_bytes.fetch_sub(front_bytes,
@@ -940,12 +941,14 @@ void Proxy::notify_gpu_completion(uint64_t& my_tail) {
         ctx_.quiet_inflight = false;
         ctx_.quiet_wr = -1;
         fifo->pop();
+        uccl::transport_timeline::record("tail_published",uint64_t(rb_idx)<<32,0,(front_wr&0xffffffffULL)+1);
       }
 
       if (ctx_.barrier_wr != -1 && front_wr == (uint64_t)ctx_.barrier_wr) {
         ctx_.barrier_inflight = false;
         ctx_.barrier_wr = -1;
         fifo->pop();
+        uccl::transport_timeline::record("tail_published",uint64_t(rb_idx)<<32,0,(front_wr&0xffffffffULL)+1);
       }
     }
   }
@@ -1024,6 +1027,15 @@ void Proxy::post_gpu_command(uint64_t& my_tail, size_t& seen) {
       uint64_t unique_wr_id = (static_cast<uint64_t>(rb_idx) << 32) |
                               (fifo_seq_[rb_idx]++ & 0xFFFFFFFFULL);
       uccl::transport_timeline::record("collect",unique_wr_id);
+      if(uccl::transport_timeline::active.load(std::memory_order_relaxed)){
+        auto* state=fifo->gpuStageState();auto* publications=fifo->gpuPublications();
+        if(state && state->enabled){auto const& publication=publications[uint32_t(unique_wr_id)%fifo->size()];
+          if(publication.slot==uint32_t(unique_wr_id) && publication.tick){
+            uccl::transport_timeline::record("gpu_publish_clock",unique_wr_id,0,publication.tick);
+            uccl::transport_timeline::record("gpu_writer",unique_wr_id,0,(uint64_t(publication.block)<<32)|publication.thread);
+          }
+        }
+      }
       wrs_to_post.push_back(unique_wr_id);
       cmds_to_post.push_back(cmd);
       fifo_pending_[rb_idx].push_back(
@@ -1052,6 +1064,7 @@ void Proxy::post_gpu_command(uint64_t& my_tail, size_t& seen) {
       } else {
         // Other operations just pop.
         fifo->pop();
+        uccl::transport_timeline::record("tail_published",uint64_t(rb_idx)<<32,0,(unique_wr_id&0xffffffffULL)+1);
       }
     }
 #else
@@ -1111,6 +1124,13 @@ void Proxy::post_gpu_command(uint64_t& my_tail, size_t& seen) {
       // Use a unique ID combining ring buffer index and command index
       uint64_t unique_wr_id = (rb_idx << 32) | i;
       uccl::transport_timeline::record("collect",unique_wr_id);
+      if(uccl::transport_timeline::active.load(std::memory_order_relaxed) && h->ring->gpu_stage_trace.enabled){
+        auto const& publication=h->ring->gpu_publications[i%h->capacity()];
+        if(publication.slot==i && publication.tick){
+          uccl::transport_timeline::record("gpu_publish_clock",unique_wr_id,0,publication.tick);
+          uccl::transport_timeline::record("gpu_writer",unique_wr_id,0,(uint64_t(publication.block)<<32)|publication.thread);
+        }
+      }
       wrs_to_post.push_back(unique_wr_id);
       cmds_to_post.push_back(cmd_entry);
 #ifdef MEASURE_PER_VERB_LATENCY

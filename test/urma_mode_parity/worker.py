@@ -33,6 +33,17 @@ measurements=Measurements(torch,dist,ep,case,mode,stage_profile,
     int(os.environ.get('PARITY_WARMUPS','50')),int(os.environ.get('PARITY_SAMPLES','50')),
     os.environ.get('PARITY_CAPTURE_LAYOUT')=='1',os.environ.get('PARITY_DISPATCH_TRIAL')=='1',
     int(os.environ.get('PARITY_DISPATCH_DELAY_US','0')),os.environ.get('PARITY_TIMELINE')=='1')
+if os.environ.get('PARITY_GPU_STAGES')=='1':
+    import buffer as stage_buffer
+    stage_proxies=[];original_buffer_init=stage_buffer.Buffer.__init__
+    def stage_buffer_init(self,*args,**kwargs):
+        original_buffer_init(self,*args,**kwargs);stage_proxies[:]=self.proxies
+    stage_buffer.Buffer.__init__=stage_buffer_init
+    def stage_rings():
+        addresses=list(dict.fromkeys(int(a) for p in stage_proxies for a in p.get_d2h_channel_addrs()))
+        if not addresses:raise RuntimeError('GPU_STAGE_RINGS_MISSING')
+        return addresses
+    measurements.gpu_rings=stage_rings
 print('PHASE_CONFIGURATION '+json.dumps(dict(suite=phase_suite,instrumented=stage_profile,
     warmups=measurements.warmups,samples=measurements.samples,
     ll_hook_workload=os.environ.get('PARITY_LL_HOOK_WORKLOAD','gemm'))),flush=True)

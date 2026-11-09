@@ -1,3 +1,5 @@
+真实Normal阶段插桩：[GPU与CPU阶段分解运行文档](STAGE_BREAKDOWN.zh-CN.md)。
+
 当前URMA窗口下一轮：[Normal同负载通知对照与真实Dispatch时间线](NORMAL_NOTIFY.zh-CN.md)。
 
 # URMA Normal / Low-latency 实现对齐与验收

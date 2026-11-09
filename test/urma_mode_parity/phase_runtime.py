@@ -5,10 +5,11 @@ import phase_support
 
 
 class Measurements:
-    def __init__(self,torch,dist,ep,case,mode,enabled,warmups,samples,capture_layout=False,dispatch_trial=False,dispatch_delay_us=0,timeline=False):
+    def __init__(self,torch,dist,ep,case,mode,enabled,warmups,samples,capture_layout=False,dispatch_trial=False,dispatch_delay_us=0,timeline=False,gpu_rings=None):
         self.torch,self.dist,self.ep=torch,dist,ep
         self.case,self.mode,self.enabled=case,mode,enabled
         self.warmups,self.samples=warmups,samples
+        self.gpu_rings=gpu_rings
         self.timeline=timeline
         self.capture_layout=capture_layout
         self.dispatch_trial=dispatch_trial;self.dispatch_delay_us=dispatch_delay_us
@@ -53,14 +54,21 @@ class Measurements:
         end=[torch.cuda.Event(enable_timing=True) for _ in range(self.samples)]
         def timed():
             for i in range(self.samples):
-                trace_this=self.timeline and i==0 and label.startswith('dispatch_')
+                trace_this=self.timeline and (self.gpu_rings is not None or (i==0 and label.startswith('dispatch_')))
+                if trace_this and self.gpu_rings is not None:self.dist.barrier()
+                rings=self.gpu_rings() if trace_this and self.gpu_rings is not None else None
+                if rings is not None:self.ep.gpu_stage_begin(rings)
                 if trace_this:self.ep.urma_timeline_begin()
                 try:
                     start[i].record(); fn(); end[i].record()
                 finally:
                     if trace_this:
-                        try:torch.cuda.synchronize()
-                        finally:self.append('urma_timeline.jsonl',dict(label=label,index=i,backend='urma',**json.loads(self.ep.urma_timeline_end())))
+                        try:
+                            torch.cuda.synchronize()
+                            if rings is not None:self.dist.barrier()
+                        finally:
+                            if rings is not None:self.append('gpu_stages.jsonl',dict(label=label,index=i,**json.loads(self.ep.gpu_stage_end(rings))))
+                            self.append('urma_timeline.jsonl',dict(label=label,index=i,backend='urma',**json.loads(self.ep.urma_timeline_end())))
                 if post_fn is not None: post_fn()
             torch.cuda.synchronize()
         self.window(label,timed,self.samples)

@@ -239,6 +239,9 @@ if __name__ == "__main__":
         if os.getenv("URMA_LIBRARY_DIR"):
             library_dirs.append(Path(os.environ["URMA_LIBRARY_DIR"]))
 
+    if int(os.getenv("UCCL_GPU_STAGE_TRACE", "0")):
+        cxx_flags.append("-DUCCL_GPU_STAGE_TRACE")
+        nvcc_flags.append("-DUCCL_GPU_STAGE_TRACE")
     use_dmabuf = int(os.getenv("USE_DMABUF", "0"))
     if use_dmabuf:
         cxx_flags.append("-DUSE_DMABUF")
