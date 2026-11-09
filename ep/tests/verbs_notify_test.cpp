@@ -66,6 +66,7 @@ ibv_mr* register_control_buffer_mr(ibv_pd* p,void* b,size_t n,int access){assert
 #define ibv_query_device fake::caps
 #define ibv_alloc_pd fake::pd
 #define ibv_dealloc_pd fake::free_pd
+#undef ibv_reg_mr
 #define ibv_reg_mr fake::mr
 #define ibv_dereg_mr fake::free_mr
 #define ibv_create_cq fake::cq
