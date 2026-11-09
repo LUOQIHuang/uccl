@@ -1,0 +1,83 @@
+{
+  "fingerprint": {
+    "job": "verbs_normal_campaign_01_cpu",
+    "variant": "current",
+    "identity": {
+      "kind": "current_source_build",
+      "sources_hash": "74c24c68cfbafd9176b071ee6a424012d8cfd1b841a895c726aa6e600bcd803e",
+      "flags": {
+        "USE_METAX": "1",
+        "USE_URMA": "0",
+        "USE_URMA_METAX": "0",
+        "USE_LIBFABRIC_CXI": "0",
+        "USE_DMABUF": "1",
+        "MAX_NUM_GPUS": "1",
+        "NUM_MAX_NVL_PEERS": "1",
+        "PER_EXPERT_BATCHING": "0"
+      }
+    },
+    "benchmark": {
+      "variant": "current",
+      "benchmark_revision": null,
+      "input_hashes": {
+        "test_internode.py": "5e09c00a24d8b661888ea317bdbbcb349460f4f20f4649eee266299d2f659956",
+        "test_low_latency.py": "0eb4396d26688adf4ad1f76c447c45e972da1eac02b59d219a1e8294fceae3e5",
+        "buffer.py": "0c354281716863069303f485bc84eee1d5d720d240c30f02746a343761aca2ff",
+        "utils.py": "c8b5f033722339883d468ac8ae762573d521c1140cd931203e77ffb693565dde"
+      },
+      "prepared_hashes": {
+        "buffer.py": "0c354281716863069303f485bc84eee1d5d720d240c30f02746a343761aca2ff",
+        "test_internode.py": "91e0a517d13c17239425bd23aad25e973c694b0a737739b6521144fdf1b56907",
+        "profile_adapter.py": "7e3db3e30e1358b4c149ba697ed0e4e6a63dda46e32911baadfae1450fa62ba5",
+        "utils.py": "c8b5f033722339883d468ac8ae762573d521c1140cd931203e77ffb693565dde",
+        "test_low_latency.py": "375d445d6ce700fadf9c537c7863a4ec471221d8464c382760188b761bcbe997"
+      },
+      "changes": [
+        "fixed Normal tuning points",
+        "LL hook immediately invokes receive hook",
+        "profiler trace-export fix; timed callables unchanged"
+      ]
+    },
+    "diagnostics": {
+      "test/verbs_baseline/micro_driver.py": "24e540cd15f00f5327d701355ae76728c94fc0f0c067f86a397ed253565b5c8c",
+      "test/verbs_baseline/micro_worker.py": "d259f9886a22deba360181c8a2b825506e2d3d1b34748e3b00eb728a8a82ceb6",
+      "test/verbs_baseline/host_tests.py": "87e5a04e7eb6b1b0b72695baf5c68583a387be4a71105c0112944813a36853df",
+      "test/verbs_baseline/summarize_campaign.py": "5680409e05ba2a9696b10615edd7142f57f0288c1196c5eea89db4ec594fa641",
+      "test/verbs_baseline/worker.py": "2abeddcfa8b15962772ca27d523f294528138cdef9cf137fd7e670b057b0cde6",
+      "test/verbs_baseline/collect_campaign.py": "c56351a5938bf87adb16e24e347334fc5dc8ebf3bf0b066bdcdbc5e9ee71f718",
+      "test/verbs_baseline/summarize.py": "991ce4b93424bce0b3325a908fa135b348ca1735320815e14295cb001e781b08",
+      "test/verbs_baseline/common.py": "8a7647a8e56b60c10d2af1f83eca9eeab5fb707d75bfcdb2dd994d2377f55da4",
+      "test/verbs_baseline/driver.py": "0aa6cfdd1eaed77e105080981095eea6700495adca92d902a0058b406817af61",
+      "test/verbs_baseline/run.sh": "1695d7e60078444c381f3694e824f3e91fccfc605cab50aae741a8f22c5fd85c",
+      "test/verbs_baseline/run_normal_campaign.sh": "4139e5d863620ef03402f3b29df2c5903a914c26528e845c3a5cd1274537f61b",
+      "test/verbs_diag/driver.py": "cf02080510ae306e7941bedc711f50db3106d9eb9b31c3c0c85993aeb1e66d48",
+      "test/verbs_diag/exit_guard.py": "9cba31fe18074bbf5b6fbe2345b570100663a3ed9da95cf6e118eedb409740c7",
+      "test/verbs_diag/run.sh": "d1293daa6bafaa9ad81914217bc66ce4f429d532f8d0c5d377343efab76dc5fa",
+      "test/verbs_diag/profile_support.py": "42c5ad17ae18f2697e958cc91e050cbabe3225b6a537dd833d2df048da5f7f63",
+      "test/urma_mode_parity/phase_support.py": "bfc1062297006da98d418100fb0717a9b192c697b066c9f192e8b6cc67d73047",
+      "ep/bench/utils.py": "c8b5f033722339883d468ac8ae762573d521c1140cd931203e77ffb693565dde",
+      "test/urma_mode_parity/split_support.py": "58faf816842a54d1499ad8e8d8c99db45337470db73c60838f86b6b365ad4049",
+      "test/urma_mode_parity/micro_support.py": "59cabb9f1a1fb7098193d9f51bd7744f40967e25f8e70f9e132cec3bc34e5483",
+      "ep/tests/verbs_diag_test.cpp": "9f2d5e54672d58154f7a9c88a4c746657ad6ada25228ee2164eca79221e7bbe2",
+      "ep/tests/urma_support/ep_shim.hpp": "cc261cedbf40977f933f90542abfd1c77abde0b212f0a428d8bbcf8371d1b37e"
+    },
+    "kernel": "6.6.0-145.3.34.165.oe2403sp3.aarch64",
+    "torch": "2.6.0+metax3.7.0.7",
+    "libraries": {
+      "libmcruntime.so": "20935386e054c5eed3c1cd0683c5f83cf9c8f33b7bcb4fcffcd0c6ca8ec1bcc6",
+      "libibverbs.so.1.14.50.0": "699c20b05cb69ad7ebe17b9efe4508b0f506b2d427e40d82e3e3f57d14ce1135"
+    },
+    "mode": "normal",
+    "repeats": 1,
+    "warmups": 5,
+    "samples": 5,
+    "no_profile": true,
+    "profile_only": false,
+    "hca": "rocep40s0f0",
+    "ifname": "enp33s0",
+    "gpu": "0",
+    "cpu_diagnostics": true,
+    "gid_index": 3
+  },
+  "error": null
+}

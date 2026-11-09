@@ -1,0 +1,3249 @@
+
+{
+  "schemaVersion": 1,
+  "deviceProperties": [
+    {
+      "id": 0, "name": "MetaX C500", "totalGlobalMem": 68283269120,
+      "computeMajor": 8, "computeMinor": 0,
+      "maxThreadsPerBlock": 1024, "maxThreadsPerMultiprocessor": 2048,
+      "regsPerBlock": 131072, "warpSize": 64,
+      "sharedMemPerBlock": 65536, "numSms": 104
+    , "regsPerMultiprocessor": 131072, "sharedMemPerBlockOptin": 65536, "sharedMemPerMultiprocessor": 65536
+    }
+  ],
+  "cupti_version": 18,
+  "cuda_runtime_version": 11060,
+  "cuda_driver_version": 11060,
+  "distributedInfo": {"backend": "nccl", "rank": 1, "world_size": 2, "pg_count": 2, "pg_config": [{"pg_name": "0", "pg_desc": "default_pg", "backend_config": "cuda:nccl", "pg_size": 2, "ranks": [0, 1]}, {"pg_name": "1", "pg_desc": "undefined", "backend_config": "cuda:nccl", "pg_size": 2, "ranks": [0, 1]}], "nccl_version": "2.16.5"},
+  "trace_id": "4270864802DC4DE4A4BC0BBDBEF483E8",
+  "traceEvents": [
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcEventQuery", "pid": 121661, "tid": 121661,
+    "ts": 3368696193628.154, "dur": 0.720,
+    "args": {
+            "cbid": 79, "correlation": 2254
+    }
+  },
+  {
+    "ph": "f", "id": 2254, "pid": 121661, "tid": 121661, "ts": 3368696193628.154,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcEventRecord", "pid": 121661, "tid": 121661,
+    "ts": 3368696193688.563, "dur": 9.650,
+    "args": {
+            "cbid": 74, "correlation": 2259
+    }
+  },
+  {
+    "ph": "f", "id": 2259, "pid": 121661, "tid": 121661, "ts": 3368696193688.563,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcStreamWaitEvent", "pid": 121661, "tid": 121661,
+    "ts": 3368696193699.113, "dur": 5.740,
+    "args": {
+            "cbid": 47, "correlation": 2260
+    }
+  },
+  {
+    "ph": "s", "id": 2260, "pid": 121661, "tid": 121661, "ts": 3368696193699.113,
+    "cat": "ac2g", "name": "ac2g"
+  },
+  {
+    "ph": "X", "cat": "kernel", "name": "void uccl::internode::cached_notify<false, 8192>(int, int, int, int, int*, int, int, int const*, int const*, int*, void*, void**, int**, int, int, bool, unsigned long const*, int, void*)", "pid": 0, "tid": 101,
+    "ts": 3368696193755.904, "dur": 70.912,
+    "args": {
+            "queued": 1794225722193739142, "device": 0, "context": 0,      "stream": 101, "correlation": 2262,      "registers per thread": 168,      "shared memory": 0,      "blocks per SM": 0.230769,      "warps per SM": 5.538462,      "grid": [24, 1, 1],      "block": [768, 1, 1],      "est. achieved occupancy %": 9
+    }
+  },
+  {
+    "ph": "f", "id": 2262, "pid": 0, "tid": 101, "ts": 3368696193755.904,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcLaunchKernelExC", "pid": 121661, "tid": 121661,
+    "ts": 3368696193708.253, "dur": 33.649,
+    "args": {
+            "cbid": 62, "correlation": 2262
+    }
+  },
+  {
+    "ph": "f", "id": 2262, "pid": 121661, "tid": 121661, "ts": 3368696193708.253,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "kernel", "name": "void uccl::internode::dispatch<true, 2, true, 20480, 7, false, 2>(int4*, float*, long*, float*, uccl::internode::SourceMeta*, int4 const*, float const*, long const*, float const*, int*, int*, int*, int*, int const*, int const*, int const*, int const*, bool const*, int, int, int, int, int, int, int, int, void*, int, int, void**, int, int, int, int, unsigned long const*, int, void*)", "pid": 0, "tid": 101,
+    "ts": 3368696193829.376, "dur": 5849.088,
+    "args": {
+            "queued": 1794225722193756222, "device": 0, "context": 0,      "stream": 101, "correlation": 2263,      "registers per thread": 163,      "shared memory": 224,      "blocks per SM": 0.230769,      "warps per SM": 4.153846,      "grid": [24, 1, 1],      "block": [576, 1, 1],      "est. achieved occupancy %": 6
+    }
+  },
+  {
+    "ph": "f", "id": 2263, "pid": 0, "tid": 101, "ts": 3368696193829.376,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcLaunchKernelExC", "pid": 121661, "tid": 121661,
+    "ts": 3368696193742.782, "dur": 15.720,
+    "args": {
+            "cbid": 62, "correlation": 2263
+    }
+  },
+  {
+    "ph": "f", "id": 2263, "pid": 121661, "tid": 121661, "ts": 3368696193742.782,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcEventRecord", "pid": 121661, "tid": 121661,
+    "ts": 3368696193760.382, "dur": 2.050,
+    "args": {
+            "cbid": 74, "correlation": 2265
+    }
+  },
+  {
+    "ph": "f", "id": 2265, "pid": 121661, "tid": 121661, "ts": 3368696193760.382,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcStreamWaitEvent", "pid": 121661, "tid": 121661,
+    "ts": 3368696193762.772, "dur": 4.500,
+    "args": {
+            "cbid": 47, "correlation": 2266
+    }
+  },
+  {
+    "ph": "s", "id": 2266, "pid": 121661, "tid": 121661, "ts": 3368696193762.772,
+    "cat": "ac2g", "name": "ac2g"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcEventRecord", "pid": 121661, "tid": 121661,
+    "ts": 3368696193863.210, "dur": 3.690,
+    "args": {
+            "cbid": 74, "correlation": 2277
+    }
+  },
+  {
+    "ph": "f", "id": 2277, "pid": 121661, "tid": 121661, "ts": 3368696193863.210,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcStreamWaitEvent", "pid": 121661, "tid": 121661,
+    "ts": 3368696193867.180, "dur": 3.070,
+    "args": {
+            "cbid": 47, "correlation": 2278
+    }
+  },
+  {
+    "ph": "s", "id": 2278, "pid": 121661, "tid": 121661, "ts": 3368696193867.180,
+    "cat": "ac2g", "name": "ac2g"
+  },
+  {
+    "ph": "X", "cat": "kernel", "name": "void uccl::internode::cached_notify<false, 8192>(int, int, int, int, int*, int, int, int const*, int const*, int*, void*, void**, int**, int, int, bool, unsigned long const*, int, void*)", "pid": 0, "tid": 101,
+    "ts": 3368696199762.944, "dur": 283.904,
+    "args": {
+            "queued": 1794225722193887089, "device": 0, "context": 0,      "stream": 101, "correlation": 2280,      "registers per thread": 168,      "shared memory": 0,      "blocks per SM": 0.230769,      "warps per SM": 5.538462,      "grid": [24, 1, 1],      "block": [768, 1, 1],      "est. achieved occupancy %": 9
+    }
+  },
+  {
+    "ph": "f", "id": 2280, "pid": 0, "tid": 101, "ts": 3368696199762.944,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcLaunchKernelExC", "pid": 121661, "tid": 121661,
+    "ts": 3368696193871.610, "dur": 16.509,
+    "args": {
+            "cbid": 62, "correlation": 2280
+    }
+  },
+  {
+    "ph": "f", "id": 2280, "pid": 121661, "tid": 121661, "ts": 3368696193871.610,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "kernel", "name": "void uccl::internode::dispatch<true, 2, true, 20480, 7, false, 2>(int4*, float*, long*, float*, uccl::internode::SourceMeta*, int4 const*, float const*, long const*, float const*, int*, int*, int*, int*, int const*, int const*, int const*, int const*, bool const*, int, int, int, int, int, int, int, int, void*, int, int, void**, int, int, int, int, unsigned long const*, int, void*)", "pid": 0, "tid": 101,
+    "ts": 3368696200049.152, "dur": 5985.280,
+    "args": {
+            "queued": 1794225722193896169, "device": 0, "context": 0,      "stream": 101, "correlation": 2281,      "registers per thread": 163,      "shared memory": 224,      "blocks per SM": 0.230769,      "warps per SM": 4.153846,      "grid": [24, 1, 1],      "block": [576, 1, 1],      "est. achieved occupancy %": 6
+    }
+  },
+  {
+    "ph": "f", "id": 2281, "pid": 0, "tid": 101, "ts": 3368696200049.152,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcLaunchKernelExC", "pid": 121661, "tid": 121661,
+    "ts": 3368696193888.659, "dur": 7.820,
+    "args": {
+            "cbid": 62, "correlation": 2281
+    }
+  },
+  {
+    "ph": "f", "id": 2281, "pid": 121661, "tid": 121661, "ts": 3368696193888.659,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcEventRecord", "pid": 121661, "tid": 121661,
+    "ts": 3368696193898.349, "dur": 0.990,
+    "args": {
+            "cbid": 74, "correlation": 2283
+    }
+  },
+  {
+    "ph": "f", "id": 2283, "pid": 121661, "tid": 121661, "ts": 3368696193898.349,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcStreamWaitEvent", "pid": 121661, "tid": 121661,
+    "ts": 3368696193899.639, "dur": 1.540,
+    "args": {
+            "cbid": 47, "correlation": 2284
+    }
+  },
+  {
+    "ph": "s", "id": 2284, "pid": 121661, "tid": 121661, "ts": 3368696193899.639,
+    "cat": "ac2g", "name": "ac2g"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcEventRecord", "pid": 121661, "tid": 121661,
+    "ts": 3368696193960.008, "dur": 2.160,
+    "args": {
+            "cbid": 74, "correlation": 2295
+    }
+  },
+  {
+    "ph": "f", "id": 2295, "pid": 121661, "tid": 121661, "ts": 3368696193960.008,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcStreamWaitEvent", "pid": 121661, "tid": 121661,
+    "ts": 3368696193962.438, "dur": 2.330,
+    "args": {
+            "cbid": 47, "correlation": 2296
+    }
+  },
+  {
+    "ph": "s", "id": 2296, "pid": 121661, "tid": 121661, "ts": 3368696193962.438,
+    "cat": "ac2g", "name": "ac2g"
+  },
+  {
+    "ph": "X", "cat": "kernel", "name": "void uccl::internode::cached_notify<false, 8192>(int, int, int, int, int*, int, int, int const*, int const*, int*, void*, void**, int**, int, int, bool, unsigned long const*, int, void*)", "pid": 0, "tid": 101,
+    "ts": 3368696206087.680, "dur": 119.040,
+    "args": {
+            "queued": 1794225722193974298, "device": 0, "context": 0,      "stream": 101, "correlation": 2298,      "registers per thread": 168,      "shared memory": 0,      "blocks per SM": 0.230769,      "warps per SM": 5.538462,      "grid": [24, 1, 1],      "block": [768, 1, 1],      "est. achieved occupancy %": 9
+    }
+  },
+  {
+    "ph": "f", "id": 2298, "pid": 0, "tid": 101, "ts": 3368696206087.680,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcLaunchKernelExC", "pid": 121661, "tid": 121661,
+    "ts": 3368696193965.978, "dur": 8.930,
+    "args": {
+            "cbid": 62, "correlation": 2298
+    }
+  },
+  {
+    "ph": "f", "id": 2298, "pid": 121661, "tid": 121661, "ts": 3368696193965.978,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "kernel", "name": "void uccl::internode::dispatch<true, 2, true, 20480, 7, false, 2>(int4*, float*, long*, float*, uccl::internode::SourceMeta*, int4 const*, float const*, long const*, float const*, int*, int*, int*, int*, int const*, int const*, int const*, int const*, bool const*, int, int, int, int, int, int, int, int, void*, int, int, void**, int, int, int, int, unsigned long const*, int, void*)", "pid": 0, "tid": 101,
+    "ts": 3368696206209.024, "dur": 6061.312,
+    "args": {
+            "queued": 1794225722193981138, "device": 0, "context": 0,      "stream": 101, "correlation": 2299,      "registers per thread": 163,      "shared memory": 224,      "blocks per SM": 0.230769,      "warps per SM": 4.153846,      "grid": [24, 1, 1],      "block": [576, 1, 1],      "est. achieved occupancy %": 6
+    }
+  },
+  {
+    "ph": "f", "id": 2299, "pid": 0, "tid": 101, "ts": 3368696206209.024,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcLaunchKernelExC", "pid": 121661, "tid": 121661,
+    "ts": 3368696193975.258, "dur": 6.230,
+    "args": {
+            "cbid": 62, "correlation": 2299
+    }
+  },
+  {
+    "ph": "f", "id": 2299, "pid": 121661, "tid": 121661, "ts": 3368696193975.258,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcEventRecord", "pid": 121661, "tid": 121661,
+    "ts": 3368696193982.868, "dur": 1.520,
+    "args": {
+            "cbid": 74, "correlation": 2301
+    }
+  },
+  {
+    "ph": "f", "id": 2301, "pid": 121661, "tid": 121661, "ts": 3368696193982.868,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcStreamWaitEvent", "pid": 121661, "tid": 121661,
+    "ts": 3368696193984.628, "dur": 1.110,
+    "args": {
+            "cbid": 47, "correlation": 2302
+    }
+  },
+  {
+    "ph": "s", "id": 2302, "pid": 121661, "tid": 121661, "ts": 3368696193984.628,
+    "cat": "ac2g", "name": "ac2g"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcEventRecord", "pid": 121661, "tid": 121661,
+    "ts": 3368696194034.567, "dur": 1.450,
+    "args": {
+            "cbid": 74, "correlation": 2313
+    }
+  },
+  {
+    "ph": "f", "id": 2313, "pid": 121661, "tid": 121661, "ts": 3368696194034.567,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcStreamWaitEvent", "pid": 121661, "tid": 121661,
+    "ts": 3368696194036.287, "dur": 1.250,
+    "args": {
+            "cbid": 47, "correlation": 2314
+    }
+  },
+  {
+    "ph": "s", "id": 2314, "pid": 121661, "tid": 121661, "ts": 3368696194036.287,
+    "cat": "ac2g", "name": "ac2g"
+  },
+  {
+    "ph": "X", "cat": "kernel", "name": "void uccl::internode::cached_notify<false, 8192>(int, int, int, int, int*, int, int, int const*, int const*, int*, void*, void**, int**, int, int, bool, unsigned long const*, int, void*)", "pid": 0, "tid": 101,
+    "ts": 3368696212346.624, "dur": 374.784,
+    "args": {
+            "queued": 1794225722194045437, "device": 0, "context": 0,      "stream": 101, "correlation": 2316,      "registers per thread": 168,      "shared memory": 0,      "blocks per SM": 0.230769,      "warps per SM": 5.538462,      "grid": [24, 1, 1],      "block": [768, 1, 1],      "est. achieved occupancy %": 9
+    }
+  },
+  {
+    "ph": "f", "id": 2316, "pid": 0, "tid": 101, "ts": 3368696212346.624,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcLaunchKernelExC", "pid": 121661, "tid": 121661,
+    "ts": 3368696194038.487, "dur": 7.569,
+    "args": {
+            "cbid": 62, "correlation": 2316
+    }
+  },
+  {
+    "ph": "f", "id": 2316, "pid": 121661, "tid": 121661, "ts": 3368696194038.487,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "kernel", "name": "void uccl::internode::dispatch<true, 2, true, 20480, 7, false, 2>(int4*, float*, long*, float*, uccl::internode::SourceMeta*, int4 const*, float const*, long const*, float const*, int*, int*, int*, int*, int const*, int const*, int const*, int const*, bool const*, int, int, int, int, int, int, int, int, void*, int, int, void**, int, int, int, int, unsigned long const*, int, void*)", "pid": 0, "tid": 101,
+    "ts": 3368696212723.968, "dur": 6028.800,
+    "args": {
+            "queued": 1794225722194052736, "device": 0, "context": 0,      "stream": 101, "correlation": 2317,      "registers per thread": 163,      "shared memory": 224,      "blocks per SM": 0.230769,      "warps per SM": 4.153846,      "grid": [24, 1, 1],      "block": [576, 1, 1],      "est. achieved occupancy %": 6
+    }
+  },
+  {
+    "ph": "f", "id": 2317, "pid": 0, "tid": 101, "ts": 3368696212723.968,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcLaunchKernelExC", "pid": 121661, "tid": 121661,
+    "ts": 3368696194046.346, "dur": 6.860,
+    "args": {
+            "cbid": 62, "correlation": 2317
+    }
+  },
+  {
+    "ph": "f", "id": 2317, "pid": 121661, "tid": 121661, "ts": 3368696194046.346,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcEventRecord", "pid": 121661, "tid": 121661,
+    "ts": 3368696194054.156, "dur": 1.350,
+    "args": {
+            "cbid": 74, "correlation": 2319
+    }
+  },
+  {
+    "ph": "f", "id": 2319, "pid": 121661, "tid": 121661, "ts": 3368696194054.156,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcStreamWaitEvent", "pid": 121661, "tid": 121661,
+    "ts": 3368696194055.736, "dur": 1.190,
+    "args": {
+            "cbid": 47, "correlation": 2320
+    }
+  },
+  {
+    "ph": "s", "id": 2320, "pid": 121661, "tid": 121661, "ts": 3368696194055.736,
+    "cat": "ac2g", "name": "ac2g"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcEventRecord", "pid": 121661, "tid": 121661,
+    "ts": 3368696194099.396, "dur": 1.330,
+    "args": {
+            "cbid": 74, "correlation": 2331
+    }
+  },
+  {
+    "ph": "f", "id": 2331, "pid": 121661, "tid": 121661, "ts": 3368696194099.396,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcStreamWaitEvent", "pid": 121661, "tid": 121661,
+    "ts": 3368696194100.996, "dur": 0.779,
+    "args": {
+            "cbid": 47, "correlation": 2332
+    }
+  },
+  {
+    "ph": "s", "id": 2332, "pid": 121661, "tid": 121661, "ts": 3368696194100.996,
+    "cat": "ac2g", "name": "ac2g"
+  },
+  {
+    "ph": "X", "cat": "kernel", "name": "void uccl::internode::cached_notify<false, 8192>(int, int, int, int, int*, int, int, int const*, int const*, int*, void*, void**, int**, int, int, bool, unsigned long const*, int, void*)", "pid": 0, "tid": 101,
+    "ts": 3368696218827.520, "dur": 66.304,
+    "args": {
+            "queued": 1794225722194109175, "device": 0, "context": 0,      "stream": 101, "correlation": 2334,      "registers per thread": 168,      "shared memory": 0,      "blocks per SM": 0.230769,      "warps per SM": 5.538462,      "grid": [24, 1, 1],      "block": [768, 1, 1],      "est. achieved occupancy %": 9
+    }
+  },
+  {
+    "ph": "f", "id": 2334, "pid": 0, "tid": 101, "ts": 3368696218827.520,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcLaunchKernelExC", "pid": 121661, "tid": 121661,
+    "ts": 3368696194102.535, "dur": 7.220,
+    "args": {
+            "cbid": 62, "correlation": 2334
+    }
+  },
+  {
+    "ph": "f", "id": 2334, "pid": 121661, "tid": 121661, "ts": 3368696194102.535,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "kernel", "name": "void uccl::internode::dispatch<true, 2, true, 20480, 7, false, 2>(int4*, float*, long*, float*, uccl::internode::SourceMeta*, int4 const*, float const*, long const*, float const*, int*, int*, int*, int*, int const*, int const*, int const*, int const*, bool const*, int, int, int, int, int, int, int, int, void*, int, int, void**, int, int, int, int, unsigned long const*, int, void*)", "pid": 0, "tid": 101,
+    "ts": 3368696218896.384, "dur": 5957.632,
+    "args": {
+            "queued": 1794225722194115635, "device": 0, "context": 0,      "stream": 101, "correlation": 2335,      "registers per thread": 163,      "shared memory": 224,      "blocks per SM": 0.230769,      "warps per SM": 4.153846,      "grid": [24, 1, 1],      "block": [576, 1, 1],      "est. achieved occupancy %": 6
+    }
+  },
+  {
+    "ph": "f", "id": 2335, "pid": 0, "tid": 101, "ts": 3368696218896.384,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcLaunchKernelExC", "pid": 121661, "tid": 121661,
+    "ts": 3368696194110.065, "dur": 5.950,
+    "args": {
+            "cbid": 62, "correlation": 2335
+    }
+  },
+  {
+    "ph": "f", "id": 2335, "pid": 121661, "tid": 121661, "ts": 3368696194110.065,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcEventRecord", "pid": 121661, "tid": 121661,
+    "ts": 3368696194116.905, "dur": 0.920,
+    "args": {
+            "cbid": 74, "correlation": 2337
+    }
+  },
+  {
+    "ph": "f", "id": 2337, "pid": 121661, "tid": 121661, "ts": 3368696194116.905,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcStreamWaitEvent", "pid": 121661, "tid": 121661,
+    "ts": 3368696194118.075, "dur": 1.060,
+    "args": {
+            "cbid": 47, "correlation": 2338
+    }
+  },
+  {
+    "ph": "s", "id": 2338, "pid": 121661, "tid": 121661, "ts": 3368696194118.075,
+    "cat": "ac2g", "name": "ac2g"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcEventRecord", "pid": 121661, "tid": 121661,
+    "ts": 3368696194159.574, "dur": 1.230,
+    "args": {
+            "cbid": 74, "correlation": 2349
+    }
+  },
+  {
+    "ph": "f", "id": 2349, "pid": 121661, "tid": 121661, "ts": 3368696194159.574,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcStreamWaitEvent", "pid": 121661, "tid": 121661,
+    "ts": 3368696194161.044, "dur": 0.760,
+    "args": {
+            "cbid": 47, "correlation": 2350
+    }
+  },
+  {
+    "ph": "s", "id": 2350, "pid": 121661, "tid": 121661, "ts": 3368696194161.044,
+    "cat": "ac2g", "name": "ac2g"
+  },
+  {
+    "ph": "X", "cat": "kernel", "name": "void uccl::internode::cached_notify<false, 8192>(int, int, int, int, int*, int, int, int const*, int const*, int*, void*, void**, int**, int, int, bool, unsigned long const*, int, void*)", "pid": 0, "tid": 101,
+    "ts": 3368696224946.432, "dur": 84.480,
+    "args": {
+            "queued": 1794225722194169524, "device": 0, "context": 0,      "stream": 101, "correlation": 2352,      "registers per thread": 168,      "shared memory": 0,      "blocks per SM": 0.230769,      "warps per SM": 5.538462,      "grid": [24, 1, 1],      "block": [768, 1, 1],      "est. achieved occupancy %": 9
+    }
+  },
+  {
+    "ph": "f", "id": 2352, "pid": 0, "tid": 101, "ts": 3368696224946.432,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcLaunchKernelExC", "pid": 121661, "tid": 121661,
+    "ts": 3368696194162.574, "dur": 7.370,
+    "args": {
+            "cbid": 62, "correlation": 2352
+    }
+  },
+  {
+    "ph": "f", "id": 2352, "pid": 121661, "tid": 121661, "ts": 3368696194162.574,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "kernel", "name": "void uccl::internode::dispatch<true, 2, true, 20480, 7, false, 2>(int4*, float*, long*, float*, uccl::internode::SourceMeta*, int4 const*, float const*, long const*, float const*, int*, int*, int*, int*, int const*, int const*, int const*, int const*, bool const*, int, int, int, int, int, int, int, int, void*, int, int, void**, int, int, int, int, unsigned long const*, int, void*)", "pid": 0, "tid": 101,
+    "ts": 3368696225033.216, "dur": 6290.432,
+    "args": {
+            "queued": 1794225722194174954, "device": 0, "context": 0,      "stream": 101, "correlation": 2353,      "registers per thread": 163,      "shared memory": 224,      "blocks per SM": 0.230769,      "warps per SM": 4.153846,      "grid": [24, 1, 1],      "block": [576, 1, 1],      "est. achieved occupancy %": 6
+    }
+  },
+  {
+    "ph": "f", "id": 2353, "pid": 0, "tid": 101, "ts": 3368696225033.216,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcLaunchKernelExC", "pid": 121661, "tid": 121661,
+    "ts": 3368696194170.264, "dur": 4.980,
+    "args": {
+            "cbid": 62, "correlation": 2353
+    }
+  },
+  {
+    "ph": "f", "id": 2353, "pid": 121661, "tid": 121661, "ts": 3368696194170.264,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcEventRecord", "pid": 121661, "tid": 121661,
+    "ts": 3368696194176.454, "dur": 0.880,
+    "args": {
+            "cbid": 74, "correlation": 2355
+    }
+  },
+  {
+    "ph": "f", "id": 2355, "pid": 121661, "tid": 121661, "ts": 3368696194176.454,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcStreamWaitEvent", "pid": 121661, "tid": 121661,
+    "ts": 3368696194177.574, "dur": 1.400,
+    "args": {
+            "cbid": 47, "correlation": 2356
+    }
+  },
+  {
+    "ph": "s", "id": 2356, "pid": 121661, "tid": 121661, "ts": 3368696194177.574,
+    "cat": "ac2g", "name": "ac2g"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcEventRecord", "pid": 121661, "tid": 121661,
+    "ts": 3368696194218.963, "dur": 0.850,
+    "args": {
+            "cbid": 74, "correlation": 2367
+    }
+  },
+  {
+    "ph": "f", "id": 2367, "pid": 121661, "tid": 121661, "ts": 3368696194218.963,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcStreamWaitEvent", "pid": 121661, "tid": 121661,
+    "ts": 3368696194220.063, "dur": 0.860,
+    "args": {
+            "cbid": 47, "correlation": 2368
+    }
+  },
+  {
+    "ph": "s", "id": 2368, "pid": 121661, "tid": 121661, "ts": 3368696194220.063,
+    "cat": "ac2g", "name": "ac2g"
+  },
+  {
+    "ph": "X", "cat": "kernel", "name": "void uccl::internode::cached_notify<false, 8192>(int, int, int, int, int*, int, int, int const*, int const*, int*, void*, void**, int**, int, int, bool, unsigned long const*, int, void*)", "pid": 0, "tid": 101,
+    "ts": 3368696231398.656, "dur": 381.952,
+    "args": {
+            "queued": 1794225722194227643, "device": 0, "context": 0,      "stream": 101, "correlation": 2370,      "registers per thread": 168,      "shared memory": 0,      "blocks per SM": 0.230769,      "warps per SM": 5.538462,      "grid": [24, 1, 1],      "block": [768, 1, 1],      "est. achieved occupancy %": 9
+    }
+  },
+  {
+    "ph": "f", "id": 2370, "pid": 0, "tid": 101, "ts": 3368696231398.656,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcLaunchKernelExC", "pid": 121661, "tid": 121661,
+    "ts": 3368696194221.663, "dur": 6.640,
+    "args": {
+            "cbid": 62, "correlation": 2370
+    }
+  },
+  {
+    "ph": "f", "id": 2370, "pid": 121661, "tid": 121661, "ts": 3368696194221.663,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "kernel", "name": "void uccl::internode::dispatch<true, 2, true, 20480, 7, false, 2>(int4*, float*, long*, float*, uccl::internode::SourceMeta*, int4 const*, float const*, long const*, float const*, int*, int*, int*, int*, int const*, int const*, int const*, int const*, bool const*, int, int, int, int, int, int, int, int, void*, int, int, void**, int, int, int, int, unsigned long const*, int, void*)", "pid": 0, "tid": 101,
+    "ts": 3368696231782.912, "dur": 5999.872,
+    "args": {
+            "queued": 1794225722194233363, "device": 0, "context": 0,      "stream": 101, "correlation": 2371,      "registers per thread": 163,      "shared memory": 224,      "blocks per SM": 0.230769,      "warps per SM": 4.153846,      "grid": [24, 1, 1],      "block": [576, 1, 1],      "est. achieved occupancy %": 6
+    }
+  },
+  {
+    "ph": "f", "id": 2371, "pid": 0, "tid": 101, "ts": 3368696231782.912,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcLaunchKernelExC", "pid": 121661, "tid": 121661,
+    "ts": 3368696194228.633, "dur": 5.060,
+    "args": {
+            "cbid": 62, "correlation": 2371
+    }
+  },
+  {
+    "ph": "f", "id": 2371, "pid": 121661, "tid": 121661, "ts": 3368696194228.633,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcEventRecord", "pid": 121661, "tid": 121661,
+    "ts": 3368696194234.573, "dur": 0.700,
+    "args": {
+            "cbid": 74, "correlation": 2373
+    }
+  },
+  {
+    "ph": "f", "id": 2373, "pid": 121661, "tid": 121661, "ts": 3368696194234.573,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcStreamWaitEvent", "pid": 121661, "tid": 121661,
+    "ts": 3368696194235.523, "dur": 1.020,
+    "args": {
+            "cbid": 47, "correlation": 2374
+    }
+  },
+  {
+    "ph": "s", "id": 2374, "pid": 121661, "tid": 121661, "ts": 3368696194235.523,
+    "cat": "ac2g", "name": "ac2g"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcEventRecord", "pid": 121661, "tid": 121661,
+    "ts": 3368696194274.592, "dur": 0.770,
+    "args": {
+            "cbid": 74, "correlation": 2385
+    }
+  },
+  {
+    "ph": "f", "id": 2385, "pid": 121661, "tid": 121661, "ts": 3368696194274.592,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcStreamWaitEvent", "pid": 121661, "tid": 121661,
+    "ts": 3368696194275.602, "dur": 0.900,
+    "args": {
+            "cbid": 47, "correlation": 2386
+    }
+  },
+  {
+    "ph": "s", "id": 2386, "pid": 121661, "tid": 121661, "ts": 3368696194275.602,
+    "cat": "ac2g", "name": "ac2g"
+  },
+  {
+    "ph": "X", "cat": "kernel", "name": "void uccl::internode::cached_notify<false, 8192>(int, int, int, int, int*, int, int, int const*, int const*, int*, void*, void**, int**, int, int, bool, unsigned long const*, int, void*)", "pid": 0, "tid": 101,
+    "ts": 3368696237879.552, "dur": 277.248,
+    "args": {
+            "queued": 1794225722194283022, "device": 0, "context": 0,      "stream": 101, "correlation": 2388,      "registers per thread": 168,      "shared memory": 0,      "blocks per SM": 0.230769,      "warps per SM": 5.538462,      "grid": [24, 1, 1],      "block": [768, 1, 1],      "est. achieved occupancy %": 9
+    }
+  },
+  {
+    "ph": "f", "id": 2388, "pid": 0, "tid": 101, "ts": 3368696237879.552,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcLaunchKernelExC", "pid": 121661, "tid": 121661,
+    "ts": 3368696194277.212, "dur": 6.170,
+    "args": {
+            "cbid": 62, "correlation": 2388
+    }
+  },
+  {
+    "ph": "f", "id": 2388, "pid": 121661, "tid": 121661, "ts": 3368696194277.212,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "kernel", "name": "void uccl::internode::dispatch<true, 2, true, 20480, 7, false, 2>(int4*, float*, long*, float*, uccl::internode::SourceMeta*, int4 const*, float const*, long const*, float const*, int*, int*, int*, int*, int const*, int const*, int const*, int const*, bool const*, int, int, int, int, int, int, int, int, void*, int, int, void**, int, int, int, int, unsigned long const*, int, void*)", "pid": 0, "tid": 101,
+    "ts": 3368696238159.360, "dur": 6184.704,
+    "args": {
+            "queued": 1794225722194289012, "device": 0, "context": 0,      "stream": 101, "correlation": 2389,      "registers per thread": 163,      "shared memory": 224,      "blocks per SM": 0.230769,      "warps per SM": 4.153846,      "grid": [24, 1, 1],      "block": [576, 1, 1],      "est. achieved occupancy %": 6
+    }
+  },
+  {
+    "ph": "f", "id": 2389, "pid": 0, "tid": 101, "ts": 3368696238159.360,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcLaunchKernelExC", "pid": 121661, "tid": 121661,
+    "ts": 3368696194283.682, "dur": 5.770,
+    "args": {
+            "cbid": 62, "correlation": 2389
+    }
+  },
+  {
+    "ph": "f", "id": 2389, "pid": 121661, "tid": 121661, "ts": 3368696194283.682,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcEventRecord", "pid": 121661, "tid": 121661,
+    "ts": 3368696194290.742, "dur": 0.900,
+    "args": {
+            "cbid": 74, "correlation": 2391
+    }
+  },
+  {
+    "ph": "f", "id": 2391, "pid": 121661, "tid": 121661, "ts": 3368696194290.742,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcStreamWaitEvent", "pid": 121661, "tid": 121661,
+    "ts": 3368696194291.882, "dur": 1.610,
+    "args": {
+            "cbid": 47, "correlation": 2392
+    }
+  },
+  {
+    "ph": "s", "id": 2392, "pid": 121661, "tid": 121661, "ts": 3368696194291.882,
+    "cat": "ac2g", "name": "ac2g"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcEventRecord", "pid": 121661, "tid": 121661,
+    "ts": 3368696194330.771, "dur": 1.190,
+    "args": {
+            "cbid": 74, "correlation": 2403
+    }
+  },
+  {
+    "ph": "f", "id": 2403, "pid": 121661, "tid": 121661, "ts": 3368696194330.771,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcStreamWaitEvent", "pid": 121661, "tid": 121661,
+    "ts": 3368696194332.221, "dur": 1.720,
+    "args": {
+            "cbid": 47, "correlation": 2404
+    }
+  },
+  {
+    "ph": "s", "id": 2404, "pid": 121661, "tid": 121661, "ts": 3368696194332.221,
+    "cat": "ac2g", "name": "ac2g"
+  },
+  {
+    "ph": "X", "cat": "kernel", "name": "void uccl::internode::cached_notify<false, 8192>(int, int, int, int, int*, int, int, int const*, int const*, int*, void*, void**, int**, int, int, bool, unsigned long const*, int, void*)", "pid": 0, "tid": 101,
+    "ts": 3368696244412.928, "dur": 185.856,
+    "args": {
+            "queued": 1794225722194341171, "device": 0, "context": 0,      "stream": 101, "correlation": 2406,      "registers per thread": 168,      "shared memory": 0,      "blocks per SM": 0.230769,      "warps per SM": 5.538462,      "grid": [24, 1, 1],      "block": [768, 1, 1],      "est. achieved occupancy %": 9
+    }
+  },
+  {
+    "ph": "f", "id": 2406, "pid": 0, "tid": 101, "ts": 3368696244412.928,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcLaunchKernelExC", "pid": 121661, "tid": 121661,
+    "ts": 3368696194334.701, "dur": 7.160,
+    "args": {
+            "cbid": 62, "correlation": 2406
+    }
+  },
+  {
+    "ph": "f", "id": 2406, "pid": 121661, "tid": 121661, "ts": 3368696194334.701,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "kernel", "name": "void uccl::internode::dispatch<true, 2, true, 20480, 7, false, 2>(int4*, float*, long*, float*, uccl::internode::SourceMeta*, int4 const*, float const*, long const*, float const*, int*, int*, int*, int*, int const*, int const*, int const*, int const*, bool const*, int, int, int, int, int, int, int, int, void*, int, int, void**, int, int, int, int, unsigned long const*, int, void*)", "pid": 0, "tid": 101,
+    "ts": 3368696244601.088, "dur": 6033.664,
+    "args": {
+            "queued": 1794225722194346851, "device": 0, "context": 0,      "stream": 101, "correlation": 2407,      "registers per thread": 163,      "shared memory": 224,      "blocks per SM": 0.230769,      "warps per SM": 4.153846,      "grid": [24, 1, 1],      "block": [576, 1, 1],      "est. achieved occupancy %": 6
+    }
+  },
+  {
+    "ph": "f", "id": 2407, "pid": 0, "tid": 101, "ts": 3368696244601.088,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcLaunchKernelExC", "pid": 121661, "tid": 121661,
+    "ts": 3368696194342.171, "dur": 5.140,
+    "args": {
+            "cbid": 62, "correlation": 2407
+    }
+  },
+  {
+    "ph": "f", "id": 2407, "pid": 121661, "tid": 121661, "ts": 3368696194342.171,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcEventRecord", "pid": 121661, "tid": 121661,
+    "ts": 3368696194348.151, "dur": 1.270,
+    "args": {
+            "cbid": 74, "correlation": 2409
+    }
+  },
+  {
+    "ph": "f", "id": 2409, "pid": 121661, "tid": 121661, "ts": 3368696194348.151,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcStreamWaitEvent", "pid": 121661, "tid": 121661,
+    "ts": 3368696194349.641, "dur": 1.520,
+    "args": {
+            "cbid": 47, "correlation": 2410
+    }
+  },
+  {
+    "ph": "s", "id": 2410, "pid": 121661, "tid": 121661, "ts": 3368696194349.641,
+    "cat": "ac2g", "name": "ac2g"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcEventRecord", "pid": 121661, "tid": 121661,
+    "ts": 3368696194388.770, "dur": 1.070,
+    "args": {
+            "cbid": 74, "correlation": 2421
+    }
+  },
+  {
+    "ph": "f", "id": 2421, "pid": 121661, "tid": 121661, "ts": 3368696194388.770,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcStreamWaitEvent", "pid": 121661, "tid": 121661,
+    "ts": 3368696194390.080, "dur": 1.140,
+    "args": {
+            "cbid": 47, "correlation": 2422
+    }
+  },
+  {
+    "ph": "s", "id": 2422, "pid": 121661, "tid": 121661, "ts": 3368696194390.080,
+    "cat": "ac2g", "name": "ac2g"
+  },
+  {
+    "ph": "X", "cat": "kernel", "name": "void uccl::internode::cached_notify<false, 8192>(int, int, int, int, int*, int, int, int const*, int const*, int*, void*, void**, int**, int, int, bool, unsigned long const*, int, void*)", "pid": 0, "tid": 101,
+    "ts": 3368696250717.440, "dur": 169.728,
+    "args": {
+            "queued": 1794225722194398260, "device": 0, "context": 0,      "stream": 101, "correlation": 2424,      "registers per thread": 168,      "shared memory": 0,      "blocks per SM": 0.230769,      "warps per SM": 5.538462,      "grid": [24, 1, 1],      "block": [768, 1, 1],      "est. achieved occupancy %": 9
+    }
+  },
+  {
+    "ph": "f", "id": 2424, "pid": 0, "tid": 101, "ts": 3368696250717.440,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcLaunchKernelExC", "pid": 121661, "tid": 121661,
+    "ts": 3368696194391.970, "dur": 7.320,
+    "args": {
+            "cbid": 62, "correlation": 2424
+    }
+  },
+  {
+    "ph": "f", "id": 2424, "pid": 121661, "tid": 121661, "ts": 3368696194391.970,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "kernel", "name": "void uccl::internode::dispatch<true, 2, true, 20480, 7, false, 2>(int4*, float*, long*, float*, uccl::internode::SourceMeta*, int4 const*, float const*, long const*, float const*, int*, int*, int*, int*, int const*, int const*, int const*, int const*, bool const*, int, int, int, int, int, int, int, int, void*, int, int, void**, int, int, int, int, unsigned long const*, int, void*)", "pid": 0, "tid": 101,
+    "ts": 3368696250889.472, "dur": 5766.144,
+    "args": {
+            "queued": 1794225722194403920, "device": 0, "context": 0,      "stream": 101, "correlation": 2425,      "registers per thread": 163,      "shared memory": 224,      "blocks per SM": 0.230769,      "warps per SM": 4.153846,      "grid": [24, 1, 1],      "block": [576, 1, 1],      "est. achieved occupancy %": 6
+    }
+  },
+  {
+    "ph": "f", "id": 2425, "pid": 0, "tid": 101, "ts": 3368696250889.472,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcLaunchKernelExC", "pid": 121661, "tid": 121661,
+    "ts": 3368696194399.570, "dur": 4.650,
+    "args": {
+            "cbid": 62, "correlation": 2425
+    }
+  },
+  {
+    "ph": "f", "id": 2425, "pid": 121661, "tid": 121661, "ts": 3368696194399.570,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcEventRecord", "pid": 121661, "tid": 121661,
+    "ts": 3368696194405.080, "dur": 0.580,
+    "args": {
+            "cbid": 74, "correlation": 2427
+    }
+  },
+  {
+    "ph": "f", "id": 2427, "pid": 121661, "tid": 121661, "ts": 3368696194405.080,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcStreamWaitEvent", "pid": 121661, "tid": 121661,
+    "ts": 3368696194405.890, "dur": 0.960,
+    "args": {
+            "cbid": 47, "correlation": 2428
+    }
+  },
+  {
+    "ph": "s", "id": 2428, "pid": 121661, "tid": 121661, "ts": 3368696194405.890,
+    "cat": "ac2g", "name": "ac2g"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcEventRecord", "pid": 121661, "tid": 121661,
+    "ts": 3368696194443.569, "dur": 0.750,
+    "args": {
+            "cbid": 74, "correlation": 2439
+    }
+  },
+  {
+    "ph": "f", "id": 2439, "pid": 121661, "tid": 121661, "ts": 3368696194443.569,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcStreamWaitEvent", "pid": 121661, "tid": 121661,
+    "ts": 3368696194444.559, "dur": 0.770,
+    "args": {
+            "cbid": 47, "correlation": 2440
+    }
+  },
+  {
+    "ph": "s", "id": 2440, "pid": 121661, "tid": 121661, "ts": 3368696194444.559,
+    "cat": "ac2g", "name": "ac2g"
+  },
+  {
+    "ph": "X", "cat": "kernel", "name": "void uccl::internode::cached_notify<false, 8192>(int, int, int, int, int*, int, int, int const*, int const*, int*, void*, void**, int**, int, int, bool, unsigned long const*, int, void*)", "pid": 0, "tid": 101,
+    "ts": 3368696256733.440, "dur": 361.728,
+    "args": {
+            "queued": 1794225722194451289, "device": 0, "context": 0,      "stream": 101, "correlation": 2442,      "registers per thread": 168,      "shared memory": 0,      "blocks per SM": 0.230769,      "warps per SM": 5.538462,      "grid": [24, 1, 1],      "block": [768, 1, 1],      "est. achieved occupancy %": 9
+    }
+  },
+  {
+    "ph": "f", "id": 2442, "pid": 0, "tid": 101, "ts": 3368696256733.440,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcLaunchKernelExC", "pid": 121661, "tid": 121661,
+    "ts": 3368696194446.069, "dur": 5.750,
+    "args": {
+            "cbid": 62, "correlation": 2442
+    }
+  },
+  {
+    "ph": "f", "id": 2442, "pid": 121661, "tid": 121661, "ts": 3368696194446.069,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "kernel", "name": "void uccl::internode::dispatch<true, 2, true, 20480, 7, false, 2>(int4*, float*, long*, float*, uccl::internode::SourceMeta*, int4 const*, float const*, long const*, float const*, int*, int*, int*, int*, int const*, int const*, int const*, int const*, bool const*, int, int, int, int, int, int, int, int, void*, int, int, void**, int, int, int, int, unsigned long const*, int, void*)", "pid": 0, "tid": 101,
+    "ts": 3368696257097.472, "dur": 6044.672,
+    "args": {
+            "queued": 1794225722194456219, "device": 0, "context": 0,      "stream": 101, "correlation": 2443,      "registers per thread": 163,      "shared memory": 224,      "blocks per SM": 0.230769,      "warps per SM": 4.153846,      "grid": [24, 1, 1],      "block": [576, 1, 1],      "est. achieved occupancy %": 6
+    }
+  },
+  {
+    "ph": "f", "id": 2443, "pid": 0, "tid": 101, "ts": 3368696257097.472,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcLaunchKernelExC", "pid": 121661, "tid": 121661,
+    "ts": 3368696194452.099, "dur": 4.570,
+    "args": {
+            "cbid": 62, "correlation": 2443
+    }
+  },
+  {
+    "ph": "f", "id": 2443, "pid": 121661, "tid": 121661, "ts": 3368696194452.099,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcEventRecord", "pid": 121661, "tid": 121661,
+    "ts": 3368696194458.019, "dur": 0.900,
+    "args": {
+            "cbid": 74, "correlation": 2445
+    }
+  },
+  {
+    "ph": "f", "id": 2445, "pid": 121661, "tid": 121661, "ts": 3368696194458.019,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcStreamWaitEvent", "pid": 121661, "tid": 121661,
+    "ts": 3368696194459.139, "dur": 1.060,
+    "args": {
+            "cbid": 47, "correlation": 2446
+    }
+  },
+  {
+    "ph": "s", "id": 2446, "pid": 121661, "tid": 121661, "ts": 3368696194459.139,
+    "cat": "ac2g", "name": "ac2g"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcEventRecord", "pid": 121661, "tid": 121661,
+    "ts": 3368696194497.108, "dur": 0.770,
+    "args": {
+            "cbid": 74, "correlation": 2457
+    }
+  },
+  {
+    "ph": "f", "id": 2457, "pid": 121661, "tid": 121661, "ts": 3368696194497.108,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcStreamWaitEvent", "pid": 121661, "tid": 121661,
+    "ts": 3368696194498.138, "dur": 1.570,
+    "args": {
+            "cbid": 47, "correlation": 2458
+    }
+  },
+  {
+    "ph": "s", "id": 2458, "pid": 121661, "tid": 121661, "ts": 3368696194498.138,
+    "cat": "ac2g", "name": "ac2g"
+  },
+  {
+    "ph": "X", "cat": "kernel", "name": "void uccl::internode::cached_notify<false, 8192>(int, int, int, int, int*, int, int, int const*, int const*, int*, void*, void**, int**, int, int, bool, unsigned long const*, int, void*)", "pid": 0, "tid": 101,
+    "ts": 3368696263239.680, "dur": 280.064,
+    "args": {
+            "queued": 1794225722194505188, "device": 0, "context": 0,      "stream": 101, "correlation": 2460,      "registers per thread": 168,      "shared memory": 0,      "blocks per SM": 0.230769,      "warps per SM": 5.538462,      "grid": [24, 1, 1],      "block": [768, 1, 1],      "est. achieved occupancy %": 9
+    }
+  },
+  {
+    "ph": "f", "id": 2460, "pid": 0, "tid": 101, "ts": 3368696263239.680,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcLaunchKernelExC", "pid": 121661, "tid": 121661,
+    "ts": 3368696194500.468, "dur": 5.250,
+    "args": {
+            "cbid": 62, "correlation": 2460
+    }
+  },
+  {
+    "ph": "f", "id": 2460, "pid": 121661, "tid": 121661, "ts": 3368696194500.468,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "kernel", "name": "void uccl::internode::dispatch<true, 2, true, 20480, 7, false, 2>(int4*, float*, long*, float*, uccl::internode::SourceMeta*, int4 const*, float const*, long const*, float const*, int*, int*, int*, int*, int const*, int const*, int const*, int const*, bool const*, int, int, int, int, int, int, int, int, void*, int, int, void**, int, int, int, int, unsigned long const*, int, void*)", "pid": 0, "tid": 101,
+    "ts": 3368696263522.304, "dur": 5991.680,
+    "args": {
+            "queued": 1794225722194509558, "device": 0, "context": 0,      "stream": 101, "correlation": 2461,      "registers per thread": 163,      "shared memory": 224,      "blocks per SM": 0.230769,      "warps per SM": 4.153846,      "grid": [24, 1, 1],      "block": [576, 1, 1],      "est. achieved occupancy %": 6
+    }
+  },
+  {
+    "ph": "f", "id": 2461, "pid": 0, "tid": 101, "ts": 3368696263522.304,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcLaunchKernelExC", "pid": 121661, "tid": 121661,
+    "ts": 3368696194506.008, "dur": 3.850,
+    "args": {
+            "cbid": 62, "correlation": 2461
+    }
+  },
+  {
+    "ph": "f", "id": 2461, "pid": 121661, "tid": 121661, "ts": 3368696194506.008,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcEventRecord", "pid": 121661, "tid": 121661,
+    "ts": 3368696194510.688, "dur": 0.610,
+    "args": {
+            "cbid": 74, "correlation": 2463
+    }
+  },
+  {
+    "ph": "f", "id": 2463, "pid": 121661, "tid": 121661, "ts": 3368696194510.688,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcStreamWaitEvent", "pid": 121661, "tid": 121661,
+    "ts": 3368696194511.518, "dur": 0.990,
+    "args": {
+            "cbid": 47, "correlation": 2464
+    }
+  },
+  {
+    "ph": "s", "id": 2464, "pid": 121661, "tid": 121661, "ts": 3368696194511.518,
+    "cat": "ac2g", "name": "ac2g"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcEventRecord", "pid": 121661, "tid": 121661,
+    "ts": 3368696194548.577, "dur": 1.180,
+    "args": {
+            "cbid": 74, "correlation": 2475
+    }
+  },
+  {
+    "ph": "f", "id": 2475, "pid": 121661, "tid": 121661, "ts": 3368696194548.577,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcStreamWaitEvent", "pid": 121661, "tid": 121661,
+    "ts": 3368696194550.027, "dur": 0.960,
+    "args": {
+            "cbid": 47, "correlation": 2476
+    }
+  },
+  {
+    "ph": "s", "id": 2476, "pid": 121661, "tid": 121661, "ts": 3368696194550.027,
+    "cat": "ac2g", "name": "ac2g"
+  },
+  {
+    "ph": "X", "cat": "kernel", "name": "void uccl::internode::cached_notify<false, 8192>(int, int, int, int, int*, int, int, int const*, int const*, int*, void*, void**, int**, int, int, bool, unsigned long const*, int, void*)", "pid": 0, "tid": 101,
+    "ts": 3368696269618.688, "dur": 171.520,
+    "args": {
+            "queued": 1794225722194556267, "device": 0, "context": 0,      "stream": 101, "correlation": 2478,      "registers per thread": 168,      "shared memory": 0,      "blocks per SM": 0.230769,      "warps per SM": 5.538462,      "grid": [24, 1, 1],      "block": [768, 1, 1],      "est. achieved occupancy %": 9
+    }
+  },
+  {
+    "ph": "f", "id": 2478, "pid": 0, "tid": 101, "ts": 3368696269618.688,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcLaunchKernelExC", "pid": 121661, "tid": 121661,
+    "ts": 3368696194551.717, "dur": 4.900,
+    "args": {
+            "cbid": 62, "correlation": 2478
+    }
+  },
+  {
+    "ph": "f", "id": 2478, "pid": 121661, "tid": 121661, "ts": 3368696194551.717,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "kernel", "name": "void uccl::internode::dispatch<true, 2, true, 20480, 7, false, 2>(int4*, float*, long*, float*, uccl::internode::SourceMeta*, int4 const*, float const*, long const*, float const*, int*, int*, int*, int*, int const*, int const*, int const*, int const*, bool const*, int, int, int, int, int, int, int, int, void*, int, int, void**, int, int, int, int, unsigned long const*, int, void*)", "pid": 0, "tid": 101,
+    "ts": 3368696269792.512, "dur": 6028.032,
+    "args": {
+            "queued": 1794225722194560957, "device": 0, "context": 0,      "stream": 101, "correlation": 2479,      "registers per thread": 163,      "shared memory": 224,      "blocks per SM": 0.230769,      "warps per SM": 4.153846,      "grid": [24, 1, 1],      "block": [576, 1, 1],      "est. achieved occupancy %": 6
+    }
+  },
+  {
+    "ph": "f", "id": 2479, "pid": 0, "tid": 101, "ts": 3368696269792.512,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcLaunchKernelExC", "pid": 121661, "tid": 121661,
+    "ts": 3368696194556.897, "dur": 4.360,
+    "args": {
+            "cbid": 62, "correlation": 2479
+    }
+  },
+  {
+    "ph": "f", "id": 2479, "pid": 121661, "tid": 121661, "ts": 3368696194556.897,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcEventRecord", "pid": 121661, "tid": 121661,
+    "ts": 3368696194562.527, "dur": 0.640,
+    "args": {
+            "cbid": 74, "correlation": 2481
+    }
+  },
+  {
+    "ph": "f", "id": 2481, "pid": 121661, "tid": 121661, "ts": 3368696194562.527,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcStreamWaitEvent", "pid": 121661, "tid": 121661,
+    "ts": 3368696194563.397, "dur": 1.500,
+    "args": {
+            "cbid": 47, "correlation": 2482
+    }
+  },
+  {
+    "ph": "s", "id": 2482, "pid": 121661, "tid": 121661, "ts": 3368696194563.397,
+    "cat": "ac2g", "name": "ac2g"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcEventRecord", "pid": 121661, "tid": 121661,
+    "ts": 3368696194601.406, "dur": 0.810,
+    "args": {
+            "cbid": 74, "correlation": 2493
+    }
+  },
+  {
+    "ph": "f", "id": 2493, "pid": 121661, "tid": 121661, "ts": 3368696194601.406,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcStreamWaitEvent", "pid": 121661, "tid": 121661,
+    "ts": 3368696194602.476, "dur": 0.750,
+    "args": {
+            "cbid": 47, "correlation": 2494
+    }
+  },
+  {
+    "ph": "s", "id": 2494, "pid": 121661, "tid": 121661, "ts": 3368696194602.476,
+    "cat": "ac2g", "name": "ac2g"
+  },
+  {
+    "ph": "X", "cat": "kernel", "name": "void uccl::internode::cached_notify<false, 8192>(int, int, int, int, int*, int, int, int const*, int const*, int*, void*, void**, int**, int, int, bool, unsigned long const*, int, void*)", "pid": 0, "tid": 101,
+    "ts": 3368696275918.592, "dur": 118.528,
+    "args": {
+            "queued": 1794225722194608806, "device": 0, "context": 0,      "stream": 101, "correlation": 2496,      "registers per thread": 168,      "shared memory": 0,      "blocks per SM": 0.230769,      "warps per SM": 5.538462,      "grid": [24, 1, 1],      "block": [768, 1, 1],      "est. achieved occupancy %": 9
+    }
+  },
+  {
+    "ph": "f", "id": 2496, "pid": 0, "tid": 101, "ts": 3368696275918.592,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcLaunchKernelExC", "pid": 121661, "tid": 121661,
+    "ts": 3368696194604.016, "dur": 5.320,
+    "args": {
+            "cbid": 62, "correlation": 2496
+    }
+  },
+  {
+    "ph": "f", "id": 2496, "pid": 121661, "tid": 121661, "ts": 3368696194604.016,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "kernel", "name": "void uccl::internode::dispatch<true, 2, true, 20480, 7, false, 2>(int4*, float*, long*, float*, uccl::internode::SourceMeta*, int4 const*, float const*, long const*, float const*, int*, int*, int*, int*, int const*, int const*, int const*, int const*, bool const*, int, int, int, int, int, int, int, int, void*, int, int, void**, int, int, int, int, unsigned long const*, int, void*)", "pid": 0, "tid": 101,
+    "ts": 3368696276039.424, "dur": 6014.464,
+    "args": {
+            "queued": 1794225722194613916, "device": 0, "context": 0,      "stream": 101, "correlation": 2497,      "registers per thread": 163,      "shared memory": 224,      "blocks per SM": 0.230769,      "warps per SM": 4.153846,      "grid": [24, 1, 1],      "block": [576, 1, 1],      "est. achieved occupancy %": 6
+    }
+  },
+  {
+    "ph": "f", "id": 2497, "pid": 0, "tid": 101, "ts": 3368696276039.424,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcLaunchKernelExC", "pid": 121661, "tid": 121661,
+    "ts": 3368696194609.626, "dur": 4.590,
+    "args": {
+            "cbid": 62, "correlation": 2497
+    }
+  },
+  {
+    "ph": "f", "id": 2497, "pid": 121661, "tid": 121661, "ts": 3368696194609.626,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcEventRecord", "pid": 121661, "tid": 121661,
+    "ts": 3368696194615.146, "dur": 0.760,
+    "args": {
+            "cbid": 74, "correlation": 2499
+    }
+  },
+  {
+    "ph": "f", "id": 2499, "pid": 121661, "tid": 121661, "ts": 3368696194615.146,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcStreamWaitEvent", "pid": 121661, "tid": 121661,
+    "ts": 3368696194616.116, "dur": 0.970,
+    "args": {
+            "cbid": 47, "correlation": 2500
+    }
+  },
+  {
+    "ph": "s", "id": 2500, "pid": 121661, "tid": 121661, "ts": 3368696194616.116,
+    "cat": "ac2g", "name": "ac2g"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcEventRecord", "pid": 121661, "tid": 121661,
+    "ts": 3368696194653.875, "dur": 0.780,
+    "args": {
+            "cbid": 74, "correlation": 2511
+    }
+  },
+  {
+    "ph": "f", "id": 2511, "pid": 121661, "tid": 121661, "ts": 3368696194653.875,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcStreamWaitEvent", "pid": 121661, "tid": 121661,
+    "ts": 3368696194654.915, "dur": 0.760,
+    "args": {
+            "cbid": 47, "correlation": 2512
+    }
+  },
+  {
+    "ph": "s", "id": 2512, "pid": 121661, "tid": 121661, "ts": 3368696194654.915,
+    "cat": "ac2g", "name": "ac2g"
+  },
+  {
+    "ph": "X", "cat": "kernel", "name": "void uccl::internode::cached_notify<false, 8192>(int, int, int, int, int*, int, int, int const*, int const*, int*, void*, void**, int**, int, int, bool, unsigned long const*, int, void*)", "pid": 0, "tid": 101,
+    "ts": 3368696282142.976, "dur": 427.008,
+    "args": {
+            "queued": 1794225722194661115, "device": 0, "context": 0,      "stream": 101, "correlation": 2514,      "registers per thread": 168,      "shared memory": 0,      "blocks per SM": 0.230769,      "warps per SM": 5.538462,      "grid": [24, 1, 1],      "block": [768, 1, 1],      "est. achieved occupancy %": 9
+    }
+  },
+  {
+    "ph": "f", "id": 2514, "pid": 0, "tid": 101, "ts": 3368696282142.976,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcLaunchKernelExC", "pid": 121661, "tid": 121661,
+    "ts": 3368696194656.415, "dur": 5.030,
+    "args": {
+            "cbid": 62, "correlation": 2514
+    }
+  },
+  {
+    "ph": "f", "id": 2514, "pid": 121661, "tid": 121661, "ts": 3368696194656.415,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "kernel", "name": "void uccl::internode::dispatch<true, 2, true, 20480, 7, false, 2>(int4*, float*, long*, float*, uccl::internode::SourceMeta*, int4 const*, float const*, long const*, float const*, int*, int*, int*, int*, int const*, int const*, int const*, int const*, bool const*, int, int, int, int, int, int, int, int, void*, int, int, void**, int, int, int, int, unsigned long const*, int, void*)", "pid": 0, "tid": 101,
+    "ts": 3368696282572.288, "dur": 5959.424,
+    "args": {
+            "queued": 1794225722194665445, "device": 0, "context": 0,      "stream": 101, "correlation": 2515,      "registers per thread": 163,      "shared memory": 224,      "blocks per SM": 0.230769,      "warps per SM": 4.153846,      "grid": [24, 1, 1],      "block": [576, 1, 1],      "est. achieved occupancy %": 6
+    }
+  },
+  {
+    "ph": "f", "id": 2515, "pid": 0, "tid": 101, "ts": 3368696282572.288,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcLaunchKernelExC", "pid": 121661, "tid": 121661,
+    "ts": 3368696194661.745, "dur": 4.000,
+    "args": {
+            "cbid": 62, "correlation": 2515
+    }
+  },
+  {
+    "ph": "f", "id": 2515, "pid": 121661, "tid": 121661, "ts": 3368696194661.745,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcEventRecord", "pid": 121661, "tid": 121661,
+    "ts": 3368696194666.515, "dur": 0.640,
+    "args": {
+            "cbid": 74, "correlation": 2517
+    }
+  },
+  {
+    "ph": "f", "id": 2517, "pid": 121661, "tid": 121661, "ts": 3368696194666.515,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcStreamWaitEvent", "pid": 121661, "tid": 121661,
+    "ts": 3368696194667.385, "dur": 1.520,
+    "args": {
+            "cbid": 47, "correlation": 2518
+    }
+  },
+  {
+    "ph": "s", "id": 2518, "pid": 121661, "tid": 121661, "ts": 3368696194667.385,
+    "cat": "ac2g", "name": "ac2g"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcEventRecord", "pid": 121661, "tid": 121661,
+    "ts": 3368696194705.165, "dur": 0.790,
+    "args": {
+            "cbid": 74, "correlation": 2529
+    }
+  },
+  {
+    "ph": "f", "id": 2529, "pid": 121661, "tid": 121661, "ts": 3368696194705.165,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcStreamWaitEvent", "pid": 121661, "tid": 121661,
+    "ts": 3368696194706.205, "dur": 0.830,
+    "args": {
+            "cbid": 47, "correlation": 2530
+    }
+  },
+  {
+    "ph": "s", "id": 2530, "pid": 121661, "tid": 121661, "ts": 3368696194706.205,
+    "cat": "ac2g", "name": "ac2g"
+  },
+  {
+    "ph": "X", "cat": "kernel", "name": "void uccl::internode::cached_notify<false, 8192>(int, int, int, int, int*, int, int, int const*, int const*, int*, void*, void**, int**, int, int, bool, unsigned long const*, int, void*)", "pid": 0, "tid": 101,
+    "ts": 3368696288630.016, "dur": 343.552,
+    "args": {
+            "queued": 1794225722194712694, "device": 0, "context": 0,      "stream": 101, "correlation": 2532,      "registers per thread": 168,      "shared memory": 0,      "blocks per SM": 0.230769,      "warps per SM": 5.538462,      "grid": [24, 1, 1],      "block": [768, 1, 1],      "est. achieved occupancy %": 9
+    }
+  },
+  {
+    "ph": "f", "id": 2532, "pid": 0, "tid": 101, "ts": 3368696288630.016,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcLaunchKernelExC", "pid": 121661, "tid": 121661,
+    "ts": 3368696194707.785, "dur": 5.279,
+    "args": {
+            "cbid": 62, "correlation": 2532
+    }
+  },
+  {
+    "ph": "f", "id": 2532, "pid": 121661, "tid": 121661, "ts": 3368696194707.785,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "kernel", "name": "void uccl::internode::dispatch<true, 2, true, 20480, 7, false, 2>(int4*, float*, long*, float*, uccl::internode::SourceMeta*, int4 const*, float const*, long const*, float const*, int*, int*, int*, int*, int const*, int const*, int const*, int const*, bool const*, int, int, int, int, int, int, int, int, void*, int, int, void**, int, int, int, int, unsigned long const*, int, void*)", "pid": 0, "tid": 101,
+    "ts": 3368696288975.872, "dur": 6098.432,
+    "args": {
+            "queued": 1794225722194716954, "device": 0, "context": 0,      "stream": 101, "correlation": 2533,      "registers per thread": 163,      "shared memory": 224,      "blocks per SM": 0.230769,      "warps per SM": 4.153846,      "grid": [24, 1, 1],      "block": [576, 1, 1],      "est. achieved occupancy %": 6
+    }
+  },
+  {
+    "ph": "f", "id": 2533, "pid": 0, "tid": 101, "ts": 3368696288975.872,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcLaunchKernelExC", "pid": 121661, "tid": 121661,
+    "ts": 3368696194713.344, "dur": 3.990,
+    "args": {
+            "cbid": 62, "correlation": 2533
+    }
+  },
+  {
+    "ph": "f", "id": 2533, "pid": 121661, "tid": 121661, "ts": 3368696194713.344,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcEventRecord", "pid": 121661, "tid": 121661,
+    "ts": 3368696194718.264, "dur": 0.610,
+    "args": {
+            "cbid": 74, "correlation": 2535
+    }
+  },
+  {
+    "ph": "f", "id": 2535, "pid": 121661, "tid": 121661, "ts": 3368696194718.264,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcStreamWaitEvent", "pid": 121661, "tid": 121661,
+    "ts": 3368696194719.104, "dur": 0.980,
+    "args": {
+            "cbid": 47, "correlation": 2536
+    }
+  },
+  {
+    "ph": "s", "id": 2536, "pid": 121661, "tid": 121661, "ts": 3368696194719.104,
+    "cat": "ac2g", "name": "ac2g"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcEventRecord", "pid": 121661, "tid": 121661,
+    "ts": 3368696194756.474, "dur": 0.750,
+    "args": {
+            "cbid": 74, "correlation": 2547
+    }
+  },
+  {
+    "ph": "f", "id": 2547, "pid": 121661, "tid": 121661, "ts": 3368696194756.474,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcStreamWaitEvent", "pid": 121661, "tid": 121661,
+    "ts": 3368696194757.494, "dur": 0.790,
+    "args": {
+            "cbid": 47, "correlation": 2548
+    }
+  },
+  {
+    "ph": "s", "id": 2548, "pid": 121661, "tid": 121661, "ts": 3368696194757.494,
+    "cat": "ac2g", "name": "ac2g"
+  },
+  {
+    "ph": "X", "cat": "kernel", "name": "void uccl::internode::cached_notify<false, 8192>(int, int, int, int, int*, int, int, int const*, int const*, int*, void*, void**, int**, int, int, bool, unsigned long const*, int, void*)", "pid": 0, "tid": 101,
+    "ts": 3368696295127.808, "dur": 71.936,
+    "args": {
+            "queued": 1794225722194764553, "device": 0, "context": 0,      "stream": 101, "correlation": 2550,      "registers per thread": 168,      "shared memory": 0,      "blocks per SM": 0.230769,      "warps per SM": 5.538462,      "grid": [24, 1, 1],      "block": [768, 1, 1],      "est. achieved occupancy %": 9
+    }
+  },
+  {
+    "ph": "f", "id": 2550, "pid": 0, "tid": 101, "ts": 3368696295127.808,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcLaunchKernelExC", "pid": 121661, "tid": 121661,
+    "ts": 3368696194759.014, "dur": 5.859,
+    "args": {
+            "cbid": 62, "correlation": 2550
+    }
+  },
+  {
+    "ph": "f", "id": 2550, "pid": 121661, "tid": 121661, "ts": 3368696194759.014,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "kernel", "name": "void uccl::internode::dispatch<true, 2, true, 20480, 7, false, 2>(int4*, float*, long*, float*, uccl::internode::SourceMeta*, int4 const*, float const*, long const*, float const*, int*, int*, int*, int*, int const*, int const*, int const*, int const*, bool const*, int, int, int, int, int, int, int, int, void*, int, int, void**, int, int, int, int, unsigned long const*, int, void*)", "pid": 0, "tid": 101,
+    "ts": 3368696295202.048, "dur": 6324.736,
+    "args": {
+            "queued": 1794225722194769453, "device": 0, "context": 0,      "stream": 101, "correlation": 2551,      "registers per thread": 163,      "shared memory": 224,      "blocks per SM": 0.230769,      "warps per SM": 4.153846,      "grid": [24, 1, 1],      "block": [576, 1, 1],      "est. achieved occupancy %": 6
+    }
+  },
+  {
+    "ph": "f", "id": 2551, "pid": 0, "tid": 101, "ts": 3368696295202.048,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcLaunchKernelExC", "pid": 121661, "tid": 121661,
+    "ts": 3368696194765.173, "dur": 4.590,
+    "args": {
+            "cbid": 62, "correlation": 2551
+    }
+  },
+  {
+    "ph": "f", "id": 2551, "pid": 121661, "tid": 121661, "ts": 3368696194765.173,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcEventRecord", "pid": 121661, "tid": 121661,
+    "ts": 3368696194770.573, "dur": 0.650,
+    "args": {
+            "cbid": 74, "correlation": 2553
+    }
+  },
+  {
+    "ph": "f", "id": 2553, "pid": 121661, "tid": 121661, "ts": 3368696194770.573,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcStreamWaitEvent", "pid": 121661, "tid": 121661,
+    "ts": 3368696194771.443, "dur": 0.980,
+    "args": {
+            "cbid": 47, "correlation": 2554
+    }
+  },
+  {
+    "ph": "s", "id": 2554, "pid": 121661, "tid": 121661, "ts": 3368696194771.443,
+    "cat": "ac2g", "name": "ac2g"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcEventRecord", "pid": 121661, "tid": 121661,
+    "ts": 3368696194808.673, "dur": 0.960,
+    "args": {
+            "cbid": 74, "correlation": 2565
+    }
+  },
+  {
+    "ph": "f", "id": 2565, "pid": 121661, "tid": 121661, "ts": 3368696194808.673,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcStreamWaitEvent", "pid": 121661, "tid": 121661,
+    "ts": 3368696194809.883, "dur": 0.800,
+    "args": {
+            "cbid": 47, "correlation": 2566
+    }
+  },
+  {
+    "ph": "s", "id": 2566, "pid": 121661, "tid": 121661, "ts": 3368696194809.883,
+    "cat": "ac2g", "name": "ac2g"
+  },
+  {
+    "ph": "X", "cat": "kernel", "name": "void uccl::internode::cached_notify<false, 8192>(int, int, int, int, int*, int, int, int const*, int const*, int*, void*, void**, int**, int, int, bool, unsigned long const*, int, void*)", "pid": 0, "tid": 101,
+    "ts": 3368696301618.944, "dur": 67.072,
+    "args": {
+            "queued": 1794225722194816223, "device": 0, "context": 0,      "stream": 101, "correlation": 2568,      "registers per thread": 168,      "shared memory": 0,      "blocks per SM": 0.230769,      "warps per SM": 5.538462,      "grid": [24, 1, 1],      "block": [768, 1, 1],      "est. achieved occupancy %": 9
+    }
+  },
+  {
+    "ph": "f", "id": 2568, "pid": 0, "tid": 101, "ts": 3368696301618.944,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcLaunchKernelExC", "pid": 121661, "tid": 121661,
+    "ts": 3368696194811.413, "dur": 5.370,
+    "args": {
+            "cbid": 62, "correlation": 2568
+    }
+  },
+  {
+    "ph": "f", "id": 2568, "pid": 121661, "tid": 121661, "ts": 3368696194811.413,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "kernel", "name": "void uccl::internode::dispatch<true, 2, true, 20480, 7, false, 2>(int4*, float*, long*, float*, uccl::internode::SourceMeta*, int4 const*, float const*, long const*, float const*, int*, int*, int*, int*, int const*, int const*, int const*, int const*, bool const*, int, int, int, int, int, int, int, int, void*, int, int, void**, int, int, int, int, unsigned long const*, int, void*)", "pid": 0, "tid": 101,
+    "ts": 3368696301688.320, "dur": 6025.984,
+    "args": {
+            "queued": 1794225722194821442, "device": 0, "context": 0,      "stream": 101, "correlation": 2569,      "registers per thread": 163,      "shared memory": 224,      "blocks per SM": 0.230769,      "warps per SM": 4.153846,      "grid": [24, 1, 1],      "block": [576, 1, 1],      "est. achieved occupancy %": 6
+    }
+  },
+  {
+    "ph": "f", "id": 2569, "pid": 0, "tid": 101, "ts": 3368696301688.320,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcLaunchKernelExC", "pid": 121661, "tid": 121661,
+    "ts": 3368696194817.063, "dur": 4.849,
+    "args": {
+            "cbid": 62, "correlation": 2569
+    }
+  },
+  {
+    "ph": "f", "id": 2569, "pid": 121661, "tid": 121661, "ts": 3368696194817.063,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcEventRecord", "pid": 121661, "tid": 121661,
+    "ts": 3368696194823.052, "dur": 1.350,
+    "args": {
+            "cbid": 74, "correlation": 2571
+    }
+  },
+  {
+    "ph": "f", "id": 2571, "pid": 121661, "tid": 121661, "ts": 3368696194823.052,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcStreamWaitEvent", "pid": 121661, "tid": 121661,
+    "ts": 3368696194824.652, "dur": 1.020,
+    "args": {
+            "cbid": 47, "correlation": 2572
+    }
+  },
+  {
+    "ph": "s", "id": 2572, "pid": 121661, "tid": 121661, "ts": 3368696194824.652,
+    "cat": "ac2g", "name": "ac2g"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcEventRecord", "pid": 121661, "tid": 121661,
+    "ts": 3368696194861.812, "dur": 0.790,
+    "args": {
+            "cbid": 74, "correlation": 2583
+    }
+  },
+  {
+    "ph": "f", "id": 2583, "pid": 121661, "tid": 121661, "ts": 3368696194861.812,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcStreamWaitEvent", "pid": 121661, "tid": 121661,
+    "ts": 3368696194862.892, "dur": 0.880,
+    "args": {
+            "cbid": 47, "correlation": 2584
+    }
+  },
+  {
+    "ph": "s", "id": 2584, "pid": 121661, "tid": 121661, "ts": 3368696194862.892,
+    "cat": "ac2g", "name": "ac2g"
+  },
+  {
+    "ph": "X", "cat": "kernel", "name": "void uccl::internode::cached_notify<false, 8192>(int, int, int, int, int*, int, int, int const*, int const*, int*, void*, void**, int**, int, int, bool, unsigned long const*, int, void*)", "pid": 0, "tid": 101,
+    "ts": 3368696307816.192, "dur": 325.120,
+    "args": {
+            "queued": 1794225722194868962, "device": 0, "context": 0,      "stream": 101, "correlation": 2586,      "registers per thread": 168,      "shared memory": 0,      "blocks per SM": 0.230769,      "warps per SM": 5.538462,      "grid": [24, 1, 1],      "block": [768, 1, 1],      "est. achieved occupancy %": 9
+    }
+  },
+  {
+    "ph": "f", "id": 2586, "pid": 0, "tid": 101, "ts": 3368696307816.192,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcLaunchKernelExC", "pid": 121661, "tid": 121661,
+    "ts": 3368696194864.502, "dur": 5.010,
+    "args": {
+            "cbid": 62, "correlation": 2586
+    }
+  },
+  {
+    "ph": "f", "id": 2586, "pid": 121661, "tid": 121661, "ts": 3368696194864.502,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "kernel", "name": "void uccl::internode::dispatch<true, 2, true, 20480, 7, false, 2>(int4*, float*, long*, float*, uccl::internode::SourceMeta*, int4 const*, float const*, long const*, float const*, int*, int*, int*, int*, int const*, int const*, int const*, int const*, bool const*, int, int, int, int, int, int, int, int, void*, int, int, void**, int, int, int, int, unsigned long const*, int, void*)", "pid": 0, "tid": 101,
+    "ts": 3368696308143.616, "dur": 6059.008,
+    "args": {
+            "queued": 1794225722194873492, "device": 0, "context": 0,      "stream": 101, "correlation": 2587,      "registers per thread": 163,      "shared memory": 224,      "blocks per SM": 0.230769,      "warps per SM": 4.153846,      "grid": [24, 1, 1],      "block": [576, 1, 1],      "est. achieved occupancy %": 6
+    }
+  },
+  {
+    "ph": "f", "id": 2587, "pid": 0, "tid": 101, "ts": 3368696308143.616,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcLaunchKernelExC", "pid": 121661, "tid": 121661,
+    "ts": 3368696194869.782, "dur": 4.030,
+    "args": {
+            "cbid": 62, "correlation": 2587
+    }
+  },
+  {
+    "ph": "f", "id": 2587, "pid": 121661, "tid": 121661, "ts": 3368696194869.782,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcEventRecord", "pid": 121661, "tid": 121661,
+    "ts": 3368696194874.781, "dur": 0.940,
+    "args": {
+            "cbid": 74, "correlation": 2589
+    }
+  },
+  {
+    "ph": "f", "id": 2589, "pid": 121661, "tid": 121661, "ts": 3368696194874.781,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcStreamWaitEvent", "pid": 121661, "tid": 121661,
+    "ts": 3368696194875.941, "dur": 0.970,
+    "args": {
+            "cbid": 47, "correlation": 2590
+    }
+  },
+  {
+    "ph": "s", "id": 2590, "pid": 121661, "tid": 121661, "ts": 3368696194875.941,
+    "cat": "ac2g", "name": "ac2g"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcEventRecord", "pid": 121661, "tid": 121661,
+    "ts": 3368696194912.891, "dur": 0.760,
+    "args": {
+            "cbid": 74, "correlation": 2601
+    }
+  },
+  {
+    "ph": "f", "id": 2601, "pid": 121661, "tid": 121661, "ts": 3368696194912.891,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcStreamWaitEvent", "pid": 121661, "tid": 121661,
+    "ts": 3368696194913.901, "dur": 0.770,
+    "args": {
+            "cbid": 47, "correlation": 2602
+    }
+  },
+  {
+    "ph": "s", "id": 2602, "pid": 121661, "tid": 121661, "ts": 3368696194913.901,
+    "cat": "ac2g", "name": "ac2g"
+  },
+  {
+    "ph": "X", "cat": "kernel", "name": "void uccl::internode::cached_notify<false, 8192>(int, int, int, int, int*, int, int, int const*, int const*, int*, void*, void**, int**, int, int, bool, unsigned long const*, int, void*)", "pid": 0, "tid": 101,
+    "ts": 3368696314295.040, "dur": 542.208,
+    "args": {
+            "queued": 1794225722194919721, "device": 0, "context": 0,      "stream": 101, "correlation": 2604,      "registers per thread": 168,      "shared memory": 0,      "blocks per SM": 0.230769,      "warps per SM": 5.538462,      "grid": [24, 1, 1],      "block": [768, 1, 1],      "est. achieved occupancy %": 9
+    }
+  },
+  {
+    "ph": "f", "id": 2604, "pid": 0, "tid": 101, "ts": 3368696314295.040,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcLaunchKernelExC", "pid": 121661, "tid": 121661,
+    "ts": 3368696194915.371, "dur": 4.900,
+    "args": {
+            "cbid": 62, "correlation": 2604
+    }
+  },
+  {
+    "ph": "f", "id": 2604, "pid": 121661, "tid": 121661, "ts": 3368696194915.371,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "kernel", "name": "void uccl::internode::dispatch<true, 2, true, 20480, 7, false, 2>(int4*, float*, long*, float*, uccl::internode::SourceMeta*, int4 const*, float const*, long const*, float const*, int*, int*, int*, int*, int const*, int const*, int const*, int const*, bool const*, int, int, int, int, int, int, int, int, void*, int, int, void**, int, int, int, int, unsigned long const*, int, void*)", "pid": 0, "tid": 101,
+    "ts": 3368696314839.808, "dur": 6039.296,
+    "args": {
+            "queued": 1794225722194924201, "device": 0, "context": 0,      "stream": 101, "correlation": 2605,      "registers per thread": 163,      "shared memory": 224,      "blocks per SM": 0.230769,      "warps per SM": 4.153846,      "grid": [24, 1, 1],      "block": [576, 1, 1],      "est. achieved occupancy %": 6
+    }
+  },
+  {
+    "ph": "f", "id": 2605, "pid": 0, "tid": 101, "ts": 3368696314839.808,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcLaunchKernelExC", "pid": 121661, "tid": 121661,
+    "ts": 3368696194920.561, "dur": 3.930,
+    "args": {
+            "cbid": 62, "correlation": 2605
+    }
+  },
+  {
+    "ph": "f", "id": 2605, "pid": 121661, "tid": 121661, "ts": 3368696194920.561,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcEventRecord", "pid": 121661, "tid": 121661,
+    "ts": 3368696194925.301, "dur": 0.620,
+    "args": {
+            "cbid": 74, "correlation": 2607
+    }
+  },
+  {
+    "ph": "f", "id": 2607, "pid": 121661, "tid": 121661, "ts": 3368696194925.301,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcStreamWaitEvent", "pid": 121661, "tid": 121661,
+    "ts": 3368696194926.151, "dur": 1.090,
+    "args": {
+            "cbid": 47, "correlation": 2608
+    }
+  },
+  {
+    "ph": "s", "id": 2608, "pid": 121661, "tid": 121661, "ts": 3368696194926.151,
+    "cat": "ac2g", "name": "ac2g"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcEventRecord", "pid": 121661, "tid": 121661,
+    "ts": 3368696194963.650, "dur": 0.840,
+    "args": {
+            "cbid": 74, "correlation": 2619
+    }
+  },
+  {
+    "ph": "f", "id": 2619, "pid": 121661, "tid": 121661, "ts": 3368696194963.650,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcStreamWaitEvent", "pid": 121661, "tid": 121661,
+    "ts": 3368696194964.770, "dur": 0.810,
+    "args": {
+            "cbid": 47, "correlation": 2620
+    }
+  },
+  {
+    "ph": "s", "id": 2620, "pid": 121661, "tid": 121661, "ts": 3368696194964.770,
+    "cat": "ac2g", "name": "ac2g"
+  },
+  {
+    "ph": "X", "cat": "kernel", "name": "void uccl::internode::cached_notify<false, 8192>(int, int, int, int, int*, int, int, int const*, int const*, int*, void*, void**, int**, int, int, bool, unsigned long const*, int, void*)", "pid": 0, "tid": 101,
+    "ts": 3368696320950.272, "dur": 390.144,
+    "args": {
+            "queued": 1794225722194971130, "device": 0, "context": 0,      "stream": 101, "correlation": 2622,      "registers per thread": 168,      "shared memory": 0,      "blocks per SM": 0.230769,      "warps per SM": 5.538462,      "grid": [24, 1, 1],      "block": [768, 1, 1],      "est. achieved occupancy %": 9
+    }
+  },
+  {
+    "ph": "f", "id": 2622, "pid": 0, "tid": 101, "ts": 3368696320950.272,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcLaunchKernelExC", "pid": 121661, "tid": 121661,
+    "ts": 3368696194966.260, "dur": 5.190,
+    "args": {
+            "cbid": 62, "correlation": 2622
+    }
+  },
+  {
+    "ph": "f", "id": 2622, "pid": 121661, "tid": 121661, "ts": 3368696194966.260,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "kernel", "name": "void uccl::internode::dispatch<true, 2, true, 20480, 7, false, 2>(int4*, float*, long*, float*, uccl::internode::SourceMeta*, int4 const*, float const*, long const*, float const*, int*, int*, int*, int*, int const*, int const*, int const*, int const*, bool const*, int, int, int, int, int, int, int, int, void*, int, int, void**, int, int, int, int, unsigned long const*, int, void*)", "pid": 0, "tid": 101,
+    "ts": 3368696321342.720, "dur": 6085.632,
+    "args": {
+            "queued": 1794225722194975440, "device": 0, "context": 0,      "stream": 101, "correlation": 2623,      "registers per thread": 163,      "shared memory": 224,      "blocks per SM": 0.230769,      "warps per SM": 4.153846,      "grid": [24, 1, 1],      "block": [576, 1, 1],      "est. achieved occupancy %": 6
+    }
+  },
+  {
+    "ph": "f", "id": 2623, "pid": 0, "tid": 101, "ts": 3368696321342.720,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcLaunchKernelExC", "pid": 121661, "tid": 121661,
+    "ts": 3368696194971.740, "dur": 4.170,
+    "args": {
+            "cbid": 62, "correlation": 2623
+    }
+  },
+  {
+    "ph": "f", "id": 2623, "pid": 121661, "tid": 121661, "ts": 3368696194971.740,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcEventRecord", "pid": 121661, "tid": 121661,
+    "ts": 3368696194977.150, "dur": 0.630,
+    "args": {
+            "cbid": 74, "correlation": 2625
+    }
+  },
+  {
+    "ph": "f", "id": 2625, "pid": 121661, "tid": 121661, "ts": 3368696194977.150,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcStreamWaitEvent", "pid": 121661, "tid": 121661,
+    "ts": 3368696194978.000, "dur": 1.000,
+    "args": {
+            "cbid": 47, "correlation": 2626
+    }
+  },
+  {
+    "ph": "s", "id": 2626, "pid": 121661, "tid": 121661, "ts": 3368696194978.000,
+    "cat": "ac2g", "name": "ac2g"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcEventRecord", "pid": 121661, "tid": 121661,
+    "ts": 3368696195015.059, "dur": 0.760,
+    "args": {
+            "cbid": 74, "correlation": 2637
+    }
+  },
+  {
+    "ph": "f", "id": 2637, "pid": 121661, "tid": 121661, "ts": 3368696195015.059,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcStreamWaitEvent", "pid": 121661, "tid": 121661,
+    "ts": 3368696195016.069, "dur": 1.740,
+    "args": {
+            "cbid": 47, "correlation": 2638
+    }
+  },
+  {
+    "ph": "s", "id": 2638, "pid": 121661, "tid": 121661, "ts": 3368696195016.069,
+    "cat": "ac2g", "name": "ac2g"
+  },
+  {
+    "ph": "X", "cat": "kernel", "name": "void uccl::internode::cached_notify<false, 8192>(int, int, int, int, int*, int, int, int const*, int const*, int*, void*, void**, int**, int, int, bool, unsigned long const*, int, void*)", "pid": 0, "tid": 101,
+    "ts": 3368696327506.688, "dur": 269.568,
+    "args": {
+            "queued": 1794225722195023159, "device": 0, "context": 0,      "stream": 101, "correlation": 2640,      "registers per thread": 168,      "shared memory": 0,      "blocks per SM": 0.230769,      "warps per SM": 5.538462,      "grid": [24, 1, 1],      "block": [768, 1, 1],      "est. achieved occupancy %": 9
+    }
+  },
+  {
+    "ph": "f", "id": 2640, "pid": 0, "tid": 101, "ts": 3368696327506.688,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcLaunchKernelExC", "pid": 121661, "tid": 121661,
+    "ts": 3368696195018.599, "dur": 5.280,
+    "args": {
+            "cbid": 62, "correlation": 2640
+    }
+  },
+  {
+    "ph": "f", "id": 2640, "pid": 121661, "tid": 121661, "ts": 3368696195018.599,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "kernel", "name": "void uccl::internode::dispatch<true, 2, true, 20480, 7, false, 2>(int4*, float*, long*, float*, uccl::internode::SourceMeta*, int4 const*, float const*, long const*, float const*, int*, int*, int*, int*, int const*, int const*, int const*, int const*, bool const*, int, int, int, int, int, int, int, int, void*, int, int, void**, int, int, int, int, unsigned long const*, int, void*)", "pid": 0, "tid": 101,
+    "ts": 3368696327778.560, "dur": 6200.832,
+    "args": {
+            "queued": 1794225722195027989, "device": 0, "context": 0,      "stream": 101, "correlation": 2641,      "registers per thread": 163,      "shared memory": 224,      "blocks per SM": 0.230769,      "warps per SM": 4.153846,      "grid": [24, 1, 1],      "block": [576, 1, 1],      "est. achieved occupancy %": 6
+    }
+  },
+  {
+    "ph": "f", "id": 2641, "pid": 0, "tid": 101, "ts": 3368696327778.560,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcLaunchKernelExC", "pid": 121661, "tid": 121661,
+    "ts": 3368696195024.149, "dur": 4.340,
+    "args": {
+            "cbid": 62, "correlation": 2641
+    }
+  },
+  {
+    "ph": "f", "id": 2641, "pid": 121661, "tid": 121661, "ts": 3368696195024.149,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcEventRecord", "pid": 121661, "tid": 121661,
+    "ts": 3368696195029.289, "dur": 0.650,
+    "args": {
+            "cbid": 74, "correlation": 2643
+    }
+  },
+  {
+    "ph": "f", "id": 2643, "pid": 121661, "tid": 121661, "ts": 3368696195029.289,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcStreamWaitEvent", "pid": 121661, "tid": 121661,
+    "ts": 3368696195030.189, "dur": 1.130,
+    "args": {
+            "cbid": 47, "correlation": 2644
+    }
+  },
+  {
+    "ph": "s", "id": 2644, "pid": 121661, "tid": 121661, "ts": 3368696195030.189,
+    "cat": "ac2g", "name": "ac2g"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcEventRecord", "pid": 121661, "tid": 121661,
+    "ts": 3368696195067.778, "dur": 0.860,
+    "args": {
+            "cbid": 74, "correlation": 2655
+    }
+  },
+  {
+    "ph": "f", "id": 2655, "pid": 121661, "tid": 121661, "ts": 3368696195067.778,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcStreamWaitEvent", "pid": 121661, "tid": 121661,
+    "ts": 3368696195068.878, "dur": 1.160,
+    "args": {
+            "cbid": 47, "correlation": 2656
+    }
+  },
+  {
+    "ph": "s", "id": 2656, "pid": 121661, "tid": 121661, "ts": 3368696195068.878,
+    "cat": "ac2g", "name": "ac2g"
+  },
+  {
+    "ph": "X", "cat": "kernel", "name": "void uccl::internode::cached_notify<false, 8192>(int, int, int, int, int*, int, int, int const*, int const*, int*, void*, void**, int**, int, int, bool, unsigned long const*, int, void*)", "pid": 0, "tid": 101,
+    "ts": 3368696334045.952, "dur": 69.120,
+    "args": {
+            "queued": 1794225722195075358, "device": 0, "context": 0,      "stream": 101, "correlation": 2658,      "registers per thread": 168,      "shared memory": 0,      "blocks per SM": 0.230769,      "warps per SM": 5.538462,      "grid": [24, 1, 1],      "block": [768, 1, 1],      "est. achieved occupancy %": 9
+    }
+  },
+  {
+    "ph": "f", "id": 2658, "pid": 0, "tid": 101, "ts": 3368696334045.952,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcLaunchKernelExC", "pid": 121661, "tid": 121661,
+    "ts": 3368696195070.758, "dur": 4.930,
+    "args": {
+            "cbid": 62, "correlation": 2658
+    }
+  },
+  {
+    "ph": "f", "id": 2658, "pid": 121661, "tid": 121661, "ts": 3368696195070.758,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "kernel", "name": "void uccl::internode::dispatch<true, 2, true, 20480, 7, false, 2>(int4*, float*, long*, float*, uccl::internode::SourceMeta*, int4 const*, float const*, long const*, float const*, int*, int*, int*, int*, int const*, int const*, int const*, int const*, bool const*, int, int, int, int, int, int, int, int, void*, int, int, void**, int, int, int, int, unsigned long const*, int, void*)", "pid": 0, "tid": 101,
+    "ts": 3368696334117.376, "dur": 5782.784,
+    "args": {
+            "queued": 1794225722195079718, "device": 0, "context": 0,      "stream": 101, "correlation": 2659,      "registers per thread": 163,      "shared memory": 224,      "blocks per SM": 0.230769,      "warps per SM": 4.153846,      "grid": [24, 1, 1],      "block": [576, 1, 1],      "est. achieved occupancy %": 6
+    }
+  },
+  {
+    "ph": "f", "id": 2659, "pid": 0, "tid": 101, "ts": 3368696334117.376,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcLaunchKernelExC", "pid": 121661, "tid": 121661,
+    "ts": 3368696195075.978, "dur": 4.030,
+    "args": {
+            "cbid": 62, "correlation": 2659
+    }
+  },
+  {
+    "ph": "f", "id": 2659, "pid": 121661, "tid": 121661, "ts": 3368696195075.978,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcEventRecord", "pid": 121661, "tid": 121661,
+    "ts": 3368696195080.798, "dur": 0.610,
+    "args": {
+            "cbid": 74, "correlation": 2661
+    }
+  },
+  {
+    "ph": "f", "id": 2661, "pid": 121661, "tid": 121661, "ts": 3368696195080.798,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcStreamWaitEvent", "pid": 121661, "tid": 121661,
+    "ts": 3368696195081.638, "dur": 0.970,
+    "args": {
+            "cbid": 47, "correlation": 2662
+    }
+  },
+  {
+    "ph": "s", "id": 2662, "pid": 121661, "tid": 121661, "ts": 3368696195081.638,
+    "cat": "ac2g", "name": "ac2g"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcEventRecord", "pid": 121661, "tid": 121661,
+    "ts": 3368696195119.097, "dur": 0.750,
+    "args": {
+            "cbid": 74, "correlation": 2673
+    }
+  },
+  {
+    "ph": "f", "id": 2673, "pid": 121661, "tid": 121661, "ts": 3368696195119.097,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcStreamWaitEvent", "pid": 121661, "tid": 121661,
+    "ts": 3368696195120.107, "dur": 0.780,
+    "args": {
+            "cbid": 47, "correlation": 2674
+    }
+  },
+  {
+    "ph": "s", "id": 2674, "pid": 121661, "tid": 121661, "ts": 3368696195120.107,
+    "cat": "ac2g", "name": "ac2g"
+  },
+  {
+    "ph": "X", "cat": "kernel", "name": "void uccl::internode::cached_notify<false, 8192>(int, int, int, int, int*, int, int, int const*, int const*, int*, void*, void**, int**, int, int, bool, unsigned long const*, int, void*)", "pid": 0, "tid": 101,
+    "ts": 3368696339963.136, "dur": 175.872,
+    "args": {
+            "queued": 1794225722195125897, "device": 0, "context": 0,      "stream": 101, "correlation": 2676,      "registers per thread": 168,      "shared memory": 0,      "blocks per SM": 0.230769,      "warps per SM": 5.538462,      "grid": [24, 1, 1],      "block": [768, 1, 1],      "est. achieved occupancy %": 9
+    }
+  },
+  {
+    "ph": "f", "id": 2676, "pid": 0, "tid": 101, "ts": 3368696339963.136,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcLaunchKernelExC", "pid": 121661, "tid": 121661,
+    "ts": 3368696195121.617, "dur": 4.800,
+    "args": {
+            "cbid": 62, "correlation": 2676
+    }
+  },
+  {
+    "ph": "f", "id": 2676, "pid": 121661, "tid": 121661, "ts": 3368696195121.617,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "kernel", "name": "void uccl::internode::dispatch<true, 2, true, 20480, 7, false, 2>(int4*, float*, long*, float*, uccl::internode::SourceMeta*, int4 const*, float const*, long const*, float const*, int*, int*, int*, int*, int const*, int const*, int const*, int const*, bool const*, int, int, int, int, int, int, int, int, void*, int, int, void**, int, int, int, int, unsigned long const*, int, void*)", "pid": 0, "tid": 101,
+    "ts": 3368696340141.312, "dur": 6074.624,
+    "args": {
+            "queued": 1794225722195130577, "device": 0, "context": 0,      "stream": 101, "correlation": 2677,      "registers per thread": 163,      "shared memory": 224,      "blocks per SM": 0.230769,      "warps per SM": 4.153846,      "grid": [24, 1, 1],      "block": [576, 1, 1],      "est. achieved occupancy %": 6
+    }
+  },
+  {
+    "ph": "f", "id": 2677, "pid": 0, "tid": 101, "ts": 3368696340141.312,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcLaunchKernelExC", "pid": 121661, "tid": 121661,
+    "ts": 3368696195126.687, "dur": 4.180,
+    "args": {
+            "cbid": 62, "correlation": 2677
+    }
+  },
+  {
+    "ph": "f", "id": 2677, "pid": 121661, "tid": 121661, "ts": 3368696195126.687,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcEventRecord", "pid": 121661, "tid": 121661,
+    "ts": 3368696195132.107, "dur": 1.460,
+    "args": {
+            "cbid": 74, "correlation": 2679
+    }
+  },
+  {
+    "ph": "f", "id": 2679, "pid": 121661, "tid": 121661, "ts": 3368696195132.107,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcStreamWaitEvent", "pid": 121661, "tid": 121661,
+    "ts": 3368696195133.797, "dur": 1.600,
+    "args": {
+            "cbid": 47, "correlation": 2680
+    }
+  },
+  {
+    "ph": "s", "id": 2680, "pid": 121661, "tid": 121661, "ts": 3368696195133.797,
+    "cat": "ac2g", "name": "ac2g"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcEventRecord", "pid": 121661, "tid": 121661,
+    "ts": 3368696195171.836, "dur": 1.130,
+    "args": {
+            "cbid": 74, "correlation": 2691
+    }
+  },
+  {
+    "ph": "f", "id": 2691, "pid": 121661, "tid": 121661, "ts": 3368696195171.836,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcStreamWaitEvent", "pid": 121661, "tid": 121661,
+    "ts": 3368696195173.206, "dur": 1.240,
+    "args": {
+            "cbid": 47, "correlation": 2692
+    }
+  },
+  {
+    "ph": "s", "id": 2692, "pid": 121661, "tid": 121661, "ts": 3368696195173.206,
+    "cat": "ac2g", "name": "ac2g"
+  },
+  {
+    "ph": "X", "cat": "kernel", "name": "void uccl::internode::cached_notify<false, 8192>(int, int, int, int, int*, int, int, int const*, int const*, int*, void*, void**, int**, int, int, bool, unsigned long const*, int, void*)", "pid": 0, "tid": 101,
+    "ts": 3368696346296.832, "dur": 379.392,
+    "args": {
+            "queued": 1794225722195180456, "device": 0, "context": 0,      "stream": 101, "correlation": 2694,      "registers per thread": 168,      "shared memory": 0,      "blocks per SM": 0.230769,      "warps per SM": 5.538462,      "grid": [24, 1, 1],      "block": [768, 1, 1],      "est. achieved occupancy %": 9
+    }
+  },
+  {
+    "ph": "f", "id": 2694, "pid": 0, "tid": 101, "ts": 3368696346296.832,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcLaunchKernelExC", "pid": 121661, "tid": 121661,
+    "ts": 3368696195175.216, "dur": 5.700,
+    "args": {
+            "cbid": 62, "correlation": 2694
+    }
+  },
+  {
+    "ph": "f", "id": 2694, "pid": 121661, "tid": 121661, "ts": 3368696195175.216,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "kernel", "name": "void uccl::internode::dispatch<true, 2, true, 20480, 7, false, 2>(int4*, float*, long*, float*, uccl::internode::SourceMeta*, int4 const*, float const*, long const*, float const*, int*, int*, int*, int*, int const*, int const*, int const*, int const*, bool const*, int, int, int, int, int, int, int, int, void*, int, int, void**, int, int, int, int, unsigned long const*, int, void*)", "pid": 0, "tid": 101,
+    "ts": 3368696346678.528, "dur": 6202.368,
+    "args": {
+            "queued": 1794225722195185966, "device": 0, "context": 0,      "stream": 101, "correlation": 2695,      "registers per thread": 163,      "shared memory": 224,      "blocks per SM": 0.230769,      "warps per SM": 4.153846,      "grid": [24, 1, 1],      "block": [576, 1, 1],      "est. achieved occupancy %": 6
+    }
+  },
+  {
+    "ph": "f", "id": 2695, "pid": 0, "tid": 101, "ts": 3368696346678.528,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcLaunchKernelExC", "pid": 121661, "tid": 121661,
+    "ts": 3368696195181.216, "dur": 5.200,
+    "args": {
+            "cbid": 62, "correlation": 2695
+    }
+  },
+  {
+    "ph": "f", "id": 2695, "pid": 121661, "tid": 121661, "ts": 3368696195181.216,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcEventRecord", "pid": 121661, "tid": 121661,
+    "ts": 3368696195187.526, "dur": 1.330,
+    "args": {
+            "cbid": 74, "correlation": 2697
+    }
+  },
+  {
+    "ph": "f", "id": 2697, "pid": 121661, "tid": 121661, "ts": 3368696195187.526,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcStreamWaitEvent", "pid": 121661, "tid": 121661,
+    "ts": 3368696195189.086, "dur": 1.190,
+    "args": {
+            "cbid": 47, "correlation": 2698
+    }
+  },
+  {
+    "ph": "s", "id": 2698, "pid": 121661, "tid": 121661, "ts": 3368696195189.086,
+    "cat": "ac2g", "name": "ac2g"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcEventRecord", "pid": 121661, "tid": 121661,
+    "ts": 3368696195225.355, "dur": 0.670,
+    "args": {
+            "cbid": 74, "correlation": 2709
+    }
+  },
+  {
+    "ph": "f", "id": 2709, "pid": 121661, "tid": 121661, "ts": 3368696195225.355,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcStreamWaitEvent", "pid": 121661, "tid": 121661,
+    "ts": 3368696195226.245, "dur": 1.050,
+    "args": {
+            "cbid": 47, "correlation": 2710
+    }
+  },
+  {
+    "ph": "s", "id": 2710, "pid": 121661, "tid": 121661, "ts": 3368696195226.245,
+    "cat": "ac2g", "name": "ac2g"
+  },
+  {
+    "ph": "X", "cat": "kernel", "name": "void uccl::internode::cached_notify<false, 8192>(int, int, int, int, int*, int, int, int const*, int const*, int*, void*, void**, int**, int, int, bool, unsigned long const*, int, void*)", "pid": 0, "tid": 101,
+    "ts": 3368696352941.056, "dur": 91.648,
+    "args": {
+            "queued": 1794225722195232525, "device": 0, "context": 0,      "stream": 101, "correlation": 2712,      "registers per thread": 168,      "shared memory": 0,      "blocks per SM": 0.230769,      "warps per SM": 5.538462,      "grid": [24, 1, 1],      "block": [768, 1, 1],      "est. achieved occupancy %": 9
+    }
+  },
+  {
+    "ph": "f", "id": 2712, "pid": 0, "tid": 101, "ts": 3368696352941.056,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcLaunchKernelExC", "pid": 121661, "tid": 121661,
+    "ts": 3368696195227.935, "dur": 5.250,
+    "args": {
+            "cbid": 62, "correlation": 2712
+    }
+  },
+  {
+    "ph": "f", "id": 2712, "pid": 121661, "tid": 121661, "ts": 3368696195227.935,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "kernel", "name": "void uccl::internode::dispatch<true, 2, true, 20480, 7, false, 2>(int4*, float*, long*, float*, uccl::internode::SourceMeta*, int4 const*, float const*, long const*, float const*, int*, int*, int*, int*, int const*, int const*, int const*, int const*, bool const*, int, int, int, int, int, int, int, int, void*, int, int, void**, int, int, int, int, unsigned long const*, int, void*)", "pid": 0, "tid": 101,
+    "ts": 3368696353035.264, "dur": 6467.328,
+    "args": {
+            "queued": 1794225722195238075, "device": 0, "context": 0,      "stream": 101, "correlation": 2713,      "registers per thread": 163,      "shared memory": 224,      "blocks per SM": 0.230769,      "warps per SM": 4.153846,      "grid": [24, 1, 1],      "block": [576, 1, 1],      "est. achieved occupancy %": 6
+    }
+  },
+  {
+    "ph": "f", "id": 2713, "pid": 0, "tid": 101, "ts": 3368696353035.264,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcLaunchKernelExC", "pid": 121661, "tid": 121661,
+    "ts": 3368696195233.415, "dur": 5.050,
+    "args": {
+            "cbid": 62, "correlation": 2713
+    }
+  },
+  {
+    "ph": "f", "id": 2713, "pid": 121661, "tid": 121661, "ts": 3368696195233.415,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcEventRecord", "pid": 121661, "tid": 121661,
+    "ts": 3368696195239.625, "dur": 1.240,
+    "args": {
+            "cbid": 74, "correlation": 2715
+    }
+  },
+  {
+    "ph": "f", "id": 2715, "pid": 121661, "tid": 121661, "ts": 3368696195239.625,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcStreamWaitEvent", "pid": 121661, "tid": 121661,
+    "ts": 3368696195241.075, "dur": 1.440,
+    "args": {
+            "cbid": 47, "correlation": 2716
+    }
+  },
+  {
+    "ph": "s", "id": 2716, "pid": 121661, "tid": 121661, "ts": 3368696195241.075,
+    "cat": "ac2g", "name": "ac2g"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcEventRecord", "pid": 121661, "tid": 121661,
+    "ts": 3368696195274.684, "dur": 1.070,
+    "args": {
+            "cbid": 74, "correlation": 2727
+    }
+  },
+  {
+    "ph": "f", "id": 2727, "pid": 121661, "tid": 121661, "ts": 3368696195274.684,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcStreamWaitEvent", "pid": 121661, "tid": 121661,
+    "ts": 3368696195275.964, "dur": 1.190,
+    "args": {
+            "cbid": 47, "correlation": 2728
+    }
+  },
+  {
+    "ph": "s", "id": 2728, "pid": 121661, "tid": 121661, "ts": 3368696195275.964,
+    "cat": "ac2g", "name": "ac2g"
+  },
+  {
+    "ph": "X", "cat": "kernel", "name": "void uccl::internode::cached_notify<false, 8192>(int, int, int, int, int*, int, int, int const*, int const*, int*, void*, void**, int**, int, int, bool, unsigned long const*, int, void*)", "pid": 0, "tid": 101,
+    "ts": 3368696359567.360, "dur": 257.792,
+    "args": {
+            "queued": 1794225722195282424, "device": 0, "context": 0,      "stream": 101, "correlation": 2730,      "registers per thread": 168,      "shared memory": 0,      "blocks per SM": 0.230769,      "warps per SM": 5.538462,      "grid": [24, 1, 1],      "block": [768, 1, 1],      "est. achieved occupancy %": 9
+    }
+  },
+  {
+    "ph": "f", "id": 2730, "pid": 0, "tid": 101, "ts": 3368696359567.360,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcLaunchKernelExC", "pid": 121661, "tid": 121661,
+    "ts": 3368696195277.764, "dur": 5.090,
+    "args": {
+            "cbid": 62, "correlation": 2730
+    }
+  },
+  {
+    "ph": "f", "id": 2730, "pid": 121661, "tid": 121661, "ts": 3368696195277.764,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "kernel", "name": "void uccl::internode::dispatch<true, 2, true, 20480, 7, false, 2>(int4*, float*, long*, float*, uccl::internode::SourceMeta*, int4 const*, float const*, long const*, float const*, int*, int*, int*, int*, int const*, int const*, int const*, int const*, bool const*, int, int, int, int, int, int, int, int, void*, int, int, void**, int, int, int, int, unsigned long const*, int, void*)", "pid": 0, "tid": 101,
+    "ts": 3368696359827.456, "dur": 6155.008,
+    "args": {
+            "queued": 1794225722195287634, "device": 0, "context": 0,      "stream": 101, "correlation": 2731,      "registers per thread": 163,      "shared memory": 224,      "blocks per SM": 0.230769,      "warps per SM": 4.153846,      "grid": [24, 1, 1],      "block": [576, 1, 1],      "est. achieved occupancy %": 6
+    }
+  },
+  {
+    "ph": "f", "id": 2731, "pid": 0, "tid": 101, "ts": 3368696359827.456,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcLaunchKernelExC", "pid": 121661, "tid": 121661,
+    "ts": 3368696195283.114, "dur": 4.920,
+    "args": {
+            "cbid": 62, "correlation": 2731
+    }
+  },
+  {
+    "ph": "f", "id": 2731, "pid": 121661, "tid": 121661, "ts": 3368696195283.114,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcEventRecord", "pid": 121661, "tid": 121661,
+    "ts": 3368696195289.184, "dur": 1.230,
+    "args": {
+            "cbid": 74, "correlation": 2733
+    }
+  },
+  {
+    "ph": "f", "id": 2733, "pid": 121661, "tid": 121661, "ts": 3368696195289.184,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcStreamWaitEvent", "pid": 121661, "tid": 121661,
+    "ts": 3368696195290.624, "dur": 1.410,
+    "args": {
+            "cbid": 47, "correlation": 2734
+    }
+  },
+  {
+    "ph": "s", "id": 2734, "pid": 121661, "tid": 121661, "ts": 3368696195290.624,
+    "cat": "ac2g", "name": "ac2g"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcEventRecord", "pid": 121661, "tid": 121661,
+    "ts": 3368696195324.213, "dur": 1.080,
+    "args": {
+            "cbid": 74, "correlation": 2745
+    }
+  },
+  {
+    "ph": "f", "id": 2745, "pid": 121661, "tid": 121661, "ts": 3368696195324.213,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcStreamWaitEvent", "pid": 121661, "tid": 121661,
+    "ts": 3368696195325.513, "dur": 1.220,
+    "args": {
+            "cbid": 47, "correlation": 2746
+    }
+  },
+  {
+    "ph": "s", "id": 2746, "pid": 121661, "tid": 121661, "ts": 3368696195325.513,
+    "cat": "ac2g", "name": "ac2g"
+  },
+  {
+    "ph": "X", "cat": "kernel", "name": "void uccl::internode::cached_notify<false, 8192>(int, int, int, int, int*, int, int, int const*, int const*, int*, void*, void**, int**, int, int, bool, unsigned long const*, int, void*)", "pid": 0, "tid": 101,
+    "ts": 3368696366086.144, "dur": 229.120,
+    "args": {
+            "queued": 1794225722195332083, "device": 0, "context": 0,      "stream": 101, "correlation": 2748,      "registers per thread": 168,      "shared memory": 0,      "blocks per SM": 0.230769,      "warps per SM": 5.538462,      "grid": [24, 1, 1],      "block": [768, 1, 1],      "est. achieved occupancy %": 9
+    }
+  },
+  {
+    "ph": "f", "id": 2748, "pid": 0, "tid": 101, "ts": 3368696366086.144,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcLaunchKernelExC", "pid": 121661, "tid": 121661,
+    "ts": 3368696195327.363, "dur": 5.340,
+    "args": {
+            "cbid": 62, "correlation": 2748
+    }
+  },
+  {
+    "ph": "f", "id": 2748, "pid": 121661, "tid": 121661, "ts": 3368696195327.363,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "kernel", "name": "void uccl::internode::dispatch<true, 2, true, 20480, 7, false, 2>(int4*, float*, long*, float*, uccl::internode::SourceMeta*, int4 const*, float const*, long const*, float const*, int*, int*, int*, int*, int const*, int const*, int const*, int const*, bool const*, int, int, int, int, int, int, int, int, void*, int, int, void**, int, int, int, int, unsigned long const*, int, void*)", "pid": 0, "tid": 101,
+    "ts": 3368696366317.568, "dur": 6001.920,
+    "args": {
+            "queued": 1794225722195337603, "device": 0, "context": 0,      "stream": 101, "correlation": 2749,      "registers per thread": 163,      "shared memory": 224,      "blocks per SM": 0.230769,      "warps per SM": 4.153846,      "grid": [24, 1, 1],      "block": [576, 1, 1],      "est. achieved occupancy %": 6
+    }
+  },
+  {
+    "ph": "f", "id": 2749, "pid": 0, "tid": 101, "ts": 3368696366317.568,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcLaunchKernelExC", "pid": 121661, "tid": 121661,
+    "ts": 3368696195332.963, "dur": 5.030,
+    "args": {
+            "cbid": 62, "correlation": 2749
+    }
+  },
+  {
+    "ph": "f", "id": 2749, "pid": 121661, "tid": 121661, "ts": 3368696195332.963,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcEventRecord", "pid": 121661, "tid": 121661,
+    "ts": 3368696195338.893, "dur": 1.140,
+    "args": {
+            "cbid": 74, "correlation": 2751
+    }
+  },
+  {
+    "ph": "f", "id": 2751, "pid": 121661, "tid": 121661, "ts": 3368696195338.893,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcStreamWaitEvent", "pid": 121661, "tid": 121661,
+    "ts": 3368696195340.253, "dur": 1.460,
+    "args": {
+            "cbid": 47, "correlation": 2752
+    }
+  },
+  {
+    "ph": "s", "id": 2752, "pid": 121661, "tid": 121661, "ts": 3368696195340.253,
+    "cat": "ac2g", "name": "ac2g"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcEventRecord", "pid": 121661, "tid": 121661,
+    "ts": 3368696195373.852, "dur": 1.390,
+    "args": {
+            "cbid": 74, "correlation": 2763
+    }
+  },
+  {
+    "ph": "f", "id": 2763, "pid": 121661, "tid": 121661, "ts": 3368696195373.852,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcStreamWaitEvent", "pid": 121661, "tid": 121661,
+    "ts": 3368696195375.452, "dur": 1.700,
+    "args": {
+            "cbid": 47, "correlation": 2764
+    }
+  },
+  {
+    "ph": "s", "id": 2764, "pid": 121661, "tid": 121661, "ts": 3368696195375.452,
+    "cat": "ac2g", "name": "ac2g"
+  },
+  {
+    "ph": "X", "cat": "kernel", "name": "void uccl::internode::cached_notify<false, 8192>(int, int, int, int, int*, int, int, int const*, int const*, int*, void*, void**, int**, int, int, bool, unsigned long const*, int, void*)", "pid": 0, "tid": 101,
+    "ts": 3368696372420.352, "dur": 451.584,
+    "args": {
+            "queued": 1794225722195383382, "device": 0, "context": 0,      "stream": 101, "correlation": 2766,      "registers per thread": 168,      "shared memory": 0,      "blocks per SM": 0.230769,      "warps per SM": 5.538462,      "grid": [24, 1, 1],      "block": [768, 1, 1],      "est. achieved occupancy %": 9
+    }
+  },
+  {
+    "ph": "f", "id": 2766, "pid": 0, "tid": 101, "ts": 3368696372420.352,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcLaunchKernelExC", "pid": 121661, "tid": 121661,
+    "ts": 3368696195377.772, "dur": 6.290,
+    "args": {
+            "cbid": 62, "correlation": 2766
+    }
+  },
+  {
+    "ph": "f", "id": 2766, "pid": 121661, "tid": 121661, "ts": 3368696195377.772,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "kernel", "name": "void uccl::internode::dispatch<true, 2, true, 20480, 7, false, 2>(int4*, float*, long*, float*, uccl::internode::SourceMeta*, int4 const*, float const*, long const*, float const*, int*, int*, int*, int*, int const*, int const*, int const*, int const*, bool const*, int, int, int, int, int, int, int, int, void*, int, int, void**, int, int, int, int, unsigned long const*, int, void*)", "pid": 0, "tid": 101,
+    "ts": 3368696372874.240, "dur": 6178.816,
+    "args": {
+            "queued": 1794225722195388422, "device": 0, "context": 0,      "stream": 101, "correlation": 2767,      "registers per thread": 163,      "shared memory": 224,      "blocks per SM": 0.230769,      "warps per SM": 4.153846,      "grid": [24, 1, 1],      "block": [576, 1, 1],      "est. achieved occupancy %": 6
+    }
+  },
+  {
+    "ph": "f", "id": 2767, "pid": 0, "tid": 101, "ts": 3368696372874.240,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcLaunchKernelExC", "pid": 121661, "tid": 121661,
+    "ts": 3368696195384.322, "dur": 4.400,
+    "args": {
+            "cbid": 62, "correlation": 2767
+    }
+  },
+  {
+    "ph": "f", "id": 2767, "pid": 121661, "tid": 121661, "ts": 3368696195384.322,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcEventRecord", "pid": 121661, "tid": 121661,
+    "ts": 3368696195389.562, "dur": 0.600,
+    "args": {
+            "cbid": 74, "correlation": 2769
+    }
+  },
+  {
+    "ph": "f", "id": 2769, "pid": 121661, "tid": 121661, "ts": 3368696195389.562,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcStreamWaitEvent", "pid": 121661, "tid": 121661,
+    "ts": 3368696195390.362, "dur": 0.830,
+    "args": {
+            "cbid": 47, "correlation": 2770
+    }
+  },
+  {
+    "ph": "s", "id": 2770, "pid": 121661, "tid": 121661, "ts": 3368696195390.362,
+    "cat": "ac2g", "name": "ac2g"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcEventRecord", "pid": 121661, "tid": 121661,
+    "ts": 3368696195423.262, "dur": 0.670,
+    "args": {
+            "cbid": 74, "correlation": 2781
+    }
+  },
+  {
+    "ph": "f", "id": 2781, "pid": 121661, "tid": 121661, "ts": 3368696195423.262,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcStreamWaitEvent", "pid": 121661, "tid": 121661,
+    "ts": 3368696195424.162, "dur": 0.720,
+    "args": {
+            "cbid": 47, "correlation": 2782
+    }
+  },
+  {
+    "ph": "s", "id": 2782, "pid": 121661, "tid": 121661, "ts": 3368696195424.162,
+    "cat": "ac2g", "name": "ac2g"
+  },
+  {
+    "ph": "X", "cat": "kernel", "name": "void uccl::internode::cached_notify<false, 8192>(int, int, int, int, int*, int, int, int const*, int const*, int*, void*, void**, int**, int, int, bool, unsigned long const*, int, void*)", "pid": 0, "tid": 101,
+    "ts": 3368696379129.088, "dur": 442.624,
+    "args": {
+            "queued": 1794225722195429791, "device": 0, "context": 0,      "stream": 101, "correlation": 2784,      "registers per thread": 168,      "shared memory": 0,      "blocks per SM": 0.230769,      "warps per SM": 5.538462,      "grid": [24, 1, 1],      "block": [768, 1, 1],      "est. achieved occupancy %": 9
+    }
+  },
+  {
+    "ph": "f", "id": 2784, "pid": 0, "tid": 101, "ts": 3368696379129.088,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcLaunchKernelExC", "pid": 121661, "tid": 121661,
+    "ts": 3368696195425.522, "dur": 4.589,
+    "args": {
+            "cbid": 62, "correlation": 2784
+    }
+  },
+  {
+    "ph": "f", "id": 2784, "pid": 121661, "tid": 121661, "ts": 3368696195425.522,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "kernel", "name": "void uccl::internode::dispatch<true, 2, true, 20480, 7, false, 2>(int4*, float*, long*, float*, uccl::internode::SourceMeta*, int4 const*, float const*, long const*, float const*, int*, int*, int*, int*, int const*, int const*, int const*, int const*, bool const*, int, int, int, int, int, int, int, int, void*, int, int, void**, int, int, int, int, unsigned long const*, int, void*)", "pid": 0, "tid": 101,
+    "ts": 3368696379574.016, "dur": 5940.224,
+    "args": {
+            "queued": 1794225722195433561, "device": 0, "context": 0,      "stream": 101, "correlation": 2785,      "registers per thread": 163,      "shared memory": 224,      "blocks per SM": 0.230769,      "warps per SM": 4.153846,      "grid": [24, 1, 1],      "block": [576, 1, 1],      "est. achieved occupancy %": 6
+    }
+  },
+  {
+    "ph": "f", "id": 2785, "pid": 0, "tid": 101, "ts": 3368696379574.016,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcLaunchKernelExC", "pid": 121661, "tid": 121661,
+    "ts": 3368696195430.351, "dur": 3.530,
+    "args": {
+            "cbid": 62, "correlation": 2785
+    }
+  },
+  {
+    "ph": "f", "id": 2785, "pid": 121661, "tid": 121661, "ts": 3368696195430.351,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcEventRecord", "pid": 121661, "tid": 121661,
+    "ts": 3368696195434.961, "dur": 0.550,
+    "args": {
+            "cbid": 74, "correlation": 2787
+    }
+  },
+  {
+    "ph": "f", "id": 2787, "pid": 121661, "tid": 121661, "ts": 3368696195434.961,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcStreamWaitEvent", "pid": 121661, "tid": 121661,
+    "ts": 3368696195435.721, "dur": 0.860,
+    "args": {
+            "cbid": 47, "correlation": 2788
+    }
+  },
+  {
+    "ph": "s", "id": 2788, "pid": 121661, "tid": 121661, "ts": 3368696195435.721,
+    "cat": "ac2g", "name": "ac2g"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcEventQuery", "pid": 121661, "tid": 121859,
+    "ts": 3368696254884.994, "dur": 0.610,
+    "args": {
+            "cbid": 79, "correlation": 2795
+    }
+  },
+  {
+    "ph": "f", "id": 2795, "pid": 121661, "tid": 121859, "ts": 3368696254884.994,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcEventQuery", "pid": 121661, "tid": 121859,
+    "ts": 3368696254886.344, "dur": 0.140,
+    "args": {
+            "cbid": 79, "correlation": 2796
+    }
+  },
+  {
+    "ph": "f", "id": 2796, "pid": 121661, "tid": 121859, "ts": 3368696254886.344,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcCtxGetCurrent", "pid": 121661, "tid": 121869,
+    "ts": 3368696351310.578, "dur": 0.340,
+    "args": {
+            "cbid": 202, "correlation": 2797
+    }
+  },
+  {
+    "ph": "f", "id": 2797, "pid": 121661, "tid": 121869, "ts": 3368696351310.578,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcDeviceSynchronize", "pid": 121661, "tid": 121661,
+    "ts": 3368696195462.651, "dur": 190112.836,
+    "args": {
+            "cbid": 18, "correlation": 2794
+    }
+  },
+  {
+    "ph": "s", "id": 2794, "pid": 121661, "tid": 121661, "ts": 3368696195462.651,
+    "cat": "ac2g", "name": "ac2g"
+  },
+  {
+    "ph": "X", "cat": "kernel", "name": "void at::native::vectorized_elementwise_kernel<4, at::native::FillFunctor<float>, at::detail::Array<char*, 1> >(int, at::native::FillFunctor<float>, at::detail::Array<char*, 1>)", "pid": 0, "tid": 0,
+    "ts": 3368696385766.656, "dur": 2.816,
+    "args": {
+            "queued": 1794225722385748334, "device": 0, "context": 0,      "stream": 0, "correlation": 2812,      "registers per thread": 9,      "shared memory": 0,      "blocks per SM": 0.009615,      "warps per SM": 0.076923,      "grid": [1, 1, 1],      "block": [256, 1, 1],      "est. achieved occupancy %": 0
+    }
+  },
+  {
+    "ph": "f", "id": 2812, "pid": 0, "tid": 0, "ts": 3368696385766.656,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcLaunchKernel", "pid": 121661, "tid": 121661,
+    "ts": 3368696385697.485, "dur": 55.399,
+    "args": {
+            "cbid": 56, "correlation": 2812
+    }
+  },
+  {
+    "ph": "s", "id": 2812, "pid": 121661, "tid": 121661, "ts": 3368696385697.485,
+    "cat": "ac2g", "name": "ac2g"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcStreamIsCapturing", "pid": 121661, "tid": 121661,
+    "ts": 3368696385758.364, "dur": 0.400,
+    "args": {
+            "cbid": 52, "correlation": 2817
+    }
+  },
+  {
+    "ph": "f", "id": 2817, "pid": 121661, "tid": 121661, "ts": 3368696385758.364,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcEventRecord", "pid": 121661, "tid": 121661,
+    "ts": 3368696385764.244, "dur": 4.220,
+    "args": {
+            "cbid": 74, "correlation": 2819
+    }
+  },
+  {
+    "ph": "f", "id": 2819, "pid": 121661, "tid": 121661, "ts": 3368696385764.244,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcStreamWaitEvent", "pid": 121661, "tid": 121661,
+    "ts": 3368696385770.254, "dur": 9.349,
+    "args": {
+            "cbid": 47, "correlation": 2822
+    }
+  },
+  {
+    "ph": "s", "id": 2822, "pid": 121661, "tid": 121661, "ts": 3368696385770.254,
+    "cat": "ac2g", "name": "ac2g"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcStreamGetCaptureInfo", "pid": 121661, "tid": 121661,
+    "ts": 3368696385793.913, "dur": 6.330,
+    "args": {
+            "cbid": 53, "correlation": 2824
+    }
+  },
+  {
+    "ph": "f", "id": 2824, "pid": 121661, "tid": 121661, "ts": 3368696385793.913,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "kernel", "name": "mcclKernel_AllReduce_TREE_LL_Sum_float(mcclDevComm*, unsigned long, mcclWork*)", "pid": 0, "tid": 10,
+    "ts": 3368696385842.432, "dur": 129.024,
+    "args": {
+            "queued": 1794225722385820303, "device": 0, "context": 0,      "stream": 10, "correlation": 2828,      "registers per thread": 118,      "shared memory": 3200,      "blocks per SM": 0.009615,      "warps per SM": 0.153846,      "grid": [1, 1, 1],      "block": [512, 1, 1],      "est. achieved occupancy %": 0
+    }
+  },
+  {
+    "ph": "f", "id": 2828, "pid": 0, "tid": 10, "ts": 3368696385842.432,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcLaunchKernel", "pid": 121661, "tid": 121661,
+    "ts": 3368696385810.153, "dur": 14.150,
+    "args": {
+            "cbid": 56, "correlation": 2828
+    }
+  },
+  {
+    "ph": "s", "id": 2828, "pid": 121661, "tid": 121661, "ts": 3368696385810.153,
+    "cat": "ac2g", "name": "ac2g"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcEventRecord", "pid": 121661, "tid": 121661,
+    "ts": 3368696385833.252, "dur": 5.030,
+    "args": {
+            "cbid": 74, "correlation": 2832
+    }
+  },
+  {
+    "ph": "f", "id": 2832, "pid": 121661, "tid": 121661, "ts": 3368696385833.252,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcEventRecord", "pid": 121661, "tid": 121661,
+    "ts": 3368696385850.322, "dur": 3.360,
+    "args": {
+            "cbid": 74, "correlation": 2838
+    }
+  },
+  {
+    "ph": "f", "id": 2838, "pid": 121661, "tid": 121661, "ts": 3368696385850.322,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcStreamWaitEvent", "pid": 121661, "tid": 121661,
+    "ts": 3368696385877.832, "dur": 4.310,
+    "args": {
+            "cbid": 47, "correlation": 2842
+    }
+  },
+  {
+    "ph": "s", "id": 2842, "pid": 121661, "tid": 121661, "ts": 3368696385877.832,
+    "cat": "ac2g", "name": "ac2g"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcEventQuery", "pid": 121661, "tid": 121661,
+    "ts": 3368696385885.262, "dur": 0.839,
+    "args": {
+            "cbid": 79, "correlation": 2844
+    }
+  },
+  {
+    "ph": "f", "id": 2844, "pid": 121661, "tid": 121661, "ts": 3368696385885.262,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcStreamSynchronize", "pid": 121661, "tid": 121661,
+    "ts": 3368696385887.721, "dur": 136.028,
+    "args": {
+            "cbid": 46, "correlation": 2846
+    }
+  },
+  {
+    "ph": "s", "id": 2846, "pid": 121661, "tid": 121661, "ts": 3368696385887.721,
+    "cat": "ac2g", "name": "ac2g"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcEventRecord", "pid": 121661, "tid": 121661,
+    "ts": 3368696386038.259, "dur": 6.290,
+    "args": {
+            "cbid": 74, "correlation": 2856
+    }
+  },
+  {
+    "ph": "f", "id": 2856, "pid": 121661, "tid": 121661, "ts": 3368696386038.259,
+    "cat": "ac2g", "name": "ac2g", "bp": "e"
+  },
+  {
+    "ph": "X", "cat": "cuda_runtime", "name": "mcDeviceSynchronize", "pid": 121661, "tid": 121661,
+    "ts": 3368696386147.107, "dur": 4.760,
+    "args": {
+            "cbid": 18, "correlation": 2860
+    }
+  },
+  {
+    "ph": "s", "id": 2860, "pid": 121661, "tid": 121661, "ts": 3368696386147.107,
+    "cat": "ac2g", "name": "ac2g"
+  },
+  {
+    "name": "process_name", "ph": "M", "ts": 3368696193433.518, "pid": 121661, "tid": 0,
+    "args": {
+      "name": "python"
+    }
+  },
+  {
+    "name": "process_labels", "ph": "M", "ts": 3368696193433.518, "pid": 121661, "tid": 0,
+    "args": {
+      "labels": "CPU"
+    }
+  },
+  {
+    "name": "process_sort_index", "ph": "M", "ts": 3368696193433.518, "pid": 121661, "tid": 0,
+    "args": {
+      "sort_index": 121661
+    }
+  },
+  {
+    "name": "process_name", "ph": "M", "ts": 3368696193433.518, "pid": 0, "tid": 0,
+    "args": {
+      "name": "python"
+    }
+  },
+  {
+    "name": "process_labels", "ph": "M", "ts": 3368696193433.518, "pid": 0, "tid": 0,
+    "args": {
+      "labels": "GPU 0"
+    }
+  },
+  {
+    "name": "process_sort_index", "ph": "M", "ts": 3368696193433.518, "pid": 0, "tid": 0,
+    "args": {
+      "sort_index": 5000000
+    }
+  },
+  {
+    "name": "process_name", "ph": "M", "ts": 3368696193433.518, "pid": 1, "tid": 0,
+    "args": {
+      "name": "python"
+    }
+  },
+  {
+    "name": "process_labels", "ph": "M", "ts": 3368696193433.518, "pid": 1, "tid": 0,
+    "args": {
+      "labels": "GPU 1"
+    }
+  },
+  {
+    "name": "process_sort_index", "ph": "M", "ts": 3368696193433.518, "pid": 1, "tid": 0,
+    "args": {
+      "sort_index": 5000001
+    }
+  },
+  {
+    "name": "process_name", "ph": "M", "ts": 3368696193433.518, "pid": 2, "tid": 0,
+    "args": {
+      "name": "python"
+    }
+  },
+  {
+    "name": "process_labels", "ph": "M", "ts": 3368696193433.518, "pid": 2, "tid": 0,
+    "args": {
+      "labels": "GPU 2"
+    }
+  },
+  {
+    "name": "process_sort_index", "ph": "M", "ts": 3368696193433.518, "pid": 2, "tid": 0,
+    "args": {
+      "sort_index": 5000002
+    }
+  },
+  {
+    "name": "process_name", "ph": "M", "ts": 3368696193433.518, "pid": 3, "tid": 0,
+    "args": {
+      "name": "python"
+    }
+  },
+  {
+    "name": "process_labels", "ph": "M", "ts": 3368696193433.518, "pid": 3, "tid": 0,
+    "args": {
+      "labels": "GPU 3"
+    }
+  },
+  {
+    "name": "process_sort_index", "ph": "M", "ts": 3368696193433.518, "pid": 3, "tid": 0,
+    "args": {
+      "sort_index": 5000003
+    }
+  },
+  {
+    "name": "process_name", "ph": "M", "ts": 3368696193433.518, "pid": 4, "tid": 0,
+    "args": {
+      "name": "python"
+    }
+  },
+  {
+    "name": "process_labels", "ph": "M", "ts": 3368696193433.518, "pid": 4, "tid": 0,
+    "args": {
+      "labels": "GPU 4"
+    }
+  },
+  {
+    "name": "process_sort_index", "ph": "M", "ts": 3368696193433.518, "pid": 4, "tid": 0,
+    "args": {
+      "sort_index": 5000004
+    }
+  },
+  {
+    "name": "process_name", "ph": "M", "ts": 3368696193433.518, "pid": 5, "tid": 0,
+    "args": {
+      "name": "python"
+    }
+  },
+  {
+    "name": "process_labels", "ph": "M", "ts": 3368696193433.518, "pid": 5, "tid": 0,
+    "args": {
+      "labels": "GPU 5"
+    }
+  },
+  {
+    "name": "process_sort_index", "ph": "M", "ts": 3368696193433.518, "pid": 5, "tid": 0,
+    "args": {
+      "sort_index": 5000005
+    }
+  },
+  {
+    "name": "process_name", "ph": "M", "ts": 3368696193433.518, "pid": 6, "tid": 0,
+    "args": {
+      "name": "python"
+    }
+  },
+  {
+    "name": "process_labels", "ph": "M", "ts": 3368696193433.518, "pid": 6, "tid": 0,
+    "args": {
+      "labels": "GPU 6"
+    }
+  },
+  {
+    "name": "process_sort_index", "ph": "M", "ts": 3368696193433.518, "pid": 6, "tid": 0,
+    "args": {
+      "sort_index": 5000006
+    }
+  },
+  {
+    "name": "process_name", "ph": "M", "ts": 3368696193433.518, "pid": 7, "tid": 0,
+    "args": {
+      "name": "python"
+    }
+  },
+  {
+    "name": "process_labels", "ph": "M", "ts": 3368696193433.518, "pid": 7, "tid": 0,
+    "args": {
+      "labels": "GPU 7"
+    }
+  },
+  {
+    "name": "process_sort_index", "ph": "M", "ts": 3368696193433.518, "pid": 7, "tid": 0,
+    "args": {
+      "sort_index": 5000007
+    }
+  },
+  {
+    "name": "process_name", "ph": "M", "ts": 3368696193433.518, "pid": 8, "tid": 0,
+    "args": {
+      "name": "python"
+    }
+  },
+  {
+    "name": "process_labels", "ph": "M", "ts": 3368696193433.518, "pid": 8, "tid": 0,
+    "args": {
+      "labels": "GPU 8"
+    }
+  },
+  {
+    "name": "process_sort_index", "ph": "M", "ts": 3368696193433.518, "pid": 8, "tid": 0,
+    "args": {
+      "sort_index": 5000008
+    }
+  },
+  {
+    "name": "process_name", "ph": "M", "ts": 3368696193433.518, "pid": 9, "tid": 0,
+    "args": {
+      "name": "python"
+    }
+  },
+  {
+    "name": "process_labels", "ph": "M", "ts": 3368696193433.518, "pid": 9, "tid": 0,
+    "args": {
+      "labels": "GPU 9"
+    }
+  },
+  {
+    "name": "process_sort_index", "ph": "M", "ts": 3368696193433.518, "pid": 9, "tid": 0,
+    "args": {
+      "sort_index": 5000009
+    }
+  },
+  {
+    "name": "process_name", "ph": "M", "ts": 3368696193433.518, "pid": 10, "tid": 0,
+    "args": {
+      "name": "python"
+    }
+  },
+  {
+    "name": "process_labels", "ph": "M", "ts": 3368696193433.518, "pid": 10, "tid": 0,
+    "args": {
+      "labels": "GPU 10"
+    }
+  },
+  {
+    "name": "process_sort_index", "ph": "M", "ts": 3368696193433.518, "pid": 10, "tid": 0,
+    "args": {
+      "sort_index": 5000010
+    }
+  },
+  {
+    "name": "process_name", "ph": "M", "ts": 3368696193433.518, "pid": 11, "tid": 0,
+    "args": {
+      "name": "python"
+    }
+  },
+  {
+    "name": "process_labels", "ph": "M", "ts": 3368696193433.518, "pid": 11, "tid": 0,
+    "args": {
+      "labels": "GPU 11"
+    }
+  },
+  {
+    "name": "process_sort_index", "ph": "M", "ts": 3368696193433.518, "pid": 11, "tid": 0,
+    "args": {
+      "sort_index": 5000011
+    }
+  },
+  {
+    "name": "process_name", "ph": "M", "ts": 3368696193433.518, "pid": 12, "tid": 0,
+    "args": {
+      "name": "python"
+    }
+  },
+  {
+    "name": "process_labels", "ph": "M", "ts": 3368696193433.518, "pid": 12, "tid": 0,
+    "args": {
+      "labels": "GPU 12"
+    }
+  },
+  {
+    "name": "process_sort_index", "ph": "M", "ts": 3368696193433.518, "pid": 12, "tid": 0,
+    "args": {
+      "sort_index": 5000012
+    }
+  },
+  {
+    "name": "process_name", "ph": "M", "ts": 3368696193433.518, "pid": 13, "tid": 0,
+    "args": {
+      "name": "python"
+    }
+  },
+  {
+    "name": "process_labels", "ph": "M", "ts": 3368696193433.518, "pid": 13, "tid": 0,
+    "args": {
+      "labels": "GPU 13"
+    }
+  },
+  {
+    "name": "process_sort_index", "ph": "M", "ts": 3368696193433.518, "pid": 13, "tid": 0,
+    "args": {
+      "sort_index": 5000013
+    }
+  },
+  {
+    "name": "process_name", "ph": "M", "ts": 3368696193433.518, "pid": 14, "tid": 0,
+    "args": {
+      "name": "python"
+    }
+  },
+  {
+    "name": "process_labels", "ph": "M", "ts": 3368696193433.518, "pid": 14, "tid": 0,
+    "args": {
+      "labels": "GPU 14"
+    }
+  },
+  {
+    "name": "process_sort_index", "ph": "M", "ts": 3368696193433.518, "pid": 14, "tid": 0,
+    "args": {
+      "sort_index": 5000014
+    }
+  },
+  {
+    "name": "process_name", "ph": "M", "ts": 3368696193433.518, "pid": 15, "tid": 0,
+    "args": {
+      "name": "python"
+    }
+  },
+  {
+    "name": "process_labels", "ph": "M", "ts": 3368696193433.518, "pid": 15, "tid": 0,
+    "args": {
+      "labels": "GPU 15"
+    }
+  },
+  {
+    "name": "process_sort_index", "ph": "M", "ts": 3368696193433.518, "pid": 15, "tid": 0,
+    "args": {
+      "sort_index": 5000015
+    }
+  },
+  {
+    "name": "thread_name", "ph": "M", "ts": 3368696193433.518, "pid": 0, "tid": 0,
+    "args": {
+      "name": "stream 0 "
+    }
+  },
+  {
+    "name": "thread_sort_index", "ph": "M", "ts": 3368696193433.518, "pid": 0, "tid": 0,
+    "args": {
+      "sort_index": 0
+    }
+  },
+  {
+    "name": "thread_name", "ph": "M", "ts": 3368696193433.518, "pid": 0, "tid": 10,
+    "args": {
+      "name": "stream 10 "
+    }
+  },
+  {
+    "name": "thread_sort_index", "ph": "M", "ts": 3368696193433.518, "pid": 0, "tid": 10,
+    "args": {
+      "sort_index": 10
+    }
+  },
+  {
+    "name": "thread_name", "ph": "M", "ts": 3368696193433.518, "pid": 0, "tid": 101,
+    "args": {
+      "name": "stream 101 "
+    }
+  },
+  {
+    "name": "thread_sort_index", "ph": "M", "ts": 3368696193433.518, "pid": 0, "tid": 101,
+    "args": {
+      "sort_index": 101
+    }
+  },
+  {
+    "ph": "X", "cat": "Trace", "ts": 3368696193346.869, "dur": 192811.008,
+    "pid": "Spans", "tid": "PyTorch Profiler",
+    "name": "PyTorch Profiler (0)",
+    "args": {
+      "Op count": 0
+    }
+  },
+  {
+    "name": "process_sort_index", "ph": "M", "ts": 3368696193346.869,
+    "pid": "Spans", "tid": 0,
+    "args": {
+      "sort_index": 536870912
+    }
+  },
+  {
+    "name": "Iteration Start: PyTorch Profiler", "ph": "i", "s": "g",
+    "pid": "Traces", "tid": "Trace PyTorch Profiler", "ts": 3368696193346.869
+  },
+  {
+    "name": "Record Window End", "ph": "i", "s": "g",
+    "pid": "", "tid": "", "ts": 3368696386380.203
+  }
+  ],
+  "traceName": "/home/h00918771/metax_dev/verbs_campaign_results/verbs_normal_campaign_01/verbs_normal_campaign_01_baseline/node1/gpu_profile/normal/gpu_trace_1.json",
+  "displayTimeUnit": "ms",
+  "baseTimeNanoseconds": 1790857026000000000
+}

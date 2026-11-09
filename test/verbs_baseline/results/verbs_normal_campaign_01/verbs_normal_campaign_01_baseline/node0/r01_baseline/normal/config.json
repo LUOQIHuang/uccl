@@ -1,0 +1,37 @@
+{
+  "tag": "r01_baseline",
+  "mode": "normal",
+  "profile": false,
+  "warmups": 50,
+  "samples": 50,
+  "shape": {
+    "tokens": 4096,
+    "hidden": 7168,
+    "experts": 256,
+    "topk": 8
+  },
+  "env": {
+    "UCCL_EP_TRANSPORT": "verbs",
+    "UCCL_EP_VERBS_REG": "dmabuf",
+    "UCCL_IB_HCA": "rocep40s0f0",
+    "UCCL_EP_DISABLE_CPU_AFFINITY": "1",
+    "UCCL_RDMA_ADAPTIVE_SLEEP": "0",
+    "MCCL_IB_DISABLE": "1",
+    "NCCL_IB_DISABLE": "1",
+    "MCCL_SOCKET_IFNAME": "enp33s0",
+    "NCCL_SOCKET_IFNAME": "enp33s0",
+    "MCCL_DEBUG": "INFO",
+    "NCCL_DEBUG": "INFO",
+    "UCCL_IB_GID_INDEX": "3",
+    "VB_CASE": "/home/h00918771/metax_dev/verbs_campaign_results/verbs_normal_campaign_01/verbs_normal_campaign_01_baseline/node0/r01_baseline/normal",
+    "VB_MODULE": "/home/h00918771/metax_dev/verbs_baseline_build/normal_campaign_v1/lib/ep.abi3.so",
+    "VB_SHA": "68e193306bd47b7f8162a5d9e70f413039f12df2ceb9b9dc50afbb9a5990e088",
+    "VB_MODE": "normal",
+    "VB_PROFILE": "0",
+    "VB_WARMUPS": "50",
+    "VB_SAMPLES": "50",
+    "VB_CPU_DIAG": "0",
+    "UCCL_TORCHRUN_NODE_RANK": "0",
+    "UCCL_EXIT_GUARD": "1"
+  }
+}

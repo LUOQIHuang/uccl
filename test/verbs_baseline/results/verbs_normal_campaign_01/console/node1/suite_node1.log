@@ -1,0 +1,41 @@
+DIAG_ROOT=/home/h00918771
+DIAG_PYTHON=/home/h00918771/metax_dev/venv-maca-py312/bin/python
+VERBS_CASE_BEGIN r01_baseline/normal log=/home/h00918771/metax_dev/verbs_campaign_results/verbs_normal_campaign_01/verbs_normal_campaign_01_baseline/node1/r01_baseline/normal/bench.log
+VERBS_CASE_END r01_baseline/normal rc=0 checks={'done': True, 'mode': True, 'exit_ack': True, 'dmabuf': True, 'no_errors': True, 'samples': True, 'correctness': True, 'profiles': True} error=None
+VERBS_CASE_BEGIN r02_baseline/normal log=/home/h00918771/metax_dev/verbs_campaign_results/verbs_normal_campaign_01/verbs_normal_campaign_01_baseline/node1/r02_baseline/normal/bench.log
+VERBS_CASE_END r02_baseline/normal rc=0 checks={'done': True, 'mode': True, 'exit_ack': True, 'dmabuf': True, 'no_errors': True, 'samples': True, 'correctness': True, 'profiles': True} error=None
+VERBS_CASE_BEGIN r03_baseline/normal log=/home/h00918771/metax_dev/verbs_campaign_results/verbs_normal_campaign_01/verbs_normal_campaign_01_baseline/node1/r03_baseline/normal/bench.log
+VERBS_CASE_END r03_baseline/normal rc=0 checks={'done': True, 'mode': True, 'exit_ack': True, 'dmabuf': True, 'no_errors': True, 'samples': True, 'correctness': True, 'profiles': True} error=None
+VERBS_CASE_BEGIN gpu_profile/normal log=/home/h00918771/metax_dev/verbs_campaign_results/verbs_normal_campaign_01/verbs_normal_campaign_01_baseline/node1/gpu_profile/normal/bench.log
+VERBS_CASE_END gpu_profile/normal rc=0 checks={'done': True, 'mode': True, 'exit_ack': True, 'dmabuf': True, 'no_errors': True, 'samples': True, 'correctness': True, 'profiles': True, 'traces': True} error=None
+VERBS_BASELINE_ALL_PASSED output=/home/h00918771/metax_dev/verbs_campaign_results/verbs_normal_campaign_01/verbs_normal_campaign_01_baseline/node1
+DIAG_ROOT=/home/h00918771
+DIAG_PYTHON=/home/h00918771/metax_dev/venv-maca-py312/bin/python
+VERBS_CASE_BEGIN cpu_diagnostic/normal log=/home/h00918771/metax_dev/verbs_campaign_results/verbs_normal_campaign_01/verbs_normal_campaign_01_cpu/node1/cpu_diagnostic/normal/bench.log
+VERBS_CASE_END cpu_diagnostic/normal rc=0 checks={'done': True, 'mode': True, 'exit_ack': True, 'dmabuf': True, 'no_errors': True, 'samples': True, 'correctness': True, 'cpu_stages': True, 'native_write_fadd_samples': True, 'no_verbs_diag_errors': True, 'complete_wr_layout': True, 'profiles': True} error=None
+VERBS_BASELINE_ALL_PASSED output=/home/h00918771/metax_dev/verbs_campaign_results/verbs_normal_campaign_01/verbs_normal_campaign_01_cpu/node1
+DIAG_ROOT=/home/h00918771
+DIAG_PYTHON=/home/h00918771/metax_dev/venv-maca-py312/bin/python
+VERBS_MICRO_BEGIN /home/h00918771/metax_dev/verbs_campaign_results/verbs_normal_campaign_01/verbs_normal_campaign_01_micro_r01_t1/node1/micro/bench.log
+VERBS_MICRO_END rc=0 checks={'done': True, 'points': True, 'raw': True, 'no_errors': True, 'boundary': True}
+DIAG_ROOT=/home/h00918771
+DIAG_PYTHON=/home/h00918771/metax_dev/venv-maca-py312/bin/python
+VERBS_MICRO_BEGIN /home/h00918771/metax_dev/verbs_campaign_results/verbs_normal_campaign_01/verbs_normal_campaign_01_micro_r01_t4/node1/micro/bench.log
+VERBS_MICRO_END rc=0 checks={'done': True, 'points': True, 'raw': True, 'no_errors': True, 'boundary': True}
+DIAG_ROOT=/home/h00918771
+DIAG_PYTHON=/home/h00918771/metax_dev/venv-maca-py312/bin/python
+VERBS_MICRO_BEGIN /home/h00918771/metax_dev/verbs_campaign_results/verbs_normal_campaign_01/verbs_normal_campaign_01_micro_r02_t4/node1/micro/bench.log
+VERBS_MICRO_END rc=0 checks={'done': True, 'points': True, 'raw': True, 'no_errors': True, 'boundary': True}
+DIAG_ROOT=/home/h00918771
+DIAG_PYTHON=/home/h00918771/metax_dev/venv-maca-py312/bin/python
+VERBS_MICRO_BEGIN /home/h00918771/metax_dev/verbs_campaign_results/verbs_normal_campaign_01/verbs_normal_campaign_01_micro_r02_t1/node1/micro/bench.log
+VERBS_MICRO_END rc=0 checks={'done': True, 'points': True, 'raw': True, 'no_errors': True, 'boundary': True}
+DIAG_ROOT=/home/h00918771
+DIAG_PYTHON=/home/h00918771/metax_dev/venv-maca-py312/bin/python
+VERBS_MICRO_BEGIN /home/h00918771/metax_dev/verbs_campaign_results/verbs_normal_campaign_01/verbs_normal_campaign_01_micro_r03_t1/node1/micro/bench.log
+VERBS_MICRO_END rc=0 checks={'done': True, 'points': True, 'raw': True, 'no_errors': True, 'boundary': True}
+DIAG_ROOT=/home/h00918771
+DIAG_PYTHON=/home/h00918771/metax_dev/venv-maca-py312/bin/python
+VERBS_MICRO_BEGIN /home/h00918771/metax_dev/verbs_campaign_results/verbs_normal_campaign_01/verbs_normal_campaign_01_micro_r03_t4/node1/micro/bench.log
+VERBS_MICRO_END rc=0 checks={'done': True, 'points': True, 'raw': True, 'no_errors': True, 'boundary': True}
+VERBS_NORMAL_CAMPAIGN_ALL_PASSED rank=1 output=/home/h00918771/metax_dev/verbs_campaign_results/verbs_normal_campaign_01

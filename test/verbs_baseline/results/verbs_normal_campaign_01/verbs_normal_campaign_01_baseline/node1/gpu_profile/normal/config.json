@@ -1,0 +1,37 @@
+{
+  "tag": "gpu_profile",
+  "mode": "normal",
+  "profile": true,
+  "warmups": 50,
+  "samples": 50,
+  "shape": {
+    "tokens": 4096,
+    "hidden": 7168,
+    "experts": 256,
+    "topk": 8
+  },
+  "env": {
+    "UCCL_EP_TRANSPORT": "verbs",
+    "UCCL_EP_VERBS_REG": "dmabuf",
+    "UCCL_IB_HCA": "rocep40s0f0",
+    "UCCL_EP_DISABLE_CPU_AFFINITY": "1",
+    "UCCL_RDMA_ADAPTIVE_SLEEP": "0",
+    "MCCL_IB_DISABLE": "1",
+    "NCCL_IB_DISABLE": "1",
+    "MCCL_SOCKET_IFNAME": "enp33s0",
+    "NCCL_SOCKET_IFNAME": "enp33s0",
+    "MCCL_DEBUG": "INFO",
+    "NCCL_DEBUG": "INFO",
+    "UCCL_IB_GID_INDEX": "3",
+    "VB_CASE": "/home/h00918771/metax_dev/verbs_campaign_results/verbs_normal_campaign_01/verbs_normal_campaign_01_baseline/node1/gpu_profile/normal",
+    "VB_MODULE": "/home/h00918771/metax_dev/verbs_baseline_build/normal_campaign_v1/lib/ep.abi3.so",
+    "VB_SHA": "38c4501ee5fdb4b089720a0b3dd19dfe6369afb0436d96d276c7dfc03499df0c",
+    "VB_MODE": "normal",
+    "VB_PROFILE": "1",
+    "VB_WARMUPS": "50",
+    "VB_SAMPLES": "50",
+    "VB_CPU_DIAG": "0",
+    "UCCL_TORCHRUN_NODE_RANK": "1",
+    "UCCL_EXIT_GUARD": "1"
+  }
+}

@@ -1,0 +1,451 @@
+/home/h00918771/uccl-ep-xpu-integration-new/test/verbs_diag/exit_guard.py:8: UserWarning: Could not find flash_attn package installed. Please try to install flash_attn whl pacakge using pip command and make sure it can be imported properly
+  from torch.distributed import run
+/home/h00918771/uccl-ep-xpu-integration-new/test/verbs_baseline/common.py:92: UserWarning: Could not find flash_attn package installed. Please try to install flash_attn whl pacakge using pip command and make sure it can be imported properly
+  import torch
+VERBS_MEASUREMENT_CONFIG {"profile": false, "warmups": 5, "samples": 5}
+[buffer] num_nvlink_bytes=0.12 GB, num_rdma_bytes=0.48 GB
+master:98823:98823 [0] MCCL INFO MCCL_SOCKET_IFNAME set by environment to enp33s0
+master:98823:98823 [0] MCCL INFO Bootstrap : Using enp33s0:141.61.17.202<0>
+master:98823:98823 [0] MCCL INFO ip=141.61.17.202, port=0
+master:98823:98823 [0] MCCL INFO MCCL version 2.16.5
+master:98823:99092 [0] MCCL INFO MCCL_IB_DISABLE set by environment to 1.
+master:98823:99092 [0] MCCL INFO MCCL_SOCKET_IFNAME set by environment to enp33s0
+master:98823:99092 [0] MCCL INFO NET/Socket : Using [0]enp33s0:141.61.17.202<0>
+master:98823:99092 [0] MCCL INFO Using network Socket
+master:98823:99092 [0] MCCL INFO comm=0xaaad047862e0, lastStream is initialized
+master:98823:99092 [0] MCCL INFO ip=141.61.17.202, port=0
+master:98823:99092 [0] MCCL INFO ip=141.61.17.202, port=0
+master:98823:99092 [0] MCCL INFO ip=141.61.17.202, port=0
+master:98823:99092 [0] MCCL INFO ip=141.61.17.202, port=0
+master:98823:99092 [0] MCCL INFO RAS client listening socket at ::1<28028>
+master:98823:99092 [0] MCCL INFO rank 0 cudeDev 0, local 0 socket 0 peer -1, fabricId 0 index 0 directLinkGroup 0 totalGpu 0, switchId 0
+master:98823:99092 [0] MCCL INFO type:0, uuid: local 0xe5999433, remote 0xd54f50f9 0x0, topology 0, isa: 10.0
+master:98823:99092 [0] MCCL INFO Setting affinity for GPU 0 to ffff,ffffffff,ffffffff,f8000000,00000000,00000000,00000000,00000000,00000000
+master:98823:99092 [0] MCCL INFO MCCL pcie buffer mode 0, rcCount 1, nodeType 0x0, minAp 104
+master:98823:99092 [0] MCCL INFO Disabling clique-based kernels due to topology (ignore with CLIQUE_IGNORE_TOPO)
+master:98823:99092 [0] MCCL INFO CLIQUE InitRemoteReadToggle enable_read:0, isaVersion:1000, topologyId:0
+master:98823:99092 [0] MCCL INFO Clique kernels disabled
+master:98823:99092 [0] MCCL INFO Channel 00/32 :    0   1
+master:98823:99092 [0] MCCL INFO Channel 01/32 :    0   1
+master:98823:99092 [0] MCCL INFO Channel 02/32 :    0   1
+master:98823:99092 [0] MCCL INFO Channel 03/32 :    0   1
+master:98823:99092 [0] MCCL INFO Channel 04/32 :    0   1
+master:98823:99092 [0] MCCL INFO Channel 05/32 :    0   1
+master:98823:99092 [0] MCCL INFO Channel 06/32 :    0   1
+master:98823:99092 [0] MCCL INFO Channel 07/32 :    0   1
+master:98823:99092 [0] MCCL INFO Channel 08/32 :    0   1
+master:98823:99092 [0] MCCL INFO Channel 09/32 :    0   1
+master:98823:99092 [0] MCCL INFO Channel 10/32 :    0   1
+master:98823:99092 [0] MCCL INFO Channel 11/32 :    0   1
+master:98823:99092 [0] MCCL INFO Channel 12/32 :    0   1
+master:98823:99092 [0] MCCL INFO Channel 13/32 :    0   1
+master:98823:99092 [0] MCCL INFO Channel 14/32 :    0   1
+master:98823:99092 [0] MCCL INFO Channel 15/32 :    0   1
+master:98823:99092 [0] MCCL INFO Channel 16/32 :    0   1
+master:98823:99092 [0] MCCL INFO Channel 17/32 :    0   1
+master:98823:99092 [0] MCCL INFO Channel 18/32 :    0   1
+master:98823:99092 [0] MCCL INFO Channel 19/32 :    0   1
+master:98823:99092 [0] MCCL INFO Channel 20/32 :    0   1
+master:98823:99092 [0] MCCL INFO Channel 21/32 :    0   1
+master:98823:99092 [0] MCCL INFO Channel 22/32 :    0   1
+master:98823:99092 [0] MCCL INFO Channel 23/32 :    0   1
+master:98823:99092 [0] MCCL INFO Channel 24/32 :    0   1
+master:98823:99092 [0] MCCL INFO Channel 25/32 :    0   1
+master:98823:99092 [0] MCCL INFO Channel 26/32 :    0   1
+master:98823:99092 [0] MCCL INFO Channel 27/32 :    0   1
+master:98823:99092 [0] MCCL INFO Channel 28/32 :    0   1
+master:98823:99092 [0] MCCL INFO Channel 29/32 :    0   1
+master:98823:99092 [0] MCCL INFO Channel 30/32 :    0   1
+master:98823:99092 [0] MCCL INFO Channel 31/32 :    0   1
+master:98823:99092 [0] MCCL INFO Trees [0] 1/-1/-1->0->-1 [1] -1/-1/-1->0->1 [2] 1/-1/-1->0->-1 [3] -1/-1/-1->0->1 [4] 1/-1/-1->0->-1 [5] -1/-1/-1->0->1 [6] 1/-1/-1->0->-1 [7] -1/-1/-1->0->1 [8] 1/-1/-1->0->-1 [9] -1/-1/-1->0->1 [10] 1/-1/-1->0->-1 [11] -1/-1/-1->0->1 [12] 1/-1/-1->0->-1 [13] -1/-1/-1->0->1 [14] 1/-1/-1->0->-1 [15] -1/-1/-1->0->1 [16] 1/-1/-1->0->-1 [17] -1/-1/-1->0->1 [18] 1/-1/-1->0->-1 [19] -1/-1/-1->0->1 [20] 1/-1/-1->0->-1 [21] -1/-1/-1->0->1 [22] 1/-1/-1->0->-1 [23] -1/-1/-1->0->1 [24] 1/-1/-1->0->-1 [25] -1/-1/-1->0->1 [26] 1/-1/-1->0->-1 [27] -1/-1/-1->0->1 [28] 1/-1/-1->0->-1 [29] -1/-1/-1->0->1 [30] 1/-1/-1->0->-1 [31] -1/-1/-1->0->1 comm 0xaaad047862e0 nRanks 02 busId a1000
+master:98823:99092 [0] MCCL INFO P2P Chunksize set to 131072
+master:98823:99092 [0] MCCL INFO disable groupWriteback
+master:98823:99092 [0] MCCL INFO threadThresholds 8/8/64 | 8/8/64 | 256 | 256
+master:98823:99092 [0] MCCL INFO 32 coll channels, 32 p2p channels, 32 p2p channels per peer
+master:98823:99092 [0] MCCL INFO comm 0xaaad047862e0 rank 0 nranks 2 macaDev 0 busId a1000 localSize 0 used 67228512 bytes - Init COMPLETE
+master:98823:99097 [0] MCCL INFO ip=141.61.17.202, port=0
+master:98823:99196 [0] MCCL INFO Channel 00/0 : 1[a1000] -> 0[a1000] [receive] via NET/Socket/0 comm 0xaaad047862e0 nRanks 02
+master:98823:99097 [0] MCCL INFO ip=141.61.17.202, port=0
+master:98823:99196 [0] MCCL INFO Channel 01/0 : 1[a1000] -> 0[a1000] [receive] via NET/Socket/0 comm 0xaaad047862e0 nRanks 02
+master:98823:99097 [0] MCCL INFO ip=141.61.17.202, port=0
+master:98823:99196 [0] MCCL INFO Channel 02/0 : 1[a1000] -> 0[a1000] [receive] via NET/Socket/0 comm 0xaaad047862e0 nRanks 02
+master:98823:99097 [0] MCCL INFO ip=141.61.17.202, port=0
+master:98823:99196 [0] MCCL INFO Channel 03/0 : 1[a1000] -> 0[a1000] [receive] via NET/Socket/0 comm 0xaaad047862e0 nRanks 02
+master:98823:99097 [0] MCCL INFO ip=141.61.17.202, port=0
+master:98823:99196 [0] MCCL INFO Channel 04/0 : 1[a1000] -> 0[a1000] [receive] via NET/Socket/0 comm 0xaaad047862e0 nRanks 02
+master:98823:99097 [0] MCCL INFO ip=141.61.17.202, port=0
+master:98823:99196 [0] MCCL INFO Channel 05/0 : 1[a1000] -> 0[a1000] [receive] via NET/Socket/0 comm 0xaaad047862e0 nRanks 02
+master:98823:99097 [0] MCCL INFO ip=141.61.17.202, port=0
+master:98823:99196 [0] MCCL INFO Channel 06/0 : 1[a1000] -> 0[a1000] [receive] via NET/Socket/0 comm 0xaaad047862e0 nRanks 02
+master:98823:99097 [0] MCCL INFO ip=141.61.17.202, port=0
+master:98823:99196 [0] MCCL INFO Channel 07/0 : 1[a1000] -> 0[a1000] [receive] via NET/Socket/0 comm 0xaaad047862e0 nRanks 02
+master:98823:99097 [0] MCCL INFO ip=141.61.17.202, port=0
+master:98823:99196 [0] MCCL INFO Channel 08/0 : 1[a1000] -> 0[a1000] [receive] via NET/Socket/0 comm 0xaaad047862e0 nRanks 02
+master:98823:99097 [0] MCCL INFO ip=141.61.17.202, port=0
+master:98823:99196 [0] MCCL INFO Channel 09/0 : 1[a1000] -> 0[a1000] [receive] via NET/Socket/0 comm 0xaaad047862e0 nRanks 02
+master:98823:99097 [0] MCCL INFO ip=141.61.17.202, port=0
+master:98823:99196 [0] MCCL INFO Channel 10/0 : 1[a1000] -> 0[a1000] [receive] via NET/Socket/0 comm 0xaaad047862e0 nRanks 02
+master:98823:99097 [0] MCCL INFO ip=141.61.17.202, port=0
+master:98823:99196 [0] MCCL INFO Channel 11/0 : 1[a1000] -> 0[a1000] [receive] via NET/Socket/0 comm 0xaaad047862e0 nRanks 02
+master:98823:99097 [0] MCCL INFO ip=141.61.17.202, port=0
+master:98823:99196 [0] MCCL INFO Channel 12/0 : 1[a1000] -> 0[a1000] [receive] via NET/Socket/0 comm 0xaaad047862e0 nRanks 02
+master:98823:99097 [0] MCCL INFO ip=141.61.17.202, port=0
+master:98823:99196 [0] MCCL INFO Channel 13/0 : 1[a1000] -> 0[a1000] [receive] via NET/Socket/0 comm 0xaaad047862e0 nRanks 02
+master:98823:99097 [0] MCCL INFO ip=141.61.17.202, port=0
+master:98823:99196 [0] MCCL INFO Channel 14/0 : 1[a1000] -> 0[a1000] [receive] via NET/Socket/0 comm 0xaaad047862e0 nRanks 02
+master:98823:99097 [0] MCCL INFO ip=141.61.17.202, port=0
+master:98823:99196 [0] MCCL INFO Channel 15/0 : 1[a1000] -> 0[a1000] [receive] via NET/Socket/0 comm 0xaaad047862e0 nRanks 02
+master:98823:99097 [0] MCCL INFO ip=141.61.17.202, port=0
+master:98823:99196 [0] MCCL INFO Channel 16/0 : 1[a1000] -> 0[a1000] [receive] via NET/Socket/0 comm 0xaaad047862e0 nRanks 02
+master:98823:99097 [0] MCCL INFO ip=141.61.17.202, port=0
+master:98823:99196 [0] MCCL INFO Channel 17/0 : 1[a1000] -> 0[a1000] [receive] via NET/Socket/0 comm 0xaaad047862e0 nRanks 02
+master:98823:99097 [0] MCCL INFO ip=141.61.17.202, port=0
+master:98823:99196 [0] MCCL INFO Channel 18/0 : 1[a1000] -> 0[a1000] [receive] via NET/Socket/0 comm 0xaaad047862e0 nRanks 02
+master:98823:99097 [0] MCCL INFO ip=141.61.17.202, port=0
+master:98823:99196 [0] MCCL INFO Channel 19/0 : 1[a1000] -> 0[a1000] [receive] via NET/Socket/0 comm 0xaaad047862e0 nRanks 02
+master:98823:99097 [0] MCCL INFO ip=141.61.17.202, port=0
+master:98823:99196 [0] MCCL INFO Channel 20/0 : 1[a1000] -> 0[a1000] [receive] via NET/Socket/0 comm 0xaaad047862e0 nRanks 02
+master:98823:99097 [0] MCCL INFO ip=141.61.17.202, port=0
+master:98823:99196 [0] MCCL INFO Channel 21/0 : 1[a1000] -> 0[a1000] [receive] via NET/Socket/0 comm 0xaaad047862e0 nRanks 02
+master:98823:99097 [0] MCCL INFO ip=141.61.17.202, port=0
+master:98823:99196 [0] MCCL INFO Channel 22/0 : 1[a1000] -> 0[a1000] [receive] via NET/Socket/0 comm 0xaaad047862e0 nRanks 02
+master:98823:99097 [0] MCCL INFO ip=141.61.17.202, port=0
+master:98823:99196 [0] MCCL INFO Channel 23/0 : 1[a1000] -> 0[a1000] [receive] via NET/Socket/0 comm 0xaaad047862e0 nRanks 02
+master:98823:99097 [0] MCCL INFO ip=141.61.17.202, port=0
+master:98823:99196 [0] MCCL INFO Channel 24/0 : 1[a1000] -> 0[a1000] [receive] via NET/Socket/0 comm 0xaaad047862e0 nRanks 02
+master:98823:99097 [0] MCCL INFO ip=141.61.17.202, port=0
+master:98823:99196 [0] MCCL INFO Channel 25/0 : 1[a1000] -> 0[a1000] [receive] via NET/Socket/0 comm 0xaaad047862e0 nRanks 02
+master:98823:99097 [0] MCCL INFO ip=141.61.17.202, port=0
+master:98823:99196 [0] MCCL INFO Channel 26/0 : 1[a1000] -> 0[a1000] [receive] via NET/Socket/0 comm 0xaaad047862e0 nRanks 02
+master:98823:99097 [0] MCCL INFO ip=141.61.17.202, port=0
+master:98823:99196 [0] MCCL INFO Channel 27/0 : 1[a1000] -> 0[a1000] [receive] via NET/Socket/0 comm 0xaaad047862e0 nRanks 02
+master:98823:99097 [0] MCCL INFO ip=141.61.17.202, port=0
+master:98823:99196 [0] MCCL INFO Channel 28/0 : 1[a1000] -> 0[a1000] [receive] via NET/Socket/0 comm 0xaaad047862e0 nRanks 02
+master:98823:99097 [0] MCCL INFO ip=141.61.17.202, port=0
+master:98823:99196 [0] MCCL INFO Channel 29/0 : 1[a1000] -> 0[a1000] [receive] via NET/Socket/0 comm 0xaaad047862e0 nRanks 02
+master:98823:99097 [0] MCCL INFO ip=141.61.17.202, port=0
+master:98823:99196 [0] MCCL INFO Channel 30/0 : 1[a1000] -> 0[a1000] [receive] via NET/Socket/0 comm 0xaaad047862e0 nRanks 02
+master:98823:99097 [0] MCCL INFO ip=141.61.17.202, port=0
+master:98823:99196 [0] MCCL INFO Channel 31/0 : 1[a1000] -> 0[a1000] [receive] via NET/Socket/0 comm 0xaaad047862e0 nRanks 02
+master:98823:99196 [0] MCCL INFO Channel 00/0 : 0[a1000] -> 1[a1000] [send] via NET/Socket/0 comm 0xaaad047862e0 nRanks 02
+master:98823:99196 [0] MCCL INFO Channel 01/0 : 0[a1000] -> 1[a1000] [send] via NET/Socket/0 comm 0xaaad047862e0 nRanks 02
+master:98823:99196 [0] MCCL INFO Channel 02/0 : 0[a1000] -> 1[a1000] [send] via NET/Socket/0 comm 0xaaad047862e0 nRanks 02
+master:98823:99196 [0] MCCL INFO Channel 03/0 : 0[a1000] -> 1[a1000] [send] via NET/Socket/0 comm 0xaaad047862e0 nRanks 02
+master:98823:99196 [0] MCCL INFO Channel 04/0 : 0[a1000] -> 1[a1000] [send] via NET/Socket/0 comm 0xaaad047862e0 nRanks 02
+master:98823:99196 [0] MCCL INFO Channel 05/0 : 0[a1000] -> 1[a1000] [send] via NET/Socket/0 comm 0xaaad047862e0 nRanks 02
+master:98823:99196 [0] MCCL INFO Channel 06/0 : 0[a1000] -> 1[a1000] [send] via NET/Socket/0 comm 0xaaad047862e0 nRanks 02
+master:98823:99196 [0] MCCL INFO Channel 07/0 : 0[a1000] -> 1[a1000] [send] via NET/Socket/0 comm 0xaaad047862e0 nRanks 02
+master:98823:99196 [0] MCCL INFO Channel 08/0 : 0[a1000] -> 1[a1000] [send] via NET/Socket/0 comm 0xaaad047862e0 nRanks 02
+master:98823:99196 [0] MCCL INFO Channel 09/0 : 0[a1000] -> 1[a1000] [send] via NET/Socket/0 comm 0xaaad047862e0 nRanks 02
+master:98823:99196 [0] MCCL INFO Channel 10/0 : 0[a1000] -> 1[a1000] [send] via NET/Socket/0 comm 0xaaad047862e0 nRanks 02
+master:98823:99196 [0] MCCL INFO Channel 11/0 : 0[a1000] -> 1[a1000] [send] via NET/Socket/0 comm 0xaaad047862e0 nRanks 02
+master:98823:99196 [0] MCCL INFO Channel 12/0 : 0[a1000] -> 1[a1000] [send] via NET/Socket/0 comm 0xaaad047862e0 nRanks 02
+master:98823:99196 [0] MCCL INFO Channel 13/0 : 0[a1000] -> 1[a1000] [send] via NET/Socket/0 comm 0xaaad047862e0 nRanks 02
+master:98823:99196 [0] MCCL INFO Channel 14/0 : 0[a1000] -> 1[a1000] [send] via NET/Socket/0 comm 0xaaad047862e0 nRanks 02
+master:98823:99196 [0] MCCL INFO Channel 15/0 : 0[a1000] -> 1[a1000] [send] via NET/Socket/0 comm 0xaaad047862e0 nRanks 02
+master:98823:99196 [0] MCCL INFO Channel 16/0 : 0[a1000] -> 1[a1000] [send] via NET/Socket/0 comm 0xaaad047862e0 nRanks 02
+master:98823:99196 [0] MCCL INFO Channel 17/0 : 0[a1000] -> 1[a1000] [send] via NET/Socket/0 comm 0xaaad047862e0 nRanks 02
+master:98823:99196 [0] MCCL INFO Channel 18/0 : 0[a1000] -> 1[a1000] [send] via NET/Socket/0 comm 0xaaad047862e0 nRanks 02
+master:98823:99196 [0] MCCL INFO Channel 19/0 : 0[a1000] -> 1[a1000] [send] via NET/Socket/0 comm 0xaaad047862e0 nRanks 02
+master:98823:99196 [0] MCCL INFO Channel 20/0 : 0[a1000] -> 1[a1000] [send] via NET/Socket/0 comm 0xaaad047862e0 nRanks 02
+master:98823:99196 [0] MCCL INFO Channel 21/0 : 0[a1000] -> 1[a1000] [send] via NET/Socket/0 comm 0xaaad047862e0 nRanks 02
+master:98823:99196 [0] MCCL INFO Channel 22/0 : 0[a1000] -> 1[a1000] [send] via NET/Socket/0 comm 0xaaad047862e0 nRanks 02
+master:98823:99196 [0] MCCL INFO Channel 23/0 : 0[a1000] -> 1[a1000] [send] via NET/Socket/0 comm 0xaaad047862e0 nRanks 02
+master:98823:99196 [0] MCCL INFO Channel 24/0 : 0[a1000] -> 1[a1000] [send] via NET/Socket/0 comm 0xaaad047862e0 nRanks 02
+master:98823:99196 [0] MCCL INFO Channel 25/0 : 0[a1000] -> 1[a1000] [send] via NET/Socket/0 comm 0xaaad047862e0 nRanks 02
+master:98823:99196 [0] MCCL INFO Channel 26/0 : 0[a1000] -> 1[a1000] [send] via NET/Socket/0 comm 0xaaad047862e0 nRanks 02
+master:98823:99196 [0] MCCL INFO Channel 27/0 : 0[a1000] -> 1[a1000] [send] via NET/Socket/0 comm 0xaaad047862e0 nRanks 02
+master:98823:99196 [0] MCCL INFO Channel 28/0 : 0[a1000] -> 1[a1000] [send] via NET/Socket/0 comm 0xaaad047862e0 nRanks 02
+master:98823:99196 [0] MCCL INFO Channel 29/0 : 0[a1000] -> 1[a1000] [send] via NET/Socket/0 comm 0xaaad047862e0 nRanks 02
+master:98823:99196 [0] MCCL INFO Channel 30/0 : 0[a1000] -> 1[a1000] [send] via NET/Socket/0 comm 0xaaad047862e0 nRanks 02
+master:98823:99196 [0] MCCL INFO Channel 31/0 : 0[a1000] -> 1[a1000] [send] via NET/Socket/0 comm 0xaaad047862e0 nRanks 02
+master:98823:99196 [0] MCCL INFO Connected all rings comm 0xaaad047862e0 nRanks 02 busId a1000
+[DEBUG] IP distribution across 2 ranks:
+[DEBUG]   141.61.17.202: 1 ranks
+[DEBUG]   141.61.17.204: 1 ranks
+Registered proxies for device 0 (high-throughput mode)
+master:98823:99225 [0] MCCL INFO Connected all trees
+[RDMA] Selected NIC rocep40s0f0 (index 0) for affinity rank 1, CUDA device 0, NUMA node 0
+[RDMA] Registered GPU memory via DMA-BUF (addr=0xa04c00000, len=483892608, fd_offset=0, rkey=0x12ae8)
+[RDMA] GPU MR registration path=dmabuf requested=dmabuf addr=0xa04c00000 bytes=483892608
+[RDMA] Thread 0 sharing NIC rocep40s0f0 context with 1 other thread(s) for affinity rank 1
+[RDMA] Thread 2 sharing NIC rocep40s0f0 context with 2 other thread(s) for affinity rank 1
+[RDMA] Thread 3 sharing NIC rocep40s0f0 context with 3 other thread(s) for affinity rank 1
+[RDMA] Registered GPU memory via DMA-BUF (addr=0xa24a03600, len=81960, fd_offset=13824, rkey=0x181cdc)
+[RDMA] control MR registration requested=dmabuf addr=0xa24a03600 bytes=81960
+[Proxy] Registered atomic_buffer_ptr MR: addr=0xa24a03600, len=81960, rkey=0x181cdc
+[RDMA] Registered GPU memory via DMA-BUF (addr=0xa24a03600, len=81960, fd_offset=13824, rkey=0x180dcc)
+[RDMA] control MR registration requested=dmabuf addr=0xa24a03600 bytes=81960
+[Proxy] Registered atomic_buffer_ptr MR: addr=0xa24a03600, len=81960, rkey=0x180dcc
+[RDMA] Registered GPU memory via DMA-BUF (addr=0xa24a03600, len=81960, fd_offset=13824, rkey=0x1802c1)
+[RDMA] control MR registration requested=dmabuf addr=0xa24a03600 bytes=81960
+[Proxy] Registered atomic_buffer_ptr MR: addr=0xa24a03600, len=81960, rkey=0x1802c1
+[RDMA] Registered GPU memory via DMA-BUF (addr=0xa24a03600, len=81960, fd_offset=13824, rkey=0x1815d4)
+[RDMA] control MR registration requested=dmabuf addr=0xa24a03600 bytes=81960
+[Proxy] Registered atomic_buffer_ptr MR: addr=0xa24a03600, len=81960, rkey=0x1815d4
+[create_per_thread_qp] Populated atomic buffer info: addr=0xa24a03600, len=81960, rkey=0x180dcc
+[create_per_thread_qp] Populated atomic buffer info: addr=0xa24a03600, len=81960, rkey=0x181cdc
+[create_per_thread_qp] Populated atomic buffer info: addr=0xa24a03600, len=81960, rkey=0x1802c1
+[create_per_thread_qp] Populated atomic buffer info: addr=0xa24a03600, len=81960, rkey=0x1815d4
+QP modified to INIT state
+QP modified to INIT state
+QP modified to INIT state
+QP modified to INIT state
+RoCE detected (Ethernet)
+Remote LID: 0x0, QPN: 414, PSN: 0
+Verifying port state:
+  link_layer: Ethernet (RoCE)
+  port_state: ACTIVE
+  max_mtu: 5
+  active_mtu: 3
+  lid: 0x0
+RoCE detected (Ethernet)
+Remote LID: 0x0, QPN: 416, PSN: 0
+Verifying port state:
+  link_layer: Ethernet (RoCE)
+  port_state: ACTIVE
+  max_mtu: 5
+  active_mtu: 3
+  lid: 0x0
+RoCE detected (Ethernet)
+Remote LID: 0x0, QPN: 415, PSN: 0
+Verifying port state:
+  link_layer: Ethernet (RoCE)
+  port_state: ACTIVE
+  max_mtu: 5
+  active_mtu: 3
+  lid: 0x0
+RoCE detected (Ethernet)
+Remote LID: 0x0, QPN: 417, PSN: 0
+Verifying port state:
+  link_layer: Ethernet (RoCE)
+  port_state: ACTIVE
+  max_mtu: 5
+  active_mtu: 3
+  lid: 0x0
+QP modified to RTR state
+QP modified to RTR state
+QP modified to RTR state
+QP modified to RTR state
+ACK-QP modified to RTR state
+ACK-QP modified to RTR state
+ACK-QP modified to RTR state
+ACK-QP modified to RTR state
+QP modified to RTS state
+QP modified to RTS state
+QP modified to RTS state
+QP modified to RTS state
+ACK-QP modified to RTS state
+[Proxy] Remote atomic buffer info for peer 1: addr=0xa24a03600, len=81960, rkey=0x1821e0
+ACK-QP modified to RTS state
+[Proxy] Remote atomic buffer info for peer 1: addr=0xa24a03600, len=81960, rkey=0x182bea
+ACK-QP modified to RTS state
+[Proxy] Peer 1 has num_mr_chunks=0 (single MR: rkey=0x12eeb)
+[Proxy] Remote atomic buffer info for peer 1: addr=0xa24a03600, len=81960, rkey=0x1818d7
+ACK-QP modified to RTS state
+[Proxy] Remote atomic buffer info for peer 1: addr=0xa24a03600, len=81960, rkey=0x1826e6
+VERBS_MODE_OK mode=normal proxies=4
+TRANSPORT_MODE_OK backend=verbs mode=normal urma_wire=0 proxies=4
+Testing with seed 0 ...
+[config] num_tokens=4096, hidden=7168, num_topk_groups=2, num_topk=8
+[rank0]:[W1109 20:02:38.214688560 ProcessGroupNCCL.cpp:4883] [PG ID 0 PG GUID 0 Rank 0]  using GPU 0 to perform barrier as devices used by this process are currently unknown. This can potentially cause a hang if this rank to GPU mapping is incorrect. Specify device_ids in barrier() to force use of a particular device, or call init_process_group() with a device_id.
+master:98823:98823 [0] MCCL INFO ip=141.61.17.202, port=0
+master:98823:99377 [0] MCCL INFO Using network Socket
+master:98823:99377 [0] MCCL INFO comm=0xaaad04bb2010, lastStream is initialized
+master:98823:99377 [0] MCCL INFO ip=141.61.17.202, port=0
+master:98823:99377 [0] MCCL INFO ip=141.61.17.202, port=0
+master:98823:99377 [0] MCCL INFO ip=141.61.17.202, port=0
+master:98823:99377 [0] MCCL INFO rank 0 cudeDev 0, local 0 socket 0 peer -1, fabricId 0 index 0 directLinkGroup 0 totalGpu 0, switchId 0
+master:98823:99377 [0] MCCL INFO type:0, uuid: local 0xe5999433, remote 0xd54f50f9 0x0, topology 0, isa: 10.0
+master:98823:99377 [0] MCCL INFO Setting affinity for GPU 0 to ffff,ffffffff,ffffffff,f8000000,00000000,00000000,00000000,00000000,00000000
+master:98823:99377 [0] MCCL INFO MCCL pcie buffer mode 0, rcCount 1, nodeType 0x0, minAp 104
+master:98823:99377 [0] MCCL INFO Disabling clique-based kernels due to topology (ignore with CLIQUE_IGNORE_TOPO)
+master:98823:99377 [0] MCCL INFO CLIQUE InitRemoteReadToggle enable_read:0, isaVersion:1000, topologyId:0
+master:98823:99377 [0] MCCL INFO Clique kernels disabled
+master:98823:99377 [0] MCCL INFO Channel 00/32 :    0   1
+master:98823:99377 [0] MCCL INFO Channel 01/32 :    0   1
+master:98823:99377 [0] MCCL INFO Channel 02/32 :    0   1
+master:98823:99377 [0] MCCL INFO Channel 03/32 :    0   1
+master:98823:99377 [0] MCCL INFO Channel 04/32 :    0   1
+master:98823:99377 [0] MCCL INFO Channel 05/32 :    0   1
+master:98823:99377 [0] MCCL INFO Channel 06/32 :    0   1
+master:98823:99377 [0] MCCL INFO Channel 07/32 :    0   1
+master:98823:99377 [0] MCCL INFO Channel 08/32 :    0   1
+master:98823:99377 [0] MCCL INFO Channel 09/32 :    0   1
+master:98823:99377 [0] MCCL INFO Channel 10/32 :    0   1
+master:98823:99377 [0] MCCL INFO Channel 11/32 :    0   1
+master:98823:99377 [0] MCCL INFO Channel 12/32 :    0   1
+master:98823:99377 [0] MCCL INFO Channel 13/32 :    0   1
+master:98823:99377 [0] MCCL INFO Channel 14/32 :    0   1
+master:98823:99377 [0] MCCL INFO Channel 15/32 :    0   1
+master:98823:99377 [0] MCCL INFO Channel 16/32 :    0   1
+master:98823:99377 [0] MCCL INFO Channel 17/32 :    0   1
+master:98823:99377 [0] MCCL INFO Channel 18/32 :    0   1
+master:98823:99377 [0] MCCL INFO Channel 19/32 :    0   1
+master:98823:99377 [0] MCCL INFO Channel 20/32 :    0   1
+master:98823:99377 [0] MCCL INFO Channel 21/32 :    0   1
+master:98823:99377 [0] MCCL INFO Channel 22/32 :    0   1
+master:98823:99377 [0] MCCL INFO Channel 23/32 :    0   1
+master:98823:99377 [0] MCCL INFO Channel 24/32 :    0   1
+master:98823:99377 [0] MCCL INFO Channel 25/32 :    0   1
+master:98823:99377 [0] MCCL INFO Channel 26/32 :    0   1
+master:98823:99377 [0] MCCL INFO Channel 27/32 :    0   1
+master:98823:99377 [0] MCCL INFO Channel 28/32 :    0   1
+master:98823:99377 [0] MCCL INFO Channel 29/32 :    0   1
+master:98823:99377 [0] MCCL INFO Channel 30/32 :    0   1
+master:98823:99377 [0] MCCL INFO Channel 31/32 :    0   1
+master:98823:99377 [0] MCCL INFO Trees [0] 1/-1/-1->0->-1 [1] -1/-1/-1->0->1 [2] 1/-1/-1->0->-1 [3] -1/-1/-1->0->1 [4] 1/-1/-1->0->-1 [5] -1/-1/-1->0->1 [6] 1/-1/-1->0->-1 [7] -1/-1/-1->0->1 [8] 1/-1/-1->0->-1 [9] -1/-1/-1->0->1 [10] 1/-1/-1->0->-1 [11] -1/-1/-1->0->1 [12] 1/-1/-1->0->-1 [13] -1/-1/-1->0->1 [14] 1/-1/-1->0->-1 [15] -1/-1/-1->0->1 [16] 1/-1/-1->0->-1 [17] -1/-1/-1->0->1 [18] 1/-1/-1->0->-1 [19] -1/-1/-1->0->1 [20] 1/-1/-1->0->-1 [21] -1/-1/-1->0->1 [22] 1/-1/-1->0->-1 [23] -1/-1/-1->0->1 [24] 1/-1/-1->0->-1 [25] -1/-1/-1->0->1 [26] 1/-1/-1->0->-1 [27] -1/-1/-1->0->1 [28] 1/-1/-1->0->-1 [29] -1/-1/-1->0->1 [30] 1/-1/-1->0->-1 [31] -1/-1/-1->0->1 comm 0xaaad04bb2010 nRanks 02 busId a1000
+master:98823:99377 [0] MCCL INFO P2P Chunksize set to 131072
+master:98823:99377 [0] MCCL INFO disable groupWriteback
+master:98823:99377 [0] MCCL INFO threadThresholds 8/8/64 | 8/8/64 | 256 | 256
+master:98823:99377 [0] MCCL INFO 32 coll channels, 32 p2p channels, 32 p2p channels per peer
+master:98823:99377 [0] MCCL INFO comm 0xaaad04bb2010 rank 0 nranks 2 macaDev 0 busId a1000 localSize 0 used 67228512 bytes - Init COMPLETE
+master:98823:99381 [0] MCCL INFO ip=141.61.17.202, port=0
+master:98823:99384 [0] MCCL INFO Channel 00/0 : 1[a1000] -> 0[a1000] [receive] via NET/Socket/0 comm 0xaaad04bb2010 nRanks 02
+master:98823:99381 [0] MCCL INFO ip=141.61.17.202, port=0
+master:98823:99384 [0] MCCL INFO Channel 01/0 : 1[a1000] -> 0[a1000] [receive] via NET/Socket/0 comm 0xaaad04bb2010 nRanks 02
+master:98823:99381 [0] MCCL INFO ip=141.61.17.202, port=0
+master:98823:99384 [0] MCCL INFO Channel 02/0 : 1[a1000] -> 0[a1000] [receive] via NET/Socket/0 comm 0xaaad04bb2010 nRanks 02
+master:98823:99381 [0] MCCL INFO ip=141.61.17.202, port=0
+master:98823:99384 [0] MCCL INFO Channel 03/0 : 1[a1000] -> 0[a1000] [receive] via NET/Socket/0 comm 0xaaad04bb2010 nRanks 02
+master:98823:99381 [0] MCCL INFO ip=141.61.17.202, port=0
+master:98823:99384 [0] MCCL INFO Channel 04/0 : 1[a1000] -> 0[a1000] [receive] via NET/Socket/0 comm 0xaaad04bb2010 nRanks 02
+master:98823:99381 [0] MCCL INFO ip=141.61.17.202, port=0
+master:98823:99384 [0] MCCL INFO Channel 05/0 : 1[a1000] -> 0[a1000] [receive] via NET/Socket/0 comm 0xaaad04bb2010 nRanks 02
+master:98823:99381 [0] MCCL INFO ip=141.61.17.202, port=0
+master:98823:99384 [0] MCCL INFO Channel 06/0 : 1[a1000] -> 0[a1000] [receive] via NET/Socket/0 comm 0xaaad04bb2010 nRanks 02
+master:98823:99381 [0] MCCL INFO ip=141.61.17.202, port=0
+master:98823:99384 [0] MCCL INFO Channel 07/0 : 1[a1000] -> 0[a1000] [receive] via NET/Socket/0 comm 0xaaad04bb2010 nRanks 02
+master:98823:99381 [0] MCCL INFO ip=141.61.17.202, port=0
+master:98823:99384 [0] MCCL INFO Channel 08/0 : 1[a1000] -> 0[a1000] [receive] via NET/Socket/0 comm 0xaaad04bb2010 nRanks 02
+master:98823:99381 [0] MCCL INFO ip=141.61.17.202, port=0
+master:98823:99384 [0] MCCL INFO Channel 09/0 : 1[a1000] -> 0[a1000] [receive] via NET/Socket/0 comm 0xaaad04bb2010 nRanks 02
+master:98823:99381 [0] MCCL INFO ip=141.61.17.202, port=0
+master:98823:99384 [0] MCCL INFO Channel 10/0 : 1[a1000] -> 0[a1000] [receive] via NET/Socket/0 comm 0xaaad04bb2010 nRanks 02
+master:98823:99381 [0] MCCL INFO ip=141.61.17.202, port=0
+master:98823:99384 [0] MCCL INFO Channel 11/0 : 1[a1000] -> 0[a1000] [receive] via NET/Socket/0 comm 0xaaad04bb2010 nRanks 02
+master:98823:99381 [0] MCCL INFO ip=141.61.17.202, port=0
+master:98823:99384 [0] MCCL INFO Channel 12/0 : 1[a1000] -> 0[a1000] [receive] via NET/Socket/0 comm 0xaaad04bb2010 nRanks 02
+master:98823:99381 [0] MCCL INFO ip=141.61.17.202, port=0
+master:98823:99384 [0] MCCL INFO Channel 13/0 : 1[a1000] -> 0[a1000] [receive] via NET/Socket/0 comm 0xaaad04bb2010 nRanks 02
+master:98823:99381 [0] MCCL INFO ip=141.61.17.202, port=0
+master:98823:99384 [0] MCCL INFO Channel 14/0 : 1[a1000] -> 0[a1000] [receive] via NET/Socket/0 comm 0xaaad04bb2010 nRanks 02
+master:98823:99381 [0] MCCL INFO ip=141.61.17.202, port=0
+master:98823:99384 [0] MCCL INFO Channel 15/0 : 1[a1000] -> 0[a1000] [receive] via NET/Socket/0 comm 0xaaad04bb2010 nRanks 02
+master:98823:99381 [0] MCCL INFO ip=141.61.17.202, port=0
+master:98823:99384 [0] MCCL INFO Channel 16/0 : 1[a1000] -> 0[a1000] [receive] via NET/Socket/0 comm 0xaaad04bb2010 nRanks 02
+master:98823:99381 [0] MCCL INFO ip=141.61.17.202, port=0
+master:98823:99384 [0] MCCL INFO Channel 17/0 : 1[a1000] -> 0[a1000] [receive] via NET/Socket/0 comm 0xaaad04bb2010 nRanks 02
+master:98823:99381 [0] MCCL INFO ip=141.61.17.202, port=0
+master:98823:99384 [0] MCCL INFO Channel 18/0 : 1[a1000] -> 0[a1000] [receive] via NET/Socket/0 comm 0xaaad04bb2010 nRanks 02
+master:98823:99381 [0] MCCL INFO ip=141.61.17.202, port=0
+master:98823:99384 [0] MCCL INFO Channel 19/0 : 1[a1000] -> 0[a1000] [receive] via NET/Socket/0 comm 0xaaad04bb2010 nRanks 02
+master:98823:99381 [0] MCCL INFO ip=141.61.17.202, port=0
+master:98823:99384 [0] MCCL INFO Channel 20/0 : 1[a1000] -> 0[a1000] [receive] via NET/Socket/0 comm 0xaaad04bb2010 nRanks 02
+master:98823:99381 [0] MCCL INFO ip=141.61.17.202, port=0
+master:98823:99384 [0] MCCL INFO Channel 21/0 : 1[a1000] -> 0[a1000] [receive] via NET/Socket/0 comm 0xaaad04bb2010 nRanks 02
+master:98823:99381 [0] MCCL INFO ip=141.61.17.202, port=0
+master:98823:99384 [0] MCCL INFO Channel 22/0 : 1[a1000] -> 0[a1000] [receive] via NET/Socket/0 comm 0xaaad04bb2010 nRanks 02
+master:98823:99381 [0] MCCL INFO ip=141.61.17.202, port=0
+master:98823:99384 [0] MCCL INFO Channel 23/0 : 1[a1000] -> 0[a1000] [receive] via NET/Socket/0 comm 0xaaad04bb2010 nRanks 02
+master:98823:99381 [0] MCCL INFO ip=141.61.17.202, port=0
+master:98823:99384 [0] MCCL INFO Channel 24/0 : 1[a1000] -> 0[a1000] [receive] via NET/Socket/0 comm 0xaaad04bb2010 nRanks 02
+master:98823:99381 [0] MCCL INFO ip=141.61.17.202, port=0
+master:98823:99384 [0] MCCL INFO Channel 25/0 : 1[a1000] -> 0[a1000] [receive] via NET/Socket/0 comm 0xaaad04bb2010 nRanks 02
+master:98823:99381 [0] MCCL INFO ip=141.61.17.202, port=0
+master:98823:99384 [0] MCCL INFO Channel 26/0 : 1[a1000] -> 0[a1000] [receive] via NET/Socket/0 comm 0xaaad04bb2010 nRanks 02
+master:98823:99381 [0] MCCL INFO ip=141.61.17.202, port=0
+master:98823:99384 [0] MCCL INFO Channel 27/0 : 1[a1000] -> 0[a1000] [receive] via NET/Socket/0 comm 0xaaad04bb2010 nRanks 02
+master:98823:99381 [0] MCCL INFO ip=141.61.17.202, port=0
+master:98823:99384 [0] MCCL INFO Channel 28/0 : 1[a1000] -> 0[a1000] [receive] via NET/Socket/0 comm 0xaaad04bb2010 nRanks 02
+master:98823:99381 [0] MCCL INFO ip=141.61.17.202, port=0
+master:98823:99384 [0] MCCL INFO Channel 29/0 : 1[a1000] -> 0[a1000] [receive] via NET/Socket/0 comm 0xaaad04bb2010 nRanks 02
+master:98823:99381 [0] MCCL INFO ip=141.61.17.202, port=0
+master:98823:99384 [0] MCCL INFO Channel 30/0 : 1[a1000] -> 0[a1000] [receive] via NET/Socket/0 comm 0xaaad04bb2010 nRanks 02
+master:98823:99381 [0] MCCL INFO ip=141.61.17.202, port=0
+master:98823:99384 [0] MCCL INFO Channel 31/0 : 1[a1000] -> 0[a1000] [receive] via NET/Socket/0 comm 0xaaad04bb2010 nRanks 02
+master:98823:99384 [0] MCCL INFO Channel 00/0 : 0[a1000] -> 1[a1000] [send] via NET/Socket/0 comm 0xaaad04bb2010 nRanks 02
+master:98823:99384 [0] MCCL INFO Channel 01/0 : 0[a1000] -> 1[a1000] [send] via NET/Socket/0 comm 0xaaad04bb2010 nRanks 02
+master:98823:99384 [0] MCCL INFO Channel 02/0 : 0[a1000] -> 1[a1000] [send] via NET/Socket/0 comm 0xaaad04bb2010 nRanks 02
+master:98823:99384 [0] MCCL INFO Channel 03/0 : 0[a1000] -> 1[a1000] [send] via NET/Socket/0 comm 0xaaad04bb2010 nRanks 02
+master:98823:99384 [0] MCCL INFO Channel 04/0 : 0[a1000] -> 1[a1000] [send] via NET/Socket/0 comm 0xaaad04bb2010 nRanks 02
+master:98823:99384 [0] MCCL INFO Channel 05/0 : 0[a1000] -> 1[a1000] [send] via NET/Socket/0 comm 0xaaad04bb2010 nRanks 02
+master:98823:99384 [0] MCCL INFO Channel 06/0 : 0[a1000] -> 1[a1000] [send] via NET/Socket/0 comm 0xaaad04bb2010 nRanks 02
+master:98823:99384 [0] MCCL INFO Channel 07/0 : 0[a1000] -> 1[a1000] [send] via NET/Socket/0 comm 0xaaad04bb2010 nRanks 02
+master:98823:99384 [0] MCCL INFO Channel 08/0 : 0[a1000] -> 1[a1000] [send] via NET/Socket/0 comm 0xaaad04bb2010 nRanks 02
+master:98823:99384 [0] MCCL INFO Channel 09/0 : 0[a1000] -> 1[a1000] [send] via NET/Socket/0 comm 0xaaad04bb2010 nRanks 02
+master:98823:99384 [0] MCCL INFO Channel 10/0 : 0[a1000] -> 1[a1000] [send] via NET/Socket/0 comm 0xaaad04bb2010 nRanks 02
+master:98823:99384 [0] MCCL INFO Channel 11/0 : 0[a1000] -> 1[a1000] [send] via NET/Socket/0 comm 0xaaad04bb2010 nRanks 02
+master:98823:99384 [0] MCCL INFO Channel 12/0 : 0[a1000] -> 1[a1000] [send] via NET/Socket/0 comm 0xaaad04bb2010 nRanks 02
+master:98823:99384 [0] MCCL INFO Channel 13/0 : 0[a1000] -> 1[a1000] [send] via NET/Socket/0 comm 0xaaad04bb2010 nRanks 02
+master:98823:99384 [0] MCCL INFO Channel 14/0 : 0[a1000] -> 1[a1000] [send] via NET/Socket/0 comm 0xaaad04bb2010 nRanks 02
+master:98823:99384 [0] MCCL INFO Channel 15/0 : 0[a1000] -> 1[a1000] [send] via NET/Socket/0 comm 0xaaad04bb2010 nRanks 02
+master:98823:99384 [0] MCCL INFO Channel 16/0 : 0[a1000] -> 1[a1000] [send] via NET/Socket/0 comm 0xaaad04bb2010 nRanks 02
+master:98823:99384 [0] MCCL INFO Channel 17/0 : 0[a1000] -> 1[a1000] [send] via NET/Socket/0 comm 0xaaad04bb2010 nRanks 02
+master:98823:99384 [0] MCCL INFO Channel 18/0 : 0[a1000] -> 1[a1000] [send] via NET/Socket/0 comm 0xaaad04bb2010 nRanks 02
+master:98823:99384 [0] MCCL INFO Channel 19/0 : 0[a1000] -> 1[a1000] [send] via NET/Socket/0 comm 0xaaad04bb2010 nRanks 02
+master:98823:99384 [0] MCCL INFO Channel 20/0 : 0[a1000] -> 1[a1000] [send] via NET/Socket/0 comm 0xaaad04bb2010 nRanks 02
+master:98823:99384 [0] MCCL INFO Channel 21/0 : 0[a1000] -> 1[a1000] [send] via NET/Socket/0 comm 0xaaad04bb2010 nRanks 02
+master:98823:99384 [0] MCCL INFO Channel 22/0 : 0[a1000] -> 1[a1000] [send] via NET/Socket/0 comm 0xaaad04bb2010 nRanks 02
+master:98823:99384 [0] MCCL INFO Channel 23/0 : 0[a1000] -> 1[a1000] [send] via NET/Socket/0 comm 0xaaad04bb2010 nRanks 02
+master:98823:99384 [0] MCCL INFO Channel 24/0 : 0[a1000] -> 1[a1000] [send] via NET/Socket/0 comm 0xaaad04bb2010 nRanks 02
+master:98823:99384 [0] MCCL INFO Channel 25/0 : 0[a1000] -> 1[a1000] [send] via NET/Socket/0 comm 0xaaad04bb2010 nRanks 02
+master:98823:99384 [0] MCCL INFO Channel 26/0 : 0[a1000] -> 1[a1000] [send] via NET/Socket/0 comm 0xaaad04bb2010 nRanks 02
+master:98823:99384 [0] MCCL INFO Channel 27/0 : 0[a1000] -> 1[a1000] [send] via NET/Socket/0 comm 0xaaad04bb2010 nRanks 02
+master:98823:99384 [0] MCCL INFO Channel 28/0 : 0[a1000] -> 1[a1000] [send] via NET/Socket/0 comm 0xaaad04bb2010 nRanks 02
+master:98823:99384 [0] MCCL INFO Channel 29/0 : 0[a1000] -> 1[a1000] [send] via NET/Socket/0 comm 0xaaad04bb2010 nRanks 02
+master:98823:99384 [0] MCCL INFO Channel 30/0 : 0[a1000] -> 1[a1000] [send] via NET/Socket/0 comm 0xaaad04bb2010 nRanks 02
+master:98823:99384 [0] MCCL INFO Channel 31/0 : 0[a1000] -> 1[a1000] [send] via NET/Socket/0 comm 0xaaad04bb2010 nRanks 02
+master:98823:99384 [0] MCCL INFO Connected all trees
+VERBS_SAMPLES {"label": "layout", "mode": "normal", "profile": false, "cpu_diagnostics": true, "warmups": 5, "measured": 5, "dropped": 1, "n": 4, "mean_us": 179.32800203561783, "median_us": 178.17600071430206, "min_us": 174.5920032262802, "max_us": 186.36800348758698, "p90_us": 184.2944011092186, "p95_us": 185.3312022984028, "std_us": 4.4136802348735324, "cv": 0.02461233150858891}
+[layout] Kernel performance: 0.179 ms
+
+[testing] Running with BF16, without top-k (async=False, previous=False) ...
+[testing] Running with BF16, with top-k (async=False, previous=False) ...
+[testing] Running with BF16, without top-k (async=False, previous=False) ...
+[testing] Running with BF16, with top-k (async=False, previous=False) ...
+[testing] Running with FP8, without top-k (async=False, previous=False) ...
+[testing] Running with FP8, with top-k (async=False, previous=False) ...
+[testing] Running with BF16, without top-k (async=True, previous=False) ...
+[testing] Running with BF16, with top-k (async=True, previous=False) ...
+[testing] Running with BF16, without top-k (async=True, previous=False) ...
+[testing] Running with BF16, with top-k (async=True, previous=False) ...
+[testing] Running with FP8, without top-k (async=True, previous=False) ...
+[testing] Running with FP8, with top-k (async=True, previous=False) ...
+[testing] Running with BF16, without top-k (async=False, previous=True) ...
+[testing] Running with BF16, with top-k (async=False, previous=True) ...
+[testing] Running with BF16, without top-k (async=False, previous=True) ...
+[testing] Running with BF16, with top-k (async=False, previous=True) ...
+[testing] Running with FP8, without top-k (async=False, previous=True) ...
+[testing] Running with FP8, with top-k (async=False, previous=True) ...
+[testing] Running with BF16, without top-k (async=True, previous=True) ...
+[testing] Running with BF16, with top-k (async=True, previous=True) ...
+[testing] Running with BF16, without top-k (async=True, previous=True) ...
+[testing] Running with BF16, with top-k (async=True, previous=True) ...
+[testing] Running with FP8, without top-k (async=True, previous=True) ...
+[testing] Running with FP8, with top-k (async=True, previous=True) ...
+
+VERBS_SAMPLES {"label": "dispatch_fp8_chunk32", "mode": "normal", "profile": false, "cpu_diagnostics": true, "warmups": 5, "measured": 5, "dropped": 1, "n": 4, "mean_us": 3533.184051513672, "median_us": 3526.6560316085815, "min_us": 3513.3440494537354, "max_us": 3566.080093383789, "p90_us": 3556.4032554626465, "p95_us": 3561.241674423218, "std_us": 20.394631249414658, "cv": 0.005772309325543705}
+VERBS_PROFILE_SKIPPED dispatch_fp8_chunk32
+[tuning] SMs 24, NVL chunk 4, RDMA chunk 32, transmit: 3533.18 us, notify: 0.00 us, BW: 17.06 GB/s (RDMA), 17.07 GB/s (NVL) 
+[tuning] Best dispatch (FP8): SMs 24, NVL chunk 4, RDMA chunk 32, transmit: 3533.18 us, notify: 0.00 us, BW: 17.06 GB/s (RDMA), 17.07 GB/s (NVL)
+
+VERBS_SAMPLES {"label": "dispatch_bf16_chunk32", "mode": "normal", "profile": false, "cpu_diagnostics": true, "warmups": 5, "measured": 5, "dropped": 1, "n": 4, "mean_us": 6274.240016937256, "median_us": 6266.752004623413, "min_us": 6123.263835906982, "max_us": 6440.192222595215, "p90_us": 6392.422580718994, "p95_us": 6416.3074016571045, "std_us": 112.74952487794174, "cv": 0.017970228198726124}
+VERBS_PROFILE_SKIPPED dispatch_bf16_chunk32
+[tuning] SMs 24, NVL chunk 4, RDMA chunk 32, transmit: 6274.24 us, notify: 0.00 us, BW: 18.64 GB/s (RDMA), 18.64 GB/s (NVL) 
+[tuning] Best dispatch (BF16): SMs 24, NVL chunk 4, RDMA chunk 32, transmit: 6274.24 us, notify: 0.00 us, BW: 18.64 GB/s (RDMA), 18.64 GB/s (NVL)
+
+VERBS_SAMPLES {"label": "combine_chunk12", "mode": "normal", "profile": false, "cpu_diagnostics": true, "warmups": 5, "measured": 5, "dropped": 1, "n": 4, "mean_us": 45785.879135131836, "median_us": 45789.27040100098, "min_us": 45763.80157470703, "max_us": 45801.17416381836, "p90_us": 45799.89471435547, "p95_us": 45800.534439086914, "std_us": 14.6719501707622, "cv": 0.0003204470559025328}
+VERBS_PROFILE_SKIPPED combine_chunk12
+[tuning] SMs 24, NVL chunk 4, RDMA chunk 12, transmit: 45785.88 us, notify: 0.00 us, BW: 2.55 GB/s (RDMA), 2.55 GB/s (NVL) 
+VERBS_SAMPLES {"label": "combine_chunk16", "mode": "normal", "profile": false, "cpu_diagnostics": true, "warmups": 5, "measured": 5, "dropped": 1, "n": 4, "mean_us": 7233.536005020142, "median_us": 7206.912040710449, "min_us": 7195.39213180542, "max_us": 7324.927806854248, "p90_us": 7289.753532409668, "p95_us": 7307.340669631958, "std_us": 52.977041425466425, "cv": 0.007323809736856202}
+VERBS_PROFILE_SKIPPED combine_chunk16
+[tuning] SMs 24, NVL chunk 4, RDMA chunk 16, transmit: 7233.54 us, notify: 0.00 us, BW: 16.16 GB/s (RDMA), 16.17 GB/s (NVL) 
+[tuning] Best combine: SMs 24, NVL chunk 4, RDMA chunk 16, transmit: 7233.54 us, notify: 0.00 us, BW: 16.16 GB/s (RDMA), 16.17 GB/s (NVL)
+
+
+master:98823:98823 [0] MCCL INFO comm 0xaaad047862e0 rank 0 nranks 2 macaDev 0 busId a1000 - Destroy COMPLETE
+master:98823:98823 [0] MCCL INFO comm 0xaaad04bb2010 rank 0 nranks 2 macaDev 0 busId a1000 - Destroy COMPLETE
+VERBS_BASELINE_DONE
+master:98823:98823 [0] MCCL INFO user has destroyed the communicators
+UCCL_EXIT_ACK_OK node_rank=0
