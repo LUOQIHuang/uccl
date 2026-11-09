@@ -53,7 +53,7 @@ def diagnostics():
               ('driver.py', 'exit_guard.py', 'run.sh', 'profile_support.py')]
     paths += [HERE.parent / 'urma_mode_parity/phase_support.py', REPO / 'ep/bench/utils.py']
     paths += [HERE.parent/'urma_mode_parity'/n for n in ('split_support.py','micro_support.py')]
-    paths += [REPO/'ep/tests/verbs_diag_test.cpp',REPO/'ep/tests/urma_support/ep_shim.hpp']
+    paths += [REPO/'ep/tests/verbs_diag_test.cpp',REPO/'ep/tests/verbs_notify_test.cpp',REPO/'ep/tests/urma_support/ep_shim.hpp']
     return {p.relative_to(REPO).as_posix(): sha(p) for p in paths}
 
 
@@ -107,7 +107,8 @@ def load_extension(module):
                           torch=torch.__version__, torch_file=torch.__file__, loaded_libraries=loaded,
                           selected_library_hashes=library_hashes,
                           verbs_diag_version=extension.get_verbs_diag_version() if hasattr(extension,'get_verbs_diag_version') else 0,
-                          verbs_micro=hasattr(extension,'VerbsWriteSession'))
+                          verbs_micro=hasattr(extension,'VerbsWriteSession'),
+                          verbs_notify_version=extension.get_verbs_notify_version() if hasattr(extension,'get_verbs_notify_version') else 0)
 
 
 def validate_samples(case, mode, samples):

@@ -1,3 +1,5 @@
+当前RDMA窗口下一轮：[WRITE/FADD/GPU通知对照与真实请求时间线](NOTIFICATIONS.zh-CN.md)。
+
 # RDMA / verbs 固定配置基线与 GPU 阶段分析
 
 当前verbs窗口请先按 **[Normal三组测试一体运行文档](NORMAL_CAMPAIGN.zh-CN.md)** 操作：新构建纯verbs模块，统一运行完整Normal、源码Proxy诊断和WRITE方向/并发对照；不测LL。本页保留历史基线流程供查阅。

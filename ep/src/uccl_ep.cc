@@ -2496,13 +2496,18 @@ NB_MODULE(ep, m) {
   m.def("verbs_diag_begin",[](){uccl::verbs_diag::begin();});
   m.def("verbs_diag_end",[](){uccl::verbs_diag::end();});
   m.def("get_verbs_diag_version",[](){return 1;});
+  m.def("get_verbs_notify_version",[](){return 1;});
+  m.def("verbs_timeline_begin",[](){uccl::verbs_timeline::begin();});
+  m.def("verbs_timeline_end",[](){return uccl::verbs_timeline::end();});
 #if defined(USE_DMABUF) && !defined(EFA)
   nb::class_<VerbsWriteSession>(m,"VerbsWriteSession")
     .def(nb::init<std::string const&,int,size_t,size_t>())
+    .def(nb::init<std::string const&,int,size_t,size_t,bool>())
     .def("descriptor",[](VerbsWriteSession const& s,size_t i){auto b=s.descriptor(i);return nb::bytes(b.data(),b.size());})
     .def("metadata",&VerbsWriteSession::metadata)
     .def("connect",[](VerbsWriteSession& s,nb::list const& blobs){std::vector<std::string> v;for(auto b:blobs){auto bytes=nb::borrow<nb::bytes>(b);v.emplace_back(bytes.c_str(),nb::len(bytes));}s.connect(v);})
     .def("prepare",&VerbsWriteSession::prepare).def("experiment",&VerbsWriteSession::experiment)
+    .def("arm",&VerbsWriteSession::arm)
     .def("step",[](VerbsWriteSession& s,size_t seq){nb::gil_scoped_release release;return s.step(seq);})
     .def("validate",&VerbsWriteSession::validate).def("close",&VerbsWriteSession::close);
 #endif

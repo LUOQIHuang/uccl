@@ -19,6 +19,10 @@ def parser():
     dev = Path(os.environ.get('VERBS_DIAG_DEV_ROOT', str(Path(os.environ.get('VERBS_DIAG_HOME', str(Path.home()))) / 'metax_dev')))
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument('--action', choices=('check', 'run', 'collect', 'build','micro'), default='check')
+    p.add_argument('--micro-repeat',type=int,choices=(1,2,3),default=1)
+    p.add_argument('--micro-suite',choices=('write','notify'),default='write')
+    p.add_argument('--timeline',action='store_true')
+    p.add_argument('--notify-check',action='store_true')
     p.add_argument('--micro-layout',type=Path)
     p.add_argument('--micro-threads',type=int,choices=(1,4),default=4)
     p.add_argument('--micro-cpus',default='auto')
@@ -58,6 +62,8 @@ def parser():
     if getattr(args,'gid_index',None) is not None and not 0<=getattr(args,'gid_index',None)<256:p.error('invalid GID index')
     if getattr(args,'cpu_diagnostics',False) and (args.variant!='current' or args.mode!='normal' or not args.no_profile):p.error('CPU diagnostics requires current Normal --no-profile')
     if args.action=='micro' and (args.variant!='current' or args.mode!='normal' or getattr(args,'gid_index',None) is None or not args.micro_layout):p.error('micro requires current Normal, --gid-index and --micro-layout')
+    if args.timeline and not args.cpu_diagnostics:p.error('--timeline requires --cpu-diagnostics')
+    if args.micro_suite=='notify' and args.action=='micro' and args.micro_threads!=4:p.error('notify suite requires four threads')
     args.output = args.output.resolve()
     args.module = args.module.resolve()
     args.build_dir = args.build_dir.resolve()
@@ -142,6 +148,7 @@ def preflight(args):
     if probe.returncode:
         raise RuntimeError('IMPORT_FAILED:\n' + probe.stdout + probe.stderr)
     info = next(json.loads(line.split(' ', 1)[1]) for line in probe.stdout.splitlines() if line.startswith('VERBS_IMPORT_OK '))
+    if (getattr(args,'notify_check',False) or getattr(args,'timeline',False) or getattr(args,'micro_suite','write')=='notify') and info.get('verbs_notify_version')!=1:raise RuntimeError('NOTIFICATION_SUITE_REQUIRES_REBUILD')
     if getattr(args,'campaign_check',False) and (info.get('verbs_diag_version')!=1 or not info.get('verbs_micro')):raise RuntimeError('CAMPAIGN_REQUIRES_REBUILD')
     if getattr(args,'cpu_diagnostics',False) and info.get('verbs_diag_version')!=1:raise RuntimeError('VERBS_DIAGNOSTICS_REQUIRES_REBUILD')
     if getattr(args,'gid_index',None) is not None:
@@ -203,7 +210,7 @@ def run_case(args, root, tag, mode, profile, module, module_sha):
     env = environment(args)
     env.update(VB_CASE=str(case), VB_MODULE=str(module), VB_SHA=module_sha, VB_MODE=mode,
                VB_PROFILE=str(int(profile)), VB_WARMUPS=str(args.warmups), VB_SAMPLES=str(args.samples),
-               VB_CPU_DIAG=str(int(getattr(args,'cpu_diagnostics',False))),
+               VB_CPU_DIAG=str(int(getattr(args,'cpu_diagnostics',False))), VB_TIMELINE=str(int(getattr(args,'timeline',False))),
                UCCL_TORCHRUN_NODE_RANK=str(args.node_rank), UCCL_EXIT_GUARD='1')
     for key, name in [('TMPDIR', 'tmpdir'), ('XDG_CACHE_HOME', 'cache')]:
         path = case / name
@@ -243,6 +250,7 @@ def run_case(args, root, tag, mode, profile, module, module_sha):
                 checks['native_write_fadd_samples']=all(sum(m.get(name,{}).get('calls',0) for m in metrics)>0 for name in ('write_requests','fadd_requests','submit_to_observed_cqe_sampled'))
                 checks['no_verbs_diag_errors']=not any(m.get(name,{}).get('calls',0) for m in metrics for name in ('verbs_post_errors','verbs_completion_errors','verbs_tracking_overflow'))
                 checks['complete_wr_layout']=not any(json.loads(x)['dropped'] for x in (case/'write_layout.jsonl').read_text().splitlines() if x.strip())
+        if getattr(args,'timeline',False):checks['timeline']=(case/'verbs_timeline.jsonl').is_file()
         expected = 4 if mode == 'normal' else 2
         checks['profiles'] = text.count('VERBS_GPU_PROFILE ') == expected if profile else text.count('VERBS_PROFILE_SKIPPED ') == expected and not (case / 'gpu_stages.jsonl').exists()
         if profile:
@@ -292,7 +300,7 @@ def run(args):
             libraries=info.get('selected_library_hashes', {}),
             mode=args.mode, repeats=args.repeats, warmups=args.warmups, samples=args.samples,
             no_profile=args.no_profile, profile_only=args.profile_only, hca=args.hca, ifname=args.ifname, gpu=args.gpu)
-        meta.update(cpu_diagnostics=getattr(args,'cpu_diagnostics',False),gid_index=getattr(args,'gid_index',None))
+        meta.update(cpu_diagnostics=getattr(args,'cpu_diagnostics',False),timeline=getattr(args,'timeline',False),gid_index=getattr(args,'gid_index',None))
     except Exception as exc:
         error = str(exc)
     (root / 'setup.json').write_text(json.dumps(dict(fingerprint=meta, error=error), indent=2))

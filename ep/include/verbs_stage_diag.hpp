@@ -3,6 +3,7 @@
 #include <infiniband/verbs.h>
 #include "urma_phase_diag.hpp"
 #include "urma_layout_diag.hpp"
+#include "verbs_timeline.hpp"
 #include <map>
 namespace uccl::verbs_diag {
 inline std::atomic<uint64_t> epoch{0};
@@ -29,7 +30,9 @@ inline int post(ibv_qp* qp,ibv_send_wr* wr,ibv_send_wr** bad) {
     }
   }
   int rc;
+  for(auto* w=wr;w;w=w->next)verbs_timeline::record("post_begin",w->wr_id,qp->qp_num,w->opcode);
   {d::Scope timing(d::SdkPost,count);rc=ibv_post_send(qp,wr,bad);}
+  for(auto* w=wr;w;w=w->next)verbs_timeline::record("post_end",w->wr_id,qp->qp_num,rc);
   if(rc)d::count(d::VerbsPostErrors);
   return rc;
 }
@@ -43,6 +46,7 @@ inline int poll(ibv_cq* cq,int max,ibv_wc* wc) {
     if(wc[i].status!=IBV_WC_SUCCESS)d::count(d::VerbsCompletionErrors);
     if(wc[i].opcode & IBV_WC_RECV){d::count(d::VerbsReceives);continue;}
     d::count(d::ObservedCqes);
+    verbs_timeline::record("cqe",wc[i].wr_id,wc[i].qp_num,wc[i].status);
     auto it=pending.find({wc[i].qp_num,wc[i].wr_id});
     if(it==pending.end())d::count(d::VerbsUnknown);
     else {d::complete(it->second.sample);pending.erase(it);d::count(d::RetiredOps,1);}

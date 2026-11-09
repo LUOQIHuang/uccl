@@ -16,9 +16,11 @@ int main(){
   ibv_send_wr w{},a{},*bad=nullptr;w.opcode=IBV_WR_RDMA_WRITE;w.wr_id=1;w.sg_list=&sge;w.num_sge=1;w.send_flags=IBV_SEND_SIGNALED;w.wr.rdma.remote_addr=0x10000;w.next=&a;
   a.opcode=IBV_WR_ATOMIC_FETCH_AND_ADD;a.wr_id=2;a.send_flags=IBV_SEND_SIGNALED;
   ibv_wc out[4];v::post(&qp,&w,&bad);assert(v::poll(&cq,4,out)==2 && d::records.empty());
-  d::identity(0,2);uccl::urma_layout::begin();v::begin();
+  d::identity(0,2);uccl::urma_layout::begin();v::begin();uccl::verbs_timeline::begin();
   for(int i=0;i<128;++i){assert(v::post(&qp,&w,&bad)==0);assert(v::poll(&cq,4,out)==2);}
-  assert(v::pending.empty());v::end();auto r=d::records.at(0);
+  assert(v::pending.empty());v::end();auto timeline=uccl::verbs_timeline::end();
+  assert(timeline.find("post_begin")!=std::string::npos && timeline.find("post_end")!=std::string::npos && timeline.find("cqe")!=std::string::npos && timeline.find("\"dropped\":0")!=std::string::npos);
+  auto r=d::records.at(0);
   assert(r->metrics[d::Write].calls==128 && r->metrics[d::Write].items==128*8192);
   assert(r->metrics[d::Fadd].calls==128 && r->metrics[d::ObservedCqes].calls==256);
   assert(r->metrics[d::WriteToObservedCqe].calls>0 && r->metrics[d::FaddToObservedCqe].calls>0);

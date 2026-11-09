@@ -41,7 +41,7 @@ def summarize(roots, output):
             if setup['error']:
                 raise ValueError('failed setup: ' + str(node))
             meta = setup['fingerprint']
-            if meta.get('cpu_diagnostics') or meta.get('suite')=='verbs_write_micro':continue
+            if meta.get('cpu_diagnostics') or meta.get('suite') in ('verbs_write_micro','verbs_notify_micro'):continue
             host = read(node / 'host.json')
             modes = ['normal', 'low_latency'] if meta['mode'] == 'both' else [meta['mode']]
             expected = []

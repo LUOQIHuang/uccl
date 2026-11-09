@@ -10,4 +10,7 @@ with tempfile.TemporaryDirectory(prefix='uccl-verbs-host-') as tmp:
     subprocess.run(flags+[str(REPO/'ep/tests/verbs_diag_test.cpp'),'-libverbs','-o',str(target)],check=True)
     subprocess.run([str(target)],check=True)
     subprocess.run(flags+['-DUSE_DMABUF','-I'+str(REPO/'ep/tests/urma_support'),'-include',str(REPO/'ep/tests/urma_support/ep_shim.hpp'),'-fsyntax-only',str(REPO/'ep/src/verbs_write_micro.cpp')],check=True)
+    native=Path(tmp)/'notify_test'
+    subprocess.run(flags+['-DUSE_DMABUF','-I'+str(REPO/'ep/tests/urma_support'),'-include',str(REPO/'ep/tests/urma_support/ep_shim.hpp'),str(REPO/'ep/tests/verbs_notify_test.cpp'),'-libverbs','-o',str(native)],check=True)
+    subprocess.run([str(native)],check=True,timeout=30)
     print('Verbs native micro host syntax passed; no MetaX/hardware validation')

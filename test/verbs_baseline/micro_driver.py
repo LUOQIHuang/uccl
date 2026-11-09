@@ -10,8 +10,9 @@ from split_support import affinity
 
 def run(args,preflight,environment,snapshot):
     root=args.output/args.job/f'node{args.node_rank}';root.mkdir(parents=True,exist_ok=False)
-    error=None;meta=dict(job=args.job,suite='verbs_write_micro',threads=args.micro_threads,kernel=os.uname().release,
-        warmups=args.warmups,samples=args.samples,hca=args.hca,gid_index=args.gid_index,diagnostics=common.diagnostics())
+    notify=args.micro_suite=='notify'
+    error=None;meta=dict(job=args.job,suite='verbs_notify_micro' if notify else 'verbs_write_micro',threads=args.micro_threads,kernel=os.uname().release,
+        repeat=getattr(args,'micro_repeat',1),warmups=args.warmups,samples=args.samples,hca=args.hca,gid_index=args.gid_index,diagnostics=common.diagnostics())
     try:
         module,manifest,identity,runtime,log=preflight(args)
         if not runtime['verbs_micro']:raise RuntimeError('VERBS_MICRO_REQUIRES_REBUILD')
@@ -30,19 +31,19 @@ def run(args,preflight,environment,snapshot):
     common.legacy.pair(args,dict(stage='micro_ready',job=args.job,rc=rc))
     request=dict(module=str(module),module_sha=runtime['module_sha'],rank=args.node_rank,threads=args.micro_threads,
         master_addr=args.master_addr,port=args.port+1,warmups=args.warmups,samples=args.samples,
-        placement=placement,layout=str(args.micro_layout.resolve()),fingerprint=meta,hca=args.hca,gid_index=args.gid_index)
+        placement=placement,suite=args.micro_suite,layout=str(args.micro_layout.resolve()),fingerprint=meta,hca=args.hca,gid_index=args.gid_index)
     (case/'request.json').write_text(json.dumps(request,indent=2));(case/'layout_input.jsonl').write_bytes(args.micro_layout.read_bytes())
     env=environment(args);env['VM_CASE']=str(case)
     for key,name in [('TMPDIR','tmpdir'),('XDG_CACHE_HOME','cache')]:
         (case/name).mkdir();env[key]=str(case/name)
     snapshot(case,args,'before');print('VERBS_MICRO_BEGIN '+str(case/'bench.log'),flush=True)
     with (case/'bench.log').open('w') as output:
-        process=subprocess.Popen([sys.executable,'-u',str(common.HERE/'micro_worker.py')],env=env,stdout=output,stderr=subprocess.STDOUT,start_new_session=True)
+        process=subprocess.Popen([sys.executable,'-u',str(common.HERE/('notify_worker.py' if notify else 'micro_worker.py'))],env=env,stdout=output,stderr=subprocess.STDOUT,start_new_session=True)
         try:rc=process.wait(timeout=args.case_timeout)
         except subprocess.TimeoutExpired:common.legacy.terminate(process);rc=124
         except KeyboardInterrupt:common.legacy.terminate(process);raise
     text=(case/'bench.log').read_text(errors='replace')
-    checks=dict(done='VERBS_MICRO_ALL_PASSED' in text,points=text.count('VERBS_MICRO_POINT ')==6,
+    checks=dict(done='VERBS_MICRO_ALL_PASSED' in text,points=text.count('VERBS_MICRO_POINT ')==(8 if notify else 6),
         raw=(case/'micro_samples.jsonl').is_file(),no_errors='Traceback' not in text and 'ERROR' not in text,
         boundary=(case/'measurement_boundary.json').is_file())
     if rc==0 and not all(checks.values()):rc=90

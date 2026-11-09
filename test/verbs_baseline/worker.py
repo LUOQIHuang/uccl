@@ -15,6 +15,7 @@ bundle = case.parents[1] / 'benchmark'
 mode = os.environ['VB_MODE']
 profile = os.environ['VB_PROFILE'] == '1'
 cpu_diag=os.environ.get('VB_CPU_DIAG')=='1'
+timeline=os.environ.get('VB_TIMELINE')=='1'
 warmups, samples = int(os.environ['VB_WARMUPS']), int(os.environ['VB_SAMPLES'])
 ep, runtime = common.load_extension(Path(os.environ['VB_MODULE']))
 assert runtime['module_sha'] == os.environ['VB_SHA'], 'extension changed after preflight'
@@ -83,9 +84,14 @@ def measure(fn, label, post_fn=None):
     if cpu_diag:
         before=json.loads(ep.urma_phase_snapshot());ep.urma_layout_begin();ep.verbs_diag_begin()
     for i in range(samples):
+        trace_this=globals().get("timeline",False) and i==0 and label.startswith("dispatch_")
+        if trace_this:ep.verbs_timeline_begin()
         start[i].record()
         fn()
         end[i].record()
+        if trace_this:
+            torch.cuda.synchronize()
+            append("verbs_timeline.jsonl",dict(label=label,index=i,**json.loads(ep.verbs_timeline_end())))
         if post_fn is not None:
             post_fn()
     torch.cuda.synchronize()
