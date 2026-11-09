@@ -1,6 +1,7 @@
 #include <cassert>
 #include <cstdint>
 #define __CUDACC__
+#define __CUDA_ARCH__ 1
 #define __device__
 #define WARP_SIZE 32
 #define UCCL_GPU_STAGE_TRACE
