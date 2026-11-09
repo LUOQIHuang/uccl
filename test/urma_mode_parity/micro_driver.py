@@ -26,11 +26,12 @@ def run(args,preflight,environment,kernel_snapshot):
         (root/'build_manifest.json').write_text(json.dumps(manifest,indent=2))
         (root/'preflight.json').write_text(json.dumps(info,indent=2))
         legacy.snapshot_host(root,args.hca,'urma',args.urma_device)
-        if args.micro_suite=='split':
+        if args.micro_suite in ('split','notify'):
             import split_support
             placement=split_support.affinity(args)
             (root/'affinity.json').write_text(json.dumps(placement,indent=2))
     except Exception as exc:error=str(exc)
+    if args.micro_suite=='notify':fingerprint['repeat']=args.micro_repeat
     fingerprint['suite']=args.micro_suite
     (root/'setup.json').write_text(json.dumps(dict(fingerprint=fingerprint,error=error),indent=2))
     if error:print('MICRO_SETUP_ERROR '+error,flush=True)
@@ -45,10 +46,11 @@ def run(args,preflight,environment,kernel_snapshot):
         master_addr=args.master_addr,port=args.port+1,threads=args.micro_threads,
         warmups=args.warmups,samples=args.samples,layout=str(args.micro_layout.resolve()),fingerprint=fingerprint)
     worker='micro_worker.py';expected=12
-    if args.micro_suite=='split':
+    if args.micro_suite in ('split','notify'):
         import split_support
         request['placement']=placement;worker='split_worker.py'
         expected=len(split_support.points(micro_support.select_geometries(args.micro_layout),args.micro_threads))
+    if args.micro_suite=='notify':worker='notify_worker.py';expected=8
     (case/'request.json').write_text(json.dumps(request,indent=2))
     (case/'layout_input.jsonl').write_bytes(args.micro_layout.read_bytes())
     env=environment(args);env['MICRO_CASE']=str(case)

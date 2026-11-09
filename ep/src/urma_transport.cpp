@@ -3,6 +3,7 @@
 #include "gpu_p2p_runtime.hpp"
 #include "urma_layout_diag.hpp"
 #include "urma_dispatch_trial.hpp"
+#include "transport_timeline.hpp"
 #include <algorithm>
 #include <chrono>
 #include <cerrno>
@@ -630,6 +631,7 @@ void UrmaTransport::prepare(PreparedWr& out, Peer& peer, size_t lane,
       request.kind == UrmaWorkRequest::Kind::Atomic ? peer.atomic_tseg : peer.barrier_tseg;
   uint64_t bytes = write ? request.bytes : sizeof(uint64_t);
   out.context = acquire_context(request);
+  op_contexts_[out.context].lane=static_cast<uint32_t>(lane);
   out.notify_pair = request.notify_pair;
   out.atomic_anchor = request.kind==UrmaWorkRequest::Kind::Atomic && request.fence;
   out.ring = request.ring==UINT32_MAX ? static_cast<uint32_t>(request.wr_id>>32) : request.ring;
@@ -709,7 +711,11 @@ void UrmaTransport::submit_prepared(size_t lane, Peer& peer) {
     for(auto const& w:prepared_)if(op_contexts_[w.context].is_write){++writes;bytes+=w.src.len;}else ++fadds;
     uccl::dispatch_trial::submit(ctx_->thread_idx,lane,bytes,writes,fadds);
   }
+  if(uccl::transport_timeline::active.load(std::memory_order_relaxed))
+    for(auto const& w:prepared_)uccl::transport_timeline::record("post_begin",op_contexts_[w.context].wr_id,lane,w.wr.opcode);
   int rc = urma_post_jetty_send_wr(jetties_[lane], &prepared_[0].wr, &bad);
+  if(uccl::transport_timeline::active.load(std::memory_order_relaxed))
+    for(auto const& w:prepared_)uccl::transport_timeline::record("post_end",op_contexts_[w.context].wr_id,lane,rc);
   if (rc == URMA_SUCCESS) return;
   // The API specifies bad_wr as the first rejected request. Keep accepted
   // contexts/scratch alive for DMA; release only the rejected suffix.
@@ -870,6 +876,7 @@ int UrmaTransport::poll(TransportCompletion* out, int max) {
             ctx_->local_rank,ctx_->thread_idx,completion.status,
             static_cast<unsigned long long>(token),static_cast<unsigned long long>(op.wr_id),op.is_write,op.is_atomic);
       }
+      uccl::transport_timeline::record("cqe",op.wr_id,op.lane,completion.status);
       uccl::urma_diag::count(uccl::urma_diag::ObservedCqes);
       uccl::urma_diag::complete(op_contexts_[index].diagnostic);
       if (op.child != UINT32_MAX) {

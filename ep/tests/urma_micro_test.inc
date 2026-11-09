@@ -3,6 +3,7 @@
 #include "gpu_p2p_runtime.hpp"
 #include "urma_layout_diag.hpp"
 #include "urma_dispatch_trial.hpp"
+#include "transport_timeline.hpp"
 #include <future>
 #include <sched.h>
 std::pair<void*,std::shared_ptr<void>> allocate_urma_atomic_control(int device) {
@@ -95,6 +96,27 @@ int main() {
     auto trial=uccl::dispatch_trial::end();assert(trial.find("\"proxy\":0")!=std::string::npos);
     assert(!uccl::dispatch_trial::submits.empty());
     a.validate(0,true,8);b.validate(0,true,8);
+    if(threads==4)for(int operation:{0,1,2,3}){
+      bool fadd=operation!=0,visible=operation==3;
+      a.prepare(128,12,20,1,0);b.prepare(128,12,20,1,1);
+      a.notification_mode(std::min(operation,2));b.notification_mode(std::min(operation,2));
+      a.experiment(true,true,false,cpus);b.experiment(true,true,false,cpus);
+      uccl::transport_timeline::begin();
+      for(size_t seq=0;seq<2;++seq){
+        a.arm(seq,visible,fadd,8);b.arm(seq,visible,fadd,8);
+        auto x=std::async(std::launch::async,[&]{return a.step(seq,fadd,8);});
+        auto y=std::async(std::launch::async,[&]{return b.step(seq,fadd,8);});
+        for(auto const& result:{x.get(),y.get()}){
+          assert(result.find(operation==1?"\"write_bytes\":0":"\"write_bytes\":4096")!=std::string::npos);
+          assert(result.find(operation>=2?"\"cqes\":64":"\"cqes\":32")!=std::string::npos);
+          assert(result.find("\"cq_span_ns\":")!=std::string::npos);
+        }
+        a.validate(seq,fadd,8);b.validate(seq,fadd,8);
+      }
+      auto trace=uccl::transport_timeline::end();
+      for(auto const* stage:{"post_begin","post_end","cqe"}){size_t count=0;for(auto const& e:uccl::transport_timeline::events){assert(e.qp==1+((e.id>>32)%8));if(std::strcmp(e.stage,stage)==0)++count;}assert(count==(operation>=2?256U:128U));}
+      assert(trace.find("post_begin")!=std::string::npos && trace.find("post_end")!=std::string::npos && trace.find("cqe")!=std::string::npos);
+    }
     a.close();b.close();
     assert(resources==0 && gpu_regs==0 && micro_allocations.empty());
   }

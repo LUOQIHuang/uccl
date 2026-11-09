@@ -120,6 +120,7 @@ class UrmaTransport final : public EpTransport {
   struct OpContext {
     uint64_t wr_id = 0;
     uint64_t generation = 0;
+    uint32_t lane = 0;
     bool is_write = false;
     bool is_atomic = false;
     bool active = false;

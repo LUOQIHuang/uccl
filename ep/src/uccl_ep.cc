@@ -2498,6 +2498,9 @@ NB_MODULE(ep, m) {
   m.def("get_verbs_diag_version",[](){return 1;});
   m.def("get_verbs_notify_version",[](){return 1;});
   m.def("verbs_timeline_begin",[](){uccl::verbs_timeline::begin();});
+  m.def("get_urma_notify_version",[](){return 1;});
+  m.def("urma_timeline_begin",[](){uccl::transport_timeline::begin();});
+  m.def("urma_timeline_end",[](){return uccl::transport_timeline::end();});
   m.def("verbs_timeline_end",[](){return uccl::verbs_timeline::end();});
 #if defined(USE_DMABUF) && !defined(EFA)
   nb::class_<VerbsWriteSession>(m,"VerbsWriteSession")
@@ -2526,7 +2529,9 @@ NB_MODULE(ep, m) {
           RemoteConnInfo info{};std::memcpy(&info,blob.c_str(),sizeof(info));remote.push_back(info);}
         self.connect(remote);
       })
+      .def("metadata",&UrmaMicroSession::metadata)
       .def("prepare",&UrmaMicroSession::prepare)
+      .def("notification_mode",&UrmaMicroSession::notification_mode)
       .def("experiment",&UrmaMicroSession::experiment)
       .def("local_scan",&UrmaMicroSession::local_scan)
       .def("arm",&UrmaMicroSession::arm)

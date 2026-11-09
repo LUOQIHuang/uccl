@@ -32,7 +32,7 @@ if hasattr(ep,'urma_phase_enable'): ep.urma_phase_enable(False)
 measurements=Measurements(torch,dist,ep,case,mode,stage_profile,
     int(os.environ.get('PARITY_WARMUPS','50')),int(os.environ.get('PARITY_SAMPLES','50')),
     os.environ.get('PARITY_CAPTURE_LAYOUT')=='1',os.environ.get('PARITY_DISPATCH_TRIAL')=='1',
-    int(os.environ.get('PARITY_DISPATCH_DELAY_US','0')))
+    int(os.environ.get('PARITY_DISPATCH_DELAY_US','0')),os.environ.get('PARITY_TIMELINE')=='1')
 print('PHASE_CONFIGURATION '+json.dumps(dict(suite=phase_suite,instrumented=stage_profile,
     warmups=measurements.warmups,samples=measurements.samples,
     ll_hook_workload=os.environ.get('PARITY_LL_HOOK_WORKLOAD','gemm'))),flush=True)

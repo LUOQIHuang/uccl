@@ -1,6 +1,6 @@
 #include "proxy.hpp"
 #include "urma_phase_diag.hpp"
-#include "verbs_timeline.hpp"
+#include "transport_timeline.hpp"
 #include "ep_backend.hpp"
 #include "bench_utils.hpp"
 #include "d2h_queue_host.hpp"
@@ -962,7 +962,7 @@ void Proxy::notify_gpu_completion(uint64_t& my_tail) {
     d2hq::HostD2HHandle* h = &cfg_.d2h_queues[rb_idx];
     h->volatile_clear_cmd_type(cmd_idx);
     h->mark_acked(cmd_idx % h->capacity());
-    uccl::verbs_timeline::record("ack_slot",wr_id);
+    uccl::transport_timeline::record("ack_slot",wr_id);
   }
   acked_wrs_.clear();
 
@@ -971,7 +971,7 @@ void Proxy::notify_gpu_completion(uint64_t& my_tail) {
     d2hq::HostD2HHandle* h = &cfg_.d2h_queues[rb_idx];
     auto previous_tail=ring_tails_[rb_idx];
     ring_tails_[rb_idx] = h->advance_tail_from_mask();
-    if(ring_tails_[rb_idx]!=previous_tail)uccl::verbs_timeline::record("tail_published",uint64_t(rb_idx)<<32,0,ring_tails_[rb_idx]);
+    if(ring_tails_[rb_idx]!=previous_tail)uccl::transport_timeline::record("tail_published",uint64_t(rb_idx)<<32,0,ring_tails_[rb_idx]);
   }
 #endif
 
@@ -1023,7 +1023,7 @@ void Proxy::post_gpu_command(uint64_t& my_tail, size_t& seen) {
 
       uint64_t unique_wr_id = (static_cast<uint64_t>(rb_idx) << 32) |
                               (fifo_seq_[rb_idx]++ & 0xFFFFFFFFULL);
-      uccl::verbs_timeline::record("collect",unique_wr_id);
+      uccl::transport_timeline::record("collect",unique_wr_id);
       wrs_to_post.push_back(unique_wr_id);
       cmds_to_post.push_back(cmd);
       fifo_pending_[rb_idx].push_back(
@@ -1110,7 +1110,7 @@ void Proxy::post_gpu_command(uint64_t& my_tail, size_t& seen) {
 
       // Use a unique ID combining ring buffer index and command index
       uint64_t unique_wr_id = (rb_idx << 32) | i;
-      uccl::verbs_timeline::record("collect",unique_wr_id);
+      uccl::transport_timeline::record("collect",unique_wr_id);
       wrs_to_post.push_back(unique_wr_id);
       cmds_to_post.push_back(cmd_entry);
 #ifdef MEASURE_PER_VERB_LATENCY
@@ -1319,6 +1319,8 @@ void Proxy::post_urma_commands(std::vector<uint64_t> const& wrs_to_post,
                                std::vector<TransferCmd> const& cmds_to_post) {
   if (wrs_to_post.size() != cmds_to_post.size())
     throw std::runtime_error("URMA command/wr_id size mismatch");
+  if(uccl::transport_timeline::active.load(std::memory_order_relaxed))
+    for(size_t i=0;i<wrs_to_post.size();++i)uccl::transport_timeline::record("prepare",wrs_to_post[i],0,cmds_to_post[i].bytes);
   uccl::urma_diag::Scope diagnostic(uccl::urma_diag::ProxyBatch,cmds_to_post.size());
   bool all_dispatch=false, all_combine=false;
   if (uccl::urma_diag::enabled.load(std::memory_order_relaxed)) {
@@ -1541,8 +1543,8 @@ void Proxy::post_gpu_commands_mixed(
   }
 
   // Separate atomic operations from regular RDMA writes
-  if(uccl::verbs_timeline::active.load(std::memory_order_relaxed))
-    for(size_t i=0;i<wrs_to_post.size();++i)uccl::verbs_timeline::record("prepare",wrs_to_post[i],0,cmds_to_post[i].bytes);
+  if(uccl::transport_timeline::active.load(std::memory_order_relaxed))
+    for(size_t i=0;i<wrs_to_post.size();++i)uccl::transport_timeline::record("prepare",wrs_to_post[i],0,cmds_to_post[i].bytes);
   uccl::urma_diag::Scope diagnostic(uccl::urma_diag::ProxyBatch,cmds_to_post.size());
   std::vector<uint64_t> rdma_wrs, atomic_wrs, quiet_wrs, barrier_wrs;
   std::vector<TransferCmd> rdma_cmds, atomic_cmds, quiet_cmds, barrier_cmds;

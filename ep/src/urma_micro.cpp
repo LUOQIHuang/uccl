@@ -6,6 +6,7 @@
 #include <atomic>
 #include <chrono>
 #include <cstdio>
+#include <cstring>
 #include <exception>
 #include <mutex>
 #include <sstream>
@@ -33,6 +34,7 @@ struct UrmaMicroSession::Impl {
   std::vector<int> cpus;
   size_t expected_sequence=0,armed_messages=0;
   uint64_t expected_counter=0;
+  int notification_operation=-1;
   uintptr_t remote_main=0;
   size_t remote_dst_pad=0;
   std::mutex mutex;
@@ -64,6 +66,9 @@ UrmaMicroSession::~UrmaMicroSession() {
 LocalConnInfo UrmaMicroSession::descriptor(size_t i) const {
   return impl_->transports.at(i)->local_info();
 }
+std::string UrmaMicroSession::metadata() const {
+  return "{\"channels\":8,\"normal_completion\":\"all\",\"write_order\":\"relax\",\"atomic_order\":\"strong\",\"atomic_fence\":\"per_request\",\"control_memory\":\""+std::string(uccl::gpu_p2p::atomic_buffer_is_gpu_memory()?"gpu":"host_mapped")+"\",\"atomic_return_memory\":\"host\",\"production_transport\":true}";
+}
 void UrmaMicroSession::connect(std::vector<RemoteConnInfo> const& peer) {
   auto& p=*impl_;std::lock_guard<std::mutex> lock(p.mutex);
   if(p.closed || p.connected || peer.size()!=p.threads)throw std::invalid_argument("invalid micro peer descriptors");
@@ -81,11 +86,17 @@ void UrmaMicroSession::prepare(size_t bytes,size_t src_mod,size_t dst_mod,size_t
   auto base=reinterpret_cast<uintptr_t>(p.main);
   p.geometry={bytes,p.stride,p.region,(src_mod+4096-base%4096)%4096,
       (dst_mod+4096-base%4096)%4096,uint32_t(p.threads),8,uint32_t(window),uint32_t(p.threads*8*window)};
-  p.rank=rank;p.expected_sequence=0;p.expected_counter=0;
+  p.rank=rank;p.expected_sequence=0;p.expected_counter=0;p.notification_operation=-1;
   p.remote_dst_pad=(dst_mod+4096-p.remote_main%4096)%4096;
   uccl::gpu_p2p::zero_memory(p.control,kAtomicBufferSize,
       uccl::gpu_p2p::atomic_buffer_is_gpu_memory()?uccl::gpu_p2p::MemoryKind::Device:uccl::gpu_p2p::MemoryKind::HostMapped,p.device);
   urma_micro_gpu_prepare(p.main,p.geometry,rank);p.prepared=true;
+}
+void UrmaMicroSession::notification_mode(int operation) {
+  auto& p=*impl_;std::lock_guard<std::mutex> lock(p.mutex);
+  if(p.closed || p.armed || !p.prepared || p.threads!=4 || p.geometry.window!=1 || p.expected_sequence || operation<0 || operation>2)
+    throw std::invalid_argument("invalid URMA notification mode");
+  p.notification_operation=operation;
 }
 void UrmaMicroSession::arm(size_t sequence,bool visible,bool with_fadd,size_t messages) {
   auto& p=*impl_;std::lock_guard<std::mutex> lock(p.mutex);
@@ -93,6 +104,7 @@ void UrmaMicroSession::arm(size_t sequence,bool visible,bool with_fadd,size_t me
       (visible && (!with_fadd || p.geometry.window!=1 || messages!=8)))
     throw std::invalid_argument("invalid micro step");
   if(p.observer){urma_micro_observer_finish(p.observer);p.observer=nullptr;}
+  if(p.notification_operation>=0 && (messages!=8 || with_fadd!=(p.notification_operation!=0) || (visible && p.notification_operation!=2)))throw std::invalid_argument("notification operation/arm mismatch");
   p.visible=visible;p.with_fadd=with_fadd;p.armed_messages=messages;
   if(visible && p.receive)p.observer=urma_micro_observer_start(p.main,p.control,p.geometry,1-p.rank,int(sequence%2),p.expected_counter+1,p.scan);
   p.armed=true;
@@ -101,7 +113,7 @@ std::string UrmaMicroSession::step(size_t sequence,bool with_fadd,size_t message
   auto& p=*impl_;std::lock_guard<std::mutex> lock(p.mutex);
   if(p.closed || !p.armed || sequence!=p.expected_sequence || with_fadd!=p.with_fadd || messages!=p.armed_messages)
     throw std::invalid_argument("micro step was not armed");
-  struct Result {uint64_t begin=0,end=0,cqes=0,retired=0,build=0,post=0,poll=0,observe=0;std::exception_ptr error;};
+  struct Result {uint64_t begin=0,end=0,cq_end=0,cqes=0,retired=0,build=0,post=0,poll=0,observe=0;std::exception_ptr error;};
   std::vector<Result> result(p.threads);
   std::atomic<size_t> ready{0};std::atomic<bool> go{false},cancel{false};
   std::vector<std::thread> workers;
@@ -126,9 +138,9 @@ std::string UrmaMicroSession::step(size_t sequence,bool with_fadd,size_t message
       size_t sent=0;
       while(p.send && sent<messages) {
         uint64_t mark=micro_now();
-        size_t n=std::min({size_t(g.lanes*g.window),messages-sent,transport.capacity()/(with_fadd?2:1)});
+        size_t n=std::min({size_t(g.lanes*g.window),messages-sent,transport.capacity()/(with_fadd && p.notification_operation!=1?2:1)});
         std::vector<UrmaWorkRequest> batch;batch.reserve(n*(with_fadd?2:1));
-        for(size_t j=0;j<n;++j) {
+        if(p.notification_operation!=1)for(size_t j=0;j<n;++j) {
           size_t m=sent+j,lane=m%g.lanes,slot=t*g.lanes*g.window+lane*g.window+(m/g.lanes)%g.window;
           UrmaWorkRequest w;w.wr_id=(uint64_t(lane)<<32)|(2*m);
           w.local_offset=(sequence%2)*g.region+slot*g.stride+g.src_pad;
@@ -152,7 +164,7 @@ std::string UrmaMicroSession::step(size_t sequence,bool with_fadd,size_t message
         r.poll+=micro_now()-mark;
         r.retired+=done;sent+=n;
       }
-      auto mark=micro_now();
+      r.cq_end=micro_now();auto mark=micro_now();
       if(p.visible && p.receive)while(!urma_micro_observer_done(p.observer,t*8,8)) {
         if(micro_now()>deadline)throw std::runtime_error("micro GPU observation timeout");
         std::this_thread::yield();
@@ -167,12 +179,12 @@ std::string UrmaMicroSession::step(size_t sequence,bool with_fadd,size_t message
   go.store(true,std::memory_order_release);for(auto& t:workers)t.join();
   for(auto const& r:result)if(r.error)std::rethrow_exception(r.error);
   p.armed=false;++p.expected_sequence;if(with_fadd && p.receive)p.expected_counter+=messages/8;
-  uint64_t begin=UINT64_MAX,end=0,cqes=0,retired=0,build=0,post=0,poll=0,observe=0;
-  for(auto const& r:result){begin=std::min(begin,r.begin);end=std::max(end,r.end);cqes+=r.cqes;retired+=r.retired;
+  uint64_t begin=UINT64_MAX,end=0,cq_end=0,cqes=0,retired=0,build=0,post=0,poll=0,observe=0;
+  for(auto const& r:result){begin=std::min(begin,r.begin);end=std::max(end,r.end);cq_end=std::max(cq_end,r.cq_end);cqes+=r.cqes;retired+=r.retired;
     build+=r.build;post+=r.post;poll+=r.poll;observe+=r.observe;}
   std::ostringstream out;out<<"{\"span_ns\":"<<end-begin<<",\"cqes\":"<<cqes<<",\"retired\":"<<retired
-      <<",\"write_bytes\":"<<(p.send?p.threads*messages*p.geometry.bytes:0)<<",\"build_ns_sum\":"<<build
-      <<",\"post_ns_sum\":"<<post<<",\"poll_ns_sum\":"<<poll<<",\"observe_ns_sum\":"<<observe<<",\"threads\":[";
+      <<",\"write_bytes\":"<<(p.send && p.notification_operation!=1?p.threads*messages*p.geometry.bytes:0)<<",\"build_ns_sum\":"<<build
+      <<",\"cq_span_ns\":"<<cq_end-begin<<",\"post_ns_sum\":"<<post<<",\"poll_ns_sum\":"<<poll<<",\"observe_ns_sum\":"<<observe<<",\"threads\":[";
   for(size_t i=0;i<result.size();++i){if(i)out<<',';out<<result[i].end-result[i].begin;}
   out<<"]}";return out.str();
 }
@@ -180,6 +192,13 @@ void UrmaMicroSession::validate(size_t sequence,bool with_fadd,size_t messages) 
   auto& p=*impl_;std::lock_guard<std::mutex> lock(p.mutex);
   if(p.closed || p.armed || sequence+1!=p.expected_sequence || messages!=p.armed_messages || with_fadd!=p.with_fadd)
     throw std::invalid_argument("invalid micro validation boundary");
+  if(p.receive && p.notification_operation==1){
+    std::vector<uint64_t> counters(p.threads*8);
+    if(uccl::gpu_p2p::atomic_buffer_is_gpu_memory())uccl::gpu_p2p::copy_device_to_host(counters.data(),p.control,counters.size()*8,p.device);
+    else std::memcpy(counters.data(),p.control,counters.size()*8);
+    for(auto c:counters)if(c!=p.expected_counter)throw std::runtime_error("micro GPU atomic counter mismatch");
+    return;
+  }
   if(p.receive && !urma_micro_gpu_validate(p.main,p.control,p.geometry,1-p.rank,int(sequence%2),p.expected_counter))
     throw std::runtime_error("micro received payload/control validation failed");
 }

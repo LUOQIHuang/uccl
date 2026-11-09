@@ -24,10 +24,12 @@ class UrmaMicroSession {
   UrmaMicroSession(UrmaMicroSession const&)=delete;
   UrmaMicroSession& operator=(UrmaMicroSession const&)=delete;
   LocalConnInfo descriptor(size_t) const;
+  std::string metadata() const;
   void connect(std::vector<RemoteConnInfo> const&);
   void prepare(size_t bytes,size_t src_mod,size_t dst_mod,size_t window,int rank);
   void experiment(bool send,bool receive,bool scan,std::vector<int> const& cpus);
   std::string local_scan(size_t sequence);
+  void notification_mode(int operation);
   void arm(size_t sequence,bool visible,bool with_fadd,size_t messages);
   std::string step(size_t sequence,bool with_fadd,size_t messages);
   void validate(size_t sequence,bool with_fadd,size_t messages);

@@ -1,3 +1,5 @@
+当前URMA窗口下一轮：[Normal同负载通知对照与真实Dispatch时间线](NORMAL_NOTIFY.zh-CN.md)。
+
 # URMA Normal / Low-latency 实现对齐与验收
 
 当前下一轮请按 **[真实Normal Dispatch错峰因果实验](DISPATCH_TRIAL.zh-CN.md)** 操作：重新编译，在实际Dispatch中比较无延迟与204侧首条payload WRITE延后200µs；完整计时包含代价，诊断和性能分开，三轮双端A/B。

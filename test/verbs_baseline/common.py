@@ -52,7 +52,7 @@ def diagnostics():
     paths += [HERE.parent / 'verbs_diag' / n for n in
               ('driver.py', 'exit_guard.py', 'run.sh', 'profile_support.py')]
     paths += [HERE.parent / 'urma_mode_parity/phase_support.py', REPO / 'ep/bench/utils.py']
-    paths += [HERE.parent/'urma_mode_parity'/n for n in ('split_support.py','micro_support.py')]
+    paths += [HERE.parent/'urma_mode_parity'/n for n in ('split_support.py','micro_support.py','timeline_support.py')]
     paths += [REPO/'ep/tests/verbs_diag_test.cpp',REPO/'ep/tests/verbs_notify_test.cpp',REPO/'ep/tests/urma_support/ep_shim.hpp']
     return {p.relative_to(REPO).as_posix(): sha(p) for p in paths}
 
