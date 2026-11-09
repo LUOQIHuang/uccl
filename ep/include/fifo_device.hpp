@@ -128,7 +128,7 @@ struct FifoDeviceHandle {
     }
 
     ProxyTrigger* triggerPtr = &(triggers[prevHead % size]);
-#ifdef UCCL_GPU_STAGE_TRACE
+#if defined(UCCL_GPU_STAGE_TRACE) && (defined(__CUDA_ARCH__) || defined(__HIP_DEVICE_COMPILE__))
     if(stageTrace && stageTrace->enabled)stagePublications[prevHead%size]={clock64(),prevHead,static_cast<uint32_t>(blockIdx.x),static_cast<uint32_t>(threadIdx.x)};
 #endif
 

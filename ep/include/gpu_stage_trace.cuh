@@ -9,7 +9,7 @@ struct alignas(128) State {volatile uint32_t enabled=0;Metric metrics[kStages][2
 struct Span {
   State* state=nullptr;unsigned stage=0,lane=0;unsigned long long begin=0;
   __device__ Span(State* s,unsigned id):stage(id) {
-#ifdef UCCL_GPU_STAGE_TRACE
+#if defined(UCCL_GPU_STAGE_TRACE) && (defined(__CUDA_ARCH__) || defined(__HIP_DEVICE_COMPILE__))
 #ifdef WARP_SIZE
     lane=threadIdx.x%WARP_SIZE;
 #else
@@ -21,7 +21,7 @@ struct Span {
 #endif
   }
   __device__ void finish(){
-#ifdef UCCL_GPU_STAGE_TRACE
+#if defined(UCCL_GPU_STAGE_TRACE) && (defined(__CUDA_ARCH__) || defined(__HIP_DEVICE_COMPILE__))
     if(state){auto elapsed=clock64()-begin;auto* m=&state->metrics[stage][lane];atomicAdd(&m->calls,1ULL);atomicAdd(&m->cycles,elapsed);atomicMax(&m->max_cycles,elapsed);state=nullptr;}
 #endif
   }
