@@ -15,6 +15,8 @@
 #include "urma_layout_diag.hpp"
 #include "urma_micro.hpp"
 #include "urma_dispatch_trial.hpp"
+#include "verbs_stage_diag.hpp"
+#include "verbs_write_micro.hpp"
 #include "internode.cuh"
 #include "internode_ll.cuh"
 #include "intranode.cuh"
@@ -2491,6 +2493,19 @@ NB_MODULE(ep, m) {
   m.def("urma_layout_end", [](){return uccl::urma_layout::end();});
   m.def("urma_dispatch_trial_begin",[](uint64_t us,bool detailed){uccl::dispatch_trial::begin(us,detailed);});
   m.def("urma_dispatch_trial_end",[](){return uccl::dispatch_trial::end();});
+  m.def("verbs_diag_begin",[](){uccl::verbs_diag::begin();});
+  m.def("verbs_diag_end",[](){uccl::verbs_diag::end();});
+  m.def("get_verbs_diag_version",[](){return 1;});
+#if defined(USE_DMABUF) && !defined(EFA)
+  nb::class_<VerbsWriteSession>(m,"VerbsWriteSession")
+    .def(nb::init<std::string const&,int,size_t,size_t>())
+    .def("descriptor",[](VerbsWriteSession const& s,size_t i){auto b=s.descriptor(i);return nb::bytes(b.data(),b.size());})
+    .def("metadata",&VerbsWriteSession::metadata)
+    .def("connect",[](VerbsWriteSession& s,nb::list const& blobs){std::vector<std::string> v;for(auto b:blobs){auto bytes=nb::borrow<nb::bytes>(b);v.emplace_back(bytes.c_str(),nb::len(bytes));}s.connect(v);})
+    .def("prepare",&VerbsWriteSession::prepare).def("experiment",&VerbsWriteSession::experiment)
+    .def("step",[](VerbsWriteSession& s,size_t seq){nb::gil_scoped_release release;return s.step(seq);})
+    .def("validate",&VerbsWriteSession::validate).def("close",&VerbsWriteSession::close);
+#endif
 #ifdef USE_URMA
   nb::class_<UrmaMicroSession>(m,"UrmaMicroSession")
       .def(nb::init<int,size_t,size_t>())

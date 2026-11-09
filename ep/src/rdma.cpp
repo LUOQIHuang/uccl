@@ -3,6 +3,7 @@
 #include "common.hpp"
 #include "proxy_ctx.hpp"
 #include "rdma_registration.hpp"
+#include "verbs_stage_diag.hpp"
 #include "rdma_util.hpp"
 #include "util/gpu_rt.h"
 #include <infiniband/verbs.h>
@@ -49,6 +50,7 @@
 #include <stdio.h>
 #include <sys/socket.h>
 #include <unistd.h>
+#define ibv_post_send uccl::verbs_diag::post
 
 #ifdef USE_DMABUF
 // ---------------------------------------------------------------------------
@@ -2299,6 +2301,7 @@ void post_rdma_async_batched(ProxyCtx& S, void* buf, size_t num_wrs,
                              int my_rank, int thread_idx,
                              bool use_normal_mode) {
   if (use_normal_mode) {
+    uccl::urma_diag::Scope diagnostic(uccl::urma_diag::GroupPrepare,num_wrs);
     post_rdma_async_batched_normal_mode(
         S, buf, num_wrs, wrs_to_post, cmds_to_post, ctxs, my_rank, thread_idx);
   } else {
@@ -2391,7 +2394,7 @@ int poll_cq_once(ibv_cq* cq, ibv_wc* wc, int max_cqes) {
   ibv_end_poll(cqx);
   return n;
 #else
-  return ibv_poll_cq(cq, max_cqes, wc);
+  return uccl::verbs_diag::poll(cq, max_cqes, wc);
 #endif
 }
 
@@ -3681,6 +3684,7 @@ void post_atomic_operations(ProxyCtx& S,
                             std::unordered_set<uint64_t>& acked_wrs,
                             bool use_normal_mode) {
   bool const use_native_atomics = device_supports_native_atomics(S.context);
+  uccl::urma_diag::Scope diagnostic(uccl::urma_diag::GroupPrepare,cmds_to_post.size(),use_normal_mode);
   if (use_normal_mode) {
     if (use_native_atomics) {
       post_atomic_operations_native_rdma(S, wrs_to_post, cmds_to_post, ctxs,

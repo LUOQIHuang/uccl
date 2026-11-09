@@ -1,5 +1,7 @@
 # RDMA / verbs 固定配置基线与 GPU 阶段分析
 
+当前verbs窗口请先按 **[Normal三组测试一体运行文档](NORMAL_CAMPAIGN.zh-CN.md)** 操作：新构建纯verbs模块，统一运行完整Normal、源码Proxy诊断和WRITE方向/并发对照；不测LL。本页保留历史基线流程供查阅。
+
 本轮用于当前可用的 **RDMA 内核环境**。不切换 URMA 内核，不要求 URMA 设备或私有 SDK。建议先完成必测的历史 verbs 基线；时间允许时，再测当前源码构建的纯 verbs 后端。两类结果分别标识，不覆盖既有数据。
 
 ## 1. 本轮测试内容和次数

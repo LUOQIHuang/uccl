@@ -1,5 +1,5 @@
 #include "urma_micro.hpp"
-#ifdef USE_URMA
+#if defined(USE_URMA) || defined(USE_DMABUF)
 #include <cuda_runtime.h>
 #include <cstring>
 #include <stdexcept>

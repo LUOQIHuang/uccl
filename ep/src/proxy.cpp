@@ -849,6 +849,7 @@ void Proxy::run_remote() {
 }
 
 void Proxy::run_dual() {
+  uccl::urma_diag::identity(cfg_.rank,cfg_.thread_idx);
   init_common();
   for (int peer = 0; peer < (int)ctxs_for_all_ranks_.size(); ++peer) {
     if (peer == cfg_.rank) continue;
@@ -879,6 +880,7 @@ void Proxy::run_dual() {
     } else if (use_urma_transport()) {
       poll_urma_completions();
     } else {
+      uccl::urma_diag::Scope diagnostic(uccl::urma_diag::CqPoll);
       poll_cq_dual(ctx_, acked_wrs_, cfg_.thread_idx, ring, ctx_by_tag_,
                    atomic_buffer_ptr_, cfg_.num_ranks, cfg_.num_experts,
                    pending_atomic_updates, cfg_.rank, cfg_.num_nodes,
@@ -1533,6 +1535,7 @@ void Proxy::post_gpu_commands_mixed(
   }
 
   // Separate atomic operations from regular RDMA writes
+  uccl::urma_diag::Scope diagnostic(uccl::urma_diag::ProxyBatch,cmds_to_post.size());
   std::vector<uint64_t> rdma_wrs, atomic_wrs, quiet_wrs, barrier_wrs;
   std::vector<TransferCmd> rdma_cmds, atomic_cmds, quiet_cmds, barrier_cmds;
 

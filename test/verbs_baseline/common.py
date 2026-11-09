@@ -52,6 +52,8 @@ def diagnostics():
     paths += [HERE.parent / 'verbs_diag' / n for n in
               ('driver.py', 'exit_guard.py', 'run.sh', 'profile_support.py')]
     paths += [HERE.parent / 'urma_mode_parity/phase_support.py', REPO / 'ep/bench/utils.py']
+    paths += [HERE.parent/'urma_mode_parity'/n for n in ('split_support.py','micro_support.py')]
+    paths += [REPO/'ep/tests/verbs_diag_test.cpp',REPO/'ep/tests/urma_support/ep_shim.hpp']
     return {p.relative_to(REPO).as_posix(): sha(p) for p in paths}
 
 
@@ -103,7 +105,9 @@ def load_extension(module):
                       if any(name in Path(p).name for name in selected) and Path(p).is_file()}
     return extension, dict(module=str(module), module_sha=sha(module), python=sys.executable,
                           torch=torch.__version__, torch_file=torch.__file__, loaded_libraries=loaded,
-                          selected_library_hashes=library_hashes)
+                          selected_library_hashes=library_hashes,
+                          verbs_diag_version=extension.get_verbs_diag_version() if hasattr(extension,'get_verbs_diag_version') else 0,
+                          verbs_micro=hasattr(extension,'VerbsWriteSession'))
 
 
 def validate_samples(case, mode, samples):

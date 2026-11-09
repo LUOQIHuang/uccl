@@ -18,7 +18,11 @@ BUILD_FLAGS = dict(USE_METAX='1', USE_URMA='0', USE_URMA_METAX='0', USE_LIBFABRI
 def parser():
     dev = Path(os.environ.get('VERBS_DIAG_DEV_ROOT', str(Path(os.environ.get('VERBS_DIAG_HOME', str(Path.home()))) / 'metax_dev')))
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument('--action', choices=('check', 'run', 'collect', 'build'), default='check')
+    p.add_argument('--action', choices=('check', 'run', 'collect', 'build','micro'), default='check')
+    p.add_argument('--micro-layout',type=Path)
+    p.add_argument('--micro-threads',type=int,choices=(1,4),default=4)
+    p.add_argument('--micro-cpus',default='auto')
+    p.add_argument('--gpu-pci',default='0000:a1:00.0')
     p.add_argument('--variant', choices=('original', 'current'), default='original')
     p.add_argument('--module', type=Path, default=dev / 'urma_after_kernel_20261029/diag/ep_host_atomic_4ed19a6b/module/ep.abi3.so')
     p.add_argument('--build-dir', type=Path, default=dev / 'verbs_baseline_build/current_v1')
@@ -31,6 +35,9 @@ def parser():
     p.add_argument('--mode', choices=('both', 'normal', 'low_latency'), default='both')
     p.add_argument('--repeats', type=int, default=3)
     p.add_argument('--warmups', type=int, default=50)
+    p.add_argument('--cpu-diagnostics',action='store_true')
+    p.add_argument('--campaign-check',action='store_true')
+    p.add_argument('--gid-index',type=int)
     p.add_argument('--samples', type=int, default=50)
     profile = p.add_mutually_exclusive_group()
     profile.add_argument('--no-profile', action='store_true')
@@ -48,6 +55,9 @@ def parser():
     if args.action == 'build' and args.variant != 'current':
         p.error('--action build requires --variant current; original uses the previously validated binary')
     args.backend = 'verbs'
+    if getattr(args,'gid_index',None) is not None and not 0<=getattr(args,'gid_index',None)<256:p.error('invalid GID index')
+    if getattr(args,'cpu_diagnostics',False) and (args.variant!='current' or args.mode!='normal' or not args.no_profile):p.error('CPU diagnostics requires current Normal --no-profile')
+    if args.action=='micro' and (args.variant!='current' or args.mode!='normal' or getattr(args,'gid_index',None) is None or not args.micro_layout):p.error('micro requires current Normal, --gid-index and --micro-layout')
     args.output = args.output.resolve()
     args.module = args.module.resolve()
     args.build_dir = args.build_dir.resolve()
@@ -69,6 +79,7 @@ def environment(args):
         # The historical validated binary uses this switch for its verbs
         # control-atomic registration path; preserve the earlier baseline.
         env['UCCL_METAX_URMA_HOST_ATOMICS'] = '1'
+    if getattr(args,'gid_index',None) is not None:env['UCCL_IB_GID_INDEX']=str(getattr(args,'gid_index',None))
     return env
 
 
@@ -88,6 +99,11 @@ def build(args):
         raise RuntimeError('BUILD_INPUTS_CHANGED: use a new --build-dir')
     path.write_text(json.dumps(request, indent=2))
     env = environment(args)
+    env.update(BUILD_FLAGS, MAX_JOBS=str(args.build_jobs))
+    for key in ('URMA_INCLUDE_DIR','URMA_LIBRARY_DIR'):env.pop(key,None)
+    if args.variant=='current':
+        with (args.build_dir/'host_tests.log').open('a') as log:
+            subprocess.run([sys.executable,str(HERE/'host_tests.py')],env=env,stdout=log,stderr=subprocess.STDOUT,check=True)
     for key in ('URMA_INCLUDE_DIR', 'URMA_LIBRARY_DIR'):
         env.pop(key, None)
     env.update(BUILD_FLAGS, MAX_JOBS=str(args.build_jobs))
@@ -126,6 +142,12 @@ def preflight(args):
     if probe.returncode:
         raise RuntimeError('IMPORT_FAILED:\n' + probe.stdout + probe.stderr)
     info = next(json.loads(line.split(' ', 1)[1]) for line in probe.stdout.splitlines() if line.startswith('VERBS_IMPORT_OK '))
+    if getattr(args,'campaign_check',False) and (info.get('verbs_diag_version')!=1 or not info.get('verbs_micro')):raise RuntimeError('CAMPAIGN_REQUIRES_REBUILD')
+    if getattr(args,'cpu_diagnostics',False) and info.get('verbs_diag_version')!=1:raise RuntimeError('VERBS_DIAGNOSTICS_REQUIRES_REBUILD')
+    if getattr(args,'gid_index',None) is not None:
+        port=Path('/sys/class/infiniband')/args.hca/'ports/1'
+        if not (port/'gids'/str(getattr(args,'gid_index',None))).read_text().strip().replace(':','').strip('0'):raise RuntimeError('selected GID is zero')
+        if 'v2' not in (port/'gid_attrs/types'/str(getattr(args,'gid_index',None))).read_text().lower():raise RuntimeError('campaign requires RoCE v2 GID')
     if args.variant == 'current' and any('/liburma.so' in p for p in info['loaded_libraries']):
         raise RuntimeError('PURE_VERBS_BUILD_LOADED_URMA: inspect runtime library environment')
     return module, data, identity, info, probe.stdout + probe.stderr
@@ -181,6 +203,7 @@ def run_case(args, root, tag, mode, profile, module, module_sha):
     env = environment(args)
     env.update(VB_CASE=str(case), VB_MODULE=str(module), VB_SHA=module_sha, VB_MODE=mode,
                VB_PROFILE=str(int(profile)), VB_WARMUPS=str(args.warmups), VB_SAMPLES=str(args.samples),
+               VB_CPU_DIAG=str(int(getattr(args,'cpu_diagnostics',False))),
                UCCL_TORCHRUN_NODE_RANK=str(args.node_rank), UCCL_EXIT_GUARD='1')
     for key, name in [('TMPDIR', 'tmpdir'), ('XDG_CACHE_HOME', 'cache')]:
         path = case / name
@@ -212,6 +235,14 @@ def run_case(args, root, tag, mode, profile, module, module_sha):
             no_errors=not re.search(r'Traceback \(most recent call last\)|AssertionError|Failed CR status|Segmentation fault|ChildFailedError|\[WARNING\]', text),
             samples=common.validate_samples(case, mode, args.samples))
         checks['correctness'] = text.count('[testing] Running with') == 24 if mode == 'normal' else 'All correctness tests passed!' in text
+        if getattr(args,'cpu_diagnostics',False):
+            checks['cpu_stages']=(case/'verbs_phases.jsonl').is_file() and (case/'write_layout.jsonl').is_file()
+            if checks['cpu_stages']:
+                windows=[json.loads(x) for x in (case/'verbs_phases.jsonl').read_text().splitlines() if x.strip()]
+                metrics=[record['metrics'] for window in windows for record in window['records']]
+                checks['native_write_fadd_samples']=all(sum(m.get(name,{}).get('calls',0) for m in metrics)>0 for name in ('write_requests','fadd_requests','submit_to_observed_cqe_sampled'))
+                checks['no_verbs_diag_errors']=not any(m.get(name,{}).get('calls',0) for m in metrics for name in ('verbs_post_errors','verbs_completion_errors','verbs_tracking_overflow'))
+                checks['complete_wr_layout']=not any(json.loads(x)['dropped'] for x in (case/'write_layout.jsonl').read_text().splitlines() if x.strip())
         expected = 4 if mode == 'normal' else 2
         checks['profiles'] = text.count('VERBS_GPU_PROFILE ') == expected if profile else text.count('VERBS_PROFILE_SKIPPED ') == expected and not (case / 'gpu_stages.jsonl').exists()
         if profile:
@@ -261,6 +292,7 @@ def run(args):
             libraries=info.get('selected_library_hashes', {}),
             mode=args.mode, repeats=args.repeats, warmups=args.warmups, samples=args.samples,
             no_profile=args.no_profile, profile_only=args.profile_only, hca=args.hca, ifname=args.ifname, gpu=args.gpu)
+        meta.update(cpu_diagnostics=getattr(args,'cpu_diagnostics',False),gid_index=getattr(args,'gid_index',None))
     except Exception as exc:
         error = str(exc)
     (root / 'setup.json').write_text(json.dumps(dict(fingerprint=meta, error=error), indent=2))
@@ -270,6 +302,9 @@ def run(args):
     if error:
         raise RuntimeError(error)
     modes = ('normal', 'low_latency') if args.mode == 'both' else (args.mode,)
+    if getattr(args,'cpu_diagnostics',False):
+        run_case(args,root,'cpu_diagnostic','normal',False,module,info['module_sha'])
+        print('VERBS_BASELINE_ALL_PASSED output='+str(root),flush=True);return
     if not args.profile_only:
         for repeat in range(1, args.repeats + 1):
             for mode in modes:
@@ -282,6 +317,9 @@ def run(args):
 
 def main():
     args = parser()
+    if args.action=='micro':
+        import micro_driver
+        micro_driver.run(args,preflight,environment,snapshot);return
     {'build': build, 'check': check, 'collect': collect, 'run': run}[args.action](args)
 
 

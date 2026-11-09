@@ -18,7 +18,8 @@ enum Stage { Collect, ProxyBatch, ProxyDispatch, ProxyCombine, GpuAck,
              Write, Fadd, Quiet, Barrier, QueueDepth, EmptyPoll,
              SubmitToObservedCqe, WriteToObservedCqe, FaddToObservedCqe,
              PairCandidates, WriteCqeSuppressed, ObservedCqes, RetiredOps,
-             RecoveryMarkers, PairedWriteToNotifyCqe, Count };
+             RecoveryMarkers, PairedWriteToNotifyCqe, VerbsPostErrors,
+             VerbsCompletionErrors, VerbsUnknown, VerbsReceives, VerbsMapOverflow, VerbsOther, Count };
 inline char const* names[] = {"collect_ready_commands", "proxy_batch",
     "proxy_dispatch_batch", "proxy_combine_batch", "gpu_ack_update",
     "capacity_wait", "quiet_barrier_drain", "group_prepare", "sdk_post",
@@ -27,7 +28,8 @@ inline char const* names[] = {"collect_ready_commands", "proxy_batch",
     "submit_to_observed_cqe_sampled", "write_to_observed_cqe_sampled",
     "fadd_to_observed_cqe_sampled", "paired_write_candidates",
     "write_cqe_suppressed", "observed_cqes", "retired_logical_ops",
-    "pair_recovery_markers", "paired_write_to_notify_cqe_sampled"};
+    "pair_recovery_markers", "paired_write_to_notify_cqe_sampled", "verbs_post_errors",
+    "verbs_completion_errors", "verbs_untracked_boundary_cqes", "verbs_receive_cqes", "verbs_tracking_overflow", "verbs_other_wrs"};
 static_assert(sizeof(names)/sizeof(names[0])==Count,"diagnostic metric names mismatch");
 struct Metric {
   std::atomic<uint64_t> calls{0}, ns{0}, items{0};
