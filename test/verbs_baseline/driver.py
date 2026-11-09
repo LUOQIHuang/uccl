@@ -14,6 +14,9 @@ HERE, REPO, legacy = common.HERE, common.REPO, common.legacy
 BUILD_FLAGS = dict(USE_METAX='1', USE_URMA='0', USE_URMA_METAX='0', USE_LIBFABRIC_CXI='0',
                    USE_DMABUF='1', MAX_NUM_GPUS='1', NUM_MAX_NVL_PEERS='1', PER_EXPERT_BATCHING='0')
 
+def build_flags(args):
+    return dict(BUILD_FLAGS, UCCL_GPU_STAGE_TRACE=str(int(bool(getattr(args,'gpu_stage_build',False) or getattr(args,'gpu_stages',False)))))
+
 
 def parser():
     dev = Path(os.environ.get('VERBS_DIAG_DEV_ROOT', str(Path(os.environ.get('VERBS_DIAG_HOME', str(Path.home()))) / 'metax_dev')))
@@ -22,6 +25,9 @@ def parser():
     p.add_argument('--micro-repeat',type=int,choices=(1,2,3),default=1)
     p.add_argument('--micro-suite',choices=('write','notify'),default='write')
     p.add_argument('--timeline',action='store_true')
+    p.add_argument('--stage-suite',action='store_true')
+    p.add_argument('--gpu-stages',action='store_true')
+    p.add_argument('--gpu-stage-build',action='store_true')
     p.add_argument('--notify-check',action='store_true')
     p.add_argument('--micro-layout',type=Path)
     p.add_argument('--micro-threads',type=int,choices=(1,4),default=4)
@@ -63,6 +69,9 @@ def parser():
     if getattr(args,'cpu_diagnostics',False) and (args.variant!='current' or args.mode!='normal' or not args.no_profile):p.error('CPU diagnostics requires current Normal --no-profile')
     if args.action=='micro' and (args.variant!='current' or args.mode!='normal' or getattr(args,'gid_index',None) is None or not args.micro_layout):p.error('micro requires current Normal, --gid-index and --micro-layout')
     if args.timeline and not args.cpu_diagnostics:p.error('--timeline requires --cpu-diagnostics')
+    if args.stage_suite and (args.variant!='current' or args.mode!='normal' or not args.no_profile or args.repeats!=1):p.error('--stage-suite requires current Normal --no-profile --repeats 1')
+    if args.gpu_stages and (not args.stage_suite or not args.timeline):p.error('--gpu-stages requires --stage-suite --timeline --cpu-diagnostics')
+    if args.gpu_stage_build and args.action!='build':p.error('--gpu-stage-build is only for build; use --gpu-stages for checks/runs')
     if args.micro_suite=='notify' and args.action=='micro' and args.micro_threads!=4:p.error('notify suite requires four threads')
     args.output = args.output.resolve()
     args.module = args.module.resolve()
@@ -91,28 +100,29 @@ def environment(args):
 
 def build(args):
     before = common.sources()
+    flags = build_flags(args)
     manifest_path = args.build_dir / 'manifest.json'
     if manifest_path.exists():
         data = json.loads(manifest_path.read_text())
-        if data['sources'] != before or data['flags'] != BUILD_FLAGS or common.sha(args.build_dir / data['module']) != data['module_sha']:
+        if data['sources'] != before or data['flags'] != flags or common.sha(args.build_dir / data['module']) != data['module_sha']:
             raise RuntimeError('BUILD_CHANGED: use a new --build-dir')
         print('VERBS_BUILD_ALREADY_PASSED', flush=True)
         return
     args.build_dir.mkdir(parents=True, exist_ok=True)
-    request = dict(sources=before, flags=BUILD_FLAGS)
+    request = dict(sources=before, flags=flags)
     path = args.build_dir / 'request.json'
     if path.exists() and json.loads(path.read_text()) != request:
         raise RuntimeError('BUILD_INPUTS_CHANGED: use a new --build-dir')
     path.write_text(json.dumps(request, indent=2))
     env = environment(args)
-    env.update(BUILD_FLAGS, MAX_JOBS=str(args.build_jobs))
+    env.update(flags, MAX_JOBS=str(args.build_jobs))
     for key in ('URMA_INCLUDE_DIR','URMA_LIBRARY_DIR'):env.pop(key,None)
     if args.variant=='current':
         with (args.build_dir/'host_tests.log').open('a') as log:
             subprocess.run([sys.executable,str(HERE/'host_tests.py')],env=env,stdout=log,stderr=subprocess.STDOUT,check=True)
     for key in ('URMA_INCLUDE_DIR', 'URMA_LIBRARY_DIR'):
         env.pop(key, None)
-    env.update(BUILD_FLAGS, MAX_JOBS=str(args.build_jobs))
+    env.update(flags, MAX_JOBS=str(args.build_jobs))
     command = [sys.executable, str(REPO / 'ep/setup.py'), 'build_ext',
                '--build-lib', str(args.build_dir / 'lib'), '--build-temp', str(args.build_dir / 'objects')]
     print('VERBS_BUILD_STARTED log=' + str(args.build_dir / 'build.log'), flush=True)
@@ -133,7 +143,7 @@ def preflight(args):
     if args.variant == 'current':
         data = json.loads((args.build_dir / 'manifest.json').read_text())
         module = args.build_dir / data['module']
-        if data['sources'] != common.sources() or data['flags'] != BUILD_FLAGS or common.sha(module) != data['module_sha']:
+        if data['sources'] != common.sources() or data['flags'] != build_flags(args) or common.sha(module) != data['module_sha']:
             raise RuntimeError('CURRENT_BUILD_MISMATCH: rebuild in a new directory')
         identity = dict(kind='current_source_build', sources_hash=common.digest(data['sources']), flags=data['flags'])
     else:
@@ -151,6 +161,7 @@ def preflight(args):
     if (getattr(args,'notify_check',False) or getattr(args,'timeline',False) or getattr(args,'micro_suite','write')=='notify') and info.get('verbs_notify_version')!=1:raise RuntimeError('NOTIFICATION_SUITE_REQUIRES_REBUILD')
     if getattr(args,'campaign_check',False) and (info.get('verbs_diag_version')!=1 or not info.get('verbs_micro')):raise RuntimeError('CAMPAIGN_REQUIRES_REBUILD')
     if getattr(args,'cpu_diagnostics',False) and info.get('verbs_diag_version')!=1:raise RuntimeError('VERBS_DIAGNOSTICS_REQUIRES_REBUILD')
+    if getattr(args,'gpu_stages',False) and info.get('gpu_stage_version')!=1:raise RuntimeError('GPU_STAGE_REQUIRES_REBUILD')
     if getattr(args,'gid_index',None) is not None:
         port=Path('/sys/class/infiniband')/args.hca/'ports/1'
         if not (port/'gids'/str(getattr(args,'gid_index',None))).read_text().strip().replace(':','').strip('0'):raise RuntimeError('selected GID is zero')
@@ -212,6 +223,7 @@ def run_case(args, root, tag, mode, profile, module, module_sha):
                VB_PROFILE=str(int(profile)), VB_WARMUPS=str(args.warmups), VB_SAMPLES=str(args.samples),
                VB_CPU_DIAG=str(int(getattr(args,'cpu_diagnostics',False))), VB_TIMELINE=str(int(getattr(args,'timeline',False))),
                UCCL_TORCHRUN_NODE_RANK=str(args.node_rank), UCCL_EXIT_GUARD='1')
+    env.update(VB_GPU_STAGES=str(int(getattr(args,'gpu_stages',False))),VB_STAGE_SUITE=str(int(getattr(args,'stage_suite',False))))
     for key, name in [('TMPDIR', 'tmpdir'), ('XDG_CACHE_HOME', 'cache')]:
         path = case / name
         path.mkdir()
@@ -252,7 +264,9 @@ def run_case(args, root, tag, mode, profile, module, module_sha):
                 checks['complete_wr_layout']=not any(json.loads(x)['dropped'] for x in (case/'write_layout.jsonl').read_text().splitlines() if x.strip())
         if getattr(args,'timeline',False):checks['timeline']=(case/'verbs_timeline.jsonl').is_file()
         expected = 4 if mode == 'normal' else 2
-        checks['profiles'] = text.count('VERBS_GPU_PROFILE ') == expected if profile else text.count('VERBS_PROFILE_SKIPPED ') == expected and not (case / 'gpu_stages.jsonl').exists()
+        checks['profiles'] = text.count('VERBS_GPU_PROFILE ') == expected if profile else text.count('VERBS_PROFILE_SKIPPED ') == expected and (getattr(args,'gpu_stages',False) or not (case / 'gpu_stages.jsonl').exists())
+        if getattr(args,'gpu_stages',False):checks['gpu_stages']=(case/'gpu_stages.jsonl').is_file()
+        if getattr(args,'stage_suite',False):checks['measurement_boundary']=(case/'measurement_boundary.json').is_file() and (case/'kernel_after_measurements.txt').is_file()
         if profile:
             checks['traces'] = all((case / f'gpu_trace_{i}.json').is_file() and (case / f'gpu_trace_{i}.json').stat().st_size > 0 for i in range(expected))
         if rc == 0 and not all(checks.values()):
@@ -281,6 +295,7 @@ def run(args):
         (root / 'module_manifest.json').write_text(json.dumps(manifest, indent=2))
         (root / 'runtime.json').write_text(json.dumps(info, indent=2))
         (root / 'import.log').write_text(log)
+        if getattr(args,'stage_suite',False):shutil.copy2(HERE.parent/'urma_mode_parity/gpu_stage_sites.json',root/'gpu_stage_sites.json')
         legacy.snapshot_host(root, args.hca)
         port = Path('/sys/class/infiniband') / args.hca / 'ports/1'
         port_paths = [p for p in port.glob('*') if p.is_file()]
@@ -301,6 +316,7 @@ def run(args):
             mode=args.mode, repeats=args.repeats, warmups=args.warmups, samples=args.samples,
             no_profile=args.no_profile, profile_only=args.profile_only, hca=args.hca, ifname=args.ifname, gpu=args.gpu)
         meta.update(cpu_diagnostics=getattr(args,'cpu_diagnostics',False),timeline=getattr(args,'timeline',False),gid_index=getattr(args,'gid_index',None))
+        meta.update(stage_suite=getattr(args,'stage_suite',False),gpu_stages=getattr(args,'gpu_stages',False))
     except Exception as exc:
         error = str(exc)
     (root / 'setup.json').write_text(json.dumps(dict(fingerprint=meta, error=error), indent=2))

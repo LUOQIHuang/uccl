@@ -20,8 +20,11 @@ inline int post(ibv_qp* qp,ibv_send_wr* wr,ibv_send_wr** bad) {
     bool atomic=w->opcode==IBV_WR_ATOMIC_FETCH_AND_ADD || w->opcode==IBV_WR_ATOMIC_CMP_AND_SWP;
     if(write){uint64_t bytes=0;for(int i=0;i<w->num_sge;++i)bytes+=w->sg_list[i].length;
       d::count(d::Write,bytes);
+      verbs_timeline::record("payload_bytes",w->wr_id,qp->qp_num,bytes);
+      verbs_timeline::record("remote_address",w->wr_id,qp->qp_num,w->wr.rdma.remote_addr);
       if(w->num_sge==1)uccl::urma_layout::record(w->sg_list[0].length,w->sg_list[0].addr,w->wr.rdma.remote_addr,qp->qp_num);
     }else d::count(atomic?d::Fadd:d::VerbsOther);
+    if(atomic){verbs_timeline::record("atomic_value",w->wr_id,qp->qp_num,w->wr.atomic.compare_add);verbs_timeline::record("remote_address",w->wr_id,qp->qp_num,w->wr.atomic.remote_addr);}
     if(w->send_flags&IBV_SEND_SIGNALED) {
       if(pending.size()>=32768){d::count(d::VerbsMapOverflow);continue;}
       auto key=std::make_pair(qp->qp_num,w->wr_id);

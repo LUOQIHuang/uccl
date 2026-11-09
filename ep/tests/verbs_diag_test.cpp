@@ -20,6 +20,7 @@ int main(){
   for(int i=0;i<128;++i){assert(v::post(&qp,&w,&bad)==0);assert(v::poll(&cq,4,out)==2);}
   assert(v::pending.empty());v::end();auto timeline=uccl::verbs_timeline::end();
   assert(timeline.find("post_begin")!=std::string::npos && timeline.find("post_end")!=std::string::npos && timeline.find("cqe")!=std::string::npos && timeline.find("\"dropped\":0")!=std::string::npos);
+  assert(timeline.find("payload_bytes")!=std::string::npos && timeline.find("atomic_value")!=std::string::npos && timeline.find("remote_address")!=std::string::npos);
   auto r=d::records.at(0);
   assert(r->metrics[d::Write].calls==128 && r->metrics[d::Write].items==128*8192);
   assert(r->metrics[d::Fadd].calls==128 && r->metrics[d::ObservedCqes].calls==256);

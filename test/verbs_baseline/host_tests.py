@@ -7,6 +7,18 @@ HERE=Path(__file__).resolve().parent;REPO=HERE.parents[1]
 with tempfile.TemporaryDirectory(prefix='uccl-verbs-host-') as tmp:
     compiler=os.environ.get('CXX','g++');target=Path(tmp)/'diag_test'
     flags=[compiler,'-std=c++17','-pthread','-Wall','-Wextra','-Werror','-I'+str(REPO/'ep/include')]
+    gpu=Path(tmp)/'gpu_stage_test'
+    subprocess.run(flags+[str(REPO/'ep/tests/gpu_stage_trace_test.cpp'),'-o',str(gpu)],check=True)
+    subprocess.run([str(gpu)],check=True)
+    source=(REPO/'ep/src/fifo.cpp').read_text()
+    (Path(tmp)/'fifo_implementation.inc').write_text(source[source.index('namespace mscclpp {'):])
+    source=(REPO/'ep/src/proxy.cpp').read_text()
+    begin=source.index('void Proxy::notify_gpu_completion(');end=source.index('void Proxy::post_gpu_command(',begin)
+    (Path(tmp)/'fifo_notify.inc').write_text(source[begin:end].replace('  if (acked_wrs_.empty())','  (void)my_tail;\n  if (acked_wrs_.empty())',1))
+    for trace in (False,True):
+        fifo=Path(tmp)/('fifo_stage_'+str(trace));extra=['-DUCCL_GPU_STAGE_TRACE'] if trace else []
+        subprocess.run(flags+['-I'+tmp]+extra+[str(REPO/'ep/tests/fifo_stage_test.cpp'),'-o',str(fifo)],check=True)
+        subprocess.run([str(fifo)],check=True)
     subprocess.run(flags+[str(REPO/'ep/tests/verbs_diag_test.cpp'),'-libverbs','-o',str(target)],check=True)
     subprocess.run([str(target)],check=True)
     subprocess.run(flags+['-DUSE_DMABUF','-I'+str(REPO/'ep/tests/urma_support'),'-include',str(REPO/'ep/tests/urma_support/ep_shim.hpp'),'-fsyntax-only',str(REPO/'ep/src/verbs_write_micro.cpp')],check=True)

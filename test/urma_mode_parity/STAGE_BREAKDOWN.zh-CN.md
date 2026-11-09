@@ -2,6 +2,8 @@
 
 本轮专门运行完整Normal的阶段诊断，不运行WRITE微测或LL。沿用原WRITE/FADD顺序、fence、quiet/barrier和completion=all。
 
+RDMA/verbs内核下的对应实验见 [verbs阶段插桩与比较文档](../verbs_baseline/STAGE_BREAKDOWN.zh-CN.md)。当前URMA任务先完成并收集，切到verbs内核后再执行；两套GPU测点一致。
+
 ## 1. 能得到哪些数据
 
 | 范围 | 本轮记录 |

@@ -46,7 +46,7 @@ class BaselineTests(unittest.TestCase):
         self.assertEqual(driver.BUILD_FLAGS['USE_URMA'], '0')
         self.assertEqual(driver.BUILD_FLAGS['USE_DMABUF'], '1')
 
-    def worker_fixture(self, mode, profile):
+    def worker_fixture(self, mode, profile, stages=False):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             bundle = root / 'benchmark'
@@ -77,7 +77,7 @@ class BaselineTests(unittest.TestCase):
             class Buffer:
                 def __init__(self):
                     self.low_latency_mode = mode != 'normal'
-                    self.proxies = [SimpleNamespace(use_normal_mode=lambda: mode == 'normal')]
+                    self.proxies = [SimpleNamespace(use_normal_mode=lambda: mode == 'normal',get_d2h_channel_addrs=lambda:[123])]
             buffer.Buffer = Buffer
             calls = Mock()
             def benchmark(path, **kwargs):
@@ -90,10 +90,14 @@ class BaselineTests(unittest.TestCase):
                         self.assertGreater(result[0], 0)
                         self.assertGreater(result[1], 0, 'zero notify would skip best-config selection')
             env = dict(VB_CASE=str(case), VB_MODE=mode, VB_PROFILE=str(int(profile)), VB_MODULE='fake.so',
-                       VB_SHA='sha', VB_WARMUPS='2', VB_SAMPLES='4')
+                       VB_SHA='sha', VB_WARMUPS='2', VB_SAMPLES='4',VB_GPU_STAGES=str(int(stages)),VB_STAGE_SUITE=str(int(stages)),VB_CPU_DIAG=str(int(stages)),VB_TIMELINE=str(int(stages)))
+            ep=SimpleNamespace()
+            if stages:
+                ep=SimpleNamespace(urma_phase_enable=Mock(),urma_phase_snapshot=lambda:'{"records":[]}',urma_layout_begin=Mock(),urma_layout_end=lambda:'{"dropped":0,"records":[]}',verbs_diag_begin=Mock(),verbs_diag_end=Mock(),verbs_timeline_begin=Mock(),verbs_timeline_end=lambda:'{"events":[],"origin_ns":0,"dropped":0}',gpu_stage_begin=Mock(),gpu_stage_end=Mock(return_value='{"records":[],"nominal_clock_khz":1000}'))
             modules = {'torch': torch, 'torch.distributed': dist, 'utils': utils, 'buffer': buffer}
             with patch.dict(os.environ, env), patch.dict(sys.modules, modules), \
-                 patch.object(common, 'load_extension', return_value=(SimpleNamespace(), dict(module_sha='sha'))), \
+                 patch.object(common, 'load_extension', return_value=(ep, dict(module_sha='sha'))), \
+                 patch('subprocess.run',return_value=SimpleNamespace(stdout='',stderr='',returncode=0)), \
                  patch.object(runpy, 'run_path', side_effect=benchmark), redirect_stdout(io.StringIO()):
                 # Execute the real worker while replacing only GPU/distributed
                 # dependencies and the benchmark body with CPU test doubles.
@@ -104,11 +108,18 @@ class BaselineTests(unittest.TestCase):
             common.validate_samples(case, mode, 4)
             rows = [json.loads(line) for line in (case / 'sample_summary.jsonl').read_text().splitlines()]
             self.assertTrue(all(r['n'] == 3 and r['mean_us'] == 2000 for r in rows))
-            if not profile:
+            if stages:
+                self.assertEqual(ep.gpu_stage_begin.call_count,20);self.assertEqual(ep.gpu_stage_end.call_count,20)
+                windows=[json.loads(x) for x in (case/'gpu_stages.jsonl').read_text().splitlines()]
+                self.assertEqual(len(windows),20);self.assertEqual({w['index'] for w in windows},{0,1,2,3})
+                self.assertTrue((case/'measurement_boundary.json').is_file())
+                self.assertEqual(ep.verbs_timeline_begin.call_count,20)
+            elif not profile:
                 self.assertFalse((case / 'gpu_stages.jsonl').exists())
                 self.assertFalse(list(case.glob('gpu_trace*')))
 
     def test_baseline_normal_never_invokes_profiler(self): self.worker_fixture('normal', False)
+    def test_gpu_stages_captures_every_normal_sample(self):self.worker_fixture('normal',False,True)
     def test_baseline_ll_skips_hook_and_profiler(self): self.worker_fixture('low_latency', False)
     def test_gpu_profile_normal_is_separate(self): self.worker_fixture('normal', True)
     def test_gpu_profile_ll_retains_send_receive_periods(self): self.worker_fixture('low_latency', True)

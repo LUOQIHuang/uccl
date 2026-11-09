@@ -5,6 +5,7 @@ import socket
 import subprocess
 import sys
 import tempfile
+import time
 import unittest
 HERE=Path(__file__).resolve().parents[1];sys.path.insert(0,str(HERE))
 import common
@@ -26,7 +27,7 @@ class CampaignTests(unittest.TestCase):
             def elapsed_time(self,other):return 1
         ep=SimpleNamespace(urma_phase_snapshot=lambda:'{"records":[]}',urma_layout_begin=lambda:events.append('layout_begin'),verbs_diag_begin=lambda:events.append('begin'),verbs_diag_end=lambda:events.append('end'),urma_layout_end=lambda:'{"writes":[],"dropped":0}')
         torch=SimpleNamespace(cuda=SimpleNamespace(synchronize=lambda:None,current_device=lambda:0,Event=Event),int='int',empty=lambda *a,**k:SimpleNamespace(zero_=lambda:None))
-        ns=dict(torch=torch,dist=SimpleNamespace(barrier=lambda:None),ep=ep,warmups=2,samples=3,cpu_diag=True,profile=False,mode='normal',common=common,json=json,append=lambda n,r:rows.append((n,r)))
+        ns=dict(torch=torch,dist=SimpleNamespace(barrier=lambda:None),ep=ep,warmups=2,samples=3,cpu_diag=True,profile=False,gpu_stages=False,time=time,mode='normal',common=common,json=json,append=lambda n,r:rows.append((n,r)))
         exec(compile(ast.Module(body=[fn],type_ignores=[]),'measure','exec'),ns)
         ns['measure'](lambda:events.append('fn'),'dispatch_fp8_chunk32')
         self.assertEqual(events,['fn','fn','layout_begin','begin','fn','fn','fn','end'])

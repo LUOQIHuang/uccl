@@ -1,4 +1,4 @@
-当前RDMA窗口下一轮：[WRITE/FADD/GPU通知对照与真实请求时间线](NOTIFICATIONS.zh-CN.md)。
+当前阶段对照：[与URMA对应的Normal GPU/CPU插桩及运行步骤](STAGE_BREAKDOWN.zh-CN.md)。
 
 # RDMA / verbs 固定配置基线与 GPU 阶段分析
 

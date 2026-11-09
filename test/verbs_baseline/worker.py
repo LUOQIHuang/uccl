@@ -6,6 +6,8 @@ import os
 from pathlib import Path
 import runpy
 import sys
+import subprocess
+import time
 from datetime import timedelta
 import common
 
@@ -16,6 +18,9 @@ mode = os.environ['VB_MODE']
 profile = os.environ['VB_PROFILE'] == '1'
 cpu_diag=os.environ.get('VB_CPU_DIAG')=='1'
 timeline=os.environ.get('VB_TIMELINE')=='1'
+gpu_stages=os.environ.get('VB_GPU_STAGES')=='1'
+stage_suite=os.environ.get('VB_STAGE_SUITE')=='1'
+stage_proxies=[]
 warmups, samples = int(os.environ['VB_WARMUPS']), int(os.environ['VB_SAMPLES'])
 ep, runtime = common.load_extension(Path(os.environ['VB_MODULE']))
 assert runtime['module_sha'] == os.environ['VB_SHA'], 'extension changed after preflight'
@@ -45,10 +50,16 @@ original_init = buffer.Buffer.__init__
 
 def checked_init(self, *args, **kwargs):
     original_init(self, *args, **kwargs)
+    if gpu_stages:stage_proxies[:]=self.proxies
     expected = mode == 'normal'
     assert self.low_latency_mode == (not expected), 'Buffer mode mismatch'
     assert self.proxies and all(bool(p.use_normal_mode()) == expected for p in self.proxies), 'Proxy mode mismatch'
     print(f'VERBS_MODE_OK mode={mode} proxies={len(self.proxies)}', flush=True)
+
+def stage_rings():
+    addresses=list(dict.fromkeys(int(a) for p in stage_proxies for a in p.get_d2h_channel_addrs()))
+    if not addresses:raise RuntimeError('GPU_STAGE_RINGS_MISSING')
+    return addresses
 
 
 buffer.Buffer.__init__ = checked_init
@@ -83,22 +94,32 @@ def measure(fn, label, post_fn=None):
     before=None
     if cpu_diag:
         before=json.loads(ep.urma_phase_snapshot());ep.urma_layout_begin();ep.verbs_diag_begin()
+    host_begin=time.perf_counter_ns()
     for i in range(samples):
-        trace_this=globals().get("timeline",False) and i==0 and label.startswith("dispatch_")
+        trace_this=globals().get("timeline",False) and (gpu_stages or (i==0 and label.startswith("dispatch_")))
+        if trace_this and gpu_stages:dist.barrier()
+        rings=stage_rings() if trace_this and gpu_stages else None
+        if rings is not None:ep.gpu_stage_begin(rings)
         if trace_this:ep.verbs_timeline_begin()
-        start[i].record()
-        fn()
-        end[i].record()
-        if trace_this:
-            torch.cuda.synchronize()
-            append("verbs_timeline.jsonl",dict(label=label,index=i,**json.loads(ep.verbs_timeline_end())))
+        try:
+            start[i].record()
+            fn()
+            end[i].record()
+        finally:
+            if trace_this:
+                try:
+                    torch.cuda.synchronize()
+                    if rings is not None:dist.barrier()
+                finally:
+                    if rings is not None:append('gpu_stages.jsonl',dict(label=label,index=i,**json.loads(ep.gpu_stage_end(rings))))
+                    append("verbs_timeline.jsonl",dict(label=label,index=i,backend='verbs',**json.loads(ep.verbs_timeline_end())))
         if post_fn is not None:
             post_fn()
     torch.cuda.synchronize()
     if cpu_diag:
         ep.verbs_diag_end();after=json.loads(ep.urma_phase_snapshot())
         records=common.phase_support.snapshot_delta(before,after)
-        append('verbs_phases.jsonl',dict(label=label,iterations=samples,records=records))
+        append('verbs_phases.jsonl',dict(label=label,iterations=samples,records=records,host_window_begin_ns=host_begin,host_window_ns=time.perf_counter_ns()-host_begin))
         append('write_layout.jsonl',dict(label=label,iterations=samples,**json.loads(ep.urma_layout_end())))
     values = [s.elapsed_time(e) * 1000 for s, e in zip(start, end)]
     for i, value in enumerate(values):
@@ -133,6 +154,15 @@ def measured_profile(fn, kernel_names, *args, **kwargs):
     # notify so the benchmark's best-config selection still executes. These
     # console tuning fields are placeholders, never GPU stage measurements.
     timing = measure(fn, label) if mode == 'normal' else None
+    if stage_suite and index==3:
+        begin=time.time_ns()
+        try:
+            snapshot=subprocess.run(['journalctl','-b','-k','-n','400','--no-pager'],capture_output=True,text=True,timeout=20)
+            (case/'kernel_after_measurements.txt').write_text(snapshot.stdout+snapshot.stderr);rc=snapshot.returncode
+        except Exception as exc:
+            (case/'kernel_after_measurements.txt').write_text(str(exc));rc=-1
+        (case/'measurement_boundary.json').write_text(json.dumps(dict(begin_realtime_ns=begin,end_realtime_ns=time.time_ns(),rc=rc,note='after all timing windows, before benchmark teardown')))
+        dist.barrier()
     if not profile:
         print('VERBS_PROFILE_SKIPPED ' + label, flush=True)
         if mode == 'normal':
