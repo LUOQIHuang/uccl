@@ -1,0 +1,56 @@
+=== NOTIFY_SUITE_START rank=1 job=urma_notify_05 2026-11-10 03:22:35 ===
+=== TASK_START micro_r01 rank=1 2026-11-10 03:22:35 ===
+DEVICE_FREE rank=1 check=1 2026-11-10 03:22:35
+DIAG_ROOT=/home/h00918771
+DIAG_PYTHON=/home/h00918771/metax_dev/venv-maca-py312/bin/python
+URMA_MICRO_BEGIN log=/home/h00918771/uccl-ep-xpu-integration-new/urma_notify_05_micro_r01/node1/micro/bench.log
+URMA_MICRO_END rc=0 checks={'done': True, 'points': True, 'raw': True, 'layout_verified': True, 'boundary': True, 'no_errors': True}
+=== TASK_END micro_r01 rank=1 rc=0 2026-11-10 03:22:56 ===
+=== TASK_START micro_r02 rank=1 2026-11-10 03:22:56 ===
+DEVICE_FREE rank=1 check=1 2026-11-10 03:22:56
+DIAG_ROOT=/home/h00918771
+DIAG_PYTHON=/home/h00918771/metax_dev/venv-maca-py312/bin/python
+URMA_MICRO_BEGIN log=/home/h00918771/uccl-ep-xpu-integration-new/urma_notify_05_micro_r02/node1/micro/bench.log
+URMA_MICRO_END rc=0 checks={'done': True, 'points': True, 'raw': True, 'layout_verified': True, 'boundary': True, 'no_errors': True}
+=== TASK_END micro_r02 rank=1 rc=0 2026-11-10 03:23:19 ===
+=== TASK_START micro_r03 rank=1 2026-11-10 03:23:19 ===
+ 550138 550146 550138 550138 550138 550138 550138 550138 550138 550138 550138 550138 550138 550138 550138 550138 550138 550138 550138 550138 550138 550138 550138 550138 550138 550138 550138 550138 550138 550138 550138 550138 550138 550138 550138 550138 562003 550138 562003 550138 562003 550138 550138 550138DEVICE_FREE rank=1 check=41 2026-11-10 03:33:22
+DIAG_ROOT=/home/h00918771
+DIAG_PYTHON=/home/h00918771/metax_dev/venv-maca-py312/bin/python
+URMA_MICRO_BEGIN log=/home/h00918771/uccl-ep-xpu-integration-new/urma_notify_05_micro_r03/node1/micro/bench.log
+URMA_MICRO_END rc=0 checks={'done': True, 'points': True, 'raw': True, 'layout_verified': True, 'boundary': True, 'no_errors': True}
+=== TASK_END micro_r03 rank=1 rc=0 2026-11-10 03:33:44 ===
+=== TASK_START baseline_r01 rank=1 2026-11-10 03:33:44 ===
+DEVICE_FREE rank=1 check=1 2026-11-10 03:33:44
+DIAG_ROOT=/home/h00918771
+DIAG_PYTHON=/home/h00918771/metax_dev/venv-maca-py312/bin/python
+CASE_BEGIN normal
+CASE_END normal rc=0 checks={'mode': True, 'done': True, 'exit_ack': True, 'no_errors': True, 'correctness': True, 'profiles': True, 'tuning': True, 'no_gpu_profiler': True, 'measurement_boundary': True, 'native_mode': True, 'device': True, 'normal_completion': True, 'phase_files': True, 'samples': True}
+URMA_MODE_PARITY_ALL_PASSED output=/home/h00918771/uccl-ep-xpu-integration-new/urma_notify_05_baseline_r01/node1
+=== TASK_END baseline_r01 rank=1 rc=0 2026-11-10 03:34:21 ===
+=== TASK_START baseline_r02 rank=1 2026-11-10 03:34:21 ===
+DEVICE_FREE rank=1 check=1 2026-11-10 03:34:21
+DIAG_ROOT=/home/h00918771
+DIAG_PYTHON=/home/h00918771/metax_dev/venv-maca-py312/bin/python
+CASE_BEGIN normal
+CASE_END normal rc=0 checks={'mode': True, 'done': True, 'exit_ack': True, 'no_errors': True, 'correctness': True, 'profiles': True, 'tuning': True, 'no_gpu_profiler': True, 'measurement_boundary': True, 'native_mode': True, 'device': True, 'normal_completion': True, 'phase_files': True, 'samples': True}
+URMA_MODE_PARITY_ALL_PASSED output=/home/h00918771/uccl-ep-xpu-integration-new/urma_notify_05_baseline_r02/node1
+=== TASK_END baseline_r02 rank=1 rc=0 2026-11-10 03:34:58 ===
+=== TASK_START baseline_r03 rank=1 2026-11-10 03:34:58 ===
+DEVICE_FREE rank=1 check=1 2026-11-10 03:34:58
+DIAG_ROOT=/home/h00918771
+DIAG_PYTHON=/home/h00918771/metax_dev/venv-maca-py312/bin/python
+CASE_BEGIN normal
+CASE_END normal rc=0 checks={'mode': True, 'done': True, 'exit_ack': True, 'no_errors': True, 'correctness': True, 'profiles': True, 'tuning': True, 'no_gpu_profiler': True, 'measurement_boundary': True, 'native_mode': True, 'device': True, 'normal_completion': True, 'phase_files': True, 'samples': True}
+URMA_MODE_PARITY_ALL_PASSED output=/home/h00918771/uccl-ep-xpu-integration-new/urma_notify_05_baseline_r03/node1
+=== TASK_END baseline_r03 rank=1 rc=0 2026-11-10 03:35:35 ===
+=== TASK_START timeline rank=1 2026-11-10 03:35:35 ===
+DEVICE_FREE rank=1 check=1 2026-11-10 03:35:35
+DIAG_ROOT=/home/h00918771
+DIAG_PYTHON=/home/h00918771/metax_dev/venv-maca-py312/bin/python
+CASE_BEGIN normal
+CASE_END normal rc=0 checks={'mode': True, 'done': True, 'exit_ack': True, 'no_errors': True, 'correctness': True, 'profiles': True, 'tuning': True, 'no_gpu_profiler': True, 'measurement_boundary': True, 'layout_capture': True, 'timeline': True, 'native_mode': True, 'device': True, 'normal_completion': True, 'phase_files': True, 'samples': True, 'stage_activity': True}
+URMA_MODE_PARITY_ALL_PASSED output=/home/h00918771/uccl-ep-xpu-integration-new/urma_notify_05_timeline/node1
+=== TASK_END timeline rank=1 rc=0 2026-11-10 03:36:11 ===
+URMA_NOTIFICATION_SUITE_ALL_PASSED rank=1 output=/home/h00918771/metax_dev/urma_notify_results/urma_notify_05
+=== NOTIFY_SUITE_DONE rank=1 2026-11-10 03:36:11 ===

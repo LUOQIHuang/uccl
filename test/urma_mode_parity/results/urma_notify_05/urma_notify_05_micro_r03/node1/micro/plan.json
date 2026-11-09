@@ -1,0 +1,255 @@
+{
+  "geometries": [
+    {
+      "label": "dispatch_fp8_chunk32",
+      "bytes": 237056,
+      "src_mod": 0,
+      "dst_mod": 0,
+      "selected_count": 120,
+      "payload_writes": 660,
+      "size_histogram": {
+        "88896": 5,
+        "133344": 15,
+        "148160": 5,
+        "155568": 20,
+        "162976": 15,
+        "237056": 600
+      }
+    },
+    {
+      "label": "dispatch_bf16_chunk32",
+      "bytes": 459264,
+      "src_mod": 0,
+      "dst_mod": 0,
+      "selected_count": 120,
+      "payload_writes": 660,
+      "size_histogram": {
+        "172224": 5,
+        "258336": 15,
+        "287040": 5,
+        "301392": 20,
+        "315744": 15,
+        "459264": 600
+      }
+    }
+  ],
+  "points": [
+    {
+      "label": "dispatch_fp8_chunk32_write_fadd",
+      "geometry": {
+        "label": "dispatch_fp8_chunk32",
+        "bytes": 237056,
+        "src_mod": 0,
+        "dst_mod": 0,
+        "selected_count": 120,
+        "payload_writes": 660,
+        "size_histogram": {
+          "88896": 5,
+          "133344": 15,
+          "148160": 5,
+          "155568": 20,
+          "162976": 15,
+          "237056": 600
+        }
+      },
+      "operation": 2,
+      "visible": false,
+      "window": 1,
+      "messages": 8,
+      "fadd": true,
+      "observation": "cqe",
+      "direction": "bidir",
+      "local": false
+    },
+    {
+      "label": "dispatch_fp8_chunk32_gpu_flag",
+      "geometry": {
+        "label": "dispatch_fp8_chunk32",
+        "bytes": 237056,
+        "src_mod": 0,
+        "dst_mod": 0,
+        "selected_count": 120,
+        "payload_writes": 660,
+        "size_histogram": {
+          "88896": 5,
+          "133344": 15,
+          "148160": 5,
+          "155568": 20,
+          "162976": 15,
+          "237056": 600
+        }
+      },
+      "operation": 2,
+      "visible": true,
+      "window": 1,
+      "messages": 8,
+      "fadd": true,
+      "observation": "flag",
+      "direction": "bidir",
+      "local": false
+    },
+    {
+      "label": "dispatch_fp8_chunk32_write",
+      "geometry": {
+        "label": "dispatch_fp8_chunk32",
+        "bytes": 237056,
+        "src_mod": 0,
+        "dst_mod": 0,
+        "selected_count": 120,
+        "payload_writes": 660,
+        "size_histogram": {
+          "88896": 5,
+          "133344": 15,
+          "148160": 5,
+          "155568": 20,
+          "162976": 15,
+          "237056": 600
+        }
+      },
+      "operation": 0,
+      "visible": false,
+      "window": 1,
+      "messages": 8,
+      "fadd": false,
+      "observation": "cqe",
+      "direction": "bidir",
+      "local": false
+    },
+    {
+      "label": "dispatch_fp8_chunk32_fadd",
+      "geometry": {
+        "label": "dispatch_fp8_chunk32",
+        "bytes": 237056,
+        "src_mod": 0,
+        "dst_mod": 0,
+        "selected_count": 120,
+        "payload_writes": 660,
+        "size_histogram": {
+          "88896": 5,
+          "133344": 15,
+          "148160": 5,
+          "155568": 20,
+          "162976": 15,
+          "237056": 600
+        }
+      },
+      "operation": 1,
+      "visible": false,
+      "window": 1,
+      "messages": 8,
+      "fadd": true,
+      "observation": "cqe",
+      "direction": "bidir",
+      "local": false
+    },
+    {
+      "label": "dispatch_bf16_chunk32_write_fadd",
+      "geometry": {
+        "label": "dispatch_bf16_chunk32",
+        "bytes": 459264,
+        "src_mod": 0,
+        "dst_mod": 0,
+        "selected_count": 120,
+        "payload_writes": 660,
+        "size_histogram": {
+          "172224": 5,
+          "258336": 15,
+          "287040": 5,
+          "301392": 20,
+          "315744": 15,
+          "459264": 600
+        }
+      },
+      "operation": 2,
+      "visible": false,
+      "window": 1,
+      "messages": 8,
+      "fadd": true,
+      "observation": "cqe",
+      "direction": "bidir",
+      "local": false
+    },
+    {
+      "label": "dispatch_bf16_chunk32_gpu_flag",
+      "geometry": {
+        "label": "dispatch_bf16_chunk32",
+        "bytes": 459264,
+        "src_mod": 0,
+        "dst_mod": 0,
+        "selected_count": 120,
+        "payload_writes": 660,
+        "size_histogram": {
+          "172224": 5,
+          "258336": 15,
+          "287040": 5,
+          "301392": 20,
+          "315744": 15,
+          "459264": 600
+        }
+      },
+      "operation": 2,
+      "visible": true,
+      "window": 1,
+      "messages": 8,
+      "fadd": true,
+      "observation": "flag",
+      "direction": "bidir",
+      "local": false
+    },
+    {
+      "label": "dispatch_bf16_chunk32_write",
+      "geometry": {
+        "label": "dispatch_bf16_chunk32",
+        "bytes": 459264,
+        "src_mod": 0,
+        "dst_mod": 0,
+        "selected_count": 120,
+        "payload_writes": 660,
+        "size_histogram": {
+          "172224": 5,
+          "258336": 15,
+          "287040": 5,
+          "301392": 20,
+          "315744": 15,
+          "459264": 600
+        }
+      },
+      "operation": 0,
+      "visible": false,
+      "window": 1,
+      "messages": 8,
+      "fadd": false,
+      "observation": "cqe",
+      "direction": "bidir",
+      "local": false
+    },
+    {
+      "label": "dispatch_bf16_chunk32_fadd",
+      "geometry": {
+        "label": "dispatch_bf16_chunk32",
+        "bytes": 459264,
+        "src_mod": 0,
+        "dst_mod": 0,
+        "selected_count": 120,
+        "payload_writes": 660,
+        "size_histogram": {
+          "172224": 5,
+          "258336": 15,
+          "287040": 5,
+          "301392": 20,
+          "315744": 15,
+          "459264": 600
+        }
+      },
+      "operation": 1,
+      "visible": false,
+      "window": 1,
+      "messages": 8,
+      "fadd": true,
+      "observation": "cqe",
+      "direction": "bidir",
+      "local": false
+    }
+  ],
+  "geometry_source": "node0 actual Normal WRITE capture; not full trace replay"
+}
