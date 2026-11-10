@@ -1,0 +1,500 @@
+Nov 10 23:24:11 master kernel: [auth_drv] auth driver install succ.
+Nov 10 23:24:11 master kernel: XSHMEM: algo: no: 1, name: fsc_algo, registered
+Nov 10 23:24:11 master kernel: XSHMEM: algo: no: 0, name: blk_algo, registered
+Nov 10 23:24:11 master kernel: r8169 0000:21:00.0: Direct firmware load for rtl_nic/rtl8168h-2.fw failed with error -2
+Nov 10 23:24:11 master kernel: r8169 0000:21:00.0: Unable to load firmware rtl_nic/rtl8168h-2.fw (-2)
+Nov 10 23:24:11 master kernel: Generic FE-GE Realtek PHY r8169-0-2100:00: attached PHY driver (mii_bus:phy_addr=r8169-0-2100:00, irq=MAC)
+Nov 10 23:24:12 master kernel: r8169 0000:21:00.0 enp33s0: Link is Down
+Nov 10 23:24:12 master kernel: mlx5_core 0000:28:00.0 enp40s0f0np0: Link up
+Nov 10 23:24:12 master kernel: <ez_PROCMGR:24292:24308> [mami ued] [INFO] [ued_task_ctx_create 1021] Create success. (devid=128; pid=24292)
+Nov 10 23:24:12 master kernel: <ez_PROCMGR:24292:24308> [mami faultmgr] [WARN] [faultmgr_fault_event_to_log 35] Fault event recover. (eventId=0x8c044e00; devid=4294967295; nodeId=0:0; detailCode=0x0; severity=2; assertion=0; time=1794324252000ms; eventName=iammgr)
+Nov 10 23:24:13 master kernel: mlx5_core 0000:28:00.1 enp40s0f1np1: Link down
+Nov 10 23:24:13 master kernel: URMA|ubcore|24505|24505|ubcore_register_client:[434]|ubcore client: urma register success.
+Nov 10 23:24:13 master kernel: URMA|ubcore|24535|24535|ubcore_register_client:[434]|ubcore client: ipourma register success.
+Nov 10 23:24:13 master kernel: Register ubcore client success.
+Nov 10 23:24:13 master kernel: Register debugfs success.
+Nov 10 23:24:13 master kernel: netlink_init:success
+Nov 10 23:24:13 master kernel: [ipourma] Register netlink success.
+Nov 10 23:24:13 master kernel: IPVS: Registered protocols (TCP, UDP, SCTP, AH, ESP)
+Nov 10 23:24:13 master kernel: IPVS: Connection hash table configured (size=4096, memory=32Kbytes)
+Nov 10 23:24:13 master kernel: IPVS: ipvs loaded.
+Nov 10 23:24:13 master kernel: OBMM: obmm_module: init started
+Nov 10 23:24:13 master kernel: OBMM: ub_feature: 0xad0000, obmm_enabled: 0
+Nov 10 23:24:13 master kernel: OBMM: nid=0, pool size = 0x10000000 bytes.
+Nov 10 23:24:13 master kernel: OBMM: nid=1, pool size = 0x10000000 bytes.
+Nov 10 23:24:13 master kernel: IPVS: [rr] scheduler registered.
+Nov 10 23:24:13 master kernel: OBMM: nid=2, pool size = 0x10000000 bytes.
+Nov 10 23:24:13 master kernel: OBMM: nid=3, pool size = 0x10000000 bytes.
+Nov 10 23:24:13 master kernel: OBMM: shmdev: root device initialization started
+Nov 10 23:24:13 master kernel: IPVS: [wrr] scheduler registered.
+Nov 10 23:24:13 master kernel: OBMM: shmdev: root device initialization completed
+Nov 10 23:24:13 master kernel: OBMM: obmm_module: init completed
+Nov 10 23:24:13 master kernel: IPVS: [sh] scheduler registered.
+Nov 10 23:24:13 master kernel: [UVB]: Success fully get UBRT table
+Nov 10 23:24:13 master kernel: [UVB]: get cis sub table success
+Nov 10 23:24:13 master kernel: [UVB]: cis group not get [index], use default value
+Nov 10 23:24:13 master kernel: [UVB]: cis group not get forwarder, use default value
+Nov 10 23:24:13 master kernel: [UVB]: cis group not get [index], use default value
+Nov 10 23:24:13 master kernel: [UVB]: cis group not get forwarder, use default value
+Nov 10 23:24:13 master kernel: [UVB]: cis group not get forwarder, use default value
+Nov 10 23:24:13 master kernel: [UVB]: found ub struct in cis info
+Nov 10 23:24:13 master kernel: [UVB]: get cis table from odf success
+Nov 10 23:24:13 master kernel: [UVB]: get uvb sub table suceess
+Nov 10 23:24:13 master kernel: [UVB]: get uvb table from odf success
+Nov 10 23:24:13 master kernel: [UVB]: odf init success
+Nov 10 23:24:13 master kernel: [UVB]: uvb window lock init success.
+Nov 10 23:24:13 master kernel: [UVB]: create uvb poll window thread successfully
+Nov 10 23:24:13 master kernel: [UVB]: cis uvb init success
+Nov 10 23:24:13 master kernel: [UVB]: register uvb over ub drv success
+Nov 10 23:24:13 master kernel: [sentry][message_helper]: smh init successfully.
+Nov 10 23:24:13 master kernel: [sentry][message_helper]: smh device registered successfully.
+Nov 10 23:24:13 master kernel: [sentry][reporter]: power notifier register successful
+Nov 10 23:24:13 master kernel: [sentry][reporter]: lowmem notifier register successful
+Nov 10 23:24:13 master kernel: [sentry][reporter]: ubus notifier register successful
+Nov 10 23:24:13 master kernel: [sentry][urma]: reboot_cleanup_nb registered
+Nov 10 23:24:13 master kernel: [sentry][uvb]: uvb communication is enabled.
+Nov 10 23:24:13 master kernel: [sentry][remote server]: Create kernel urma receiver thread success.
+Nov 10 23:24:13 master kernel: [sentry][remote client]: Kernel reboot handler registered
+Nov 10 23:24:13 master kernel: [sentry][remote client]: Panic handler registered
+Nov 10 23:24:14 master kernel: <pm_child:24964:24964> [mami ued] [INFO] [ued_task_ctx_create 1021] Create success. (devid=128; pid=24964)
+Nov 10 23:24:14 master kernel: <pm_child:24964:24964> [mami faultmgr] [WARN] [faultmgr_fault_event_to_log 35] Fault event recover. (eventId=0x8c024e00; devid=4294967295; nodeId=0:0; detailCode=0x0; severity=2; assertion=0; time=1794324253000ms; eventName=process-manager)
+Nov 10 23:24:14 master kernel: <pm_child:24964:24964> [mami ued] [INFO] [ued_task_ctx_release 978] Release success. (devid=128; pid=24964)
+Nov 10 23:24:15 master kernel: r8169 0000:21:00.0 enp33s0: Link is Up - 1Gbps/Full - flow control off
+Nov 10 23:24:19 master kernel: block dm-0: the capability attribute has been deprecated.
+Nov 10 23:24:19 master kernel: qemu-system-aar[26995]: memfd_create() called without MFD_EXEC or MFD_NOEXEC_SEAL set
+Nov 10 23:24:23 master kernel: [auth_drv] IOCTL_GET_PROCNAME: add pid[27155] into auth_task_list
+Nov 10 23:24:23 master kernel: [auth_drv] IOCTL_GET_PROCNAME: wake up iammgr select
+Nov 10 23:24:23 master kernel: [auth_drv] IOCTL_GET_PID: pid: 27155
+Nov 10 23:24:23 master kernel: [auth_drv] IOCTL_SET_PROCNAME: pid=27155, procname=ubeUser1
+Nov 10 23:24:23 master kernel: [auth_drv] IOCTL_GET_PROCNAME: pid=27155, procname=ubeUser1
+Nov 10 23:24:23 master kernel: [auth_drv] IOCTL_GET_PROCNAME: remove pid[27155] from auth_task_list
+Nov 10 23:24:23 master kernel: <SDK_UDIE_DEV_DE:27155:27246> [mami ued] [INFO] [ued_task_ctx_create 1021] Create success. (devid=128; pid=27155)
+Nov 10 23:24:23 master kernel: <SDK_Enable_Dev_:27155:27249> [mami udm] [INFO] [_udm_add_dev 138] Add local device. (udevid=0)
+Nov 10 23:24:23 master kernel: <SDK_Enable_Dev_:27155:27249> [mami udm] [INFO] [_udm_add_dev 141] The device is added successfully. (udevid=0)
+Nov 10 23:24:23 master kernel: <SDK_Enable_Dev_:27155:27249> [mami hw-adapt] [INFO] [udev_hw_set_save_bios_udie_info 447] save bios die cfg info, (devid=0, ue_num=126 275 11 1661)
+Nov 10 23:24:23 master kernel: <SDK_Enable_Dev_:27155:27249> [mami hw-adapt] [INFO] [udev_hw_set_save_bios_udie_info 452] cdma ue0 0, urma ue0 0, port num 9, hpa 0x902000000000:0x3e000000000, ue_num 126, body_mask 0x1f
+Nov 10 23:24:23 master kernel: <SDK_Enable_Dev_:27155:27249> [mami hw-adapt] [INFO] [udev_hw_set_udie_info 535] chip0 die0, cdma ue0 0, urma ue0 0, port num 9, hpa 0x902000000000:0x3e000000000, ue_num 126
+Nov 10 23:24:23 master kernel: <SDK_Enable_Dev_:27155:27249> [mami hw-adapt] [INFO] [udev_hw_set_pcie_and_body_mask 492] Set pcie_mask and body_mask success. (devid=0; dieid=0; pcie_mask=0x0; body_mask=0x1f)
+Nov 10 23:24:23 master kernel: <SDK_Enable_Dev_:27155:27249> [mami hw-adapt] [INFO] [udev_hw_set_save_bios_udie_info 447] save bios die cfg info, (devid=0, ue_num=126 275 11 1661)
+Nov 10 23:24:23 master kernel: <SDK_Enable_Dev_:27155:27249> [mami hw-adapt] [INFO] [udev_hw_set_save_bios_udie_info 452] cdma ue0 0, urma ue0 0, port num 9, hpa 0xb02000000000:0x3e000000000, ue_num 126, body_mask 0x1f
+Nov 10 23:24:23 master kernel: <SDK_Enable_Dev_:27155:27249> [mami hw-adapt] [INFO] [udev_hw_set_udie_info 535] chip1 die0, cdma ue0 0, urma ue0 0, port num 9, hpa 0xb02000000000:0x3e000000000, ue_num 126
+Nov 10 23:24:23 master kernel: <SDK_Enable_Dev_:27155:27249> [mami hw-adapt] [INFO] [udev_hw_set_pcie_and_body_mask 492] Set pcie_mask and body_mask success. (devid=0; dieid=1; pcie_mask=0x0; body_mask=0x1f)
+Nov 10 23:24:23 master kernel: <SDK_Enable_Dev_:27155:27249> [mami hw-adapt] [INFO] [udev_hw_set_dev_info 371] set ctrl ue id in device. (devid=0; ret=0)
+Nov 10 23:24:23 master kernel: <SDK_Enable_Dev_:27155:27249> [mami hw-adapt] [INFO] [udev_set_ures_hsec_mem 179] Get hsec mem.(devid=0; len=268435456)
+Nov 10 23:24:23 master kernel: <SDK_Enable_Dev_:27155:27249> [mami hw-adapt] [INFO] [udev_set_ures_bbox_mem 253] The hw connect type is : 2
+Nov 10 23:24:23 master kernel: <SDK_Enable_Dev_:27155:27249> [mami hw-adapt] [WARN] [udev_set_ures_bbox_mem 264] The chip doesn't support blackbox. (devid=0, len=0, addr=valid 0)
+Nov 10 23:24:23 master kernel: <SDK_Enable_Dev_:27155:27249> [mami mng] [INFO] [idm_kern_is_nl_valid 820] set valid_body_mask success. (devid=0; fdieid=0; valid_body_mask=0x1f)
+Nov 10 23:24:24 master kernel: <SDK_Enable_Dev_:27155:27249> [mami mng] [INFO] [idm_kern_is_nl_valid 820] set valid_body_mask success. (devid=0; fdieid=1; valid_body_mask=0x1f)
+Nov 10 23:24:24 master kernel: <SDK_Enable_Dev_:27155:27249> [mami udev_port_mng] [INFO] [port_info_show 36] Device port info. (devid=0; num=18)
+Nov 10 23:24:24 master kernel: <SDK_Enable_Dev_:27155:27249> [mami udev_port_mng] [INFO] [port_info_show 38] Port id info. (index=0; phyport=0; dlphy_port_id=0, enable=1; link_mode=2; lane_mode=0; die0_rxpa_tgtid_index=0; die0_tx_tpp_tgtid_index=0)
+Nov 10 23:24:24 master kernel: <SDK_Enable_Dev_:27155:27249> [mami udev_port_mng] [INFO] [port_info_show 38] Port id info. (index=1; phyport=2; dlphy_port_id=2, enable=1; link_mode=2; lane_mode=0; die0_rxpa_tgtid_index=1; die0_tx_tpp_tgtid_index=1)
+Nov 10 23:24:24 master kernel: <SDK_Enable_Dev_:27155:27249> [mami udev_port_mng] [INFO] [port_info_show 38] Port id info. (index=2; phyport=4; dlphy_port_id=0, enable=1; link_mode=2; lane_mode=0; die0_rxpa_tgtid_index=2; die0_tx_tpp_tgtid_index=2)
+Nov 10 23:24:24 master kernel: <SDK_Enable_Dev_:27155:27249> [mami udev_port_mng] [INFO] [port_info_show 38] Port id info. (index=3; phyport=6; dlphy_port_id=2, enable=1; link_mode=2; lane_mode=0; die0_rxpa_tgtid_index=3; die0_tx_tpp_tgtid_index=3)
+Nov 10 23:24:24 master kernel: <SDK_Enable_Dev_:27155:27249> [mami udev_port_mng] [INFO] [port_info_show 38] Port id info. (index=4; phyport=8; dlphy_port_id=0, enable=1; link_mode=2; lane_mode=0; die0_rxpa_tgtid_index=4; die0_tx_tpp_tgtid_index=4)
+Nov 10 23:24:24 master kernel: <SDK_Enable_Dev_:27155:27249> [mami udev_port_mng] [INFO] [port_info_show 38] Port id info. (index=5; phyport=10; dlphy_port_id=2, enable=1; link_mode=2; lane_mode=0; die0_rxpa_tgtid_index=5; die0_tx_tpp_tgtid_index=5)
+Nov 10 23:24:24 master kernel: <SDK_Enable_Dev_:27155:27249> [mami udev_port_mng] [INFO] [port_info_show 38] Port id info. (index=6; phyport=12; dlphy_port_id=0, enable=1; link_mode=2; lane_mode=0; die0_rxpa_tgtid_index=6; die0_tx_tpp_tgtid_index=6)
+Nov 10 23:24:24 master kernel: <SDK_Enable_Dev_:27155:27249> [mami udev_port_mng] [INFO] [port_info_show 38] Port id info. (index=7; phyport=14; dlphy_port_id=2, enable=1; link_mode=2; lane_mode=0; die0_rxpa_tgtid_index=7; die0_tx_tpp_tgtid_index=7)
+Nov 10 23:24:24 master kernel: <SDK_Enable_Dev_:27155:27249> [mami udev_port_mng] [INFO] [port_info_show 38] Port id info. (index=8; phyport=16; dlphy_port_id=0, enable=1; link_mode=2; lane_mode=0; die0_rxpa_tgtid_index=8; die0_tx_tpp_tgtid_index=8)
+Nov 10 23:24:24 master kernel: <SDK_Enable_Dev_:27155:27249> [mami udev_port_mng] [INFO] [port_info_show 38] Port id info. (index=9; phyport=20; dlphy_port_id=0, enable=1; link_mode=2; lane_mode=0; die0_rxpa_tgtid_index=9; die0_tx_tpp_tgtid_index=9)
+Nov 10 23:24:24 master kernel: <SDK_Enable_Dev_:27155:27249> [mami udev_port_mng] [INFO] [port_info_show 38] Port id info. (index=10; phyport=22; dlphy_port_id=2, enable=1; link_mode=2; lane_mode=0; die0_rxpa_tgtid_index=10; die0_tx_tpp_tgtid_index=10)
+Nov 10 23:24:24 master kernel: <SDK_Enable_Dev_:27155:27249> [mami udev_port_mng] [INFO] [port_info_show 38] Port id info. (index=11; phyport=24; dlphy_port_id=0, enable=1; link_mode=2; lane_mode=0; die0_rxpa_tgtid_index=11; die0_tx_tpp_tgtid_index=11)
+Nov 10 23:24:24 master kernel: <SDK_Enable_Dev_:27155:27249> [mami udev_port_mng] [INFO] [port_info_show 38] Port id info. (index=12; phyport=26; dlphy_port_id=2, enable=1; link_mode=2; lane_mode=0; die0_rxpa_tgtid_index=12; die0_tx_tpp_tgtid_index=12)
+Nov 10 23:24:24 master kernel: <SDK_Enable_Dev_:27155:27249> [mami udev_port_mng] [INFO] [port_info_show 38] Port id info. (index=13; phyport=28; dlphy_port_id=0, enable=1; link_mode=2; lane_mode=0; die0_rxpa_tgtid_index=13; die0_tx_tpp_tgtid_index=13)
+Nov 10 23:24:24 master kernel: <SDK_Enable_Dev_:27155:27249> [mami udev_port_mng] [INFO] [port_info_show 38] Port id info. (index=14; phyport=30; dlphy_port_id=2, enable=1; link_mode=2; lane_mode=0; die0_rxpa_tgtid_index=14; die0_tx_tpp_tgtid_index=14)
+Nov 10 23:24:24 master kernel: <SDK_Enable_Dev_:27155:27249> [mami udev_port_mng] [INFO] [port_info_show 38] Port id info. (index=15; phyport=32; dlphy_port_id=0, enable=1; link_mode=2; lane_mode=0; die0_rxpa_tgtid_index=15; die0_tx_tpp_tgtid_index=15)
+Nov 10 23:24:24 master kernel: <SDK_Enable_Dev_:27155:27249> [mami udev_port_mng] [INFO] [port_info_show 38] Port id info. (index=16; phyport=34; dlphy_port_id=2, enable=1; link_mode=2; lane_mode=0; die0_rxpa_tgtid_index=16; die0_tx_tpp_tgtid_index=16)
+Nov 10 23:24:24 master kernel: <SDK_Enable_Dev_:27155:27249> [mami udev_port_mng] [INFO] [port_info_show 38] Port id info. (index=17; phyport=36; dlphy_port_id=0, enable=1; link_mode=2; lane_mode=0; die0_rxpa_tgtid_index=17; die0_tx_tpp_tgtid_index=17)
+Nov 10 23:24:24 master kernel: <SDK_Enable_Dev_:27155:27249> [mami mctrlq] [INFO] [_ctrlq_hw_create 504] Ctrlq hw create. (devid=0;)
+Nov 10 23:24:24 master kernel: <SDK_Enable_Dev_:27155:27249> [mami mctrlq] [INFO] [ctrlq_hw_get_die_num 54] Device info. (devid=0; die_num=2; version=0)
+Nov 10 23:24:24 master kernel: <SDK_Enable_Dev_:27155:27249> [mami mng] [INFO] [idm_kern_init 238] idm_kern_init success. (devid=0)
+Nov 10 23:24:24 master kernel: <SDK_Enable_Dev_:27155:27249> [mami uop] [INFO] [uop_kern_register_msg_ops 368] Uop msg ops reg success. (devid=0)
+Nov 10 23:24:24 master kernel: <SDK_Enable_Dev_:27155:27249> [mami linkcom] [INFO] [linkcom_dev_mng_init 333] init linkcom devid[0] mng success.
+Nov 10 23:24:24 master kernel: usi_irq_drv 00004: Sync request entity enable msg, enable=1
+Nov 10 23:24:24 master kernel: usi_irq_drv 00004: Change the entity status to normal
+Nov 10 23:24:24 master kernel: usi_irq_drv 00004: device id alloc success, id: 20481.
+Nov 10 23:24:24 master kernel: <SDK_Enable_Dev_:27155:27249> [mami USI] [INFO] [usi_dev_request_irqs 377] Register irq success. (devid=0; dieid=0; eid=3; irq_idx=0; irq_name=usi_0_0_0)
+Nov 10 23:24:24 master kernel: <SDK_Enable_Dev_:27155:27249> [mami USI] [INFO] [usi_dev_request_irqs 377] Register irq success. (devid=0; dieid=0; eid=3; irq_idx=1; irq_name=usi_0_0_1)
+Nov 10 23:24:24 master kernel: <SDK_Enable_Dev_:27155:27249> [mami USI] [INFO] [usi_dev_request_irqs 377] Register irq success. (devid=0; dieid=0; eid=3; irq_idx=2; irq_name=usi_0_0_2)
+Nov 10 23:24:24 master kernel: usi_irq_drv 00006: Sync request entity enable msg, enable=1
+Nov 10 23:24:24 master kernel: usi_irq_drv 00006: Change the entity status to normal
+Nov 10 23:24:24 master kernel: usi_irq_drv 00006: device id alloc success, id: 53249.
+Nov 10 23:24:24 master kernel: <SDK_Enable_Dev_:27155:27249> [mami USI] [INFO] [usi_dev_request_irqs 377] Register irq success. (devid=0; dieid=1; eid=5; irq_idx=0; irq_name=usi_0_1_0)
+Nov 10 23:24:24 master kernel: <SDK_Enable_Dev_:27155:27249> [mami USI] [INFO] [usi_dev_request_irqs 377] Register irq success. (devid=0; dieid=1; eid=5; irq_idx=1; irq_name=usi_0_1_1)
+Nov 10 23:24:24 master kernel: <SDK_Enable_Dev_:27155:27249> [mami USI] [INFO] [usi_dev_request_irqs 377] Register irq success. (devid=0; dieid=1; eid=5; irq_idx=2; irq_name=usi_0_1_2)
+Nov 10 23:24:24 master kernel: <SDK_Enable_Dev_:27155:27249> [mami USI] [INFO] [usi_local_dev_init 622] USI local dev init success. (devid=0)
+Nov 10 23:24:24 master kernel: <SDK_Enable_Dev_:27155:27249> [mami mng] [INFO] [mng_ucd_create_dev 113] mng_add_dev_to_udm success. (ret=0; devid=0)
+Nov 10 23:24:24 master kernel: <mami_dev_ctrl.b:27300:27300> [mami ued] [INFO] [ued_task_ctx_create 1021] Create success. (devid=0; pid=27300)
+Nov 10 23:24:24 master kernel: <SDK_Enable_Dev_:27155:27249> [mami ued] [INFO] [ued_task_ctx_create 1021] Create success. (devid=0; pid=27155)
+Nov 10 23:24:25 master kernel: [auth_drv] IOCTL_GET_PROCNAME: add pid[26117] into auth_task_list
+Nov 10 23:24:25 master kernel: [auth_drv] IOCTL_GET_PROCNAME: wake up iammgr select
+Nov 10 23:24:25 master kernel: [auth_drv] IOCTL_GET_PID: pid: 26117
+Nov 10 23:24:25 master kernel: [auth_drv] IOCTL_SET_PROCNAME: pid=26117, procname=ubeUser2
+Nov 10 23:24:25 master kernel: [auth_drv] IOCTL_GET_PROCNAME: pid=26117, procname=ubeUser2
+Nov 10 23:24:25 master kernel: [auth_drv] IOCTL_GET_PROCNAME: remove pid[26117] from auth_task_list
+Nov 10 23:24:25 master kernel: <hpp_dophi_rpc_0:26117:26285> [mami ued] [INFO] [ued_task_ctx_create 1021] Create success. (devid=128; pid=26117)
+Nov 10 23:24:25 master kernel: <hpp_dophi_rpc_0:26117:26285> [mami ued] [INFO] [ued_task_ctx_create 1021] Create success. (devid=0; pid=26117)
+Nov 10 23:24:25 master kernel: <ipc_worker_0:27300:27349> [mami linkcom] [INFO] [linkcom_core_open_link_pkt 117] open link channel success. (dev_id=0; chan_id=0; pid=26117)
+Nov 10 23:24:25 master kernel: <ipc_worker_0:27300:27349> [mami linkcom] [INFO] [linkcom_core_open_link_pkt 117] open link channel success. (dev_id=0; chan_id=1; pid=26117)
+Nov 10 23:24:25 master kernel: <ipc_worker_1:27300:27350> [mami linkcom] [INFO] [linkcom_core_open_link_pkt 117] open link channel success. (dev_id=0; chan_id=2; pid=26117)
+Nov 10 23:24:25 master kernel: <ipc_worker_0:27300:27349> [mami linkcom] [INFO] [linkcom_core_open_link_pkt 117] open link channel success. (dev_id=0; chan_id=3; pid=26117)
+Nov 10 23:24:25 master kernel: <ipc_worker_0:27300:27349> [mami linkcom] [INFO] [linkcom_core_open_link_pkt 117] open link channel success. (dev_id=0; chan_id=4; pid=26117)
+Nov 10 23:24:25 master kernel: <ipc_worker_0:27300:27349> [mami linkcom] [INFO] [linkcom_core_open_link_pkt 117] open link channel success. (dev_id=0; chan_id=5; pid=26117)
+Nov 10 23:24:25 master kernel: <ipc_worker_0:27300:27349> [mami linkcom] [INFO] [linkcom_core_open_link_pkt 117] open link channel success. (dev_id=0; chan_id=6; pid=26117)
+Nov 10 23:24:25 master kernel: <ipc_worker_0:27300:27349> [mami linkcom] [INFO] [linkcom_core_open_link_pkt 117] open link channel success. (dev_id=0; chan_id=7; pid=26117)
+Nov 10 23:24:30 master kernel:  ub_bus_controller0: rx msg coming, code=0x4c
+Nov 10 23:24:30 master kernel:  ub_bus_controller0: update cluster ubc cna to 0xa
+Nov 10 23:24:30 master kernel:  ub_bus_controller0: update boundary port0 cna to 0x1
+Nov 10 23:24:30 master kernel:  ub_bus_controller0: update boundary port1 cna to 0x2
+Nov 10 23:24:30 master kernel:  ub_bus_controller0: update boundary port2 cna to 0x3
+Nov 10 23:24:30 master kernel:  ub_bus_controller0: update boundary port3 cna to 0x4
+Nov 10 23:24:30 master kernel:  ub_bus_controller0: update boundary port4 cna to 0x5
+Nov 10 23:24:30 master kernel:  ub_bus_controller0: update boundary port5 cna to 0x6
+Nov 10 23:24:30 master kernel:  ub_bus_controller0: update boundary port6 cna to 0x7
+Nov 10 23:24:30 master kernel:  ub_bus_controller0: update boundary port7 cna to 0x8
+Nov 10 23:24:30 master kernel:  ub_bus_controller0: update cluster ubc upi to 0x7040
+Nov 10 23:24:30 master kernel:  ub_bus_controller0: update cluster ubc eid to 0x4000a
+Nov 10 23:24:30 master kernel:  ub_bus_controller0: update cluster ubc fm cna to 0xf000
+Nov 10 23:24:30 master kernel: ub_generic_component 00001: Adding to iommu group 4
+Nov 10 23:24:30 master kernel: ub_generic_component 00001: dma_configure ret = 0
+Nov 10 23:24:30 master kernel: ub_generic_component 00001: device id alloc success, id: 20482.
+Nov 10 23:24:30 master kernel:  ub_bus_controller1: rx msg coming, code=0x4c
+Nov 10 23:24:30 master kernel:  ub_bus_controller1: update cluster ubc cna to 0x40a
+Nov 10 23:24:30 master kernel:  ub_bus_controller1: update boundary port0 cna to 0x401
+Nov 10 23:24:30 master kernel:  ub_bus_controller1: update boundary port1 cna to 0x402
+Nov 10 23:24:30 master kernel:  ub_bus_controller1: update boundary port2 cna to 0x403
+Nov 10 23:24:30 master kernel:  ub_bus_controller1: update boundary port3 cna to 0x404
+Nov 10 23:24:30 master kernel:  ub_bus_controller1: update boundary port4 cna to 0x405
+Nov 10 23:24:30 master kernel:  ub_bus_controller1: update boundary port5 cna to 0x406
+Nov 10 23:24:30 master kernel:  ub_bus_controller1: update boundary port6 cna to 0x407
+Nov 10 23:24:30 master kernel:  ub_bus_controller1: update boundary port7 cna to 0x408
+Nov 10 23:24:30 master kernel:  ub_bus_controller1: update cluster ubc upi to 0x7040
+Nov 10 23:24:30 master kernel:  ub_bus_controller1: update cluster ubc eid to 0x4040a
+Nov 10 23:24:30 master kernel:  ub_bus_controller1: update cluster ubc fm cna to 0xf000
+Nov 10 23:24:30 master kernel: ub_generic_component 00002: Adding to iommu group 5
+Nov 10 23:24:30 master kernel: ub_generic_component 00002: dma_configure ret = 0
+Nov 10 23:24:30 master kernel: ub_generic_component 00002: device id alloc success, id: 53250.
+Nov 10 23:24:30 master kernel:  ub_bus_controller0: rx msg coming, code=0xf6
+Nov 10 23:24:30 master kernel:  ub_bus_controller0: vdm msg opcode 0x0, sub 0x7
+Nov 10 23:24:30 master kernel:  ub_bus_controller0: rx msg coming, code=0xf6
+Nov 10 23:24:30 master kernel:  ub_bus_controller0: rx msg coming, code=0xf6
+Nov 10 23:24:30 master kernel: ub 00007: guid=cc08-a001-0-2-000000-00000076e5f20080
+Nov 10 23:24:30 master kernel: ub 00007: mmio idx 0, [mem 0x3318000000-0x331800ffff]
+Nov 10 23:24:30 master kernel: ub 00007: MMIO[0]: ubba=0x0, size=0x10000, hpa=0x3318000000, wr attr=0, prefetchable=0, order type=0,
+Nov 10 23:24:30 master kernel: ub 00007: mmio idx 1, [mem 0x900000000000-0x90001fffffff]
+Nov 10 23:24:30 master kernel: ub 00007: MMIO[1]: ubba=0x0, size=0x20000000, hpa=0x900000000000, wr attr=0, prefetchable=0, order type=0,
+Nov 10 23:24:30 master kernel: ub 00007: mmio idx 2, [mem 0x3319000000-0x331901ffff]
+Nov 10 23:24:30 master kernel: ub 00007: MMIO[2]: ubba=0x0, size=0x20000, hpa=0x3319000000, wr attr=0, prefetchable=0, order type=0,
+Nov 10 23:24:30 master kernel: ub_generic_component 00001: port8 link up and create device
+Nov 10 23:24:30 master kernel: ub 00007: delay task work coming, type[0], src[0x100]
+Nov 10 23:24:30 master kernel:  ub_bus_controller0: VDM port enable: port_idx[8] status[0x0]
+Nov 10 23:24:30 master kernel: ubase 00007: Adding to iommu group 6
+Nov 10 23:24:30 master kernel:  ub_bus_controller0: vdm msg opcode 0x0, sub 0x1
+Nov 10 23:24:30 master kernel: ubase 00007: dma_configure ret = 0
+Nov 10 23:24:30 master kernel: ub 00008: guid=cc08-a001-0-2-000000-00000076e5f20081
+Nov 10 23:24:30 master kernel: ubase 00007: Sync request entity enable msg, enable=1
+Nov 10 23:24:30 master kernel: ub 00008: mmio idx 0, [mem 0x3318010000-0x331801ffff]
+Nov 10 23:24:30 master kernel: ub 00008: MMIO[0]: ubba=0x0, size=0x10000, hpa=0x3318010000, wr attr=0, prefetchable=0, order type=0,
+Nov 10 23:24:30 master kernel: ub 00008: mmio idx 1, [mem 0x900020000000-0x90003fffffff]
+Nov 10 23:24:30 master kernel:  ub_bus_controller1: rx msg coming, code=0xf6
+Nov 10 23:24:30 master kernel: ub 00008: MMIO[1]: ubba=0x0, size=0x20000000, hpa=0x900020000000, wr attr=0, prefetchable=0, order type=0,
+Nov 10 23:24:30 master kernel:  ub_bus_controller1: rx msg coming, code=0xf6
+Nov 10 23:24:30 master kernel: ub 00008: mmio idx 2, [mem 0x3319020000-0x331903ffff]
+Nov 10 23:24:30 master kernel: <ipc_worker_3:27300:27353> [mami mctrlq] [INFO] [_ctrlq_cq_enable 440] Already on. (devid=0; chan_id=0)
+Nov 10 23:24:30 master kernel: ubase 00007: Change the entity status to normal
+Nov 10 23:24:30 master kernel: ubase 00007: (pid 1789) cmdq handshake1 = 0x0.
+Nov 10 23:24:30 master kernel:  ub_bus_controller1: rx msg coming, code=0xf6
+Nov 10 23:24:30 master kernel: ubase 00007: (pid 1789) The firmware version is 6.0.21.27
+Nov 10 23:24:30 master kernel: ub 00008: MMIO[2]: ubba=0x0, size=0x20000, hpa=0x3319020000, wr attr=0, prefetchable=0, order type=0,
+Nov 10 23:24:30 master kernel: ubase 00007: (pid 1789) udev cap_bits[0] = 0x1aa23d
+Nov 10 23:24:30 master kernel: ubase 00007: enable mue[1] succeeded, user_eid=0x1000a
+Nov 10 23:24:30 master kernel: ubase 00007: (pid 1789) udev cap_bits[1] = 0x0
+Nov 10 23:24:30 master kernel:  ub_bus_controller0: MUE reg: guid[0xcc08a00102000000-0x76e5f20080] idx[1] cnt[1] start[10] end[10] ueid[0x1000a] status[0x0]
+Nov 10 23:24:30 master kernel: ubase 00007: (pid 1789) udev cap_bits[2] = 0x0
+Nov 10 23:24:30 master kernel:  ub_bus_controller0: vdm msg opcode 0x0, sub 0x1
+Nov 10 23:24:30 master kernel: ubase 00007: device id alloc success, id: 20483.
+Nov 10 23:24:30 master kernel: ub 00009: guid=cc08-a001-0-2-000000-00000076e5f20082
+Nov 10 23:24:30 master kernel: ubase 00007: (pid 27762) ubase ae task start.
+Nov 10 23:24:30 master kernel: ubase 00007: (pid 1789) vl 3 has been allocated to other traffic type
+Nov 10 23:24:30 master kernel: ubase 00007: (pid 1789) vl 3 has been allocated to other traffic type
+Nov 10 23:24:30 master kernel: ubase 00007: (pid 1789) pre-alloc memory feature is enabled.
+Nov 10 23:24:30 master kernel: udma.udma ubase.udma.2: UDMA: udma init dev called, matched aux dev(udma.2).
+Nov 10 23:24:30 master kernel: URMA|ubcore|1789|1789|ubcore_get_eid_list[2134]|There is no eids in device: udmac0d1e2 eid_table.
+Nov 10 23:24:30 master kernel: URMA|ubcore|1789|1789|ubcore_get_eid_list[2134]|There is no eids in device: udmac0d1e2 eid_table.
+Nov 10 23:24:30 master kernel: URMA|ubcore|1789|1789|ubcore_register_device:[1423]|ubcore device: udmac0d1e2 register success.
+Nov 10 23:24:30 master kernel: ipourma0 (uninitialized): ipourma jetty cnt: 9, tx ring size: 16, rx ring size: 32
+Nov 10 23:24:30 master kernel: URMA|ubcore|1789|1789|ubmad_ubc_eid_ops:[340]|Invalid eid 0000:0000:0001:0200:0010:0000:df00:0200.
+Nov 10 23:24:30 master kernel: URMA|ubcore|1789|1789|ubcore_dispatch_mgmt_event:[2777]|cast eid to ubcm failed.
+Nov 10 23:24:30 master kernel: URMA|ubcore|1789|1789|ubmad_ubc_eid_ops:[340]|Invalid eid 0000:0000:003f:0200:0010:0000:df00:0b00.
+Nov 10 23:24:30 master kernel: URMA|ubcore|1789|1789|ubcore_dispatch_mgmt_event:[2777]|cast eid to ubcm failed.
+Nov 10 23:24:30 master kernel: URMA|ubcore|1789|1789|ubmad_ubc_eid_ops:[340]|Invalid eid 0000:0000:0007:0200:0010:0000:df00:0800.
+Nov 10 23:24:30 master kernel: URMA|ubcore|1789|1789|ubcore_dispatch_mgmt_event:[2777]|cast eid to ubcm failed.
+Nov 10 23:24:30 master kernel: URMA|ubcore|1789|1789|ubmad_ubc_eid_ops:[340]|Invalid eid 0000:0000:0006:0200:0010:0000:df00:0700.
+Nov 10 23:24:30 master kernel: URMA|ubcore|1789|1789|ubcore_dispatch_mgmt_event:[2777]|cast eid to ubcm failed.
+Nov 10 23:24:30 master kernel: URMA|ubcore|1789|1789|ubmad_ubc_eid_ops:[340]|Invalid eid 0000:0000:0005:0200:0010:0000:df00:0600.
+Nov 10 23:24:30 master kernel: URMA|ubcore|1789|1789|ubcore_dispatch_mgmt_event:[2777]|cast eid to ubcm failed.
+Nov 10 23:24:30 master kernel: URMA|ubcore|1789|1789|ubmad_ubc_eid_ops:[340]|Invalid eid 0000:0000:0004:0200:0010:0000:df00:0500.
+Nov 10 23:24:30 master kernel: URMA|ubcore|1789|1789|ubcore_dispatch_mgmt_event:[2777]|cast eid to ubcm failed.
+Nov 10 23:24:30 master kernel: URMA|ubcore|1789|1789|ubmad_ubc_eid_ops:[340]|Invalid eid 0000:0000:0003:0200:0010:0000:df00:0400.
+Nov 10 23:24:30 master kernel: URMA|ubcore|1789|1789|ubcore_dispatch_mgmt_event:[2777]|cast eid to ubcm failed.
+Nov 10 23:24:30 master kernel: URMA|ubcore|1789|1789|ubmad_ubc_eid_ops:[340]|Invalid eid 0000:0000:0002:0200:0010:0000:df00:0300.
+Nov 10 23:24:30 master kernel: URMA|ubcore|1789|1789|ubcore_dispatch_mgmt_event:[2777]|cast eid to ubcm failed.
+Nov 10 23:24:30 master kernel: ubase 00007: UDMA: init udma successfully.
+Nov 10 23:24:30 master kernel: ubase 00007: (pid 1789) udma.2 updated adev status, status = 0x0.
+Nov 10 23:24:30 master kernel: ubase 00007: register share port at 0 success
+Nov 10 23:24:30 master kernel: ipourma0: Device opened.
+Nov 10 23:24:30 master kernel: ipourma0: ipourma create jetty set priority : 4, tp_type : ctp
+Nov 10 23:24:30 master kernel: ub 00008: delay task work coming, type[0], src[0x200]
+Nov 10 23:24:30 master kernel: ipourma0: ipourma create jetty set priority : 4, tp_type : ctp
+Nov 10 23:24:30 master kernel: ipourma0: ipourma create jetty set priority : 4, tp_type : ctp
+Nov 10 23:24:30 master kernel: ubase 00008: Adding to iommu group 7
+Nov 10 23:24:30 master kernel: ipourma0: ipourma create jetty set priority : 4, tp_type : ctp
+Nov 10 23:24:30 master kernel: ub 00009: mmio idx 0, [mem 0x3318020000-0x331802ffff]
+Nov 10 23:24:30 master kernel: ipourma0: ipourma create jetty set priority : 4, tp_type : ctp
+Nov 10 23:24:30 master kernel: ub 00009: MMIO[0]: ubba=0x0, size=0x10000, hpa=0x3318020000, wr attr=0, prefetchable=0, order type=0,
+Nov 10 23:24:30 master kernel: ipourma0: ipourma create jetty set priority : 4, tp_type : ctp
+Nov 10 23:24:30 master kernel: ubase 00008: dma_configure ret = 0
+Nov 10 23:24:30 master kernel: ub 00009: mmio idx 1, [mem 0x900040000000-0x90005fffffff]
+Nov 10 23:24:30 master kernel: ipourma0: ipourma create jetty set priority : 4, tp_type : ctp
+Nov 10 23:24:30 master kernel: ipourma0: ipourma create jetty set priority : 4, tp_type : ctp
+Nov 10 23:24:30 master kernel: ipourma0: ipourma create jetty set priority : 4, tp_type : ctp
+Nov 10 23:24:30 master kernel: ub 00009: MMIO[1]: ubba=0x0, size=0x20000000, hpa=0x900040000000, wr attr=0, prefetchable=0, order type=0,
+Nov 10 23:24:30 master kernel: ubase 00008: Sync request entity enable msg, enable=1
+Nov 10 23:24:30 master kernel: ub 00009: mmio idx 2, [mem 0x3319040000-0x331905ffff]
+Nov 10 23:24:30 master kernel: <ipc_worker_3:27300:27353> [mami mctrlq] [INFO] [_ctrlq_cq_enable 440] Already on. (devid=0; chan_id=1)
+Nov 10 23:24:30 master kernel: ub 00009: MMIO[2]: ubba=0x0, size=0x20000, hpa=0x3319040000, wr attr=0, prefetchable=0, order type=0,
+Nov 10 23:24:30 master kernel: ubase 00008: Change the entity status to normal
+Nov 10 23:24:30 master kernel: ubase 00007: enable mue[2] succeeded, user_eid=0x1000a
+Nov 10 23:24:30 master kernel: ubase 00008: (pid 1789) cmdq handshake1 = 0x0.
+Nov 10 23:24:30 master kernel:  ub_bus_controller0: MUE reg: guid[0xcc08a00102000000-0x76e5f20080] idx[2] cnt[1] start[11] end[11] ueid[0x1000a] status[0x0]
+Nov 10 23:24:30 master kernel: ubase 00008: (pid 1789) The firmware version is 6.0.21.27
+Nov 10 23:24:30 master kernel:  ub_bus_controller1: vdm msg opcode 0x0, sub 0x7
+Nov 10 23:24:30 master kernel: ubase 00008: (pid 1789) udev cap_bits[0] = 0x1aa23d
+Nov 10 23:24:30 master kernel: ub 0000a: guid=cc08-a001-0-2-000000-0000006435c00180
+Nov 10 23:24:30 master kernel: ubase 00008: (pid 1789) udev cap_bits[1] = 0x0
+Nov 10 23:24:30 master kernel: ubase 00008: (pid 1789) udev cap_bits[2] = 0x0
+Nov 10 23:24:30 master kernel: ub 0000a: mmio idx 0, [mem 0x7318000000-0x731800ffff]
+Nov 10 23:24:30 master kernel: ubase 00008: device id alloc success, id: 20484.
+Nov 10 23:24:30 master kernel: ub 0000a: MMIO[0]: ubba=0x0, size=0x10000, hpa=0x7318000000, wr attr=0, prefetchable=0, order type=0,
+Nov 10 23:24:30 master kernel: ubase 00008: (pid 27774) ubase ae task start.
+Nov 10 23:24:30 master kernel: ubase 00008: (pid 1789) vl 3 has been allocated to other traffic type
+Nov 10 23:24:30 master kernel: ubase 00008: (pid 1789) vl 3 has been allocated to other traffic type
+Nov 10 23:24:30 master kernel: ubase 00008: (pid 1789) pre-alloc memory feature is enabled.
+Nov 10 23:24:30 master kernel: ub 0000a: mmio idx 1, [mem 0xb00000000000-0xb0001fffffff]
+Nov 10 23:24:30 master kernel: udma.udma ubase.udma.3: UDMA: udma init dev called, matched aux dev(udma.3).
+Nov 10 23:24:30 master kernel: URMA|ubcore|1789|1789|ubcore_get_eid_list[2134]|There is no eids in device: udmac0d1e3 eid_table.
+Nov 10 23:24:30 master kernel: URMA|ubcore|1789|1789|ubcore_get_eid_list[2134]|There is no eids in device: udmac0d1e3 eid_table.
+Nov 10 23:24:30 master kernel: URMA|ubcore|1789|1789|ubcore_register_device:[1423]|ubcore device: udmac0d1e3 register success.
+Nov 10 23:24:30 master kernel: ipourma1 (uninitialized): ipourma jetty cnt: 9, tx ring size: 16, rx ring size: 32
+Nov 10 23:24:30 master kernel: URMA|ubcore|1789|1789|ubmad_ubc_eid_ops:[340]|Invalid eid 0000:0000:0000:0300:0010:0000:df00:0100.
+Nov 10 23:24:30 master kernel: URMA|ubcore|1789|1789|ubcore_dispatch_mgmt_event:[2777]|cast eid to ubcm failed.
+Nov 10 23:24:30 master kernel: ubase 00008: UDMA: init udma successfully.
+Nov 10 23:24:30 master kernel: ubase 00008: (pid 1789) udma.3 updated adev status, status = 0x0.
+Nov 10 23:24:30 master kernel: ubase 00008: register share port at 1 success
+Nov 10 23:24:30 master kernel: ub 00009: delay task work coming, type[0], src[0x200]
+Nov 10 23:24:30 master kernel: ubase 00009: Adding to iommu group 8
+Nov 10 23:24:30 master kernel: ipourma1: Device opened.
+Nov 10 23:24:30 master kernel: ipourma1: ipourma create jetty set priority : 4, tp_type : ctp
+Nov 10 23:24:30 master kernel: ipourma1: ipourma create jetty set priority : 4, tp_type : ctp
+Nov 10 23:24:30 master kernel: ubase 00009: dma_configure ret = 0
+Nov 10 23:24:30 master kernel: ipourma1: ipourma create jetty set priority : 4, tp_type : ctp
+Nov 10 23:24:30 master kernel: ipourma1: ipourma create jetty set priority : 4, tp_type : ctp
+Nov 10 23:24:30 master kernel: ipourma1: ipourma create jetty set priority : 4, tp_type : ctp
+Nov 10 23:24:30 master kernel: ipourma1: ipourma create jetty set priority : 4, tp_type : ctp
+Nov 10 23:24:30 master kernel: ub 0000a: MMIO[1]: ubba=0x0, size=0x20000000, hpa=0xb00000000000, wr attr=0, prefetchable=0, order type=0,
+Nov 10 23:24:30 master kernel: ubase 00009: Sync request entity enable msg, enable=1
+Nov 10 23:24:30 master kernel: ipourma1: ipourma create jetty set priority : 4, tp_type : ctp
+Nov 10 23:24:30 master kernel: ub 0000a: mmio idx 2, [mem 0x7319000000-0x731901ffff]
+Nov 10 23:24:30 master kernel: ipourma1: ipourma create jetty set priority : 4, tp_type : ctp
+Nov 10 23:24:30 master kernel: ub 0000a: MMIO[2]: ubba=0x0, size=0x20000, hpa=0x7319000000, wr attr=0, prefetchable=0, order type=0,
+Nov 10 23:24:30 master kernel: ipourma1: ipourma create jetty set priority : 4, tp_type : ctp
+Nov 10 23:24:30 master kernel: ub_generic_component 00002: port8 link up and create device
+Nov 10 23:24:30 master kernel: <ipc_worker_3:27300:27353> [mami mctrlq] [INFO] [_ctrlq_cq_enable 440] Already on. (devid=0; chan_id=2)
+Nov 10 23:24:30 master kernel:  ub_bus_controller1: VDM port enable: port_idx[8] status[0x0]
+Nov 10 23:24:30 master kernel: ubase 00009: Change the entity status to normal
+Nov 10 23:24:30 master kernel:  ub_bus_controller1: vdm msg opcode 0x0, sub 0x1
+Nov 10 23:24:30 master kernel: ubase 00009: (pid 1789) cmdq handshake1 = 0x0.
+Nov 10 23:24:30 master kernel: ub 0000b: guid=cc08-a001-0-2-000000-0000006435c00181
+Nov 10 23:24:30 master kernel: ubase 00009: (pid 1789) The firmware version is 6.0.21.27
+Nov 10 23:24:30 master kernel: ub 0000b: mmio idx 0, [mem 0x7318010000-0x731801ffff]
+Nov 10 23:24:30 master kernel: ubase 00009: (pid 1789) udev cap_bits[0] = 0x1aa23d
+Nov 10 23:24:30 master kernel: ub 0000b: MMIO[0]: ubba=0x0, size=0x10000, hpa=0x7318010000, wr attr=0, prefetchable=0, order type=0,
+Nov 10 23:24:30 master kernel: ubase 00009: (pid 1789) udev cap_bits[1] = 0x0
+Nov 10 23:24:30 master kernel: ub 0000b: mmio idx 1, [mem 0xb00020000000-0xb0003fffffff]
+Nov 10 23:24:30 master kernel: ubase 00009: (pid 1789) udev cap_bits[2] = 0x0
+Nov 10 23:24:30 master kernel: ub 0000b: MMIO[1]: ubba=0x0, size=0x20000000, hpa=0xb00020000000, wr attr=0, prefetchable=0, order type=0,
+Nov 10 23:24:30 master kernel: ubase 00009: device id alloc success, id: 20485.
+Nov 10 23:24:30 master kernel: ub 0000b: mmio idx 2, [mem 0x7319020000-0x731903ffff]
+Nov 10 23:24:30 master kernel: ubase 00009: (pid 27785) ubase ae task start.
+Nov 10 23:24:30 master kernel: ubase 00009: (pid 1789) pre-alloc memory feature is enabled.
+Nov 10 23:24:30 master kernel: ub 0000b: MMIO[2]: ubba=0x0, size=0x20000, hpa=0x7319020000, wr attr=0, prefetchable=0, order type=0,
+Nov 10 23:24:30 master kernel: udma.udma ubase.udma.4: UDMA: udma init dev called, matched aux dev(udma.4).
+Nov 10 23:24:30 master kernel: ub 0000a: enable mue[1] succeeded, user_eid=0x1000a
+Nov 10 23:24:30 master kernel: URMA|ubcore|1789|1789|ubcore_get_eid_list[2134]|There is no eids in device: udmac0d1e4 eid_table.
+Nov 10 23:24:30 master kernel:  ub_bus_controller1: MUE reg: guid[0xcc08a00102000000-0x6435c00180] idx[1] cnt[1] start[10] end[10] ueid[0x1000a] status[0x0]
+Nov 10 23:24:30 master kernel: URMA|ubcore|1789|1789|ubcore_get_eid_list[2134]|There is no eids in device: udmac0d1e4 eid_table.
+Nov 10 23:24:30 master kernel:  ub_bus_controller1: vdm msg opcode 0x0, sub 0x1
+Nov 10 23:24:30 master kernel: URMA|ubcore|1789|1789|ubcore_register_device:[1423]|ubcore device: udmac0d1e4 register success.
+Nov 10 23:24:30 master kernel: ub 0000c: guid=cc08-a001-0-2-000000-0000006435c00182
+Nov 10 23:24:30 master kernel: ipourma2 (uninitialized): ipourma jetty cnt: 9, tx ring size: 16, rx ring size: 32
+Nov 10 23:24:30 master kernel: URMA|ubcore|1789|1789|ubmad_ubc_eid_ops:[340]|Invalid eid 0000:0000:0000:0400:0010:0000:df00:0100.
+Nov 10 23:24:30 master kernel: URMA|ubcore|1789|1789|ubcore_dispatch_mgmt_event:[2777]|cast eid to ubcm failed.
+Nov 10 23:24:30 master kernel: ubase 00009: UDMA: init udma successfully.
+Nov 10 23:24:30 master kernel: ubase 00009: (pid 1789) udma.4 updated adev status, status = 0x0.
+Nov 10 23:24:30 master kernel: ubase 00009: register share port at 2 success
+Nov 10 23:24:30 master kernel: ub 0000a: delay task work coming, type[0], src[0x100]
+Nov 10 23:24:30 master kernel: ubase 0000a: Adding to iommu group 9
+Nov 10 23:24:30 master kernel: ubase 0000a: dma_configure ret = 0
+Nov 10 23:24:30 master kernel: ub 0000c: mmio idx 0, [mem 0x7318020000-0x731802ffff]
+Nov 10 23:24:30 master kernel: ub 0000c: MMIO[0]: ubba=0x0, size=0x10000, hpa=0x7318020000, wr attr=0, prefetchable=0, order type=0,
+Nov 10 23:24:30 master kernel: ub 0000c: mmio idx 1, [mem 0xb00040000000-0xb0005fffffff]
+Nov 10 23:24:30 master kernel: ub 0000c: MMIO[1]: ubba=0x0, size=0x20000000, hpa=0xb00040000000, wr attr=0, prefetchable=0, order type=0,
+Nov 10 23:24:30 master kernel: ub 0000c: mmio idx 2, [mem 0x7319040000-0x731905ffff]
+Nov 10 23:24:30 master kernel: ub 0000c: MMIO[2]: ubba=0x0, size=0x20000, hpa=0x7319040000, wr attr=0, prefetchable=0, order type=0,
+Nov 10 23:24:30 master kernel: ubase 0000a: enable mue[2] succeeded, user_eid=0x1000a
+Nov 10 23:24:30 master kernel:  ub_bus_controller1: MUE reg: guid[0xcc08a00102000000-0x6435c00180] idx[2] cnt[1] start[11] end[11] ueid[0x1000a] status[0x0]
+Nov 10 23:24:31 master kernel: ipourma2: Device opened.
+Nov 10 23:24:31 master kernel: ipourma2: ipourma create jetty set priority : 6, tp_type : ctp
+Nov 10 23:24:31 master kernel: ipourma2: ipourma create jetty set priority : 6, tp_type : ctp
+Nov 10 23:24:31 master kernel: ipourma2: ipourma create jetty set priority : 6, tp_type : ctp
+Nov 10 23:24:31 master kernel: ipourma2: ipourma create jetty set priority : 6, tp_type : ctp
+Nov 10 23:24:31 master kernel: ipourma2: ipourma create jetty set priority : 6, tp_type : ctp
+Nov 10 23:24:31 master kernel: ipourma2: ipourma create jetty set priority : 6, tp_type : ctp
+Nov 10 23:24:31 master kernel: ipourma2: ipourma create jetty set priority : 6, tp_type : ctp
+Nov 10 23:24:31 master kernel: ipourma2: ipourma create jetty set priority : 6, tp_type : ctp
+Nov 10 23:24:31 master kernel: ipourma2: ipourma create jetty set priority : 6, tp_type : ctp
+Nov 10 23:24:31 master kernel: ubase 0000a: Sync request entity enable msg, enable=1
+Nov 10 23:24:32 master kernel: <ipc_worker_3:27300:27353> [mami mctrlq] [INFO] [_ctrlq_cq_enable 440] Already on. (devid=0; chan_id=18)
+Nov 10 23:24:32 master kernel: ubase 0000a: Change the entity status to normal
+Nov 10 23:24:32 master kernel: ubase 0000a: (pid 1789) cmdq handshake1 = 0x0.
+Nov 10 23:24:32 master kernel: ubase 0000a: (pid 1789) The firmware version is 6.0.21.27
+Nov 10 23:24:32 master kernel: ubase 0000a: (pid 1789) udev cap_bits[0] = 0x1aa23d
+Nov 10 23:24:32 master kernel: ubase 0000a: (pid 1789) udev cap_bits[1] = 0x0
+Nov 10 23:24:32 master kernel: ubase 0000a: (pid 1789) udev cap_bits[2] = 0x0
+Nov 10 23:24:32 master kernel: ubase 0000a: device id alloc success, id: 53251.
+Nov 10 23:24:32 master kernel: ubase 0000a: (pid 27796) ubase ae task start.
+Nov 10 23:24:32 master kernel: ubase 0000a: (pid 1789) vl 3 has been allocated to other traffic type
+Nov 10 23:24:32 master kernel: ubase 0000a: (pid 1789) vl 3 has been allocated to other traffic type
+Nov 10 23:24:32 master kernel: ubase 0000a: (pid 1789) pre-alloc memory feature is enabled.
+Nov 10 23:24:32 master kernel: udma.udma ubase.udma.5: UDMA: udma init dev called, matched aux dev(udma.5).
+Nov 10 23:24:32 master kernel: URMA|ubcore|1789|1789|ubcore_get_eid_list[2134]|There is no eids in device: udmac1d1e2 eid_table.
+Nov 10 23:24:32 master kernel: URMA|ubcore|1789|1789|ubcore_get_eid_list[2134]|There is no eids in device: udmac1d1e2 eid_table.
+Nov 10 23:24:32 master kernel: URMA|ubcore|1789|1789|ubcore_register_device:[1423]|ubcore device: udmac1d1e2 register success.
+Nov 10 23:24:32 master kernel: ipourma3 (uninitialized): ipourma jetty cnt: 9, tx ring size: 16, rx ring size: 32
+Nov 10 23:24:32 master kernel: ubase 0000a: UDMA: init udma successfully.
+Nov 10 23:24:32 master kernel: ipourma3: Device opened.
+Nov 10 23:24:32 master kernel: ipourma3: ipourma create jetty set priority : 4, tp_type : ctp
+Nov 10 23:24:32 master kernel: ipourma3: ipourma create jetty set priority : 4, tp_type : ctp
+Nov 10 23:24:32 master kernel: ipourma3: ipourma create jetty set priority : 4, tp_type : ctp
+Nov 10 23:24:32 master kernel: ipourma3: ipourma create jetty set priority : 4, tp_type : ctp
+Nov 10 23:24:32 master kernel: ipourma3: ipourma create jetty set priority : 4, tp_type : ctp
+Nov 10 23:24:32 master kernel: ipourma3: ipourma create jetty set priority : 4, tp_type : ctp
+Nov 10 23:24:32 master kernel: ipourma3: ipourma create jetty set priority : 4, tp_type : ctp
+Nov 10 23:24:32 master kernel: ipourma3: ipourma create jetty set priority : 4, tp_type : ctp
+Nov 10 23:24:32 master kernel: ipourma3: ipourma create jetty set priority : 4, tp_type : ctp
+Nov 10 23:24:32 master kernel: ubase 0000a: (pid 1789) udma.5 updated adev status, status = 0x0.
+Nov 10 23:24:32 master kernel: ubase 0000a: register share port at 0 success
+Nov 10 23:24:32 master kernel: ub 0000b: delay task work coming, type[0], src[0x200]
+Nov 10 23:24:32 master kernel: ubase 0000b: Adding to iommu group 10
+Nov 10 23:24:32 master kernel: ubase 0000b: dma_configure ret = 0
+Nov 10 23:24:32 master kernel: ubase 0000b: Sync request entity enable msg, enable=1
+Nov 10 23:24:32 master kernel: <ipc_worker_3:27300:27353> [mami mctrlq] [INFO] [_ctrlq_cq_enable 440] Already on. (devid=0; chan_id=19)
+Nov 10 23:24:32 master kernel: ubase 0000b: Change the entity status to normal
+Nov 10 23:24:32 master kernel: ubase 0000b: (pid 1789) cmdq handshake1 = 0x0.
+Nov 10 23:24:32 master kernel: ubase 0000b: (pid 1789) The firmware version is 6.0.21.27
+Nov 10 23:24:32 master kernel: ubase 0000b: (pid 1789) udev cap_bits[0] = 0x1aa23d
+Nov 10 23:24:32 master kernel: ubase 0000b: (pid 1789) udev cap_bits[1] = 0x0
+Nov 10 23:24:32 master kernel: ubase 0000b: (pid 1789) udev cap_bits[2] = 0x0
+Nov 10 23:24:32 master kernel: ubase 0000b: device id alloc success, id: 53252.
+Nov 10 23:24:32 master kernel: ubase 0000b: (pid 27873) ubase ae task start.
+Nov 10 23:24:32 master kernel: ubase 0000b: (pid 1789) vl 3 has been allocated to other traffic type
+Nov 10 23:24:32 master kernel: [sentry][urma]: urma 0 dev is not exist, ignore to release the urma source.
+Nov 10 23:24:32 master kernel: ubase 0000b: (pid 1789) vl 3 has been allocated to other traffic type
+Nov 10 23:24:32 master kernel: [sentry][urma]: urma 1 dev is not exist, ignore to release the urma source.
+Nov 10 23:24:32 master kernel: ubase 0000b: (pid 1789) pre-alloc memory feature is enabled.
+Nov 10 23:24:32 master kernel: URMA|ubcore|24217|24217|ubcore_register_client:[434]|ubcore client: sentry_ubcore_client register success.
+Nov 10 23:24:32 master kernel: udma.udma ubase.udma.6: UDMA: udma init dev called, matched aux dev(udma.6).
+Nov 10 23:24:32 master kernel: [sentry][urma]: ubcore_register_client success
+Nov 10 23:24:32 master kernel: URMA|ubcore|1789|1789|ubcore_get_eid_list[2134]|There is no eids in device: udmac1d1e3 eid_table.
+Nov 10 23:24:32 master kernel: [sentry][urma]: ubcore init success
+Nov 10 23:24:32 master kernel: URMA|ubcore|1789|1789|ubcore_get_eid_list[2134]|There is no eids in device: udmac1d1e3 eid_table.
+Nov 10 23:24:32 master kernel: [sentry][urma]: Match device udmac0d1e2, use it to send/recv data
+Nov 10 23:24:32 master kernel: URMA|ubcore|1789|1789|ubcore_register_device:[1423]|ubcore device: udmac1d1e3 register success.
+Nov 10 23:24:32 master kernel: [sentry][urma]: ubcore_create_jfc success
+Nov 10 23:24:32 master kernel: ipourma4 (uninitialized): ipourma jetty cnt: 9, tx ring size: 16, rx ring size: 32
+Nov 10 23:24:32 master kernel: ubase 0000b: UDMA: init udma successfully.
+Nov 10 23:24:32 master kernel: ubase 0000b: (pid 1789) udma.6 updated adev status, status = 0x0.
+Nov 10 23:24:32 master kernel: ubase 0000b: register share port at 1 success
+Nov 10 23:24:32 master kernel: ub 0000c: delay task work coming, type[0], src[0x200]
+Nov 10 23:24:32 master kernel: [sentry][urma]: ubcore_create_jfc success
+Nov 10 23:24:32 master kernel: [sentry][urma]: ubcore_create_jfr success
+Nov 10 23:24:32 master kernel: [sentry][urma]: ubcore_register_seg success
+Nov 10 23:24:32 master kernel: [sentry][urma]: Match device udmac1d1e2, use it to send/recv data
+Nov 10 23:24:32 master kernel: ubase 0000c: Adding to iommu group 11
+Nov 10 23:24:32 master kernel: [sentry][urma]: ubcore_create_jfc success
+Nov 10 23:24:32 master kernel: ubase 0000c: dma_configure ret = 0
+Nov 10 23:24:32 master kernel: ipourma4: Device opened.
+Nov 10 23:24:32 master kernel: ipourma4: ipourma create jetty set priority : 4, tp_type : ctp
+Nov 10 23:24:32 master kernel: ipourma4: ipourma create jetty set priority : 4, tp_type : ctp
+Nov 10 23:24:32 master kernel: ipourma4: ipourma create jetty set priority : 4, tp_type : ctp
+Nov 10 23:24:32 master kernel: ipourma4: ipourma create jetty set priority : 4, tp_type : ctp
+Nov 10 23:24:32 master kernel: ipourma4: ipourma create jetty set priority : 4, tp_type : ctp
+Nov 10 23:24:32 master kernel: ipourma4: ipourma create jetty set priority : 4, tp_type : ctp
+Nov 10 23:24:32 master kernel: ipourma4: ipourma create jetty set priority : 4, tp_type : ctp
+Nov 10 23:24:32 master kernel: ipourma4: ipourma create jetty set priority : 4, tp_type : ctp
+Nov 10 23:24:32 master kernel: ipourma4: ipourma create jetty set priority : 4, tp_type : ctp
+Nov 10 23:24:32 master kernel: [sentry][urma]: ubcore_create_jfc success
+Nov 10 23:24:32 master kernel: ubase 0000c: Sync request entity enable msg, enable=1
+Nov 10 23:24:32 master kernel: [sentry][urma]: ubcore_create_jfr success
+Nov 10 23:24:32 master kernel: <ipc_worker_3:27300:27353> [mami mctrlq] [INFO] [_ctrlq_cq_enable 440] Already on. (devid=0; chan_id=20)
+Nov 10 23:24:32 master kernel: [sentry][urma]: ubcore_register_seg success
+Nov 10 23:24:32 master kernel: ubase 0000c: Change the entity status to normal
+Nov 10 23:24:32 master kernel: [UVB]: register cis func for callid=c00b2010 recvid=10000000 success
+Nov 10 23:24:32 master kernel: ubase 0000c: (pid 1789) cmdq handshake1 = 0x0.
+Nov 10 23:24:32 master kernel: [sentry][urma]: proc_client_info_write kbuf is 0000:0000:003f:0200:0010:0000:df00:0b00,0000:0000:003f:0200:0010:0000:df01:cb00,0000:0000:003f:0200:0010:0000:df01:8b00,0000:0000:003f:0200:0010:0000:df01:4b00,0000:0000:003f:0200:0010:0000:df00:cb00,0000:0000:003f:0200:0010:0000:df00:4b00,0000:0000:003f:0200:0010:0000:df01:0b00,0000:0000:003f:0200:0010:0000:df00:8b00;0000:0000:007f:0200:0010:0000:df04:0b00,0000:0000:007f:0200:0010:0000:df05:cb00,0000:0000:007f:0200:0010:0000:df05:8b00,0000:0000:007f:0200:0010:0000:df05:4b00,0000:0000:007f:0200:0010:0000:df04:cb00,0000:0000:007f:0200:0010:0000:df04:4b00,0000:0000:007f:0200:0010:0000:df05:0b00,0000:0000:007f:0200:0010:0000:df04:8b00 1000
+Nov 10 23:24:32 master kernel: ubase 0000c: (pid 1789) The firmware version is 6.0.21.27
+Nov 10 23:24:32 master kernel: [sentry][urma]: client_jetty_id is 1000
+Nov 10 23:24:32 master kernel: ubase 0000c: (pid 1789) udev cap_bits[0] = 0x1aa23d
+Nov 10 23:24:32 master kernel: [sentry][urma]: create jetty set priority : 1, tp_type : ctp
+Nov 10 23:24:32 master kernel: ubase 0000c: (pid 1789) udev cap_bits[1] = 0x0
+Nov 10 23:24:32 master kernel: [sentry][urma]: ubcore_create_jetty success for device udmac0d1e2
+Nov 10 23:24:32 master kernel: ubase 0000c: (pid 1789) udev cap_bits[2] = 0x0
+Nov 10 23:24:32 master kernel: [sentry][urma]: import: 7/7 success for device udmac0d1e2
+Nov 10 23:24:32 master kernel: ubase 0000c: device id alloc success, id: 53253.
+Nov 10 23:24:32 master kernel: [sentry][urma]: create jetty set priority : 1, tp_type : ctp
+Nov 10 23:24:32 master kernel: ubase 0000c: (pid 27887) ubase ae task start.
+Nov 10 23:24:32 master kernel: ubase 0000c: (pid 1789) pre-alloc memory feature is enabled.
+Nov 10 23:24:32 master kernel: [sentry][urma]: ubcore_create_jetty success for device udmac1d1e2
+Nov 10 23:24:32 master kernel: udma.udma ubase.udma.7: UDMA: udma init dev called, matched aux dev(udma.7).
+Nov 10 23:24:32 master kernel: [sentry][urma]: import: 7/7 success for device udmac1d1e2
+Nov 10 23:24:32 master kernel: URMA|ubcore|1789|1789|ubcore_get_eid_list[2134]|There is no eids in device: udmac1d1e4 eid_table.
+Nov 10 23:24:32 master kernel: URMA|ubagg|27843|27843|ubagg_cmd_set_topo_info:[1556]|Finish to set topo info, node_num: 8.
+Nov 10 23:24:32 master kernel: URMA|ubcore|1789|1789|ubcore_get_eid_list[2134]|There is no eids in device: udmac1d1e4 eid_table.
+Nov 10 23:24:33 master kernel: URMA|ubcore|1789|1789|ubcore_register_device:[1423]|ubcore device: udmac1d1e4 register success.
+Nov 10 23:24:33 master kernel: ipourma5 (uninitialized): ipourma jetty cnt: 9, tx ring size: 16, rx ring size: 32
+Nov 10 23:24:33 master kernel: ubase 0000c: UDMA: init udma successfully.
+Nov 10 23:24:33 master kernel: URMA|ubcore|27843|27843|ubcore_get_eid_list[2134]|There is no eids in device: bonding_dev_0 eid_table.
+Nov 10 23:24:33 master kernel: ipourma5: Device opened.
+Nov 10 23:24:33 master kernel: ipourma5: ipourma create jetty set priority : 6, tp_type : ctp
+Nov 10 23:24:33 master kernel: ipourma5: ipourma create jetty set priority : 6, tp_type : ctp
+Nov 10 23:24:33 master kernel: ipourma5: ipourma create jetty set priority : 6, tp_type : ctp
+Nov 10 23:24:33 master kernel: ipourma5: ipourma create jetty set priority : 6, tp_type : ctp
+Nov 10 23:24:33 master kernel: ipourma5: ipourma create jetty set priority : 6, tp_type : ctp
+Nov 10 23:24:33 master kernel: ipourma5: ipourma create jetty set priority : 6, tp_type : ctp
+Nov 10 23:24:33 master kernel: ipourma5: ipourma create jetty set priority : 6, tp_type : ctp
+Nov 10 23:24:33 master kernel: ipourma5: ipourma create jetty set priority : 6, tp_type : ctp
+Nov 10 23:24:33 master kernel: ipourma5: ipourma create jetty set priority : 6, tp_type : ctp
+Nov 10 23:24:33 master kernel: ubase 0000c: (pid 1789) udma.7 updated adev status, status = 0x0.
+Nov 10 23:24:33 master kernel: ubase 0000c: register share port at 2 success
+Nov 10 23:24:33 master kernel: URMA|ubcore|27843|27843|ubcore_get_eid_list[2134]|There is no eids in device: bonding_dev_0 eid_table.
+Nov 10 23:24:33 master kernel: ubctl: <ubctl_add_udma_device:374>device not added, ret = -22.
+Nov 10 23:24:33 master kernel: URMA|ubcore|27843|27843|ubcore_clients_add[1137]|ubcore device: bonding_dev_0 add client:ub_fwctl context failed.
+Nov 10 23:24:33 master kernel: URMA|ubcore|27843|27843|ubcore_clients_add[1137]|ubcore device: bonding_dev_0 add client:ipourma context failed.
+Nov 10 23:24:33 master kernel: URMA|ubcore|27843|27843|ubcore_register_device:[1423]|ubcore device: bonding_dev_0 register success.
+Nov 10 23:24:33 master kernel: URMA|ubagg|27843|27843|ubagg_create_dev:[1703]|Finish to create ubagg device: bonding_dev_0.
+Nov 10 23:24:37 master kernel: URMA|ubagg|27812|27812|ubagg_cmd_set_topo_info:[1556]|Finish to set topo info, node_num: 8.
+Nov 10 23:24:38 master kernel: URMA|ubagg|27845|27845|ubagg_cmd_set_topo_info:[1556]|Finish to set topo info, node_num: 8.
+Nov 10 23:28:47 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 10 23:28:47 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 10 23:29:04 master kernel: platform ummu_vdev.16.auto: Adding to iommu group 14
+Nov 10 23:32:06 master kernel: platform ummu_vdev.16.auto: Adding to iommu group 14
+Nov 10 23:32:06 master kernel: platform ummu_vdev.17.auto: Adding to iommu group 15
