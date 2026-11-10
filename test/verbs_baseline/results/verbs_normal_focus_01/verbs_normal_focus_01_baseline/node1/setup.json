@@ -1,0 +1,111 @@
+{
+  "fingerprint": {
+    "job": "verbs_normal_focus_01_baseline",
+    "variant": "archived",
+    "identity": {
+      "kind": "pinned_archived_source_build",
+      "revision": "664c8193134bbd360caea322e2ec6a0630bfd4d5",
+      "sources_hash": "1ff29c7a519d6804a89dbc3757c7ae9873e5af7af4a0cbed1f2368e188dd7270",
+      "flags": {
+        "USE_METAX": "1",
+        "USE_URMA": "0",
+        "USE_URMA_METAX": "0",
+        "USE_LIBFABRIC_CXI": "0",
+        "USE_DMABUF": "1",
+        "MAX_NUM_GPUS": "1",
+        "NUM_MAX_NVL_PEERS": "1",
+        "PER_EXPERT_BATCHING": "0",
+        "UCCL_GPU_STAGE_TRACE": "0"
+      },
+      "reference_module_sha": "c9c647ff644983a0c3ba03b9bac95ce3cb46c1b01c6c3ef621bc1aabb00ae985",
+      "note": "Archived compiled inputs, frozen benchmark Python; current diagnostic workers. Binary SHA verified against local original manifest; runtime still requires correctness checks."
+    },
+    "benchmark": {
+      "variant": "archived",
+      "benchmark_revision": "664c8193134bbd360caea322e2ec6a0630bfd4d5",
+      "input_hashes": {
+        "test_internode.py": "5e09c00a24d8b661888ea317bdbbcb349460f4f20f4649eee266299d2f659956",
+        "test_low_latency.py": "0eb4396d26688adf4ad1f76c447c45e972da1eac02b59d219a1e8294fceae3e5",
+        "buffer.py": "0c354281716863069303f485bc84eee1d5d720d240c30f02746a343761aca2ff",
+        "utils.py": "c8b5f033722339883d468ac8ae762573d521c1140cd931203e77ffb693565dde"
+      },
+      "prepared_hashes": {
+        "buffer.py": "0c354281716863069303f485bc84eee1d5d720d240c30f02746a343761aca2ff",
+        "test_internode.py": "91e0a517d13c17239425bd23aad25e973c694b0a737739b6521144fdf1b56907",
+        "profile_adapter.py": "7e3db3e30e1358b4c149ba697ed0e4e6a63dda46e32911baadfae1450fa62ba5",
+        "utils.py": "c8b5f033722339883d468ac8ae762573d521c1140cd931203e77ffb693565dde",
+        "test_low_latency.py": "375d445d6ce700fadf9c537c7863a4ec471221d8464c382760188b761bcbe997"
+      },
+      "changes": [
+        "fixed Normal tuning points",
+        "LL hook immediately invokes receive hook",
+        "profiler trace-export fix; timed callables unchanged"
+      ]
+    },
+    "diagnostics": {
+      "test/verbs_baseline/micro_driver.py": "24061b20bf9714702b92b7d9e5807e3e274557ed55d963adea86f20c4554f026",
+      "test/verbs_baseline/summarize_normal_focus.py": "c64f3332ac0fef22a23bbee855e234bfd522d0c4438ee78b08edc3f5decfa87b",
+      "test/verbs_baseline/micro_worker.py": "d259f9886a22deba360181c8a2b825506e2d3d1b34748e3b00eb728a8a82ceb6",
+      "test/verbs_baseline/host_tests.py": "39695126d4f671b5b80760b82fc3554449b90bcfdabeb5aa43e9bb51141efb6a",
+      "test/verbs_baseline/summarize_campaign.py": "5680409e05ba2a9696b10615edd7142f57f0288c1196c5eea89db4ec594fa641",
+      "test/verbs_baseline/worker.py": "b4dd503f826f21375a39417225c66b34e12d712b0fcb441b5edf0deaa9abe902",
+      "test/verbs_baseline/collect_campaign.py": "c56351a5938bf87adb16e24e347334fc5dc8ebf3bf0b066bdcdbc5e9ee71f718",
+      "test/verbs_baseline/summarize_notifications.py": "e720288ae1d30eaaea8e0597c3b8eaf7d15401baa5ed71ef23c09ff836853dd9",
+      "test/verbs_baseline/notify_worker.py": "56bb46ea17d5fa9a8b14235887da4889a103aa72b144c7ef4d263a944f92e9e3",
+      "test/verbs_baseline/summarize.py": "f9699663c33451209ddf705dbf8f416f8ad2285fafc605d0e0c17ca6f3a98922",
+      "test/verbs_baseline/common.py": "495d99c54010d8e872b48bae698736ba0e7694d3684337f67afdba43b1e244f9",
+      "test/verbs_baseline/summarize_stage_breakdown.py": "7080ff6423cac15ab3ca273ec2835396d590d8994b4683e0592072c0b6ba496f",
+      "test/verbs_baseline/notify_support.py": "0ff0352542355339f1d58f8cd04820546e5086e79c81c1278be69a614c408d67",
+      "test/verbs_baseline/archived_base.py": "5ce566b1041c6274d88aea663a3ec9c4145633231a3d2c7582191b3c26066b90",
+      "test/verbs_baseline/compare_stage_breakdown.py": "fc2ed247453c2d636621d59661c82ffdc53d3b1ee81ac57f4cf5dfe2d6ef7fda",
+      "test/verbs_baseline/driver.py": "c2129b42ca7d07b5c397731dc68c30948febdd548c4d70f9f6431e12eb099751",
+      "test/verbs_baseline/run.sh": "1695d7e60078444c381f3694e824f3e91fccfc605cab50aae741a8f22c5fd85c",
+      "test/verbs_baseline/run_normal_campaign.sh": "4139e5d863620ef03402f3b29df2c5903a914c26528e845c3a5cd1274537f61b",
+      "test/verbs_baseline/run_notifications.sh": "c337b016050e3614e9e9210ca4d3ff73b5a163fa60caef4453156ad5aa10d81b",
+      "test/verbs_baseline/run_normal_focus.sh": "d413b42f416ff3ebe7002de6a7816ad05dbd95662a7bfb486c30657bb09cd649",
+      "test/verbs_baseline/run_stage_breakdown.sh": "f8adaae09bd5fe3797b992bae729b336d29611b095a631ab657f7666d45ceee5",
+      "test/verbs_diag/driver.py": "cf02080510ae306e7941bedc711f50db3106d9eb9b31c3c0c85993aeb1e66d48",
+      "test/verbs_diag/exit_guard.py": "9cba31fe18074bbf5b6fbe2345b570100663a3ed9da95cf6e118eedb409740c7",
+      "test/verbs_diag/run.sh": "d1293daa6bafaa9ad81914217bc66ce4f429d532f8d0c5d377343efab76dc5fa",
+      "test/verbs_diag/profile_support.py": "42c5ad17ae18f2697e958cc91e050cbabe3225b6a537dd833d2df048da5f7f63",
+      "test/urma_mode_parity/phase_support.py": "bfc1062297006da98d418100fb0717a9b192c697b066c9f192e8b6cc67d73047",
+      "ep/bench/utils.py": "c8b5f033722339883d468ac8ae762573d521c1140cd931203e77ffb693565dde",
+      "test/gpu_stage_recovery/precision_probe.py": "22309b603ad7b608d0e8492f8411ffb476ff1e0ba57783038ff5332f6e4e81f7",
+      "test/urma_mode_parity/split_support.py": "58faf816842a54d1499ad8e8d8c99db45337470db73c60838f86b6b365ad4049",
+      "test/urma_mode_parity/micro_support.py": "59cabb9f1a1fb7098193d9f51bd7744f40967e25f8e70f9e132cec3bc34e5483",
+      "test/urma_mode_parity/timeline_support.py": "8f94233fdb91ada1bc880ee0afd5fdabe6047036f4b9103a401e729781adefbf",
+      "test/urma_mode_parity/gpu_stage_sites.json": "5565fe81078f67d7fefc8a1471ad70e7fc821ece68c2bcd29c9ed027cd13e667",
+      "ep/tests/verbs_diag_test.cpp": "e42cda46efff3b481887623b8c1017c4143d58a0f1907f16636670e24ce330ef",
+      "ep/tests/verbs_notify_test.cpp": "c6ad255f2a0bb9f7cd55e86f773f9e3d9b55801cb914e539cc83a6f2a70b8175",
+      "ep/tests/urma_support/ep_shim.hpp": "cc261cedbf40977f933f90542abfd1c77abde0b212f0a428d8bbcf8371d1b37e",
+      "ep/tests/gpu_stage_trace_test.cpp": "eb28e487368a2bc3d82781641e4b0067168e3ef32c2eea88fd1ee1415368394f",
+      "ep/tests/fifo_stage_test.cpp": "c481dcf2cd4c183cf0ff68090683ea2238dd8ff50adfb0b7c35607e0cb1620a7",
+      "ep/tests/gpu_stage_runtime_test.cpp": "47c5f78cc34b2dbedb26009c10553aa52c7fb34a0e4de3b0b93eb85b4be4ff3f",
+      "ep/tests/gpu_stage_runtime_support/cuda_runtime.h": "353c1c1ac61f235eaff83aa3cfc12229339ea85de11f0aabe03e231e8c178681"
+    },
+    "kernel": "6.6.0-145.3.34.165.oe2403sp3.aarch64",
+    "torch": "2.6.0+metax3.7.0.7",
+    "libraries": {
+      "libmcruntime.so": "bef5663d8c72272bccd8e2f23acc33345876a67c6325644285dff27737938807",
+      "libibverbs.so.1.14.50.0": "699c20b05cb69ad7ebe17b9efe4508b0f506b2d427e40d82e3e3f57d14ce1135"
+    },
+    "mode": "normal",
+    "repeats": 1,
+    "warmups": 50,
+    "samples": 50,
+    "no_profile": true,
+    "profile_only": false,
+    "hca": "rocep40s0f0",
+    "ifname": "enp33s0",
+    "gpu": "0",
+    "cpu_light": false,
+    "cpu_diagnostics": false,
+    "timeline": false,
+    "gid_index": 3,
+    "normal_tokens": 4096,
+    "stage_suite": false,
+    "gpu_stages": false,
+    "gpu_stage_mode": "all"
+  },
+  "error": null
+}
