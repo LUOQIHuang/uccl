@@ -1,0 +1,11 @@
+DIAG_ROOT=/home/h00918771
+DIAG_PYTHON=/home/h00918771/metax_dev/venv-maca-py312/bin/python
+Traceback (most recent call last):
+  File "/home/h00918771/uccl-ep-xpu-integration-new/test/urma_mode_parity/driver.py", line 342, in <module>
+    if __name__=='__main__': main()
+                             ^^^^^^
+  File "/home/h00918771/uccl-ep-xpu-integration-new/test/urma_mode_parity/driver.py", line 280, in main
+    legacy.pair(args,dict(stage='ready',job=args.job,mode=mode,rc=rc))
+  File "/home/h00918771/uccl-ep-xpu-integration-new/test/verbs_diag/driver.py", line 53, in pair
+    raise RuntimeError(f'PAIR_STOP local={payload!r} peer={peer!r}')
+RuntimeError: PAIR_STOP local={'stage': 'ready', 'job': 'urma_stage_01_baseline_r03', 'mode': 'normal', 'rc': 1} peer={'stage': 'ready', 'job': 'urma_stage_01_baseline_r03', 'mode': 'normal', 'rc': 1}
