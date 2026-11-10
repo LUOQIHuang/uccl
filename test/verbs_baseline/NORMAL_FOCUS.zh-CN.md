@@ -83,6 +83,37 @@ bash test/verbs_baseline/run_normal_focus.sh --action run --part all \
 
 窗口短可先--part notify，只完成前三个任务并立即收集；之后用同一JOB、ROOT改--part normal，只完成后两个。不要对已有成功目录再次运行同一part；失败重跑换JOB尾号。支持--variant current用于另行验证的新base，但默认archived不自动构建；不要把两种variant混在同一JOB。
 
+### 5.1 当前下一步：通知观察器失败后，独立完成Normal
+
+已上传的verbs_normal_focus_01在notify_r01的FP8 GPU flag观察点报错`micro GPU observer timeout/payload mismatch`，两端前三个微测点通过，但该轮未完成。由于脚本遇错即停，notify_r02/r03、BF16以及baseline/cpu均未运行。不要再次运行`--part all`，下一步先独立运行Normal的baseline和cpu，不执行通知微测及其GPU观察器。该步骤不修复观察器，也不将失败微测标记为通过。
+
+两端先执行第3节的环境设置，保留原BUILD、GID、PLAN、运行库和模块；202设置RANK=0，204设置RANK=1。使用原JOB和ROOT可将尚未运行的Normal任务补到本次结果目录；两端确认`${JOB}_baseline/node${RANK}`和`${JOB}_cpu/node${RANK}`均不存在。若其中已有运行目录，不覆盖或删除，改用两端一致的新JOB，并相应更新ROOT。
+
+202先启动，180秒内在204运行以下相同命令（仅RANK不同）：
+
+```bash
+JOB=verbs_normal_focus_01
+ROOT=/home/h00918771/metax_dev/verbs_normal_focus_results/$JOB
+test ! -e "$ROOT/${JOB}_baseline/node${RANK}"
+test ! -e "$ROOT/${JOB}_cpu/node${RANK}"
+bash test/verbs_baseline/run_normal_focus.sh --action run --part normal \
+  --node-rank "$RANK" --master-addr 141.61.17.202 \
+  --job "$JOB" --build-dir "$BUILD" --output "$ROOT" \
+  --gid-index "$GID" --matched-plan "$PLAN" --micro-cpus auto --port 32680
+```
+
+入口会先做本地check，再依次运行baseline和cpu；无需重新编译。每项预热50次、采样50次，丢弃首个采样，保留49个有效样本。两端两个任务均应`CASE_END rc=0`，最后打印`NORMAL_FOCUS_ALL_PASSED part=normal`；这个标志只表示本次选择的Normal部分通过，不表示此前通知微测已完成。任一任务报错即停止，按第6节收集日志。
+
+两端结束后分别执行第6节的收集命令，提供完整`test/verbs_baseline/results/$JOB`目录。新增数据重点是`${JOB}_baseline/node0`、`node1`及`${JOB}_cpu/node0`、`node1`，连同console中的baseline.log、cpu.log和check.log；保留此前失败的notify_r01日志。两端结果齐全后，只汇总Normal：
+
+```bash
+DEST="$PWD/test/verbs_baseline/results/$JOB"
+"$PY" test/verbs_baseline/summarize_normal_focus.py \
+  --root "$DEST" --job "$JOB" --part normal --output "$DEST/summary_normal"
+```
+
+此时不要使用第7节默认all汇总，也不传`--urma-results`：通知三轮仍不完整。本次要获得未经CPU统计的Normal API时延和轻量CPU准备、提交、完成观察统计，并检查统计扰动；这些CPU累计时间不能直接相加为GPU/CPU重叠执行的完整关键路径。
+
 ## 6. 收集两端日志；失败也收集
 
 ```bash
