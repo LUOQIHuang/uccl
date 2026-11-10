@@ -49,4 +49,10 @@ class KernelTests(unittest.TestCase):
             path=Path(tmp)/'value';self.assertIn('error',m.read_file(path));path.write_text('abcdefgh')
             with patch.object(m,'LIMIT',4):self.assertEqual(m.read_file(path),dict(path=str(path),text='abcd',truncated=True))
 
+    @unittest.skipUnless(Path('/proc/sys/kernel/panic').is_file(),'Linux sysctl interface required')
+    def test_linux_sysctl_small_reads(self):
+        result=m.read_file('/proc/sys/kernel/panic')
+        self.assertNotIn('error',result)
+        self.assertTrue(result['text'].strip().lstrip('-').isdigit())
+
 if __name__=='__main__':unittest.main()

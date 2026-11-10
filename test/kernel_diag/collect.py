@@ -21,7 +21,15 @@ LIMIT=4*1024*1024
 def read_file(path):
     path=Path(path)
     try:
-        with path.open('rb') as f:data=f.read(LIMIT+1)
+        # proc/sys handlers may reject a multi-MiB read request with ENOMEM
+        # even when the machine has ample RAM. Bound individual read sizes too.
+        chunks=[];size=0
+        with path.open('rb',buffering=0) as f:
+            while size<LIMIT+1:
+                block=f.read(min(4096,LIMIT+1-size))
+                if not block:break
+                chunks.append(block);size+=len(block)
+        data=b''.join(chunks)
         return dict(path=str(path),text=data[:LIMIT].decode('utf8','replace'),truncated=len(data)>LIMIT)
     except OSError as exc:return dict(path=str(path),error=str(exc))
 
