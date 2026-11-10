@@ -32,6 +32,10 @@ class CampaignTests(unittest.TestCase):
         ns['measure'](lambda:events.append('fn'),'dispatch_fp8_chunk32')
         self.assertEqual(events,['fn','fn','layout_begin','begin','fn','fn','fn','end'])
         self.assertIn('verbs_phases.jsonl',[x[0] for x in rows])
+        events.clear();rows.clear();ns['cpu_light']=True
+        ns['measure'](lambda:events.append('fn'),'dispatch_fp8_chunk32')
+        self.assertEqual(events,['fn','fn','begin','fn','fn','fn','end'])
+        self.assertNotIn('write_layout.jsonl',[x[0] for x in rows])
 
     def test_real_micro_protocol_all_jobs_and_campaign_validation(self):
         with tempfile.TemporaryDirectory() as tmp:

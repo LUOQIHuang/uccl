@@ -18,10 +18,12 @@ def passed(case):
 from timeline_support import timeline_rows
 
 
-def summarize(root,output):
+def summarize(root,output,include_timeline=True):
     raw_runs=[];timeline=[];coverage=[];seen=collections.defaultdict(set);provenance=collections.defaultdict(set);micro_jobs=set();trace_jobs=set();groups=collections.defaultdict(list)
     for setup_path in sorted(root.glob('*/node*/setup.json')):
-        node=setup_path.parent;rank=int(node.name[-1]);setup=read(setup_path);c=setup['fingerprint'];host=read(node/'host.json')
+        node=setup_path.parent;rank=int(node.name[-1]);setup=read(setup_path);c=setup['fingerprint']
+        if not include_timeline and c.get('suite')!='verbs_notify_micro':continue
+        host=read(node/'host.json')
         if setup['error']:raise ValueError('failed setup '+str(node))
         kind='micro' if c.get('suite')=='verbs_notify_micro' else 'timeline'
         seen[(node.parent.name,kind)].add(rank)
@@ -54,7 +56,7 @@ def summarize(root,output):
             if not s['validation'] or any(not math.isclose(s[k],v,rel_tol=1e-9) for k,v in stats.items()):raise ValueError('saved/raw summary mismatch')
             row=dict(node=node.name,host=host['host'],job=c['job'],label=p['label'],operation=op,visible=p['visible'],bytes=g['bytes'],cq_mean_us=statistics.mean(r['cq_span_ns']/1000 for r in rr if r['used']),tx_GBps=32*g['bytes']/stats['mean_us']/1000 if op!=1 else '',**stats)
             raw_runs.append(row);key=(node.name,p['label'],g['bytes'],g['src_mod'],g['dst_mod'],common.digest(pair),common.digest(native));groups[key].append(row)
-    if len(micro_jobs)!=3 or len(trace_jobs)!=1 or len(seen)!=4 or any(v!={0,1} for v in seen.values()) or any(len(provenance[r])!=1 for r in (0,1)):raise ValueError('need three matched micro jobs + one trace job, both nodes, stable build/kernel/boot')
+    if len(micro_jobs)!=3 or len(trace_jobs)!=int(include_timeline) or len(seen)!=3+int(include_timeline) or any(v!={0,1} for v in seen.values()) or any(len(provenance[r])!=1 for r in (0,1)):raise ValueError('need matched micro/trace jobs, both nodes, stable build/kernel/boot')
     if any({read(p)['fingerprint']['repeat'] for p in root.glob('*/'+node+'/setup.json') if read(p)['fingerprint'].get('suite')=='verbs_notify_micro'}!={1,2,3} for node in ('node0','node1')):raise ValueError('missing repeat/order configuration')
     aggregate=[]
     for key,rr in sorted(groups.items()):

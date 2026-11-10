@@ -15,7 +15,7 @@ def summarize(root,job,output):
         for kind in ('baseline','cpu'):
             node=root/(job+'_'+kind)/f'node{rank}';c=read(node/'setup.json')
             if c['error']:raise ValueError('setup failed')
-            c=c['fingerprint'];verbs=c.get('variant')=='current'
+            c=c['fingerprint'];verbs=c.get('variant') in ('current','archived')
             case=node/(('cpu_diagnostic' if kind=='cpu' else 'r01_baseline')+'/normal') if verbs else node/'normal'
             status=read(case/'status.json')
             if status['rc'] or not status['checks'] or not all(status['checks'].values()):raise ValueError('failed case')

@@ -34,7 +34,8 @@ def parser():
     p.add_argument('--micro-threads',type=int,choices=(1,4),default=4)
     p.add_argument('--micro-cpus',default='auto')
     p.add_argument('--gpu-pci',default='0000:a1:00.0')
-    p.add_argument('--variant', choices=('original', 'current'), default='original')
+    p.add_argument('--variant', choices=('original', 'current','archived'), default='original')
+    p.add_argument('--micro-plan',type=Path,help='matched notification plan from existing URMA results')
     p.add_argument('--module', type=Path, default=dev / 'urma_after_kernel_20261029/diag/ep_host_atomic_4ed19a6b/module/ep.abi3.so')
     p.add_argument('--build-dir', type=Path, default=dev / 'verbs_baseline_build/current_v1')
     p.add_argument('--build-jobs', type=int, default=4)
@@ -69,8 +70,9 @@ def parser():
         p.error('--action build requires --variant current; original uses the previously validated binary')
     args.backend = 'verbs'
     if getattr(args,'gid_index',None) is not None and not 0<=getattr(args,'gid_index',None)<256:p.error('invalid GID index')
-    if getattr(args,'cpu_diagnostics',False) and (args.variant!='current' or args.mode!='normal' or not args.no_profile):p.error('CPU diagnostics requires current Normal --no-profile')
-    if args.action=='micro' and (args.variant!='current' or args.mode!='normal' or getattr(args,'gid_index',None) is None or not args.micro_layout):p.error('micro requires current Normal, --gid-index and --micro-layout')
+    if getattr(args,'cpu_diagnostics',False) and (args.variant not in ('current','archived') or args.mode!='normal' or not args.no_profile):p.error('CPU diagnostics requires current/archived Normal --no-profile')
+    if args.action=='micro' and (args.variant not in ('current','archived') or args.mode!='normal' or getattr(args,'gid_index',None) is None or not (args.micro_layout or args.micro_plan)):p.error('micro requires current/archived Normal, --gid-index and layout/plan')
+    if args.micro_plan and args.micro_suite!='notify':p.error('--micro-plan is for notification micro only')
     if args.cpu_light and (not args.cpu_diagnostics or args.timeline):p.error('--cpu-light requires CPU diagnostics without timeline')
     if args.timeline and not args.cpu_diagnostics:p.error('--timeline requires --cpu-diagnostics')
     if args.stage_suite and (args.variant!='current' or args.mode!='normal' or not args.no_profile or args.repeats!=1):p.error('--stage-suite requires current Normal --no-profile --repeats 1')
@@ -150,7 +152,11 @@ def build(args):
 def preflight(args):
     if args.expected_kernel and os.uname().release != args.expected_kernel:
         raise RuntimeError('KERNEL_MISMATCH: ' + os.uname().release)
-    if args.variant == 'current':
+    if args.variant == 'archived':
+        import archived_base
+        if os.uname().release!=archived_base.KERNEL:raise RuntimeError('ARCHIVED_RECIPE_KERNEL_MISMATCH')
+        module,data,identity=archived_base.load(args.build_dir)
+    elif args.variant == 'current':
         data = json.loads((args.build_dir / 'manifest.json').read_text())
         module = args.build_dir / data['module']
         if data['sources'] != common.sources() or data['flags'] != build_flags(args) or common.sha(module) != data['module_sha']:
@@ -176,8 +182,10 @@ def preflight(args):
         port=Path('/sys/class/infiniband')/args.hca/'ports/1'
         if not (port/'gids'/str(getattr(args,'gid_index',None))).read_text().strip().replace(':','').strip('0'):raise RuntimeError('selected GID is zero')
         if 'v2' not in (port/'gid_attrs/types'/str(getattr(args,'gid_index',None))).read_text().lower():raise RuntimeError('campaign requires RoCE v2 GID')
-    if args.variant == 'current' and any('/liburma.so' in p for p in info['loaded_libraries']):
+    if args.variant in ('current','archived') and any('/liburma.so' in p for p in info['loaded_libraries']):
         raise RuntimeError('PURE_VERBS_BUILD_LOADED_URMA: inspect runtime library environment')
+    if args.variant=='archived' and (info.get('gpu_stage_version')!=0 or info.get('queue_backend')!='fifo'):
+        raise RuntimeError('ARCHIVE_RUNTIME_NOT_TRACE_OFF_FIFO')
     return module, data, identity, info, probe.stdout + probe.stderr
 
 

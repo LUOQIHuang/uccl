@@ -16,8 +16,12 @@ class NotificationTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             root=Path(tmp);layout=root/'layout.jsonl'
             layout.write_text('\n'.join(json.dumps(dict(label=l,modulus=4096,dropped=0,writes=[dict(bytes=8192,src_mod=12,dst_mod=20,lane=0,count=10)])) for l in LABELS[1:3]))
+            from micro_support import select_geometries
+            from normal_notify_support import points as urma_points
+            matched=root/'matched.json';geometry=select_geometries(layout)
+            matched.write_text(json.dumps(dict(geometries=geometry,points=urma_points(geometry))))
             boot=root/'boot.py';boot.write_text("""
-import json,os,runpy,sys,types,subprocess
+import json,os,runpy,sys,types,subprocess,hashlib
 from pathlib import Path
 sys.path[:0]=[sys.argv[1],str(Path(sys.argv[1]).parent/'urma_mode_parity')]
 import phase_support
@@ -34,7 +38,7 @@ class Session:
         return json.dumps(dict(span_ns=10000,cq_span_ns=9000,write_bytes=0 if self.op==1 else 32*self.size,cqes=64 if self.op==2 else 32,retired=64 if self.op==2 else 32))
     def validate(self,seq):assert seq+1==self.seq
     def close(self):pass
-c=types.ModuleType('common');c.phase_support=phase_support
+c=types.ModuleType('common');c.phase_support=phase_support;c.sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
 c.load_extension=lambda p:(types.SimpleNamespace(VerbsWriteSession=Session),dict(module_sha='sha'))
 sys.modules['common']=c
 os.sched_setaffinity=lambda *a:None
@@ -51,10 +55,10 @@ runpy.run_path(str(Path(sys.argv[1])/'notify_worker.py'),run_name='__main__')
                 processes=[];logs=[];job=f'job_notify_r0{repeat}'
                 try:
                     for rank in (0,1):
-                        node,c=setup(job,rank,suite='verbs_notify_micro',threads=4,repeat=repeat,warmups=20,samples=50)
+                        node,c=setup(job,rank,suite='verbs_notify_micro',threads=4,repeat=repeat,warmups=20,samples=50,matched_plan_sha=common.sha(matched))
                         case=node/'micro';case.mkdir();placement=dict(workers=[0,1,2,3],controller=4)
                         (node/'affinity.json').write_text(json.dumps(placement));(case/'status.json').write_text('{"rc":0,"checks":{"done":true}}')
-                        req=dict(module='fake',module_sha='sha',rank=rank,threads=4,master_addr='127.0.0.1',port=port,warmups=20,samples=50,placement=placement,layout=str(layout),fingerprint=c,hca='fake',gid_index=3)
+                        req=dict(module='fake',module_sha='sha',rank=rank,threads=4,master_addr='127.0.0.1',port=port,warmups=20,samples=50,placement=placement,layout=str(layout),matched_plan=str(matched),fingerprint=c,hca='fake',gid_index=3)
                         (case/'request.json').write_text(json.dumps(req));log=(case/'bench.log').open('w');logs.append(log)
                         processes.append(subprocess.Popen([sys.executable,str(boot),str(HERE)],env=dict(os.environ,VM_CASE=str(case)),stdout=log,stderr=subprocess.STDOUT))
                     for rank,proc in enumerate(processes):
@@ -77,6 +81,8 @@ runpy.run_path(str(Path(sys.argv[1])/'notify_worker.py'),run_name='__main__')
                     windows.append(dict(label=label,index=0,origin_ns=0,dropped=0,events=events))
                 (case/'verbs_timeline.jsonl').write_text('\n'.join(json.dumps(w) for w in windows))
             runs,agg,trace=summarize(root,root/'summary');self.assertEqual((len(runs),len(agg),len(trace)),(48,16,4))
+            only_micro=summarize(root,root/'micro_only',include_timeline=False)
+            self.assertEqual(tuple(len(x) for x in only_micro),(48,16,0))
             self.assertTrue(all(r['tx_GBps']=='' for r in agg if r['operation']==1))
             r=trace[0];self.assertAlmostEqual(sum(r[k] for k in r if '_to_' in k and k.endswith('_us') and k not in ('collect_to_ack_slot_us','ack_slot_to_tail_published_us')),r['collect_to_ack_slot_us'])
             path=root/'job_notify_r01/node0/micro/micro_samples.jsonl';samples=[json.loads(x) for x in path.read_text().splitlines()];samples[0]['write_bytes']+=1;path.write_text('\n'.join(json.dumps(x) for x in samples))

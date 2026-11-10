@@ -16,7 +16,12 @@ def run(args,preflight,environment,snapshot):
     try:
         module,manifest,identity,runtime,log=preflight(args)
         if not runtime['verbs_micro']:raise RuntimeError('VERBS_MICRO_REQUIRES_REBUILD')
-        select_geometries(args.micro_layout);placement=affinity(args)
+        if getattr(args,'micro_plan',None):
+            from notify_support import matched_geometries
+            matched_geometries(args.micro_plan)
+            meta['matched_plan_sha']=common.sha(args.micro_plan)
+        else:select_geometries(args.micro_layout)
+        placement=affinity(args)
         meta.update(identity=identity,torch=runtime['torch'],libraries=runtime['selected_library_hashes'])
         for name,data in [('module_manifest.json',manifest),('runtime.json',runtime),('affinity.json',placement)]:
             (root/name).write_text(json.dumps(data,indent=2))
@@ -31,8 +36,12 @@ def run(args,preflight,environment,snapshot):
     common.legacy.pair(args,dict(stage='micro_ready',job=args.job,rc=rc))
     request=dict(module=str(module),module_sha=runtime['module_sha'],rank=args.node_rank,threads=args.micro_threads,
         master_addr=args.master_addr,port=args.port+1,warmups=args.warmups,samples=args.samples,
-        placement=placement,suite=args.micro_suite,layout=str(args.micro_layout.resolve()),fingerprint=meta,hca=args.hca,gid_index=args.gid_index)
-    (case/'request.json').write_text(json.dumps(request,indent=2));(case/'layout_input.jsonl').write_bytes(args.micro_layout.read_bytes())
+        placement=placement,suite=args.micro_suite,layout=str(args.micro_layout.resolve()) if args.micro_layout else None,fingerprint=meta,hca=args.hca,gid_index=args.gid_index)
+    if getattr(args,'micro_plan',None):
+        request['matched_plan']=str((case/'matched_plan.json').resolve())
+        (case/'matched_plan.json').write_bytes(args.micro_plan.read_bytes())
+    (case/'request.json').write_text(json.dumps(request,indent=2))
+    if args.micro_layout:(case/'layout_input.jsonl').write_bytes(args.micro_layout.read_bytes())
     env=environment(args);env['VM_CASE']=str(case)
     for key,name in [('TMPDIR','tmpdir'),('XDG_CACHE_HOME','cache')]:
         (case/name).mkdir();env[key]=str(case/name)

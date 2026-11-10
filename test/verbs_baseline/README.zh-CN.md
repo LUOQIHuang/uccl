@@ -1,4 +1,4 @@
-当前阶段对照：[与URMA对应的Normal GPU/CPU插桩及运行步骤](STAGE_BREAKDOWN.zh-CN.md)。
+当前发行版内核窗口：[复用旧base的通知四点＋轻量CPU对照](NORMAL_FOCUS.zh-CN.md)。
 
 # RDMA / verbs 固定配置基线与 GPU 阶段分析
 

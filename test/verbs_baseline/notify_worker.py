@@ -7,7 +7,7 @@ import subprocess
 import time
 import common
 from micro_support import Peer,select_geometries
-from notify_support import points
+from notify_support import points,matched_geometries
 faulthandler.enable()
 case=Path(os.environ['VM_CASE']);r=json.loads((case/'request.json').read_text());rank=r['rank']
 ep,runtime=common.load_extension(Path(r['module']))
@@ -17,8 +17,11 @@ def append(name,row):
     with (case/name).open('a') as f:f.write(json.dumps(row)+'\n')
 try:
     peer.agree('fingerprint',r['fingerprint'])
-    g=select_geometries(r['layout']) if rank==0 else None;other=peer.exchange('geometry',g)
+    if r.get('matched_plan') and common.sha(Path(r['matched_plan']))!=r['fingerprint']['matched_plan_sha']:raise RuntimeError('matched plan SHA changed')
+    local_geometry=matched_geometries(Path(r['matched_plan'])) if r.get('matched_plan') else select_geometries(r['layout'])
+    g=local_geometry if rank==0 else None;other=peer.exchange('geometry',g)
     if rank==1:g=other
+    if r.get('matched_plan') and g!=local_geometry:raise RuntimeError('matched geometry differs between peers')
     plan=points(g,r['fingerprint']['repeat'])
     (case/'plan.json').write_text(json.dumps(dict(geometries=g,points=plan),indent=2))
     placement=peer.exchange('placement',r['placement'])

@@ -14,6 +14,7 @@ HERE = Path(__file__).resolve().parent
 REPO = HERE.parents[1]
 sys.path.append(str(HERE.parent / 'verbs_diag'))
 sys.path.append(str(HERE.parent / 'urma_mode_parity'))
+sys.path.append(str(HERE.parent / 'gpu_stage_recovery'))
 import phase_support
 import profile_support
 
@@ -67,6 +68,9 @@ def function_source(source, name):
 def prepare(root, variant):
     """Freeze compatible benchmark Python; never alter the user's checkout."""
     revision = git('rev-parse', BENCH_REVISION + '^{commit}').strip() if variant == 'original' else None
+    if variant=='archived':
+        from archived_base import REVISION
+        revision=git('rev-parse',REVISION+'^{commit}').strip()
     original = {}
     for name in FILES:
         source = git('show', revision + ':ep/bench/' + name) if revision else (REPO / 'ep/bench' / name).read_text()
