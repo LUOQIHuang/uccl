@@ -24,6 +24,7 @@ void UrmaTransport::configure(bool normal, size_t channels) {
   UrmaMode requested{normal, normal ? channels : 1};
   requested.validate();
   ll_relaxed_write_ = urma_ll_relaxed_write_from_env();
+  normal_relaxed_write_ = urma_normal_relaxed_write_from_env();
   normal_completion_ = urma_normal_completion_from_env();
   mode_ = requested;
 }
@@ -317,7 +318,7 @@ void UrmaTransport::init(ProxyCtx& ctx) {
         "[URMA] mode=%s channels=%zu endpoints=%zu batch=linked capacity=%zu wire=%u write_order=%s atomic_fence=per_request normal_completion=%s\n",
         mode_.normal ? "normal" : "low_latency", mode_.channels,
         jetties_.size(), capacity(), UrmaMode::kWireVersion,
-        mode_.normal || ll_relaxed_write_ ? "relax" : "strong",
+        (mode_.normal ? normal_relaxed_write_ : ll_relaxed_write_) ? "relax" : "strong",
         urma_normal_completion_name(normal_completion_));
   } catch (...) {
     destroy();
@@ -653,10 +654,11 @@ void UrmaTransport::prepare(PreparedWr& out, Peer& peer, size_t lane,
     out.src.tseg = main_tseg_;
     if(mode_.normal)uccl::urma_layout::record(request.bytes,out.src.addr,out.dst.addr,lane);
     out.wr.opcode = URMA_OPC_WRITE;
-    // Normal uses the tested relaxed data path. Notifying FADDs retain a
-    // strong fence on the SAME lane. LL defaults to conservative ordering;
-    // only the explicit diagnostic A/B can select relaxed LL WRITEs.
-    out.wr.flag.bs.place_order = mode_.normal || ll_relaxed_write_ ? URMA_RELAX_ORDER : URMA_STRONG_ORDER;
+    // Diagnostic switches change only WRITE placement. Normal defaults to
+    // RELAX and LL to STRONG. FADD placement/fence and lane selection are
+    // independent and remain unchanged.
+    out.wr.flag.bs.place_order = (mode_.normal ? normal_relaxed_write_ : ll_relaxed_write_)
+        ? URMA_RELAX_ORDER : URMA_STRONG_ORDER;
     out.wr.rw.src.sge = &out.src;
     out.wr.rw.src.num_sge = 1;
     out.wr.rw.dst.sge = &out.dst;

@@ -320,6 +320,8 @@ int urma_poll_jfc(urma_jfc_t* j, int max, urma_cr_t* out) {
 #ifndef UCCL_URMA_MICRO_TEST
 int main() {
   unsetenv("UCCL_URMA_NORMAL_COMPLETION");
+  unsetenv("UCCL_URMA_NORMAL_WRITE_ORDER");
+  unsetenv("UCCL_URMA_LL_WRITE_ORDER");
   ProxyCtx ctx;
   // Failure before a context exists must release global initialization
   // ownership.
@@ -729,13 +731,16 @@ int main() {
   unsetenv("UCCL_URMA_NORMAL_COMPLETION");
   // Exercise opt-in diagnostics through the real submission and completion
   // code in both modes; existing tests above exercise the disabled path.
-  // A/B changes only LL WRITE ordering. Verify the actual submitted SDK WRs,
+  // A/B changes only the selected mode's WRITE ordering. Verify SDK WRs,
   // not just the parser; configuration remains frozen if the env changes.
-  for (auto const* order : {"strong","relax"}) for (bool normal : {true,false}) {
+  for (auto const* order : {"strong","relax"})
+  for (auto const* normal_order : {"strong","relax"}) for (bool normal : {true,false}) {
     setenv("UCCL_URMA_LL_WRITE_ORDER",order,1);
+    setenv("UCCL_URMA_NORMAL_WRITE_ORDER",normal_order,1);
     UrmaTransport left,right;
     left.configure(normal,normal ? 8 : 1); right.configure(normal,normal ? 8 : 1);
     unsetenv("UCCL_URMA_LL_WRITE_ORDER");
+    unsetenv("UCCL_URMA_NORMAL_WRITE_ORDER");
     left.init(ctx); right.init(ctx);
     left.register_main_buffer(a,sizeof(a),2); right.register_main_buffer(b,sizeof(b),2);
     left.register_atomic_buffer(ac,sizeof(ac),2); right.register_atomic_buffer(bc,sizeof(bc),2);
@@ -746,9 +751,11 @@ int main() {
     size_t seen=posted_ops.size();
     left.post_batch(1,{write,atomic});
     assert(posted_ops.size()==seen+2);
-    assert(posted_ops[seen].order==unsigned(normal || std::string(order)=="relax" ? URMA_RELAX_ORDER : URMA_STRONG_ORDER));
+    assert(posted_ops[seen].order==unsigned(std::string(normal ? normal_order : order)=="relax" ? URMA_RELAX_ORDER : URMA_STRONG_ORDER));
     assert(posted_ops[seen+1].order==URMA_STRONG_ORDER);
     assert(posted_ops[seen+1].fence==URMA_FENCE_ENABLE);
+    assert(posted_ops[seen].complete==1 && posted_ops[seen+1].complete==1);
+    assert(posted_ops[seen].comp_order==0 && posted_ops[seen+1].comp_order==0);
     assert(posted_ops[seen].jetty==posted_ops[seen+1].jetty);
     TransportCompletion out[4]; assert(left.poll(out,4)==2);
     left.post_barrier_atomic_add(1,102,0,1);
@@ -760,6 +767,9 @@ int main() {
   setenv("UCCL_URMA_LL_WRITE_ORDER","invalid",1);
   { UrmaTransport t; rejects([&] {t.configure(false,1);}); }
   unsetenv("UCCL_URMA_LL_WRITE_ORDER");
+  setenv("UCCL_URMA_NORMAL_WRITE_ORDER","invalid",1);
+  { UrmaTransport t; rejects([&] {t.configure(true,8);}); }
+  unsetenv("UCCL_URMA_NORMAL_WRITE_ORDER");
   for (bool normal:{true,false}) {
     UrmaTransport left,right;
     left.configure(normal,normal ? 8 : 1); right.configure(normal,normal ? 8 : 1);

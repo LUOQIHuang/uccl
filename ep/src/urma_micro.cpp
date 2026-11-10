@@ -46,6 +46,8 @@ UrmaMicroSession::UrmaMicroSession(int device,size_t threads,size_t max_bytes) {
     throw std::invalid_argument("invalid URMA micro allocation configuration");
   if(urma_normal_completion_from_env()!=UrmaNormalCompletion::All)
     throw std::invalid_argument("URMA micro requires normal_completion=all");
+  if(!urma_normal_relaxed_write_from_env())
+    throw std::invalid_argument("URMA micro requires relaxed Normal WRITE; use the full Normal order A/B for STRONG");
   auto p=std::make_unique<Impl>(device,threads,max_bytes);
   p->main=uccl::gpu_p2p::allocate_device(p->total,device);
   p->main_owner=UrmaTransport::acquire_buffer_ownership(p->main,false,device);

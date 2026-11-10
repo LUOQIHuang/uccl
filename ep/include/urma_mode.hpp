@@ -17,6 +17,14 @@ inline bool urma_ll_relaxed_write_from_env() {
   throw std::invalid_argument("UCCL_URMA_LL_WRITE_ORDER must be default|strong|relax");
 }
 
+inline bool urma_normal_relaxed_write_from_env() {
+  auto const* value = std::getenv("UCCL_URMA_NORMAL_WRITE_ORDER");
+  if (!value || !*value || !std::strcmp(value,"default") || !std::strcmp(value,"relax"))
+    return true;
+  if (!std::strcmp(value,"strong")) return false;
+  throw std::invalid_argument("UCCL_URMA_NORMAL_WRITE_ORDER must be default|strong|relax");
+}
+
 enum class UrmaNormalCompletion { All, Ordered, Paired };
 inline UrmaNormalCompletion urma_normal_completion_from_env() {
   auto const* value=std::getenv("UCCL_URMA_NORMAL_COMPLETION");

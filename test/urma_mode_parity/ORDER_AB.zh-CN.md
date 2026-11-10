@@ -1,5 +1,7 @@
 # URMA下一轮：LL WRITE排序A/B与Normal纯基线
 
+**Normal WRITE强序/弱序实验请使用[新的Normal专用文档](NORMAL_ORDER_AB.zh-CN.md)。本文的`--ll-write-order`只改变LL，不能用其Normal控制任务声称已完成Normal排序A/B。**
+
 本轮针对 `urma_phase_v1` 的结果缩小变量。先补齐已存在的node1及r01_baseline日志，不要求为补文件重新占用GPU。下面的运行仅在**下一次已协调到URMA内核和设备的窗口**执行；现在只有RDMA资源时，不执行URMA guard或切内核。
 
 ## 1. 改了什么

@@ -46,9 +46,11 @@ def load_extension(module):
         actual=[Path(p).resolve() for p in loaded if '/liburma.so' in p]
         if not actual or not all(p.is_relative_to(private) for p in actual):
             raise RuntimeError(f'PRIVATE_URMA_LIBRARY_REQUIRED: {actual}')
-    return extension,dict(module=str(Path(module).resolve()),module_sha=sha(module),wire=2,torch=torch.__version__,torch_file=torch.__file__,python=sys.executable,loaded_libraries=loaded,
+    runtime_hashes={Path(p).name:sha(p) for p in loaded if Path(p).name.startswith(('libmcruntime.so','libruntime_cu.so'))}
+    return extension,dict(module=str(Path(module).resolve()),module_sha=sha(module),wire=2,torch=torch.__version__,torch_file=torch.__file__,python=sys.executable,loaded_libraries=loaded,selected_runtime_hashes=runtime_hashes,
                           phase_diagnostics=all(hasattr(extension,n) for n in ('urma_phase_enable','urma_phase_snapshot')),
                           ll_write_order=extension.get_urma_ll_write_order() if hasattr(extension,'get_urma_ll_write_order') else None,
+                          normal_write_order=extension.get_urma_normal_write_order() if hasattr(extension,'get_urma_normal_write_order') else None,
                           normal_completion=extension.get_urma_normal_completion() if hasattr(extension,'get_urma_normal_completion') else None,
                           micro_diagnostics=hasattr(extension,'UrmaMicroSession'),
                           queue_backend=extension.get_d2h_backend() if hasattr(extension,'get_d2h_backend') else None,

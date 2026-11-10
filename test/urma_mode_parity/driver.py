@@ -38,6 +38,7 @@ def build(args):
     env=os.environ.copy()
     env.pop('LD_PRELOAD',None); env.pop('UMDK_HOME',None)
     env['UCCL_URMA_LL_WRITE_ORDER']='default'
+    env['UCCL_URMA_NORMAL_WRITE_ORDER']='default'
     env['UCCL_URMA_NORMAL_COMPLETION']='all'
     flags=dict(UCCL_GPU_STAGE_TRACE=str(int(getattr(args,'gpu_stage_build',False))),USE_METAX='1',USE_URMA='1',USE_URMA_METAX='0',USE_LIBFABRIC_CXI='0',USE_DMABUF='1',MAX_NUM_GPUS='1',NUM_MAX_NVL_PEERS='1',PER_EXPERT_BATCHING=str(args.per_expert_batching),MAX_JOBS=str(args.build_jobs),URMA_INCLUDE_DIR=str(include),URMA_LIBRARY_DIR=str(args.urma_lib_dir.resolve()))
     env.update(flags)
@@ -99,6 +100,7 @@ def parser():
     p.add_argument('--phase-suite',action='store_true')
     p.add_argument('--api-only',action='store_true',help='phase suite: skip Kineto and retain whole-call samples only')
     p.add_argument('--ll-write-order',choices=('default','strong','relax'),default='default',help='diagnostic LL WRITE ordering; FADD fences unchanged')
+    p.add_argument('--normal-write-order',choices=('default','strong','relax'),default='default',help='diagnostic Normal WRITE placement; FADD, fence and completion unchanged')
     p.add_argument('--normal-completion',choices=('all','ordered','paired'),default='all',help='Normal-only completion A/B; paired suppresses eligible WRITE CQEs')
     p.add_argument('--stage-profile',action='store_true')
     p.add_argument('--save-traces',action='store_true')
@@ -137,6 +139,8 @@ def parser():
     if args.phase_suite and args.backend!='urma': p.error('phase suite currently supports URMA only')
     if args.api_only and (not args.phase_suite or args.save_traces): p.error('--api-only requires --phase-suite and excludes --save-traces')
     if args.ll_write_order!='default' and args.backend!='urma': p.error('LL WRITE order diagnostics require URMA')
+    if args.normal_write_order!='default' and (args.backend!='urma' or args.mode!='normal' or args.normal_completion!='all' or not args.api_only or args.action in ('micro','probe')):
+        p.error('Normal WRITE order A/B requires URMA Normal API-only completion=all; excludes micro/probe')
     if args.normal_completion!='all' and (args.backend!='urma' or args.mode!='normal'):
         p.error('normal completion diagnostics require --backend urma --mode normal')
     if args.collect_suite and args.action!='collect': p.error('--collect-suite requires --action collect')
@@ -170,6 +174,7 @@ def environment(args):
     if args.backend=='urma':
         env.pop('UCCL_EP_VERBS_REG',None); env.pop('UCCL_IB_HCA',None)
     env['UCCL_URMA_LL_WRITE_ORDER']=args.ll_write_order
+    env['UCCL_URMA_NORMAL_WRITE_ORDER']=getattr(args,'normal_write_order','default')
     env['UCCL_URMA_NORMAL_COMPLETION']=args.normal_completion
     env['LD_LIBRARY_PATH']=str(args.urma_lib_dir)+':'+env.get('LD_LIBRARY_PATH','')
     return env
@@ -186,6 +191,8 @@ def preflight(args):
         raise RuntimeError('PHASE_DIAGNOSTICS_REQUIRES_REBUILD')
     if args.ll_write_order!='default' and metadata.get('ll_write_order')!=args.ll_write_order:
         raise RuntimeError('LL_WRITE_ORDER_DIAGNOSTICS_REQUIRES_REBUILD')
+    if getattr(args,'normal_write_order','default')!='default' and metadata.get('normal_write_order')!=args.normal_write_order:
+        raise RuntimeError('NORMAL_WRITE_ORDER_DIAGNOSTICS_REQUIRES_REBUILD')
     if args.normal_completion!='all' and metadata.get('normal_completion')!=args.normal_completion:
         raise RuntimeError('NORMAL_COMPLETION_DIAGNOSTICS_REQUIRES_REBUILD')
     if args.capture_layout and not metadata.get('layout_diagnostics'):raise RuntimeError('LAYOUT_DIAGNOSTICS_REQUIRES_REBUILD')
@@ -260,11 +267,11 @@ def main():
     error=None; fingerprint=dict(job=args.job,backend=args.backend,mode=args.mode,shape=[args.normal_tokens,args.ll_tokens,args.hidden,args.experts,args.topk],sources_hash=support.digest(support.source_manifest()),diagnostics_hash=support.digest(support.diagnostic_manifest()),ifname=args.ifname,kernel=os.uname().release,
         phase_suite=args.phase_suite,stage_profile=args.stage_profile,save_traces=args.save_traces,
         warmups=args.warmups,samples=args.samples,ll_hook_workload=args.ll_hook_workload,
-        api_only=args.api_only,ll_write_order=args.ll_write_order,normal_completion=args.normal_completion,capture_layout=args.capture_layout,
+        api_only=args.api_only,ll_write_order=args.ll_write_order,normal_write_order=args.normal_write_order,normal_completion=args.normal_completion,capture_layout=args.capture_layout,
         dispatch_trial=args.dispatch_trial,dispatch_delay_us=args.dispatch_delay_us,delay_node=1,timeline=getattr(args,'timeline',False),gpu_stages=getattr(args,'gpu_stages',False),gpu_stage_mode=args.gpu_stage_mode,device=args.urma_device,gpu=args.gpu)
     try:
         module,manifest,info=preflight(args)
-        fingerprint.update(build_hash=support.digest({key:manifest[key] for key in ('sources','sdk','flags')}),libraries=info['libraries'],torch=info['runtime']['torch'])
+        fingerprint.update(build_hash=support.digest({key:manifest[key] for key in ('sources','sdk','flags')}),libraries=info['libraries'],runtime_libraries=info['runtime'].get('selected_runtime_hashes',{}),torch=info['runtime']['torch'])
         (root/'preflight.json').write_text(json.dumps(info,indent=2))
         (root/'build_manifest.json').write_text(json.dumps(manifest,indent=2))
         legacy.snapshot_host(root,args.hca,args.backend,args.urma_device)
@@ -322,8 +329,8 @@ def main():
         if args.backend=='urma':
             checks['native_mode']=f'[URMA] mode={mode} channels={8 if mode=="normal" else 1} endpoints={9 if mode=="normal" else 1} batch=linked' in text
             checks['device']=f': {args.urma_device}' in text
-            if args.ll_write_order!='default':
-                expected_order='relax' if mode=='normal' else args.ll_write_order
+            if args.ll_write_order!='default' or args.normal_write_order!='default':
+                expected_order=(args.normal_write_order if args.normal_write_order!='default' else 'relax') if mode=='normal' else args.ll_write_order
                 checks['write_order']=text.count('write_order='+expected_order+' atomic_fence=per_request')>=1
             if mode=='normal' and info['runtime'].get('normal_completion') is not None:
                 checks['normal_completion']=text.count('normal_completion='+args.normal_completion)>=1
