@@ -1,0 +1,400 @@
+Nov 10 06:18:18 master kernel: METAX.BA100.D0.MC.INFO get vram size 0x1000000000 from fuse
+Nov 10 06:18:18 master kernel: METAX.BA100.D0.MC.INFO mc vram size 0x1000000000
+Nov 10 06:18:18 master kernel: METAX.BA100.D0.MC.INFO pcie bar0 vram original base 0xa00000000000 size 0x1000000000
+Nov 10 06:18:18 master kernel: METAX.BA100.D0.MC.INFO pcie bar0 vram final base 0xa00000000000 size 0x1000000000 cpu visible 0x1000000000
+Nov 10 06:18:18 master kernel: METAX.BA100.D0.MC.INFO unmapped one 0x0-0xfffffffff, off 0x0 unmapped two 0x0-0x0
+Nov 10 06:18:18 master kernel: METAX.BA100.D0.BASE.INFO detected vram size 65536M, bar size 65536M
+Nov 10 06:18:18 master kernel: METAX.BA100.D0.BASE.INFO vram width 4096bits HBM
+Nov 10 06:18:18 master kernel: METAX.BA100.D0.MC.INFO buffer object driver init succeeded, dma32 0
+Nov 10 06:18:18 master kernel: METAX.BA100.D0.MC.INFO unmapped_aperture_kaddr[0] 0xffff800180000000-0xffff80117fffffff
+Nov 10 06:18:18 master kernel: METAX.MC.INFO 1664095M of (XTT + Userptr) memory available
+Nov 10 06:18:18 master kernel: METAX.BA100.D0.MC.INFO 65536M of vram memory ready
+Nov 10 06:18:18 master kernel: METAX.BA100.D0.MC.INFO 0M of MXME memory ready
+Nov 10 06:18:18 master kernel: METAX.BA100.D0.RAS.INFO sync bad pages from SMP
+Nov 10 06:18:18 master kernel: METAX.BA100.D0.MC.INFO reserved memory index 5: offset 0x0
+Nov 10 06:18:18 master kernel: METAX.BA100.D0.MC.INFO reserved memory index 6: offset 0x400000
+Nov 10 06:18:18 master kernel: METAX.BA100.D0.MC.INFO reserved memory index 7: offset 0xff3800000
+Nov 10 06:18:18 master kernel: METAX.BA100.D0.MC.INFO reserved memory index 8: offset 0x1400000
+Nov 10 06:18:18 master kernel: METAX.BA100.D0.MC.INFO reserved memory index 9: offset 0x1800000
+Nov 10 06:18:18 master kernel: METAX.BA100.D0.MC.INFO reserved memory index 10: offset 0x1c00000
+Nov 10 06:18:18 master kernel: METAX.BA100.D0.MC.INFO reserved memory index 11: offset 0x2000000
+Nov 10 06:18:18 master kernel: METAX.BA100.D0.MC.INFO reserved memory index 12: offset 0x2400000
+Nov 10 06:18:18 master kernel: METAX.BA100.D0.MC.INFO reserved memory index 13: offset 0x7400000
+Nov 10 06:18:18 master kernel: METAX.BA100.D0.MC.INFO reserved memory index 14: offset 0xc400000
+Nov 10 06:18:18 master kernel: METAX.BA100.D0.MC.INFO reserved memory index 15: offset 0xc800000
+Nov 10 06:18:18 master kernel: METAX.BA100.D0.MC.INFO reserved xtt share memory index 21: cpu_va 0xffff8000d9021000
+Nov 10 06:18:18 master kernel: METAX.BA100.D0.BASE.INFO IP block <mxc500_mc> init done!
+Nov 10 06:18:18 master kernel: METAX.BA100.D0.ATU.INFO system memory size is 0x21db2a09000, GPA starts from 0x21dc0000000
+Nov 10 06:18:18 master kernel: METAX.BA100.D0.ATU.INFO ATUL2_CTRL 0x10004 APTURE_0 BASE 0x0 TOP 0xfffffffff OFFSET 21dc0000000
+Nov 10 06:18:18 master kernel: METAX.BA100.D0.ATU.INFO ATUL2_CTRL 0x10004 APTURE_0 BASE 0x0 TOP 0xfffffffff OFFSET 21dc0000000
+Nov 10 06:18:18 master kernel: METAX.BA100.D0.HAG.INFO hag ATUL1 CTRL1 0x400080
+Nov 10 06:18:18 master kernel: METAX.BA100.D0.HAG.INFO hag init done, ATUL1 CTRL3 0x82
+Nov 10 06:18:18 master kernel: METAX.BA100.D0.HAG.INFO hag init done, ATUL1 XPID 0x0
+Nov 10 06:18:18 master kernel: METAX.BA100.D0.HAG.INFO hag init done, ATUL1 SPACE 0x4
+Nov 10 06:18:18 master kernel: METAX.BA100.D0.MC.INFO metax_kmem_init: pd_base 0x200000
+Nov 10 06:18:18 master kernel: METAX.BA100.D0.ATU.INFO KMEM PAGE BASE ENABLE (table at 0x200000) pd_pa 0x200000.
+Nov 10 06:18:18 master kernel: METAX.BA100.D0.BASE.INFO IP block <mxc500_atu> init done!
+Nov 10 06:18:18 master kernel: METAX.BA100.D0.INT.INFO ring-wptr gpu va:0x4000200000 cpu va:0xffff0a002b0ba000
+Nov 10 06:18:18 master kernel: METAX.BA100.D0.INT.INFO ringbuf gpu va 0x4000400000 cpu va 0xffff8000cba00000
+Nov 10 06:18:18 master kernel: METAX.BA100.D0.INT.INFO ringbuf gpu pa 0xa00633c0000
+Nov 10 06:18:18 master kernel: device-mapper: ioctl: lvm[5148]: dm-2 (openeuler-home) is created successfully
+Nov 10 06:18:18 master kernel: METAX.BA100.D0.INT.INFO ring-wptr addr gpu va 0x4000200000 gpu pa 0xa002b0ba000
+Nov 10 06:18:18 master kernel: METAX.BA100.D0.BASE.INFO IP block <mxc500_int> init done!
+Nov 10 06:18:18 master kernel: [drm] Initialized hibmc 1.0.0 20160828 for 0000:22:00.0 on minor 1
+Nov 10 06:18:18 master kernel: METAX.BA100.D0.BASE.INFO IP block <mxc500_sdma> init done!
+Nov 10 06:18:18 master kernel: METAX.BA100.D0.FW.INFO load /lib/firmware/metax/mxc500/vpud0_fw.bin firmware
+Nov 10 06:18:18 master kernel: METAX.BA100.D0.FW.INFO load /lib/firmware/metax/mxc500/vpue_fw.bin firmware
+Nov 10 06:18:18 master kernel: METAX.BA100.D0.FW.INFO load /lib/firmware/metax/mxc500/vpud1_fw.bin firmware
+Nov 10 06:18:18 master kernel: METAX.BA100.D0.BASE.INFO IP block <mxc500_ccx> init done!
+Nov 10 06:18:18 master kernel: METAX.BA100.D0.SMP.INFO SMP0, log_pa:c400000
+Nov 10 06:18:18 master kernel: Console: switching to colour frame buffer device 128x48
+Nov 10 06:18:18 master kernel: hisi_ptt 0000:00:01.0: enabling device (0000 -> 0002)
+Nov 10 06:18:18 master kernel: hisi_pcie_pmu 0000:00:00.0: enabling device (0000 -> 0002)
+Nov 10 06:18:18 master kernel: METAX.BA100.D0.SMP.INFO SMP1, log_pa:c800000
+Nov 10 06:18:18 master kernel: hibmc-drm 0000:22:00.0: [drm] fb0: hibmcdrmfb frame buffer device
+Nov 10 06:18:18 master kernel:  cs_system_cfg: CoreSight Configuration manager initialised
+Nov 10 06:18:18 master kernel: METAX.BA100.D0.BASE.INFO IP block <mxc500_smp> init done!
+Nov 10 06:18:18 master kernel: METAX.BA100.D0.SMP.INFO wait XSC change to be idle start 1721 wait 10 secs
+Nov 10 06:18:18 master kernel: hisi_ptt 0000:00:09.0: enabling device (0000 -> 0002)
+Nov 10 06:18:18 master kernel: hisi_pcie_pmu 0000:00:08.0: enabling device (0000 -> 0002)
+Nov 10 06:18:18 master kernel: arm-smmu-v3-pmcg arm-smmu-v3-pmcg.0.auto: option mask 0x0
+Nov 10 06:18:18 master kernel: arm_spe_pmu arm,spe-v1: probed SPEv1.3 for CPUs 0-383 [max_record_sz 128, align 64, features 0x77]
+Nov 10 06:18:18 master kernel: hisi_ptt 0000:01:01.0: enabling device (0000 -> 0002)
+Nov 10 06:18:18 master kernel: hisi_pcie_pmu 0000:01:00.0: enabling device (0000 -> 0002)
+Nov 10 06:18:18 master kernel: arm-smmu-v3-pmcg arm-smmu-v3-pmcg.0.auto: Registered PMU @ 0x0000002c08020000 using 8 counters with Individual filter settings
+Nov 10 06:18:18 master kernel: arm-smmu-v3-pmcg arm-smmu-v3-pmcg.1.auto: option mask 0x0
+Nov 10 06:18:18 master kernel: METAX.BA100.D0.SMP.INFO XSC idle now
+Nov 10 06:18:18 master kernel: METAX.BA100.D0.BASE.INFO IP block <mxc500_xcore> init done!
+Nov 10 06:18:18 master kernel: hisi_ptt 0000:01:09.0: enabling device (0000 -> 0002)
+Nov 10 06:18:18 master kernel: METAX.BA100.D0.RAS.INFO RAS CE Monitor is on
+Nov 10 06:18:18 master kernel: METAX.BA100.D0.SMI.INFO smi init ok
+Nov 10 06:18:18 master kernel: MXCD.BASE.INFO allocated 1572864 bytes for tba memory in xtt.
+Nov 10 06:18:18 master kernel: MXCD.BA100.D0.DOORBELL.INFO doorbell initialization:
+Nov 10 06:18:18 master kernel: MXCD.BA100.D0.DOORBELL.INFO doorbell base = 0xa01000000000
+Nov 10 06:18:18 master kernel: MXCD.BA100.D0.DOORBELL.INFO doorbell_id_offset = 0x00000000
+Nov 10 06:18:18 master kernel: MXCD.BA100.D0.DOORBELL.INFO db_process_ida_end = 0x00000400
+Nov 10 06:18:18 master kernel: MXCD.BA100.D0.DOORBELL.INFO doorbell vmrange size = 0x00800000
+Nov 10 06:18:18 master kernel: METAX.BA100.D0.MC.INFO aper: base a00000000000 limit a01000000000 pub size 1000000000 pri size 0 addr mask ffff000000000000
+Nov 10 06:18:18 master kernel: MXCD.TOPO.INFO Adding GPU node 4(ID: 54392) to layout
+Nov 10 06:18:19 master kernel: hisi_pcie_pmu 0000:01:08.0: enabling device (0000 -> 0002)
+Nov 10 06:18:19 master kernel: arm-smmu-v3-pmcg arm-smmu-v3-pmcg.1.auto: Registered PMU @ 0x0000002d08020000 using 8 counters with Individual filter settings
+Nov 10 06:18:19 master kernel: arm-smmu-v3-pmcg arm-smmu-v3-pmcg.2.auto: option mask 0x0
+Nov 10 06:18:19 master kernel: MXCD.BA100.D0.TOPO.INFO Added [157] GPU cache entries
+Nov 10 06:18:19 master kernel: MXCD.TOPO.INFO Update layout SYSFS entries
+Nov 10 06:18:19 master kernel: hisi_ptt 0000:80:01.0: enabling device (0000 -> 0002)
+Nov 10 06:18:19 master kernel: hisi_pcie_pmu 0000:80:00.0: enabling device (0000 -> 0002)
+Nov 10 06:18:19 master kernel: arm-smmu-v3-pmcg arm-smmu-v3-pmcg.2.auto: Registered PMU @ 0x0000002000020000 using 8 counters with Individual filter settings
+Nov 10 06:18:19 master kernel: arm-smmu-v3-pmcg arm-smmu-v3-pmcg.3.auto: option mask 0x0
+Nov 10 06:18:19 master kernel: EXT4-fs (nvme0n1p2): mounted filesystem 8e19fa07-433e-4304-993f-cd34623be04f r/w with ordered data mode. Quota mode: none.
+Nov 10 06:18:19 master kernel: hisi_ptt 0000:80:09.0: enabling device (0000 -> 0002)
+Nov 10 06:18:19 master kernel: hisi_pcie_pmu 0000:80:08.0: enabling device (0000 -> 0002)
+Nov 10 06:18:19 master kernel: arm-smmu-v3-pmcg arm-smmu-v3-pmcg.3.auto: Registered PMU @ 0x0000002800020000 using 8 counters with Individual filter settings
+Nov 10 06:18:19 master kernel: arm-smmu-v3-pmcg arm-smmu-v3-pmcg.4.auto: option mask 0x0
+Nov 10 06:18:19 master kernel: hisi_ptt 0000:81:01.0: enabling device (0000 -> 0002)
+Nov 10 06:18:20 master kernel: MXCD.BA100.D0.RINGBUF.INFO alloc private memory size 1c000000
+Nov 10 06:18:20 master kernel: hisi_pcie_pmu 0000:81:00.0: enabling device (0000 -> 0002)
+Nov 10 06:18:20 master kernel: arm-smmu-v3-pmcg arm-smmu-v3-pmcg.4.auto: Registered PMU @ 0x0000003002c20000 using 8 counters with Individual filter settings
+Nov 10 06:18:20 master kernel: arm-smmu-v3-pmcg arm-smmu-v3-pmcg.5.auto: option mask 0x0
+Nov 10 06:18:20 master kernel: hisi_ptt 0000:81:09.0: enabling device (0000 -> 0002)
+Nov 10 06:18:20 master kernel: ubase 00003: Adding to iommu group 0
+Nov 10 06:18:20 master kernel: hisi_pcie_pmu 0000:81:08.0: enabling device (0000 -> 0002)
+Nov 10 06:18:20 master kernel: arm-smmu-v3-pmcg arm-smmu-v3-pmcg.5.auto: Registered PMU @ 0x0000003200020000 using 8 counters with Individual filter settings
+Nov 10 06:18:20 master kernel: arm-smmu-v3-pmcg arm-smmu-v3-pmcg.6.auto: option mask 0x0
+Nov 10 06:18:20 master kernel: ubase 00003: dma_configure ret = 0
+Nov 10 06:18:20 master kernel: ubase 00003: Sync request entity enable msg, enable=1
+Nov 10 06:18:20 master kernel: ubase 00003: Change the entity status to normal
+Nov 10 06:18:20 master kernel: ubase 00003: (pid 4708) cmdq handshake1 = 0x0.
+Nov 10 06:18:20 master kernel: ubase 00003: (pid 4708) The firmware version is 6.0.21.27
+Nov 10 06:18:20 master kernel: ubase 00003: (pid 4708) udev cap_bits[0] = 0x1000201
+Nov 10 06:18:20 master kernel: ubase 00003: (pid 4708) udev cap_bits[1] = 0x0
+Nov 10 06:18:20 master kernel: ubase 00003: (pid 4708) udev cap_bits[2] = 0x0
+Nov 10 06:18:20 master kernel: ubase 00003: (pid 4708) using default public jetty count(1024).
+Nov 10 06:18:20 master kernel: ubase 00003: device id alloc success, id: 20480.
+Nov 10 06:18:20 master kernel: arm-smmu-v3-pmcg arm-smmu-v3-pmcg.6.auto: Registered PMU @ 0x0000006c08020000 using 8 counters with Individual filter settings
+Nov 10 06:18:20 master kernel: ubase 00003: register share port at 0 success
+Nov 10 06:18:20 master kernel: arm-smmu-v3-pmcg arm-smmu-v3-pmcg.7.auto: option mask 0x0
+Nov 10 06:18:20 master kernel: ubase 00005: Adding to iommu group 1
+Nov 10 06:18:20 master kernel: arm-smmu-v3-pmcg arm-smmu-v3-pmcg.7.auto: Registered PMU @ 0x0000006d08020000 using 8 counters with Individual filter settings
+Nov 10 06:18:20 master kernel: arm-smmu-v3-pmcg arm-smmu-v3-pmcg.8.auto: option mask 0x0
+Nov 10 06:18:20 master kernel: ubase 00005: dma_configure ret = 0
+Nov 10 06:18:20 master kernel: ubase 00005: Sync request entity enable msg, enable=1
+Nov 10 06:18:20 master kernel: ubase 00005: Change the entity status to normal
+Nov 10 06:18:20 master kernel: ubase 00005: (pid 4708) cmdq handshake1 = 0x0.
+Nov 10 06:18:20 master kernel: ubase 00005: (pid 4708) The firmware version is 6.0.21.27
+Nov 10 06:18:20 master kernel: ubase 00005: (pid 4708) udev cap_bits[0] = 0x1000201
+Nov 10 06:18:20 master kernel: ubase 00005: (pid 4708) udev cap_bits[1] = 0x0
+Nov 10 06:18:20 master kernel: ubase 00005: (pid 4708) udev cap_bits[2] = 0x0
+Nov 10 06:18:20 master kernel: ubase 00005: (pid 4708) using default public jetty count(1024).
+Nov 10 06:18:20 master kernel: ubase 00005: device id alloc success, id: 53248.
+Nov 10 06:18:20 master kernel: ubase 00005: register share port at 0 success
+Nov 10 06:18:20 master kernel: arm-smmu-v3-pmcg arm-smmu-v3-pmcg.8.auto: Registered PMU @ 0x0000006000020000 using 8 counters with Individual filter settings
+Nov 10 06:18:20 master kernel: arm-smmu-v3-pmcg arm-smmu-v3-pmcg.9.auto: option mask 0x0
+Nov 10 06:18:20 master kernel: MXCD.BA100.D0.RINGBUF.INFO alloc GPU reserved memory, size=0x1000000
+Nov 10 06:18:20 master kernel: METAX.BA100.D0.MC.INFO reserved utc memory index 23: offset 0xff0000000
+Nov 10 06:18:20 master kernel: URMA|ubcore|4856|4856|ubcore_register_client:[434]|ubcore client: ubmad register success.
+Nov 10 06:18:20 master kernel: URMA|ubcore|4856|4856|ubcore_register_client:[434]|ubcore client: ubcm register success.
+Nov 10 06:18:20 master kernel: URMA|ubcore|4856|4856|ubcore_register_client:[434]|ubcore client: ubmgr_ping register success.
+Nov 10 06:18:20 master kernel: MXCD.BA100.D0.RINGBUF.INFO Shader UTC Time: 0x18e67ffaef995214 [2026-11-09_22:10:17]
+Nov 10 06:18:20 master kernel: arm-smmu-v3-pmcg arm-smmu-v3-pmcg.9.auto: Registered PMU @ 0x0000006800020000 using 8 counters with Individual filter settings
+Nov 10 06:18:20 master kernel: METAX.XCORE.INFO set xcore page size to 2MB.
+Nov 10 06:18:20 master kernel: arm-smmu-v3-pmcg arm-smmu-v3-pmcg.10.auto: option mask 0x0
+Nov 10 06:18:20 master kernel: MXCD.BASE.INFO added device 9999:4001
+Nov 10 06:18:20 master kernel: URMA|ubcore|4637|4637|ubcore_register_client:[434]|ubcore client: ub_fwctl register success.
+Nov 10 06:18:20 master kernel: METAX.BASE.INFO metax pro feature device page support 0
+Nov 10 06:18:20 master kernel: METAX.BA100.D0.BASE.INFO pcba sn: AENA2502001153, gpuid 54392, socket_id 0, topo_id 0
+Nov 10 06:18:20 master kernel: METAX.BA100.D0.BASE.INFO native device init ok
+Nov 10 06:18:20 master kernel: METAX.BA100.D0.BASE.INFO device pm enabled.
+Nov 10 06:18:20 master kernel: [drm] Initialized METAX 3.10.14 2026-11-07 20:06:28 for 0000:a1:00.0 on minor 0
+Nov 10 06:18:20 master kernel: METAX.BASE.INFO MetaX driver startup! built by root, git commit unknown
+Nov 10 06:18:20 master kernel: arm-smmu-v3-pmcg arm-smmu-v3-pmcg.10.auto: Registered PMU @ 0x0000007002c20000 using 8 counters with Individual filter settings
+Nov 10 06:18:20 master kernel: arm-smmu-v3-pmcg arm-smmu-v3-pmcg.11.auto: option mask 0x0
+Nov 10 06:18:20 master kernel: arm-smmu-v3-pmcg arm-smmu-v3-pmcg.11.auto: Registered PMU @ 0x0000007200020000 using 8 counters with Individual filter settings
+Nov 10 06:18:21 master kernel: EXT4-fs (dm-2): mounted filesystem 0eba1b3b-d6b4-4684-a778-76aed10f6841 r/w with ordered data mode. Quota mode: none.
+Nov 10 06:18:21 master kernel: <insmod:23926:23926> [mami uop] [WARN] [starry_api_init 271] Failed to get starry symbol: drv_board_get_ucmi_chip_num.
+Nov 10 06:18:21 master kernel: <insmod:23926:23926> [mami UCD] [INFO] [ucd_proc_ctrl_init 140] Base install path: /usr/local/mami.
+Nov 10 06:18:21 master kernel: <insmod:23926:23926> [mami UCD] [INFO] [ucd_init 446] ucd init success.
+Nov 10 06:18:21 master kernel: <insmod:23926:23926> [mami UCD] [INFO] [ucd_add_cmd 255] register OK. (owner_name=ures; main_cmd=0; sub_cmd=7; proc_ctrl_bitmap=1)
+Nov 10 06:18:21 master kernel: <insmod:23926:23926> [mami UCD] [INFO] [ucd_add_cmd 255] register OK. (owner_name=ures; main_cmd=0; sub_cmd=8; proc_ctrl_bitmap=1)
+Nov 10 06:18:21 master kernel: <insmod:23926:23926> [mami UCD] [INFO] [ucd_add_cmd 255] register OK. (owner_name=ures; main_cmd=0; sub_cmd=0; proc_ctrl_bitmap=2)
+Nov 10 06:18:21 master kernel: <insmod:23926:23926> [mami UCD] [INFO] [ucd_add_cmd 255] register OK. (owner_name=ures; main_cmd=0; sub_cmd=1; proc_ctrl_bitmap=2)
+Nov 10 06:18:21 master kernel: <insmod:23926:23926> [mami UCD] [INFO] [ucd_add_cmd 255] register OK. (owner_name=ures; main_cmd=0; sub_cmd=2; proc_ctrl_bitmap=2)
+Nov 10 06:18:21 master kernel: <insmod:23926:23926> [mami UCD] [INFO] [ucd_add_cmd 255] register OK. (owner_name=ures; main_cmd=0; sub_cmd=3; proc_ctrl_bitmap=2)
+Nov 10 06:18:21 master kernel: <insmod:23926:23926> [mami UCD] [INFO] [ucd_add_cmd 255] register OK. (owner_name=ures; main_cmd=0; sub_cmd=4; proc_ctrl_bitmap=1)
+Nov 10 06:18:21 master kernel: <insmod:23926:23926> [mami UCD] [INFO] [ucd_add_cmd 255] register OK. (owner_name=ures; main_cmd=0; sub_cmd=5; proc_ctrl_bitmap=2)
+Nov 10 06:18:21 master kernel: <insmod:23926:23926> [mami UCD] [INFO] [ucd_add_cmd 255] register OK. (owner_name=ures; main_cmd=0; sub_cmd=6; proc_ctrl_bitmap=1)
+Nov 10 06:18:21 master kernel: <insmod:23926:23926> [mami UCD] [INFO] [ucd_add_cmd 255] register OK. (owner_name=ures; main_cmd=0; sub_cmd=9; proc_ctrl_bitmap=2)
+Nov 10 06:18:21 master kernel: <insmod:23926:23926> [mami udm] [INFO] [_udm_notifier_register 156] The notifier registers successfully. (notifier="ued"; pri=1)
+Nov 10 06:18:21 master kernel: <insmod:23926:23926> [mami UCD] [INFO] [ucd_add_cmd 255] register OK. (owner_name=ued; main_cmd=1; sub_cmd=0; proc_ctrl_bitmap=1)
+Nov 10 06:18:21 master kernel: <insmod:23926:23926> [mami UCD] [INFO] [ucd_add_cmd 255] register OK. (owner_name=ued; main_cmd=1; sub_cmd=0; proc_ctrl_bitmap=1)
+Nov 10 06:18:21 master kernel: <insmod:23926:23926> [mami UCD] [INFO] [ucd_add_cmd 255] register OK. (owner_name=ued; main_cmd=1; sub_cmd=1; proc_ctrl_bitmap=1)
+Nov 10 06:18:21 master kernel: <insmod:23926:23926> [mami UCD] [INFO] [ucd_add_cmd 255] register OK. (owner_name=ued; main_cmd=1; sub_cmd=1; proc_ctrl_bitmap=1)
+Nov 10 06:18:21 master kernel: <insmod:23926:23926> [mami UCD] [INFO] [ucd_add_cmd 255] register OK. (owner_name=ued; main_cmd=1; sub_cmd=2; proc_ctrl_bitmap=2)
+Nov 10 06:18:21 master kernel: <insmod:23926:23926> [mami UCD] [INFO] [ucd_add_cmd 255] register OK. (owner_name=ued; main_cmd=1; sub_cmd=2; proc_ctrl_bitmap=2)
+Nov 10 06:18:21 master kernel: <insmod:23926:23926> [mami UCD] [INFO] [ucd_add_cmd 255] register OK. (owner_name=ued; main_cmd=1; sub_cmd=3; proc_ctrl_bitmap=1)
+Nov 10 06:18:21 master kernel: <insmod:23926:23926> [mami UCD] [INFO] [ucd_add_cmd 255] register OK. (owner_name=ued; main_cmd=1; sub_cmd=3; proc_ctrl_bitmap=1)
+Nov 10 06:18:21 master kernel: <insmod:23926:23926> [mami UCD] [INFO] [ucd_add_cmd 255] register OK. (owner_name=ued; main_cmd=1; sub_cmd=4; proc_ctrl_bitmap=2)
+Nov 10 06:18:21 master kernel: <insmod:23926:23926> [mami UCD] [INFO] [ucd_add_cmd 255] register OK. (owner_name=ued; main_cmd=1; sub_cmd=4; proc_ctrl_bitmap=2)
+Nov 10 06:18:21 master kernel: <insmod:23926:23926> [mami udm] [INFO] [_udm_notifier_register 156] The notifier registers successfully. (notifier="uid"; pri=5)
+Nov 10 06:18:21 master kernel: <insmod:23926:23926> [mami UCD] [INFO] [ucd_add_cmd 255] register OK. (owner_name=ulog; main_cmd=9; sub_cmd=0; proc_ctrl_bitmap=2)
+Nov 10 06:18:21 master kernel: <insmod:23926:23926> [mami UCD] [INFO] [ucd_add_cmd 255] register OK. (owner_name=ulog; main_cmd=9; sub_cmd=1; proc_ctrl_bitmap=2)
+Nov 10 06:18:21 master kernel: <insmod:23926:23926> [mami uop] [WARN] [cdma_get_kern_symbol 78] The cmda symbol cannot get.(symbol=dma_read;)
+Nov 10 06:18:21 master kernel: <insmod:23926:23926> [mami uop] [WARN] [cdma_get_kern_symbol 78] The cmda symbol cannot get.(symbol=dma_write;)
+Nov 10 06:18:21 master kernel: <insmod:23926:23926> [mami uop] [WARN] [cdma_get_kern_symbol 78] The cmda symbol cannot get.(symbol=dma_get_device_list;)
+Nov 10 06:18:21 master kernel: <insmod:23926:23926> [mami uop] [WARN] [cdma_get_kern_symbol 78] The cmda symbol cannot get.(symbol=dma_free_device_list;)
+Nov 10 06:18:21 master kernel: <insmod:23926:23926> [mami uop] [WARN] [cdma_get_kern_symbol 78] The cmda symbol cannot get.(symbol=dma_register_client;)
+Nov 10 06:18:21 master kernel: <insmod:23926:23926> [mami uop] [WARN] [cdma_get_kern_symbol 78] The cmda symbol cannot get.(symbol=dma_unregister_client;)
+Nov 10 06:18:21 master kernel: <insmod:23926:23926> [mami uop] [WARN] [cdma_get_kern_symbol 78] The cmda symbol cannot get.(symbol=dma_register_seg;)
+Nov 10 06:18:21 master kernel: <insmod:23926:23926> [mami uop] [WARN] [cdma_get_kern_symbol 78] The cmda symbol cannot get.(symbol=dma_import_seg;)
+Nov 10 06:18:21 master kernel: <insmod:23926:23926> [mami uop] [WARN] [cdma_get_kern_symbol 78] The cmda symbol cannot get.(symbol=dma_unregister_seg;)
+Nov 10 06:18:21 master kernel: <insmod:23926:23926> [mami uop] [WARN] [cdma_get_kern_symbol 78] The cmda symbol cannot get.(symbol=dma_alloc_queue;)
+Nov 10 06:18:21 master kernel: <insmod:23926:23926> [mami uop] [WARN] [cdma_get_kern_symbol 78] The cmda symbol cannot get.(symbol=dma_poll_queue;)
+Nov 10 06:18:21 master kernel: <insmod:23926:23926> [mami uop] [WARN] [cdma_get_kern_symbol 78] The cmda symbol cannot get.(symbol=dma_free_queue;)
+Nov 10 06:18:21 master kernel: <insmod:23926:23926> [mami uop] [WARN] [cdma_get_kern_symbol 78] The cmda symbol cannot get.(symbol=dma_create_context;)
+Nov 10 06:18:21 master kernel: <insmod:23926:23926> [mami uop] [WARN] [cdma_get_kern_symbol 78] The cmda symbol cannot get.(symbol=dma_delete_context;)
+Nov 10 06:18:21 master kernel: <insmod:23926:23926> [mami uop] [WARN] [cdma_get_kern_symbol 78] The cmda symbol cannot get.(symbol=dma_unimport_seg;)
+Nov 10 06:18:21 master kernel: <insmod:23926:23926> [mami uop] [WARN] [uops_cdma_init 659] Cdma symbol not found. (ret=1)
+Nov 10 06:18:21 master kernel: <insmod:23926:23926> [mami udm] [INFO] [_udm_notifier_register 156] The notifier registers successfully. (notifier="uop"; pri=1)
+Nov 10 06:18:21 master kernel: <insmod:23926:23926> [mami UCD] [INFO] [ucd_add_cmd 255] register OK. (owner_name=uop; main_cmd=2; sub_cmd=0; proc_ctrl_bitmap=2)
+Nov 10 06:18:21 master kernel: <insmod:23926:23926> [mami UCD] [INFO] [ucd_add_cmd 255] register OK. (owner_name=uop; main_cmd=2; sub_cmd=1; proc_ctrl_bitmap=2)
+Nov 10 06:18:21 master kernel: <insmod:23926:23926> [mami UCD] [INFO] [ucd_add_cmd 255] register OK. (owner_name=uop; main_cmd=2; sub_cmd=2; proc_ctrl_bitmap=2)
+Nov 10 06:18:21 master kernel: <insmod:23926:23926> [mami UCD] [INFO] [ucd_add_cmd 255] register OK. (owner_name=uop; main_cmd=2; sub_cmd=3; proc_ctrl_bitmap=2)
+Nov 10 06:18:21 master kernel: <insmod:23926:23926> [mami UCD] [INFO] [ucd_add_cmd 255] register OK. (owner_name=uop; main_cmd=2; sub_cmd=4; proc_ctrl_bitmap=2)
+Nov 10 06:18:21 master kernel: <insmod:23926:23926> [mami UCD] [INFO] [ucd_add_cmd 255] register OK. (owner_name=uop; main_cmd=2; sub_cmd=5; proc_ctrl_bitmap=2)
+Nov 10 06:18:21 master kernel: <insmod:23926:23926> [mami UCD] [INFO] [ucd_add_cmd 255] register OK. (owner_name=uop; main_cmd=2; sub_cmd=6; proc_ctrl_bitmap=2)
+Nov 10 06:18:21 master kernel: <insmod:23926:23926> [mami UCD] [INFO] [ucd_add_cmd 255] register OK. (owner_name=uop; main_cmd=2; sub_cmd=7; proc_ctrl_bitmap=2)
+Nov 10 06:18:21 master kernel: <insmod:23926:23926> [mami UCD] [INFO] [ucd_add_cmd 255] register OK. (owner_name=uop; main_cmd=2; sub_cmd=8; proc_ctrl_bitmap=2)
+Nov 10 06:18:21 master kernel: <insmod:23926:23926> [mami UCD] [INFO] [ucd_add_cmd 255] register OK. (owner_name=uop; main_cmd=2; sub_cmd=9; proc_ctrl_bitmap=2)
+Nov 10 06:18:22 master kernel: <insmod:24077:24077> [mami RAS] [INFO] [local_ras_register_init 152] Local ras module table init success.
+Nov 10 06:18:22 master kernel: <insmod:24077:24077> [mami RAS] [INFO] [apei_ub_v100_init 1748] APEI ub v100 init success.
+Nov 10 06:18:22 master kernel: <insmod:24077:24077> [mami RAS] [INFO] [apei_ub_v160_init 641] APEI ub v160 init success.
+Nov 10 06:18:22 master kernel: <insmod:24077:24077> [mami RAS] [INFO] [apei_ucmi_init 84] APEI ucmi ras table init success.
+Nov 10 06:18:22 master kernel: <insmod:24077:24077> [mami UCD] [INFO] [ucd_add_cmd 255] register OK. (owner_name=mng; main_cmd=3; sub_cmd=0; proc_ctrl_bitmap=1)
+Nov 10 06:18:22 master kernel: <insmod:24077:24077> [mami UCD] [INFO] [ucd_add_cmd 255] register OK. (owner_name=mng; main_cmd=3; sub_cmd=1; proc_ctrl_bitmap=1)
+Nov 10 06:18:22 master kernel: <insmod:24077:24077> [mami UCD] [INFO] [ucd_add_cmd 255] register OK. (owner_name=mng; main_cmd=3; sub_cmd=2; proc_ctrl_bitmap=1)
+Nov 10 06:18:22 master kernel: <insmod:24077:24077> [mami UCD] [INFO] [ucd_add_cmd 255] register OK. (owner_name=mng; main_cmd=3; sub_cmd=3; proc_ctrl_bitmap=1)
+Nov 10 06:18:22 master kernel: <insmod:24077:24077> [mami UCD] [INFO] [ucd_add_cmd 255] register OK. (owner_name=mng; main_cmd=3; sub_cmd=4; proc_ctrl_bitmap=1)
+Nov 10 06:18:22 master kernel: <insmod:24077:24077> [mami UCD] [INFO] [ucd_add_cmd 255] register OK. (owner_name=mng; main_cmd=3; sub_cmd=5; proc_ctrl_bitmap=2)
+Nov 10 06:18:22 master kernel: <insmod:24077:24077> [mami mng] [INFO] [mng_init 28] Init ubdevm mng success.
+Nov 10 06:18:22 master kernel: <insmod:24077:24077> [mami hw-adapt] [INFO] [parse_ubfm_table 94] Succeed to get ubfabric_addr from ubfm table.
+Nov 10 06:18:22 master kernel: <insmod:24077:24077> [mami hw-adapt] [INFO] [udev_get_hw_info 913] Get hw cfg info. (devid=128;type=4;slot_id=1;socket_id=0;guid=guid_8000:aedc:8700:0000:0000:0002:00a0:08cc)
+Nov 10 06:18:22 master kernel: <insmod:24077:24077> [mami hw-adapt] [INFO] [udev_local_dev_init 271] Alloc devid. (slot_id=1, socket_id=0, devid=0)
+Nov 10 06:18:22 master kernel: <insmod:24077:24077> [mami UCD] [INFO] [ucd_add_cmd 255] register OK. (owner_name=faultmgr; main_cmd=8; sub_cmd=0; proc_ctrl_bitmap=30)
+Nov 10 06:18:22 master kernel: <insmod:24077:24077> [mami UCD] [INFO] [ucd_add_cmd 255] register OK. (owner_name=faultmgr; main_cmd=8; sub_cmd=1; proc_ctrl_bitmap=1)
+Nov 10 06:18:22 master kernel: <insmod:24077:24077> [mami udm] [INFO] [_udm_notifier_register 156] The notifier registers successfully. (notifier="faultmgr"; pri=2)
+Nov 10 06:18:22 master kernel: <insmod:24077:24077> [mami faultmgr] [INFO] [faultmgr_init 121] Init faultmgr success.
+Nov 10 06:18:22 master kernel: <insmod:24077:24077> [mami udm] [INFO] [_udm_notifier_register 156] The notifier registers successfully. (notifier="hw-adapt"; pri=0)
+Nov 10 06:18:22 master kernel: <insmod:24077:24077> [mami udm] [INFO] [_udm_notifier_register 156] The notifier registers successfully. (notifier="udev_port_mng"; pri=2)
+Nov 10 06:18:22 master kernel: <insmod:24077:24077> [mami USI] [INFO] [usi_ubus_api_init 162] Usi ubus api init successfully.
+Nov 10 06:18:22 master kernel: usi_irq_drv 00004: Adding to iommu group 2
+Nov 10 06:18:22 master kernel: usi_irq_drv 00004: dma_configure ret = 0
+Nov 10 06:18:22 master kernel: <insmod:24077:24077> [mami USI] [INFO] [usi_ctrl_ue_probe 486] ctrl ue probe. (eid=3; cna=2353; entity_idx=0; ent_type=2; no_intr=0;intr_type1=0; intr_en=0)
+Nov 10 06:18:22 master kernel: <insmod:24077:24077> [mami USI] [INFO] [usi_ctrl_ue_probe 490] ctrl ue probe. (eid=3; local_dev=1; guid=cc08-a007-0-2-000000-00000087dcae0080)
+Nov 10 06:18:22 master kernel: usi_irq_drv 00006: Adding to iommu group 3
+Nov 10 06:18:22 master kernel: usi_irq_drv 00006: dma_configure ret = 0
+Nov 10 06:18:22 master kernel: <insmod:24077:24077> [mami USI] [INFO] [usi_ctrl_ue_probe 486] ctrl ue probe. (eid=5; cna=2355; entity_idx=0; ent_type=2; no_intr=0;intr_type1=0; intr_en=0)
+Nov 10 06:18:22 master kernel: <insmod:24077:24077> [mami USI] [INFO] [usi_ctrl_ue_probe 490] ctrl ue probe. (eid=5; local_dev=1; guid=cc08-a007-0-2-000000-000000578c190180)
+Nov 10 06:18:22 master kernel: <insmod:24077:24077> [mami udm] [INFO] [_udm_notifier_register 156] The notifier registers successfully. (notifier="USI"; pri=4)
+Nov 10 06:18:22 master kernel: <insmod:24077:24077> [mami USI] [INFO] [usi_init 891] Register usi success.
+Nov 10 06:18:22 master kernel: <insmod:24077:24077> [mami UCD] [INFO] [ucd_add_cmd 255] register OK. (owner_name=hw-adapt; main_cmd=4; sub_cmd=0; proc_ctrl_bitmap=1)
+Nov 10 06:18:22 master kernel: <insmod:24077:24077> [mami udm] [INFO] [_udm_notifier_register 156] The notifier registers successfully. (notifier="RAS"; pri=3)
+Nov 10 06:18:22 master kernel: <insmod:24174:24174> [mami udm] [INFO] [_udm_notifier_register 156] The notifier registers successfully. (notifier="linkcom"; pri=3)
+Nov 10 06:18:22 master kernel: <insmod:24174:24174> [mami UCD] [INFO] [ucd_add_cmd 255] register OK. (owner_name=linkcom; main_cmd=6; sub_cmd=0; proc_ctrl_bitmap=2)
+Nov 10 06:18:22 master kernel: <insmod:24174:24174> [mami UCD] [INFO] [ucd_add_cmd 255] register OK. (owner_name=linkcom; main_cmd=6; sub_cmd=1; proc_ctrl_bitmap=2)
+Nov 10 06:18:22 master kernel: <insmod:24174:24174> [mami UCD] [INFO] [ucd_add_cmd 255] register OK. (owner_name=linkcom; main_cmd=6; sub_cmd=2; proc_ctrl_bitmap=1)
+Nov 10 06:18:22 master kernel: <insmod:24174:24174> [mami UCD] [INFO] [ucd_add_cmd 255] register OK. (owner_name=linkcom; main_cmd=6; sub_cmd=3; proc_ctrl_bitmap=1)
+Nov 10 06:18:22 master kernel: <insmod:24174:24174> [mami UCD] [INFO] [ucd_add_cmd 255] register OK. (owner_name=linkcom; main_cmd=6; sub_cmd=4; proc_ctrl_bitmap=1)
+Nov 10 06:18:22 master kernel: <insmod:24174:24174> [mami linkcom] [INFO] [linkcom_init 158] Init linkcom success.
+Nov 10 06:18:22 master kernel: mami_mctrlq: no symbol version for idm_kern_get_plane_by_fdie
+Nov 10 06:18:22 master kernel: <insmod:24178:24178> [mami UCD] [INFO] [ucd_add_cmd 255] register OK. (owner_name=mctrlq; main_cmd=7; sub_cmd=0; proc_ctrl_bitmap=2)
+Nov 10 06:18:22 master kernel: <insmod:24178:24178> [mami UCD] [INFO] [ucd_add_cmd 255] register OK. (owner_name=mctrlq; main_cmd=7; sub_cmd=1; proc_ctrl_bitmap=1)
+Nov 10 06:18:22 master kernel: <insmod:24178:24178> [mami UCD] [INFO] [ucd_add_cmd 255] register OK. (owner_name=mctrlq; main_cmd=7; sub_cmd=2; proc_ctrl_bitmap=2)
+Nov 10 06:18:22 master kernel: <insmod:24178:24178> [mami UCD] [INFO] [ucd_add_cmd 255] register OK. (owner_name=mctrlq; main_cmd=5; sub_cmd=0; proc_ctrl_bitmap=2)
+Nov 10 06:18:22 master kernel: <insmod:24178:24178> [mami UCD] [INFO] [ucd_add_cmd 255] register OK. (owner_name=mctrlq; main_cmd=5; sub_cmd=1; proc_ctrl_bitmap=1)
+Nov 10 06:18:22 master kernel: <insmod:24178:24178> [mami mctrlq] [INFO] [ctrlq_irq_init 51] Register ctrlq uid.
+Nov 10 06:18:22 master kernel: <insmod:24178:24178> [mami udm] [INFO] [_udm_notifier_register 156] The notifier registers successfully. (notifier="mctrlq"; pri=2)
+Nov 10 06:18:22 master kernel: [auth_drv] auth driver install succ.
+Nov 10 06:18:22 master kernel: XSHMEM: algo: no: 1, name: fsc_algo, registered
+Nov 10 06:18:22 master kernel: XSHMEM: algo: no: 0, name: blk_algo, registered
+Nov 10 06:18:22 master kernel: r8169 0000:21:00.0: Direct firmware load for rtl_nic/rtl8168h-2.fw failed with error -2
+Nov 10 06:18:22 master kernel: r8169 0000:21:00.0: Unable to load firmware rtl_nic/rtl8168h-2.fw (-2)
+Nov 10 06:18:22 master kernel: Generic FE-GE Realtek PHY r8169-0-2100:00: attached PHY driver (mii_bus:phy_addr=r8169-0-2100:00, irq=MAC)
+Nov 10 06:18:23 master kernel: r8169 0000:21:00.0 enp33s0: Link is Down
+Nov 10 06:18:23 master kernel: mlx5_core 0000:28:00.0 enp40s0f0np0: Link up
+Nov 10 06:18:23 master kernel: <ez_PROCMGR:24280:24296> [mami ued] [INFO] [ued_task_ctx_create 1021] Create success. (devid=128; pid=24280)
+Nov 10 06:18:24 master kernel: <ez_PROCMGR:24280:24296> [mami faultmgr] [WARN] [faultmgr_fault_event_to_log 35] Fault event recover. (eventId=0x8c044e00; devid=4294967295; nodeId=0:0; detailCode=0x0; severity=2; assertion=0; time=1794262703000ms; eventName=iammgr)
+Nov 10 06:18:24 master kernel: mlx5_core 0000:28:00.1 enp40s0f1np1: Link down
+Nov 10 06:18:24 master kernel: URMA|ubcore|24493|24493|ubcore_register_client:[434]|ubcore client: urma register success.
+Nov 10 06:18:24 master kernel: URMA|ubcore|24532|24532|ubcore_register_client:[434]|ubcore client: ipourma register success.
+Nov 10 06:18:24 master kernel: Register ubcore client success.
+Nov 10 06:18:24 master kernel: Register debugfs success.
+Nov 10 06:18:24 master kernel: netlink_init:success
+Nov 10 06:18:24 master kernel: [ipourma] Register netlink success.
+Nov 10 06:18:24 master kernel: OBMM: obmm_module: init started
+Nov 10 06:18:24 master kernel: OBMM: ub_feature: 0xad0000, obmm_enabled: 0
+Nov 10 06:18:24 master kernel: OBMM: nid=0, pool size = 0x10000000 bytes.
+Nov 10 06:18:24 master kernel: OBMM: nid=1, pool size = 0x10000000 bytes.
+Nov 10 06:18:24 master kernel: OBMM: nid=2, pool size = 0x10000000 bytes.
+Nov 10 06:18:24 master kernel: OBMM: nid=3, pool size = 0x10000000 bytes.
+Nov 10 06:18:24 master kernel: OBMM: shmdev: root device initialization started
+Nov 10 06:18:24 master kernel: OBMM: shmdev: root device initialization completed
+Nov 10 06:18:24 master kernel: OBMM: obmm_module: init completed
+Nov 10 06:18:24 master kernel: [UVB]: Success fully get UBRT table
+Nov 10 06:18:24 master kernel: [UVB]: get cis sub table success
+Nov 10 06:18:24 master kernel: [UVB]: cis group not get [index], use default value
+Nov 10 06:18:24 master kernel: [UVB]: cis group not get forwarder, use default value
+Nov 10 06:18:24 master kernel: [UVB]: cis group not get [index], use default value
+Nov 10 06:18:24 master kernel: [UVB]: cis group not get forwarder, use default value
+Nov 10 06:18:24 master kernel: [UVB]: cis group not get forwarder, use default value
+Nov 10 06:18:24 master kernel: [UVB]: found ub struct in cis info
+Nov 10 06:18:24 master kernel: [UVB]: get cis table from odf success
+Nov 10 06:18:24 master kernel: [UVB]: get uvb sub table suceess
+Nov 10 06:18:24 master kernel: [UVB]: get uvb table from odf success
+Nov 10 06:18:24 master kernel: [UVB]: odf init success
+Nov 10 06:18:24 master kernel: [UVB]: uvb window lock init success.
+Nov 10 06:18:24 master kernel: [UVB]: create uvb poll window thread successfully
+Nov 10 06:18:24 master kernel: [UVB]: cis uvb init success
+Nov 10 06:18:24 master kernel: [UVB]: register uvb over ub drv success
+Nov 10 06:18:24 master kernel: [sentry][message_helper]: smh init successfully.
+Nov 10 06:18:24 master kernel: [sentry][message_helper]: smh device registered successfully.
+Nov 10 06:18:24 master kernel: [sentry][reporter]: power notifier register successful
+Nov 10 06:18:24 master kernel: [sentry][reporter]: lowmem notifier register successful
+Nov 10 06:18:24 master kernel: [sentry][reporter]: ubus notifier register successful
+Nov 10 06:18:24 master kernel: [sentry][urma]: reboot_cleanup_nb registered
+Nov 10 06:18:24 master kernel: [sentry][uvb]: uvb communication is enabled.
+Nov 10 06:18:24 master kernel: [sentry][remote server]: Create kernel urma receiver thread success.
+Nov 10 06:18:24 master kernel: [sentry][remote client]: Kernel reboot handler registered
+Nov 10 06:18:24 master kernel: [sentry][remote client]: Panic handler registered
+Nov 10 06:18:25 master kernel: <pm_child:25003:25003> [mami ued] [INFO] [ued_task_ctx_create 1021] Create success. (devid=128; pid=25003)
+Nov 10 06:18:25 master kernel: <pm_child:25003:25003> [mami faultmgr] [WARN] [faultmgr_fault_event_to_log 35] Fault event recover. (eventId=0x8c024e00; devid=4294967295; nodeId=0:0; detailCode=0x0; severity=2; assertion=0; time=1794262705000ms; eventName=process-manager)
+Nov 10 06:18:25 master kernel: <pm_child:25003:25003> [mami ued] [INFO] [ued_task_ctx_release 978] Release success. (devid=128; pid=25003)
+Nov 10 06:18:26 master kernel: r8169 0000:21:00.0 enp33s0: Link is Up - 1Gbps/Full - flow control off
+Nov 10 06:18:30 master kernel: block dm-0: the capability attribute has been deprecated.
+Nov 10 06:18:34 master kernel: IPVS: Registered protocols (TCP, UDP, SCTP, AH, ESP)
+Nov 10 06:18:34 master kernel: IPVS: Connection hash table configured (size=4096, memory=32Kbytes)
+Nov 10 06:18:34 master kernel: IPVS: ipvs loaded.
+Nov 10 06:18:34 master kernel: IPVS: [rr] scheduler registered.
+Nov 10 06:18:34 master kernel: IPVS: [wrr] scheduler registered.
+Nov 10 06:18:34 master kernel: IPVS: [sh] scheduler registered.
+Nov 10 06:18:34 master kernel: [auth_drv] IOCTL_GET_PROCNAME: add pid[26452] into auth_task_list
+Nov 10 06:18:34 master kernel: [auth_drv] IOCTL_GET_PROCNAME: wake up iammgr select
+Nov 10 06:18:34 master kernel: [auth_drv] IOCTL_GET_PID: pid: 26452
+Nov 10 06:18:34 master kernel: [auth_drv] IOCTL_SET_PROCNAME: pid=26452, procname=ubeUser1
+Nov 10 06:18:34 master kernel: [auth_drv] IOCTL_GET_PROCNAME: pid=26452, procname=ubeUser1
+Nov 10 06:18:34 master kernel: [auth_drv] IOCTL_GET_PROCNAME: remove pid[26452] from auth_task_list
+Nov 10 06:18:34 master kernel: <SDK_UDIE_DEV_DE:26452:26674> [mami ued] [INFO] [ued_task_ctx_create 1021] Create success. (devid=128; pid=26452)
+Nov 10 06:18:34 master kernel: <SDK_Enable_Dev_:26452:26693> [mami udm] [INFO] [_udm_add_dev 138] Add local device. (udevid=0)
+Nov 10 06:18:34 master kernel: <SDK_Enable_Dev_:26452:26693> [mami udm] [INFO] [_udm_add_dev 141] The device is added successfully. (udevid=0)
+Nov 10 06:18:34 master kernel: <SDK_Enable_Dev_:26452:26693> [mami hw-adapt] [INFO] [udev_hw_set_save_bios_udie_info 447] save bios die cfg info, (devid=0, ue_num=126 275 11 1661)
+Nov 10 06:18:34 master kernel: <SDK_Enable_Dev_:26452:26693> [mami hw-adapt] [INFO] [udev_hw_set_save_bios_udie_info 452] cdma ue0 0, urma ue0 0, port num 9, hpa 0x902000000000:0x3e000000000, ue_num 126, body_mask 0x1f
+Nov 10 06:18:34 master kernel: <SDK_Enable_Dev_:26452:26693> [mami hw-adapt] [INFO] [udev_hw_set_udie_info 535] chip0 die0, cdma ue0 0, urma ue0 0, port num 9, hpa 0x902000000000:0x3e000000000, ue_num 126
+Nov 10 06:18:35 master kernel: <SDK_Enable_Dev_:26452:26693> [mami hw-adapt] [INFO] [udev_hw_set_pcie_and_body_mask 492] Set pcie_mask and body_mask success. (devid=0; dieid=0; pcie_mask=0x0; body_mask=0x1f)
+Nov 10 06:18:35 master kernel: <SDK_Enable_Dev_:26452:26693> [mami hw-adapt] [INFO] [udev_hw_set_save_bios_udie_info 447] save bios die cfg info, (devid=0, ue_num=126 275 11 1661)
+Nov 10 06:18:35 master kernel: <SDK_Enable_Dev_:26452:26693> [mami hw-adapt] [INFO] [udev_hw_set_save_bios_udie_info 452] cdma ue0 0, urma ue0 0, port num 9, hpa 0xb02000000000:0x3e000000000, ue_num 126, body_mask 0x1f
+Nov 10 06:18:35 master kernel: <SDK_Enable_Dev_:26452:26693> [mami hw-adapt] [INFO] [udev_hw_set_udie_info 535] chip1 die0, cdma ue0 0, urma ue0 0, port num 9, hpa 0xb02000000000:0x3e000000000, ue_num 126
+Nov 10 06:18:35 master kernel: <SDK_Enable_Dev_:26452:26693> [mami hw-adapt] [INFO] [udev_hw_set_pcie_and_body_mask 492] Set pcie_mask and body_mask success. (devid=0; dieid=1; pcie_mask=0x0; body_mask=0x1f)
+Nov 10 06:18:35 master kernel: <SDK_Enable_Dev_:26452:26693> [mami hw-adapt] [INFO] [udev_hw_set_dev_info 371] set ctrl ue id in device. (devid=0; ret=0)
+Nov 10 06:18:35 master kernel: <SDK_Enable_Dev_:26452:26693> [mami hw-adapt] [INFO] [udev_set_ures_hsec_mem 179] Get hsec mem.(devid=0; len=268435456)
+Nov 10 06:18:35 master kernel: <SDK_Enable_Dev_:26452:26693> [mami hw-adapt] [INFO] [udev_set_ures_bbox_mem 253] The hw connect type is : 2
+Nov 10 06:18:35 master kernel: <SDK_Enable_Dev_:26452:26693> [mami hw-adapt] [WARN] [udev_set_ures_bbox_mem 264] The chip doesn't support blackbox. (devid=0, len=0, addr=valid 0)
+Nov 10 06:18:35 master kernel: <SDK_Enable_Dev_:26452:26693> [mami mng] [INFO] [idm_kern_is_nl_valid 820] set valid_body_mask success. (devid=0; fdieid=0; valid_body_mask=0x1f)
+Nov 10 06:18:35 master kernel: <SDK_Enable_Dev_:26452:26693> [mami mng] [INFO] [idm_kern_is_nl_valid 820] set valid_body_mask success. (devid=0; fdieid=1; valid_body_mask=0x1f)
+Nov 10 06:18:35 master kernel: <SDK_Enable_Dev_:26452:26693> [mami udev_port_mng] [INFO] [port_info_show 36] Device port info. (devid=0; num=18)
+Nov 10 06:18:35 master kernel: <SDK_Enable_Dev_:26452:26693> [mami udev_port_mng] [INFO] [port_info_show 38] Port id info. (index=0; phyport=0; dlphy_port_id=0, enable=1; link_mode=2; lane_mode=0; die0_rxpa_tgtid_index=0; die0_tx_tpp_tgtid_index=0)
+Nov 10 06:18:35 master kernel: <SDK_Enable_Dev_:26452:26693> [mami udev_port_mng] [INFO] [port_info_show 38] Port id info. (index=1; phyport=2; dlphy_port_id=2, enable=1; link_mode=2; lane_mode=0; die0_rxpa_tgtid_index=1; die0_tx_tpp_tgtid_index=1)
+Nov 10 06:18:35 master kernel: <SDK_Enable_Dev_:26452:26693> [mami udev_port_mng] [INFO] [port_info_show 38] Port id info. (index=2; phyport=4; dlphy_port_id=0, enable=1; link_mode=2; lane_mode=0; die0_rxpa_tgtid_index=2; die0_tx_tpp_tgtid_index=2)
+Nov 10 06:18:35 master kernel: <SDK_Enable_Dev_:26452:26693> [mami udev_port_mng] [INFO] [port_info_show 38] Port id info. (index=3; phyport=6; dlphy_port_id=2, enable=1; link_mode=2; lane_mode=0; die0_rxpa_tgtid_index=3; die0_tx_tpp_tgtid_index=3)
+Nov 10 06:18:35 master kernel: <SDK_Enable_Dev_:26452:26693> [mami udev_port_mng] [INFO] [port_info_show 38] Port id info. (index=4; phyport=8; dlphy_port_id=0, enable=1; link_mode=2; lane_mode=0; die0_rxpa_tgtid_index=4; die0_tx_tpp_tgtid_index=4)
+Nov 10 06:18:35 master kernel: <SDK_Enable_Dev_:26452:26693> [mami udev_port_mng] [INFO] [port_info_show 38] Port id info. (index=5; phyport=10; dlphy_port_id=2, enable=1; link_mode=2; lane_mode=0; die0_rxpa_tgtid_index=5; die0_tx_tpp_tgtid_index=5)
+Nov 10 06:18:35 master kernel: <SDK_Enable_Dev_:26452:26693> [mami udev_port_mng] [INFO] [port_info_show 38] Port id info. (index=6; phyport=12; dlphy_port_id=0, enable=1; link_mode=2; lane_mode=0; die0_rxpa_tgtid_index=6; die0_tx_tpp_tgtid_index=6)
+Nov 10 06:18:35 master kernel: <SDK_Enable_Dev_:26452:26693> [mami udev_port_mng] [INFO] [port_info_show 38] Port id info. (index=7; phyport=14; dlphy_port_id=2, enable=1; link_mode=2; lane_mode=0; die0_rxpa_tgtid_index=7; die0_tx_tpp_tgtid_index=7)
+Nov 10 06:18:35 master kernel: <SDK_Enable_Dev_:26452:26693> [mami udev_port_mng] [INFO] [port_info_show 38] Port id info. (index=8; phyport=16; dlphy_port_id=0, enable=1; link_mode=2; lane_mode=0; die0_rxpa_tgtid_index=8; die0_tx_tpp_tgtid_index=8)
+Nov 10 06:18:35 master kernel: <SDK_Enable_Dev_:26452:26693> [mami udev_port_mng] [INFO] [port_info_show 38] Port id info. (index=9; phyport=20; dlphy_port_id=0, enable=1; link_mode=2; lane_mode=0; die0_rxpa_tgtid_index=9; die0_tx_tpp_tgtid_index=9)
+Nov 10 06:18:35 master kernel: <SDK_Enable_Dev_:26452:26693> [mami udev_port_mng] [INFO] [port_info_show 38] Port id info. (index=10; phyport=22; dlphy_port_id=2, enable=1; link_mode=2; lane_mode=0; die0_rxpa_tgtid_index=10; die0_tx_tpp_tgtid_index=10)
+Nov 10 06:18:35 master kernel: <SDK_Enable_Dev_:26452:26693> [mami udev_port_mng] [INFO] [port_info_show 38] Port id info. (index=11; phyport=24; dlphy_port_id=0, enable=1; link_mode=2; lane_mode=0; die0_rxpa_tgtid_index=11; die0_tx_tpp_tgtid_index=11)
+Nov 10 06:18:35 master kernel: <SDK_Enable_Dev_:26452:26693> [mami udev_port_mng] [INFO] [port_info_show 38] Port id info. (index=12; phyport=26; dlphy_port_id=2, enable=1; link_mode=2; lane_mode=0; die0_rxpa_tgtid_index=12; die0_tx_tpp_tgtid_index=12)
+Nov 10 06:18:35 master kernel: <SDK_Enable_Dev_:26452:26693> [mami udev_port_mng] [INFO] [port_info_show 38] Port id info. (index=13; phyport=28; dlphy_port_id=0, enable=1; link_mode=2; lane_mode=0; die0_rxpa_tgtid_index=13; die0_tx_tpp_tgtid_index=13)
+Nov 10 06:18:35 master kernel: <SDK_Enable_Dev_:26452:26693> [mami udev_port_mng] [INFO] [port_info_show 38] Port id info. (index=14; phyport=30; dlphy_port_id=2, enable=1; link_mode=2; lane_mode=0; die0_rxpa_tgtid_index=14; die0_tx_tpp_tgtid_index=14)
+Nov 10 06:18:35 master kernel: <SDK_Enable_Dev_:26452:26693> [mami udev_port_mng] [INFO] [port_info_show 38] Port id info. (index=15; phyport=32; dlphy_port_id=0, enable=1; link_mode=2; lane_mode=0; die0_rxpa_tgtid_index=15; die0_tx_tpp_tgtid_index=15)
+Nov 10 06:18:35 master kernel: <SDK_Enable_Dev_:26452:26693> [mami udev_port_mng] [INFO] [port_info_show 38] Port id info. (index=16; phyport=34; dlphy_port_id=2, enable=1; link_mode=2; lane_mode=0; die0_rxpa_tgtid_index=16; die0_tx_tpp_tgtid_index=16)
+Nov 10 06:18:35 master kernel: <SDK_Enable_Dev_:26452:26693> [mami udev_port_mng] [INFO] [port_info_show 38] Port id info. (index=17; phyport=36; dlphy_port_id=0, enable=1; link_mode=2; lane_mode=0; die0_rxpa_tgtid_index=17; die0_tx_tpp_tgtid_index=17)
+Nov 10 06:18:35 master kernel: <SDK_Enable_Dev_:26452:26693> [mami mctrlq] [INFO] [_ctrlq_hw_create 504] Ctrlq hw create. (devid=0;)
+Nov 10 06:18:35 master kernel: <SDK_Enable_Dev_:26452:26693> [mami mctrlq] [INFO] [ctrlq_hw_get_die_num 54] Device info. (devid=0; die_num=2; version=0)
+Nov 10 06:18:35 master kernel: <SDK_Enable_Dev_:26452:26693> [mami mng] [INFO] [idm_kern_init 238] idm_kern_init success. (devid=0)
+Nov 10 06:18:35 master kernel: <SDK_Enable_Dev_:26452:26693> [mami uop] [INFO] [uop_kern_register_msg_ops 368] Uop msg ops reg success. (devid=0)
+Nov 10 06:18:35 master kernel: <SDK_Enable_Dev_:26452:26693> [mami linkcom] [INFO] [linkcom_dev_mng_init 333] init linkcom devid[0] mng success.
+Nov 10 06:18:35 master kernel: usi_irq_drv 00004: Sync request entity enable msg, enable=1
+Nov 10 06:18:35 master kernel: usi_irq_drv 00004: Change the entity status to normal
+Nov 10 06:18:35 master kernel: usi_irq_drv 00004: device id alloc success, id: 20481.
+Nov 10 06:18:35 master kernel: <SDK_Enable_Dev_:26452:26693> [mami USI] [INFO] [usi_dev_request_irqs 377] Register irq success. (devid=0; dieid=0; eid=3; irq_idx=0; irq_name=usi_0_0_0)
+Nov 10 06:18:35 master kernel: <SDK_Enable_Dev_:26452:26693> [mami USI] [INFO] [usi_dev_request_irqs 377] Register irq success. (devid=0; dieid=0; eid=3; irq_idx=1; irq_name=usi_0_0_1)
+Nov 10 06:18:35 master kernel: <SDK_Enable_Dev_:26452:26693> [mami USI] [INFO] [usi_dev_request_irqs 377] Register irq success. (devid=0; dieid=0; eid=3; irq_idx=2; irq_name=usi_0_0_2)
+Nov 10 06:18:35 master kernel: usi_irq_drv 00006: Sync request entity enable msg, enable=1
+Nov 10 06:18:35 master kernel: usi_irq_drv 00006: Change the entity status to normal
+Nov 10 06:18:35 master kernel: usi_irq_drv 00006: device id alloc success, id: 53249.
+Nov 10 06:18:35 master kernel: <SDK_Enable_Dev_:26452:26693> [mami USI] [INFO] [usi_dev_request_irqs 377] Register irq success. (devid=0; dieid=1; eid=5; irq_idx=0; irq_name=usi_0_1_0)
+Nov 10 06:18:35 master kernel: <SDK_Enable_Dev_:26452:26693> [mami USI] [INFO] [usi_dev_request_irqs 377] Register irq success. (devid=0; dieid=1; eid=5; irq_idx=1; irq_name=usi_0_1_1)
+Nov 10 06:18:35 master kernel: <SDK_Enable_Dev_:26452:26693> [mami USI] [INFO] [usi_dev_request_irqs 377] Register irq success. (devid=0; dieid=1; eid=5; irq_idx=2; irq_name=usi_0_1_2)
+Nov 10 06:18:35 master kernel: <SDK_Enable_Dev_:26452:26693> [mami USI] [INFO] [usi_local_dev_init 622] USI local dev init success. (devid=0)
+Nov 10 06:18:35 master kernel: <SDK_Enable_Dev_:26452:26693> [mami mng] [INFO] [mng_ucd_create_dev 113] mng_add_dev_to_udm success. (ret=0; devid=0)
+Nov 10 06:18:35 master kernel: <mami_dev_ctrl.b:26918:26918> [mami ued] [INFO] [ued_task_ctx_create 1021] Create success. (devid=0; pid=26918)
+Nov 10 06:18:35 master kernel: <SDK_Enable_Dev_:26452:26693> [mami ued] [INFO] [ued_task_ctx_create 1021] Create success. (devid=0; pid=26452)
+Nov 10 06:18:36 master kernel: <fwmd:26452:26452> [mami ued] [INFO] [ued_task_ctx_release 978] Release success. (devid=0; pid=26452)
+Nov 10 06:18:36 master kernel: <fwmd:26452:26452> [mami ued] [INFO] [ued_task_ctx_release 978] Release success. (devid=128; pid=26452)
+Nov 10 06:18:42 master kernel: [auth_drv] IOCTL_GET_PROCNAME: add pid[28417] into auth_task_list
+Nov 10 06:18:42 master kernel: [auth_drv] IOCTL_GET_PROCNAME: wake up iammgr select
+Nov 10 06:18:42 master kernel: [auth_drv] IOCTL_GET_PID: pid: 28417
+Nov 10 06:18:42 master kernel: [auth_drv] IOCTL_SET_PROCNAME: pid=28417, procname=ubeUser1
+Nov 10 06:18:42 master kernel: [auth_drv] IOCTL_GET_PROCNAME: pid=28417, procname=ubeUser1
+Nov 10 06:18:42 master kernel: [auth_drv] IOCTL_GET_PROCNAME: remove pid[28417] from auth_task_list
+Nov 10 06:18:42 master kernel: <SDK_UDIE_DEV_DE:28417:28495> [mami ued] [INFO] [ued_task_ctx_create 1021] Create success. (devid=128; pid=28417)
+Nov 10 06:18:42 master kernel: <SDK_Enable_Dev_:28417:28506> [mami ued] [INFO] [ued_task_ctx_create 1021] Create success. (devid=0; pid=28417)
+Nov 10 06:18:42 master kernel: <fwmd:28417:28417> [mami ued] [INFO] [ued_task_ctx_release 978] Release success. (devid=0; pid=28417)
+Nov 10 06:18:42 master kernel: <fwmd:28417:28417> [mami ued] [INFO] [ued_task_ctx_release 978] Release success. (devid=128; pid=28417)
+Nov 10 06:18:49 master kernel: [auth_drv] IOCTL_GET_PROCNAME: add pid[30604] into auth_task_list
+Nov 10 06:18:49 master kernel: [auth_drv] IOCTL_GET_PROCNAME: wake up iammgr select
+Nov 10 06:18:49 master kernel: [auth_drv] IOCTL_GET_PID: pid: 30604
+Nov 10 06:18:49 master kernel: [auth_drv] IOCTL_SET_PROCNAME: pid=30604, procname=ubeUser1
+Nov 10 06:18:49 master kernel: [auth_drv] IOCTL_GET_PROCNAME: pid=30604, procname=ubeUser1
+Nov 10 06:18:49 master kernel: [auth_drv] IOCTL_GET_PROCNAME: remove pid[30604] from auth_task_list
+Nov 10 06:18:49 master kernel: <SDK_UDIE_DEV_DE:30604:30650> [mami ued] [INFO] [ued_task_ctx_create 1021] Create success. (devid=128; pid=30604)
+Nov 10 06:18:49 master kernel: <SDK_Enable_Dev_:30604:30666> [mami ued] [INFO] [ued_task_ctx_create 1021] Create success. (devid=0; pid=30604)
