@@ -1,0 +1,13 @@
+/home/h00918771/uccl-ep-xpu-integration-new/test/verbs_baseline/common.py:98: UserWarning: Could not find flash_attn package installed. Please try to install flash_attn whl pacakge using pip command and make sure it can be imported properly
+  import torch
+[RDMA] Registered GPU memory via DMA-BUF (addr=0xa04400000, len=180707328, fd_offset=0, rkey=0x222e2)
+[RDMA] Registered GPU memory via DMA-BUF (addr=0xa0f400000, len=4096, fd_offset=0, rkey=0x17f2b1)
+[RDMA] control MR registration requested=dmabuf addr=0xa0f400000 bytes=4096
+VERBS_MICRO_POINT {"label": "dispatch_fp8_chunk32_write", "validation": true, "send": true, "receive": true, "direction": "bidir", "operation": 0, "visible": false, "bytes": 237056, "src_mod": 0, "dst_mod": 0, "threads": 4, "warmups": 20, "samples": 50, "n": 49, "mean_us": 947.5987755102041, "median_us": 922.17, "min_us": 853.04, "max_us": 1156.2, "p90_us": 1068.1860000000001, "p95_us": 1101.7279999999996, "std_us": 80.49576638969215, "cv": 0.0849470983606451, "tx_GBps": 8.005278390018681}
+VERBS_MICRO_POINT {"label": "dispatch_fp8_chunk32_fadd", "validation": true, "send": true, "receive": true, "direction": "bidir", "operation": 1, "visible": false, "bytes": 237056, "src_mod": 0, "dst_mod": 0, "threads": 4, "warmups": 20, "samples": 50, "n": 49, "mean_us": 10.797755102040815, "median_us": 10.59, "min_us": 9.62, "max_us": 12.88, "p90_us": 11.626, "p95_us": 11.934, "std_us": 0.6933364036284393, "cv": 0.0642111621421564, "tx_GBps": null}
+VERBS_MICRO_POINT {"label": "dispatch_fp8_chunk32_write_fadd", "validation": true, "send": true, "receive": true, "direction": "bidir", "operation": 2, "visible": false, "bytes": 237056, "src_mod": 0, "dst_mod": 0, "threads": 4, "warmups": 20, "samples": 50, "n": 49, "mean_us": 939.620612244898, "median_us": 938.67, "min_us": 855.07, "max_us": 1140.67, "p90_us": 1016.4000000000001, "p95_us": 1042.172, "std_us": 57.2405464045058, "cv": 0.060918785367797906, "tx_GBps": 8.073249885266328}
+Traceback (most recent call last):
+  File "/home/h00918771/uccl-ep-xpu-integration-new/test/verbs_baseline/notify_worker.py", line 40, in <module>
+    peer.agree('ready',dict(label=label,seq=seq));sample=json.loads(session.step(seq))
+                                                                    ^^^^^^^^^^^^^^^^^
+RuntimeError: micro GPU observer timeout/payload mismatch
