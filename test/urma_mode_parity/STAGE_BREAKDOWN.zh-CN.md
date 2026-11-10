@@ -1,5 +1,8 @@
 # URMA Normal真实程序：GPU与CPU阶段插桩
 
+**更新：旧v1插桩曾导致系统故障，请先按 [GPU插桩v2分步恢复文档](../gpu_stage_recovery/README.zh-CN.md) 验证，不直接运行下列全量诊断。v2不再记录GPU发布tick；旧文有关该项描述仅适用于v1。**
+
+
 本轮专门运行完整Normal的阶段诊断，不运行WRITE微测或LL。沿用原WRITE/FADD顺序、fence、quiet/barrier和completion=all。
 
 RDMA/verbs内核下的对应实验见 [verbs阶段插桩与比较文档](../verbs_baseline/STAGE_BREAKDOWN.zh-CN.md)。当前URMA任务先完成并收集，切到verbs内核后再执行；两套GPU测点一致。

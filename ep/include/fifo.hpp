@@ -31,8 +31,6 @@ class Fifo {
   /// Get FIFO size.
   /// @return Number of entries in the FIFO.
   int size() const;
-  uccl::gpu_stages::State* gpuStageState() const;
-  uccl::gpu_stages::Publication* gpuPublications() const;
 
   /// Get device-side FIFO handle.
   /// @return FifoDeviceHandle for device access.

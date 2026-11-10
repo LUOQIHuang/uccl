@@ -99,7 +99,7 @@ def measure(fn, label, post_fn=None):
         trace_this=globals().get("timeline",False) and (gpu_stages or (i==0 and label.startswith("dispatch_")))
         if trace_this and gpu_stages:dist.barrier()
         rings=stage_rings() if trace_this and gpu_stages else None
-        if rings is not None:ep.gpu_stage_begin(rings)
+        if rings is not None:ep.gpu_stage_begin(rings,os.environ.get("VB_GPU_STAGE_MODE","all"))
         if trace_this:ep.verbs_timeline_begin()
         try:
             start[i].record()
@@ -186,7 +186,7 @@ def measured_profile(fn, kernel_names, *args, **kwargs):
 
 utils.bench_kineto = measured_profile
 sys.argv = [str(bundle / ('test_internode.py' if mode == 'normal' else 'test_low_latency.py')),
-            '--num-processes=1', '--num-tokens=' + ('4096' if mode == 'normal' else '128'),
+            '--num-processes=1', '--num-tokens=' + (os.environ.get('VB_NORMAL_TOKENS','4096') if mode == 'normal' else '128'),
             '--hidden=7168', '--num-experts=256', '--num-topk=8', '--pressure-test-mode=0']
 if mode == 'normal':
     sys.argv += ['--num-topk-groups=2', '--test-ll-compatibility']

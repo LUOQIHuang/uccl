@@ -44,6 +44,7 @@ if os.environ.get('PARITY_GPU_STAGES')=='1':
         if not addresses:raise RuntimeError('GPU_STAGE_RINGS_MISSING')
         return addresses
     measurements.gpu_rings=stage_rings
+    measurements.gpu_stage_mode=os.environ.get("PARITY_GPU_STAGE_MODE","all")
 print('PHASE_CONFIGURATION '+json.dumps(dict(suite=phase_suite,instrumented=stage_profile,
     warmups=measurements.warmups,samples=measurements.samples,
     ll_hook_workload=os.environ.get('PARITY_LL_HOOK_WORKLOAD','gemm'))),flush=True)

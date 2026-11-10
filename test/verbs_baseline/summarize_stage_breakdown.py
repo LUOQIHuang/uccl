@@ -22,10 +22,12 @@ def summarize(root,output):
     for path in sorted(root.glob('*/node*/setup.json')):
         node=path.parent;rank=int(node.name[-1]);setup=read(path);c=setup['fingerprint']
         host=read(node/'host.json');manifest=read(node/'module_manifest.json');runtime=read(node/'runtime.json')
-        diag=c.get('gpu_stages',False);flags=dict(manifest['flags']);compiled=flags.pop('UCCL_GPU_STAGE_TRACE','0')
+        diag=c.get('gpu_stages',False);
+        if diag and c.get('gpu_stage_mode','all')!='all':raise ValueError('partial recovery group is not a full stage experiment')
+        flags=dict(manifest['flags']);compiled=flags.pop('UCCL_GPU_STAGE_TRACE','0')
         if setup['error'] or c['variant']!='current' or c['mode']!='normal' or not c.get('stage_suite') or not c['no_profile'] or c['profile_only'] or c['repeats']!=1:
             raise ValueError('wrong verbs stage configuration')
-        if compiled!=('1' if diag else '0') or c['cpu_diagnostics']!=diag or c['timeline']!=diag or runtime['gpu_stage_version']!=int(diag) or runtime['queue_backend']!='fifo':
+        if compiled!=('1' if diag else '0') or c['cpu_diagnostics']!=diag or c['timeline']!=diag or runtime['gpu_stage_version']!=(2 if diag else 0) or runtime['queue_backend']!='fifo':
             raise ValueError('instrumentation/build/backend mismatch')
         if flags.get('USE_URMA')!='0' or flags.get('USE_DMABUF')!='1' or any('/liburma.so' in p for p in runtime['loaded_libraries']):
             raise ValueError('expected pure verbs DMA-BUF build')
@@ -55,14 +57,13 @@ def summarize(root,output):
         if len(windows)!=25 or {(w['label'],w['index']) for w in windows}!={(l,i) for l in LABELS for i in range(5)}:raise ValueError('missing GPU windows')
         active=collections.Counter()
         for w in windows:
-            if w['version']!=1 or w['clock_domain']!='per_thread_clock64_delta' or w['nominal_clock_khz']<=0:raise ValueError('invalid GPU clock metadata')
+            if w['version']!=2 or w['clock_domain']!='per_thread_clock64_delta' or w['nominal_clock_khz']<=0:raise ValueError('invalid GPU clock metadata')
             for r in w['records']:
                 stage=r['stage'];active[stage]+=r['calls']
                 if str(stage) not in sites['additional'] or r['sample_lane'] not in (0,1) or r['calls']<=0 or not 0<=r['max_cycles']<=r['sum_cycles']:raise ValueError('invalid GPU metric')
-                gpu.append(dict(node=node.name,label=w['label'],index=w['index'],used=w['index']>0,name=sites['additional'][str(stage)],ring=r['ring'],sample_lane=r['sample_lane'],calls=r['calls'],sum_cycles=r['sum_cycles'],max_cycles=r['max_cycles'],estimated_mean_us=r['sum_cycles']*1000/w['nominal_clock_khz']/r['calls'],estimated_max_us=r['max_cycles']*1000/w['nominal_clock_khz'],clock_note='nominal clock estimate; inclusive representative lane scopes'))
+                gpu.append(dict(node=node.name,label=w['label'],index=w['index'],used=w['index']>0,name=sites['additional'][str(stage)],ring=r['ring'],sample_lane=r['sample_lane'],block=r.get('block',''),warp=r.get('warp',''),calls=r['calls'],sum_cycles=r['sum_cycles'],max_cycles=r['max_cycles'],estimated_mean_us=r['sum_cycles']*1000/w['nominal_clock_khz']/r['calls'],estimated_max_us=r['max_cycles']*1000/w['nominal_clock_khz'],clock_note='nominal clock estimate; inclusive representative lane scopes'))
         if not all(active[k] for k in (40,41,42,46,48)):raise ValueError('missing GPU operator/kernel coverage')
         t,v=timeline_rows(case/'verbs_timeline.jsonl',node.name,LABELS,range(5));traces.extend(t);coverage.extend(v)
-        if not any(e['stage']=='gpu_publish_clock' for w in rows(case/'verbs_timeline.jsonl') for e in w['events']):raise ValueError('no GPU publication/CPU collection correlation')
         windows=rows(case/'verbs_phases.jsonl')
         if len(windows)!=5 or {w['label'] for w in windows}!=LABELS:raise ValueError('missing CPU windows')
         for w in windows:

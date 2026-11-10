@@ -240,6 +240,8 @@ if __name__ == "__main__":
             library_dirs.append(Path(os.environ["URMA_LIBRARY_DIR"]))
 
     if int(os.getenv("UCCL_GPU_STAGE_TRACE", "0")):
+        if not use_metax:
+            raise RuntimeError("GPU stage v2 currently requires MetaX RDC build")
         cxx_flags.append("-DUCCL_GPU_STAGE_TRACE")
         nvcc_flags.append("-DUCCL_GPU_STAGE_TRACE")
     use_dmabuf = int(os.getenv("USE_DMABUF", "0"))

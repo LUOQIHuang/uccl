@@ -192,8 +192,6 @@ struct alignas(128) RingBuffer {
 
   static constexpr size_t kNumWords = (Capacity + 63) / 64;
   uint64_t ack_mask[kNumWords] = {};
-  uccl::gpu_stages::State gpu_stage_trace{};
-  uccl::gpu_stages::Publication gpu_publications[Capacity]{};
   static constexpr int kFenceBatch = 8;
   inline void mark_acked(size_t idx) noexcept {
     assert(idx < Capacity && "mark_acked: idx out of range");
@@ -437,7 +435,7 @@ struct alignas(128) RingBuffer {
   __host__ __device__ inline bool atomic_set_and_commit(
       T const& item, uint64_t* out_slot = nullptr) {
 #if defined(__CUDA_ARCH__) || defined(__HIP_DEVICE_COMPILE__)
-    uccl::gpu_stages::Span stage_span(&gpu_stage_trace,40);
+    uccl::gpu_stages::Span stage_span(uccl::gpu_stages::active_state(),40);
 #endif
     uint64_t slot;
     while (true) {
@@ -476,9 +474,6 @@ struct alignas(128) RingBuffer {
     auto saved_cmd = tmp.cmd_type;
     tmp.cmd_type = CmdType::EMPTY;
     buf[idx] = tmp;
-#if defined(UCCL_GPU_STAGE_TRACE) && (defined(__CUDA_ARCH__) || defined(__HIP_DEVICE_COMPILE__))
-    if(gpu_stage_trace.enabled)gpu_publications[idx]={clock64(),slot,static_cast<uint32_t>(blockIdx.x),static_cast<uint32_t>(threadIdx.x)};
-#endif
 
 #if defined(__CUDA_ARCH__) || defined(__HIP_DEVICE_COMPILE__)
     if constexpr (Dir == FlowDirection::DeviceToHost)

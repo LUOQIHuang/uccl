@@ -74,7 +74,7 @@ struct D2HHandle {
       TransferCmd const& item, uint64_t* out_slot = nullptr) {
 #ifdef USE_MSCCLPP_FIFO_BACKEND
 #ifdef MSCCLPP_DEVICE_COMPILE
-    uccl::gpu_stages::Span gpu_enqueue_stage(fifo.stageTrace,40);
+    uccl::gpu_stages::Span gpu_enqueue_stage(uccl::gpu_stages::active_state(),40);
     mscclpp::ProxyTrigger trig;
     uint64_t fst, snd;
     pack_transfer_cmd(item, fst, snd);
@@ -93,17 +93,9 @@ struct D2HHandle {
 };
 
 __device__ inline uccl::gpu_stages::State* stage_state(uint64_t const* addresses,int count) {
-#if !defined(UCCL_GPU_STAGE_TRACE) || !(defined(__CUDA_ARCH__) || defined(__HIP_DEVICE_COMPILE__))
-  return nullptr;
-#else
-  if(!addresses || count<=0)return nullptr;
-  auto* h=reinterpret_cast<D2HHandle*>(static_cast<uintptr_t>(addresses[blockIdx.x%count]));
-#ifdef USE_MSCCLPP_FIFO_BACKEND
-  return h->fifo.stageTrace;
-#else
-  return &h->ring->gpu_stage_trace;
-#endif
-#endif
+  (void)addresses;(void)count;
+  // v2 never reads a FIFO/ring/host-state pointer, including when disabled.
+  return uccl::gpu_stages::active_state();
 }
 
 }  // namespace d2hq

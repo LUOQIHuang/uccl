@@ -10,6 +10,9 @@ with tempfile.TemporaryDirectory(prefix='uccl-verbs-host-') as tmp:
     gpu=Path(tmp)/'gpu_stage_test'
     subprocess.run(flags+[str(REPO/'ep/tests/gpu_stage_trace_test.cpp'),'-o',str(gpu)],check=True)
     subprocess.run([str(gpu)],check=True)
+    runtime=Path(tmp)/'gpu_stage_runtime_test'
+    subprocess.run(flags+['-I'+str(REPO/'ep/tests/gpu_stage_runtime_support'),str(REPO/'ep/tests/gpu_stage_runtime_test.cpp'),'-o',str(runtime)],check=True)
+    subprocess.run([str(runtime)],check=True)
     source=(REPO/'ep/src/fifo.cpp').read_text()
     (Path(tmp)/'fifo_implementation.inc').write_text(source[source.index('namespace mscclpp {'):])
     source=(REPO/'ep/src/proxy.cpp').read_text()

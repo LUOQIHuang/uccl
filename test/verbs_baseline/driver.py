@@ -27,6 +27,7 @@ def parser():
     p.add_argument('--timeline',action='store_true')
     p.add_argument('--stage-suite',action='store_true')
     p.add_argument('--gpu-stages',action='store_true')
+    p.add_argument('--gpu-stage-mode',choices=('bypass','access','clock','kernels','waits','operators','all'),default='all')
     p.add_argument('--gpu-stage-build',action='store_true')
     p.add_argument('--notify-check',action='store_true')
     p.add_argument('--micro-layout',type=Path)
@@ -49,6 +50,7 @@ def parser():
     p.add_argument('--campaign-check',action='store_true')
     p.add_argument('--gid-index',type=int)
     p.add_argument('--samples', type=int, default=50)
+    p.add_argument('--normal-tokens',type=int,choices=(128,4096),default=4096)
     profile = p.add_mutually_exclusive_group()
     profile.add_argument('--no-profile', action='store_true')
     profile.add_argument('--profile-only', action='store_true')
@@ -161,7 +163,7 @@ def preflight(args):
     if (getattr(args,'notify_check',False) or getattr(args,'timeline',False) or getattr(args,'micro_suite','write')=='notify') and info.get('verbs_notify_version')!=1:raise RuntimeError('NOTIFICATION_SUITE_REQUIRES_REBUILD')
     if getattr(args,'campaign_check',False) and (info.get('verbs_diag_version')!=1 or not info.get('verbs_micro')):raise RuntimeError('CAMPAIGN_REQUIRES_REBUILD')
     if getattr(args,'cpu_diagnostics',False) and info.get('verbs_diag_version')!=1:raise RuntimeError('VERBS_DIAGNOSTICS_REQUIRES_REBUILD')
-    if getattr(args,'gpu_stages',False) and info.get('gpu_stage_version')!=1:raise RuntimeError('GPU_STAGE_REQUIRES_REBUILD')
+    if getattr(args,'gpu_stages',False) and info.get('gpu_stage_version')!=2:raise RuntimeError('GPU_STAGE_REQUIRES_REBUILD')
     if getattr(args,'gid_index',None) is not None:
         port=Path('/sys/class/infiniband')/args.hca/'ports/1'
         if not (port/'gids'/str(getattr(args,'gid_index',None))).read_text().strip().replace(':','').strip('0'):raise RuntimeError('selected GID is zero')
@@ -223,13 +225,13 @@ def run_case(args, root, tag, mode, profile, module, module_sha):
                VB_PROFILE=str(int(profile)), VB_WARMUPS=str(args.warmups), VB_SAMPLES=str(args.samples),
                VB_CPU_DIAG=str(int(getattr(args,'cpu_diagnostics',False))), VB_TIMELINE=str(int(getattr(args,'timeline',False))),
                UCCL_TORCHRUN_NODE_RANK=str(args.node_rank), UCCL_EXIT_GUARD='1')
-    env.update(VB_GPU_STAGES=str(int(getattr(args,'gpu_stages',False))),VB_STAGE_SUITE=str(int(getattr(args,'stage_suite',False))))
+    env.update(VB_NORMAL_TOKENS=str(getattr(args,'normal_tokens',4096)),VB_GPU_STAGE_MODE=getattr(args,'gpu_stage_mode','all'),VB_GPU_STAGES=str(int(getattr(args,'gpu_stages',False))),VB_STAGE_SUITE=str(int(getattr(args,'stage_suite',False))))
     for key, name in [('TMPDIR', 'tmpdir'), ('XDG_CACHE_HOME', 'cache')]:
         path = case / name
         path.mkdir()
         env[key] = str(path)
     (case / 'config.json').write_text(json.dumps(dict(tag=tag, mode=mode, profile=profile,
-        warmups=args.warmups, samples=args.samples, shape=dict(tokens=4096 if mode == 'normal' else 128,
+        warmups=args.warmups, samples=args.samples, shape=dict(tokens=getattr(args,'normal_tokens',4096) if mode == 'normal' else 128,
         hidden=7168, experts=256, topk=8), env={k:v for k,v in env.items() if k.startswith(('UCCL_', 'VB_', 'MCCL_', 'NCCL_'))}), indent=2))
     command = [sys.executable, str(HERE.parent / 'verbs_diag/exit_guard.py'), '--nnodes=2', '--nproc_per_node=1',
                f'--node_rank={args.node_rank}', f'--master_addr={args.master_addr}', f'--master_port={args.port + 1}',
@@ -316,7 +318,7 @@ def run(args):
             mode=args.mode, repeats=args.repeats, warmups=args.warmups, samples=args.samples,
             no_profile=args.no_profile, profile_only=args.profile_only, hca=args.hca, ifname=args.ifname, gpu=args.gpu)
         meta.update(cpu_diagnostics=getattr(args,'cpu_diagnostics',False),timeline=getattr(args,'timeline',False),gid_index=getattr(args,'gid_index',None))
-        meta.update(stage_suite=getattr(args,'stage_suite',False),gpu_stages=getattr(args,'gpu_stages',False))
+        meta.update(normal_tokens=getattr(args,'normal_tokens',4096),stage_suite=getattr(args,'stage_suite',False),gpu_stages=getattr(args,'gpu_stages',False),gpu_stage_mode=getattr(args,'gpu_stage_mode','all'))
     except Exception as exc:
         error = str(exc)
     (root / 'setup.json').write_text(json.dumps(dict(fingerprint=meta, error=error), indent=2))

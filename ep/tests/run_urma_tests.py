@@ -21,6 +21,9 @@ with tempfile.TemporaryDirectory(prefix='uccl-urma-test-') as tmp:
     gpu_stage_test=tmp/'gpu_stage_test'
     subprocess.run([os.environ.get('CXX','c++'),'-std=c++17','-Wall','-Wextra','-Werror','-I'+str(ep/'include'),str(ep/'tests/gpu_stage_trace_test.cpp'),'-o',str(gpu_stage_test)],check=True)
     subprocess.run([str(gpu_stage_test)],check=True)
+    runtime_test=tmp/'gpu_stage_runtime_test'
+    subprocess.run([os.environ.get('CXX','c++'),'-std=c++17','-pthread','-Wall','-Wextra','-Werror','-I'+str(ep/'tests/gpu_stage_runtime_support'),'-I'+str(ep/'include'),str(ep/'tests/gpu_stage_runtime_test.cpp'),'-o',str(runtime_test)],check=True)
+    subprocess.run([str(runtime_test)],check=True)
     fifo_source=(ep/'src/fifo.cpp').read_text()
     (tmp/'fifo_implementation.inc').write_text(fifo_source[fifo_source.index('namespace mscclpp {'):])
     notify_source=(ep/'src/proxy.cpp').read_text()

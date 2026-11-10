@@ -77,6 +77,7 @@ def parser():
     p.add_argument('--notification-check',action='store_true')
     p.add_argument('--timeline',action='store_true')
     p.add_argument('--gpu-stages',action='store_true')
+    p.add_argument('--gpu-stage-mode',choices=('bypass','access','clock','kernels','waits','operators','all'),default='all')
     p.add_argument('--gpu-stage-build',action='store_true')
     p.add_argument('--micro-repeat',type=int,choices=(1,2,3),default=1)
     p.add_argument('--dispatch-trial',action='store_true')
@@ -186,7 +187,8 @@ def preflight(args):
     if args.action=='micro' and not metadata.get('micro_diagnostics'):raise RuntimeError('MICRO_DIAGNOSTICS_REQUIRES_REBUILD')
     if (getattr(args,'notification_check',False) or getattr(args,'timeline',False) or args.micro_suite=='notify') and metadata.get('notify_version')!=1:raise RuntimeError('URMA_NOTIFICATION_SUITE_REQUIRES_REBUILD')
     if args.micro_suite=='split' and metadata.get('micro_version')!=2:raise RuntimeError('MICRO_SPLIT_REQUIRES_REBUILD_V2')
-    if getattr(args,'gpu_stages',False) and metadata.get('gpu_stage_version')!=1:raise RuntimeError('GPU_STAGE_REQUIRES_REBUILD')
+    if getattr(args,'gpu_stages',False) and metadata.get('gpu_stage_version')!=2:raise RuntimeError('GPU_STAGE_REQUIRES_REBUILD')
+    if not getattr(args,'gpu_stages',False) and metadata.get('gpu_stage_version',0):raise RuntimeError('CPU_OR_BASELINE_REQUIRES_GPU_TRACE_OFF_BUILD')
     return module,manifest,dict(libraries=libraries,hardware=hardware,import_log=probe.stdout+probe.stderr,runtime=metadata)
 
 def collect(args):
@@ -253,7 +255,7 @@ def main():
         phase_suite=args.phase_suite,stage_profile=args.stage_profile,save_traces=args.save_traces,
         warmups=args.warmups,samples=args.samples,ll_hook_workload=args.ll_hook_workload,
         api_only=args.api_only,ll_write_order=args.ll_write_order,normal_completion=args.normal_completion,capture_layout=args.capture_layout,
-        dispatch_trial=args.dispatch_trial,dispatch_delay_us=args.dispatch_delay_us,delay_node=1,timeline=getattr(args,'timeline',False),gpu_stages=getattr(args,'gpu_stages',False),device=args.urma_device,gpu=args.gpu)
+        dispatch_trial=args.dispatch_trial,dispatch_delay_us=args.dispatch_delay_us,delay_node=1,timeline=getattr(args,'timeline',False),gpu_stages=getattr(args,'gpu_stages',False),gpu_stage_mode=args.gpu_stage_mode,device=args.urma_device,gpu=args.gpu)
     try:
         module,manifest,info=preflight(args)
         fingerprint.update(build_hash=support.digest({key:manifest[key] for key in ('sources','sdk','flags')}),libraries=info['libraries'],torch=info['runtime']['torch'])
@@ -282,7 +284,7 @@ def main():
         env.update(PARITY_CASE=str(case),PARITY_MODULE=str(module),PARITY_MODULE_SHA=manifest['module_sha'],PARITY_MODE=mode,PARITY_TOKENS=str(args.normal_tokens if mode=='normal' else args.ll_tokens),PARITY_HIDDEN=str(args.hidden),PARITY_EXPERTS=str(args.experts),PARITY_TOPK=str(args.topk),UCCL_TORCHRUN_NODE_RANK=str(args.node_rank),UCCL_EXIT_GUARD='1')
         env.update(PARITY_PHASE_SUITE=str(int(args.phase_suite)),PARITY_STAGE_PROFILE=str(int(args.stage_profile)),
                    PARITY_DISPATCH_TRIAL=str(int(args.dispatch_trial)),PARITY_DISPATCH_DELAY_US=str(args.dispatch_delay_us if args.node_rank==1 else 0),
-                   PARITY_GPU_STAGES=str(int(getattr(args,'gpu_stages',False))), PARITY_API_ONLY=str(int(args.api_only)), PARITY_TIMELINE=str(int(getattr(args,'timeline',False))),
+                   PARITY_GPU_STAGES=str(int(getattr(args,'gpu_stages',False))), PARITY_GPU_STAGE_MODE=args.gpu_stage_mode, PARITY_API_ONLY=str(int(args.api_only)), PARITY_TIMELINE=str(int(getattr(args,'timeline',False))),
                    PARITY_CAPTURE_LAYOUT=str(int(args.capture_layout)),
                    PARITY_SAVE_TRACES=str(int(args.save_traces)),PARITY_WARMUPS=str(args.warmups),
                    PARITY_SAMPLES=str(args.samples),PARITY_LL_HOOK_WORKLOAD=args.ll_hook_workload)

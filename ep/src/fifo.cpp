@@ -15,8 +15,6 @@ struct Fifo::Impl {
   detail::UniqueGpuPtr<uint64_t> head;
   detail::UniqueGpuHostPtr<uint64_t> tail;
   detail::UniqueGpuPtr<uint64_t> tailCache;
-  detail::UniqueGpuHostPtr<uccl::gpu_stages::State> stageTrace;
-  detail::UniqueGpuHostPtr<uccl::gpu_stages::Publication> stagePublications;
   int const size;
 
   Impl(int size)
@@ -24,12 +22,7 @@ struct Fifo::Impl {
         head(detail::gpuCallocUnique<uint64_t>()),
         tail(detail::gpuCallocHostUnique<uint64_t>()),
         tailCache(detail::gpuCallocUnique<uint64_t>()),
-        size(size) {
-#ifdef UCCL_GPU_STAGE_TRACE
-    stageTrace=detail::gpuCallocHostUnique<uccl::gpu_stages::State>();
-    stagePublications=detail::gpuCallocHostUnique<uccl::gpu_stages::Publication>(size);
-#endif
-  }
+        size(size) {}
 };
 
 Fifo::Fifo(int size) {
@@ -69,8 +62,6 @@ void Fifo::pop() {
 
 int Fifo::size() const { return pimpl_->size; }
 
-uccl::gpu_stages::State* Fifo::gpuStageState() const {return pimpl_->stageTrace.get();}
-uccl::gpu_stages::Publication* Fifo::gpuPublications() const {return pimpl_->stagePublications.get();}
 
 FifoDeviceHandle Fifo::deviceHandle() const {
   FifoDeviceHandle deviceHandle;
@@ -79,7 +70,6 @@ FifoDeviceHandle Fifo::deviceHandle() const {
   deviceHandle.tail = pimpl_->tail.get();
   deviceHandle.tailCache = pimpl_->tailCache.get();
   deviceHandle.size = pimpl_->size;
-  deviceHandle.stageTrace=pimpl_->stageTrace.get();deviceHandle.stagePublications=pimpl_->stagePublications.get();
   return deviceHandle;
 }
 

@@ -1,5 +1,8 @@
 # RDMA/verbs Normal：与URMA对应的GPU与CPU阶段插桩
 
+**更新：旧v1插桩曾导致系统故障，请先按 [GPU插桩v2分步恢复文档](../gpu_stage_recovery/README.zh-CN.md) 验证，不直接运行下列全量诊断。v2不再记录GPU发布tick；旧文有关该项描述仅适用于v1。**
+
+
 本轮在verbs内核下运行，不启动URMA，不运行LL或微测。当前正在运行的URMA阶段测试先正常完成、收集日志，协调切换到verbs内核后再执行本文。无需为本次verbs脚本中断URMA测试。
 
 使用当前源码重新构建的纯verbs模块（USE_URMA=0、DMA-BUF），不使用历史ep_host_atomic私有二进制。它对照的是当前URMA源码的verbs分支，不是声称复现历史原版二进制的精确构建。

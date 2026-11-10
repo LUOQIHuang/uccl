@@ -23,7 +23,7 @@ constexpr int memoryOrderAcquire=0,memoryOrderRelease=1;
 template<class T>T atomicLoad(T* p,int){return *p;}
 template<class T>void atomicStore(T* p,T v,int){*p=v;}
 struct ProxyTrigger {uint64_t fst=0,snd=0;};
-struct FifoDeviceHandle {ProxyTrigger* triggers;uint64_t *head,*tail,*tailCache;int size;uccl::gpu_stages::State* stageTrace=nullptr;uccl::gpu_stages::Publication* stagePublications=nullptr;};
+struct FifoDeviceHandle {ProxyTrigger* triggers;uint64_t *head,*tail,*tailCache;int size;};
 namespace detail {
 template<class T>struct Free {void operator()(T* p){if(p){--allocations;std::free(p);}}};
 template<class T>using UniqueGpuHostPtr=std::unique_ptr<T,Free<T>>;
@@ -31,7 +31,7 @@ template<class T>using UniqueGpuPtr=UniqueGpuHostPtr<T>;
 template<class T>auto gpuCallocHostUnique(size_t n=1){void* p=nullptr;assert(posix_memalign(&p,128,n*sizeof(T))==0);std::memset(p,0,n*sizeof(T));++allocations;return UniqueGpuHostPtr<T>(static_cast<T*>(p));}
 template<class T>auto gpuCallocUnique(size_t n=1){return gpuCallocHostUnique<T>(n);}
 }
-class Fifo {struct Impl;std::unique_ptr<Impl> pimpl_;public:Fifo(int);~Fifo();ProxyTrigger poll();void pop();int size() const;FifoDeviceHandle deviceHandle() const;uccl::gpu_stages::State* gpuStageState() const;uccl::gpu_stages::Publication* gpuPublications() const;};
+class Fifo {struct Impl;std::unique_ptr<Impl> pimpl_;public:Fifo(int);~Fifo();ProxyTrigger poll();void pop();int size() const;FifoDeviceHandle deviceHandle() const;};
 }
 #include "fifo_implementation.inc"
 #define USE_MSCCLPP_FIFO_BACKEND
@@ -48,11 +48,8 @@ struct Proxy {
 #include "fifo_notify.inc"
 int main(){
  {mscclpp::Fifo fifo(16);auto h=fifo.deviceHandle();assert(fifo.size()==16);
-#ifdef UCCL_GPU_STAGE_TRACE
- assert(allocations==6 && fifo.gpuStageState() && fifo.gpuPublications());assert(h.stageTrace==fifo.gpuStageState() && h.stagePublications==fifo.gpuPublications());assert(!h.stageTrace->enabled);h.stageTrace->enabled=1;h.stagePublications[0]={42,0,2,3};assert(fifo.gpuPublications()[0].tick==42);
-#else
- assert(allocations==4 && !h.stageTrace && !h.stagePublications);
-#endif
+ assert(allocations==4); // tracing must allocate nothing in the production FIFO
+
  h.triggers[0]={123,456};auto t=fifo.poll();assert(t.fst==123 && t.snd==456);fifo.pop();assert(*h.tail==1 && !h.triggers[0].fst);
  Proxy p;p.cfg_.d2h_queues.push_back({&fifo});p.fifo_pending_.resize(1);p.fifo_pending_[0].push_back({0,8});p.fifo_pending_[0].push_back({1,0});p.acked_wrs_={0,1};
  uccl::urma_diag::identity(0,0);uccl::transport_timeline::begin();uint64_t tail=0;p.notify_gpu_completion(tail);auto trace=uccl::transport_timeline::end();

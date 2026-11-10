@@ -1,3 +1,4 @@
+#include "gpu_stage_trace_host.hpp"
 #include "bench_kernel.cuh"
 #include "bench_utils.hpp"
 #include "common.hpp"
@@ -2453,29 +2454,17 @@ NB_MODULE(ep, m) {
   });
   m.def("get_gpu_stage_version",[](){
 #ifdef UCCL_GPU_STAGE_TRACE
-    return 1;
+    return 2;
 #else
     return 0;
 #endif
   });
-  auto stage_state_host=[](uintptr_t address)->uccl::gpu_stages::State* {
-#ifdef USE_MSCCLPP_FIFO_BACKEND
-    return reinterpret_cast<mscclpp::Fifo*>(address)->gpuStageState();
-#else
-    return &reinterpret_cast<DeviceToHostCmdBuffer*>(address)->gpu_stage_trace;
-#endif
-  };
-  m.def("gpu_stage_begin",[stage_state_host](std::vector<uintptr_t> const& addresses){
-    for(auto a:addresses)if(!a || !stage_state_host(a) || stage_state_host(a)->enabled)throw std::runtime_error("invalid/active GPU stage state");
-    for(auto a:addresses){auto& t=*stage_state_host(a);t={};t.enabled=1;}
-  });
-  m.def("gpu_stage_end",[stage_state_host](std::vector<uintptr_t> const& addresses){
-    std::ostringstream out;out<<"{\"version\":1,\"clock_domain\":\"per_thread_clock64_delta\",\"records\":[";bool comma=false;
-    for(size_t ring=0;ring<addresses.size();++ring){auto* state=stage_state_host(addresses[ring]);if(!state)throw std::runtime_error("GPU stage state unavailable");auto& t=*state;t.enabled=0;
-      for(unsigned stage=0;stage<uccl::gpu_stages::kStages;++stage)for(unsigned lane=0;lane<2;++lane){auto const& m=t.metrics[stage][lane];if(!m.calls)continue;
-        if(comma){out<<',';}comma=true;out<<"{\"ring\":"<<ring<<",\"ring_address\":"<<addresses[ring]<<",\"stage\":"<<stage<<",\"sample_lane\":"<<lane<<",\"calls\":"<<m.calls<<",\"sum_cycles\":"<<m.cycles<<",\"max_cycles\":"<<m.max_cycles<<'}';}}
-    int device=0;cudaDeviceProp props{};CUDA_CHECK(cudaGetDevice(&device));CUDA_CHECK(cudaGetDeviceProperties(&props,device));
-    out<<"],\"nominal_clock_khz\":"<<props.clockRate<<'}';return out.str();
+  m.def("gpu_stage_begin",[](std::vector<uintptr_t> const& addresses,std::string const& mode){
+    if(addresses.empty())throw std::runtime_error("GPU_STAGE_V2_NO_PROXY");
+    uccl::gpu_stages::begin(mode);
+  },nb::arg("addresses"),nb::arg("mode")="all");
+  m.def("gpu_stage_end",[](std::vector<uintptr_t> const& addresses){
+    (void)addresses;return uccl::gpu_stages::end();
   });
   m.def("alloc_cmd_ring", &alloc_cmd_ring);
   m.def("free_cmd_ring", &free_cmd_ring);

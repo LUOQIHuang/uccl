@@ -33,11 +33,13 @@ def summarize(root,output):
             for r in w['records']:
                 stage=r['stage'];active[stage]+=r['calls']
                 if str(stage) not in names or r['sample_lane'] not in (0,1) or r['calls']<=0 or not 0<=r['max_cycles']<=r['sum_cycles']:raise ValueError('invalid GPU metric')
-                gpu.append(dict(node=node.name,label=w['label'],index=w['index'],used=w['index']>0,name=names[str(stage)],ring=r['ring'],sample_lane=r['sample_lane'],calls=r['calls'],sum_cycles=r['sum_cycles'],max_cycles=r['max_cycles'],estimated_max_us=r['max_cycles']*1000/w['nominal_clock_khz'],estimated_mean_us=r['sum_cycles']*1000/w['nominal_clock_khz']/r['calls'],clock_note='nominal clock estimate; inclusive representative lane scopes'))
+                gpu.append(dict(node=node.name,label=w['label'],index=w['index'],used=w['index']>0,name=names[str(stage)],ring=r['ring'],sample_lane=r['sample_lane'],block=r.get('block',''),warp=r.get('warp',''),calls=r['calls'],sum_cycles=r['sum_cycles'],max_cycles=r['max_cycles'],estimated_max_us=r['max_cycles']*1000/w['nominal_clock_khz'],estimated_mean_us=r['sum_cycles']*1000/w['nominal_clock_khz']/r['calls'],clock_note='nominal clock estimate; inclusive representative lane scopes'))
         if not all(active[k] for k in (40,41,42,46,48)):raise ValueError('missing GPU operator/kernel coverage')
         t,v=timeline_rows(case/'urma_timeline.jsonl',node.name,LABELS,range(5));timeline.extend(t);coverage.extend(v)
-        publications=sum(e['stage']=='gpu_publish_clock' for w in rows(case/'urma_timeline.jsonl') for e in w['events'])
-        if not publications:raise ValueError('no GPU publication/CPU collection correlation')
+        if any(w.get('version',1)==1 for w in windows):
+            publications=sum(e['stage']=='gpu_publish_clock' for w in rows(case/'urma_timeline.jsonl') for e in w['events'])
+            if not publications:raise ValueError('no GPU publication/CPU collection correlation')
+        if c.get('gpu_stage_mode','all')!='all':raise ValueError('partial recovery group is not a full stage experiment')
         for w in rows(case/'phases.jsonl'):
             totals=collections.defaultdict(collections.Counter)
             for record in w['records']:

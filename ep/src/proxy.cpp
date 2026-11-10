@@ -1027,15 +1027,6 @@ void Proxy::post_gpu_command(uint64_t& my_tail, size_t& seen) {
       uint64_t unique_wr_id = (static_cast<uint64_t>(rb_idx) << 32) |
                               (fifo_seq_[rb_idx]++ & 0xFFFFFFFFULL);
       uccl::transport_timeline::record("collect",unique_wr_id);
-      if(uccl::transport_timeline::active.load(std::memory_order_relaxed)){
-        auto* state=fifo->gpuStageState();auto* publications=fifo->gpuPublications();
-        if(state && state->enabled){auto const& publication=publications[uint32_t(unique_wr_id)%fifo->size()];
-          if(publication.slot==uint32_t(unique_wr_id) && publication.tick){
-            uccl::transport_timeline::record("gpu_publish_clock",unique_wr_id,0,publication.tick);
-            uccl::transport_timeline::record("gpu_writer",unique_wr_id,0,(uint64_t(publication.block)<<32)|publication.thread);
-          }
-        }
-      }
       wrs_to_post.push_back(unique_wr_id);
       cmds_to_post.push_back(cmd);
       fifo_pending_[rb_idx].push_back(
@@ -1124,13 +1115,6 @@ void Proxy::post_gpu_command(uint64_t& my_tail, size_t& seen) {
       // Use a unique ID combining ring buffer index and command index
       uint64_t unique_wr_id = (rb_idx << 32) | i;
       uccl::transport_timeline::record("collect",unique_wr_id);
-      if(uccl::transport_timeline::active.load(std::memory_order_relaxed) && h->ring->gpu_stage_trace.enabled){
-        auto const& publication=h->ring->gpu_publications[i%h->capacity()];
-        if(publication.slot==i && publication.tick){
-          uccl::transport_timeline::record("gpu_publish_clock",unique_wr_id,0,publication.tick);
-          uccl::transport_timeline::record("gpu_writer",unique_wr_id,0,(uint64_t(publication.block)<<32)|publication.thread);
-        }
-      }
       wrs_to_post.push_back(unique_wr_id);
       cmds_to_post.push_back(cmd_entry);
 #ifdef MEASURE_PER_VERB_LATENCY

@@ -11,7 +11,7 @@ LABELS=['layout','dispatch_fp8_chunk32','dispatch_bf16_chunk32','combine_chunk12
 def mask(s):return re.sub(r'//[^\n]*|/\*[\s\S]*?\*/|"(?:\\.|[^"\\])*"|\'(?:\\.|[^\'\\])*\'',lambda m:''.join('\n' if c=='\n' else ' ' for c in m.group()),s)
 class GpuStageTests(unittest.TestCase):
     def test_annotations_preserve_original_kernel_statements(self):
-        s=(REPO/'ep/src/internode.cu').read_text();masked=mask(s);edits=[]
+        s=(REPO/'ep/src/internode.cu').read_text();s=re.sub(r'// GPU_STAGE_V2_LAUNCH_GUARD_BEGIN[\s\S]*?// GPU_STAGE_V2_LAUNCH_GUARD_END\n\n','',s);masked=mask(s);edits=[]
         pattern=r'\{ uccl::gpu_stages::Span gpu_stage_(\d+)\([^;]+;\n'
         matches=list(re.finditer(pattern,s));self.assertEqual(len(matches),24)
         for m in matches:

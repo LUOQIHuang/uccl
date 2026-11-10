@@ -25,7 +25,7 @@ def fixture(root,backend):
             manifest=dict(sources={'ep/src/internode.cu':'same'},sdk={},flags=flags)
             dump(node/'setup.json',dict(error=None,fingerprint=c));dump(node/'host.json',dict(boot_id=str(rank),host='host'+str(rank)))
             dump(node/('module_manifest.json' if backend=='verbs' else 'build_manifest.json'),manifest)
-            dump(node/('runtime.json' if backend=='verbs' else 'normal/runtime.json'),dict(queue_backend='fifo',gpu_stage_version=int(diag),loaded_libraries=[]))
+            dump(node/('runtime.json' if backend=='verbs' else 'normal/runtime.json'),dict(queue_backend='fifo',gpu_stage_version=2 if diag else 0,loaded_libraries=[]))
             if backend=='verbs':
                 (node/'benchmark').mkdir();(node/'benchmark/test_internode.py').write_text('same benchmark')
             else:(node/'normal.py').write_text('same benchmark')
@@ -40,7 +40,7 @@ def fixture(root,backend):
             gpu=[];trace=[]
             for label in LABELS:
                 for i in range(n):
-                    gpu.append(dict(version=1,label=label,index=i,clock_domain='per_thread_clock64_delta',nominal_clock_khz=1000,records=[dict(ring=0,stage=k,sample_lane=0,calls=1,sum_cycles=100,max_cycles=100) for k in (40,41,42,46,48)]))
+                    gpu.append(dict(version=2,label=label,index=i,clock_domain='per_thread_clock64_delta',nominal_clock_khz=1000,records=[dict(ring=0,stage=k,sample_lane=0,calls=1,sum_cycles=100,max_cycles=100) for k in (40,41,42,46,48)]))
                     events=[dict(ns=(j+1)*100,wr_id=1,proxy=0,qp=1,stage=s,value=0) for j,s in enumerate(('collect','prepare','post_begin','post_end','cqe','ack_slot'))]
                     events.append(dict(ns=250,wr_id=1,proxy=0,qp=0,stage='gpu_publish_clock',value=1000))
                     trace.append(dict(label=label,index=i,origin_ns=0,dropped=0,events=events))

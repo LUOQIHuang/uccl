@@ -9,6 +9,20 @@
 // #include "ibgda_device.cuh"
 #include "internode.cuh"
 
+// GPU_STAGE_V2_LAUNCH_GUARD_BEGIN
+#include "gpu_stage_trace_host.hpp"
+#ifdef UCCL_GPU_STAGE_TRACE
+#undef LAUNCH_KERNEL
+#define LAUNCH_KERNEL(config, kernel, ...) do { \
+  auto* stage_cfg=(config); \
+  uccl::gpu_stages::validate_launch(reinterpret_cast<uintptr_t>(stage_cfg->stream), \
+    stage_cfg->gridDim.x,stage_cfg->gridDim.y,stage_cfg->gridDim.z, \
+    stage_cfg->blockDim.x,stage_cfg->blockDim.y,stage_cfg->blockDim.z); \
+  CUDA_CHECK(cudaLaunchKernelEx(stage_cfg,kernel,##__VA_ARGS__)); \
+} while(false)
+#endif
+// GPU_STAGE_V2_LAUNCH_GUARD_END
+
 namespace uccl {
 
 namespace internode {

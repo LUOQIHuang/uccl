@@ -5,11 +5,11 @@ import phase_support
 
 
 class Measurements:
-    def __init__(self,torch,dist,ep,case,mode,enabled,warmups,samples,capture_layout=False,dispatch_trial=False,dispatch_delay_us=0,timeline=False,gpu_rings=None):
+    def __init__(self,torch,dist,ep,case,mode,enabled,warmups,samples,capture_layout=False,dispatch_trial=False,dispatch_delay_us=0,timeline=False,gpu_rings=None,gpu_stage_mode="all"):
         self.torch,self.dist,self.ep=torch,dist,ep
         self.case,self.mode,self.enabled=case,mode,enabled
         self.warmups,self.samples=warmups,samples
-        self.gpu_rings=gpu_rings
+        self.gpu_rings=gpu_rings;self.gpu_stage_mode=gpu_stage_mode
         self.timeline=timeline
         self.capture_layout=capture_layout
         self.dispatch_trial=dispatch_trial;self.dispatch_delay_us=dispatch_delay_us
@@ -57,7 +57,7 @@ class Measurements:
                 trace_this=self.timeline and (self.gpu_rings is not None or (i==0 and label.startswith('dispatch_')))
                 if trace_this and self.gpu_rings is not None:self.dist.barrier()
                 rings=self.gpu_rings() if trace_this and self.gpu_rings is not None else None
-                if rings is not None:self.ep.gpu_stage_begin(rings)
+                if rings is not None:self.ep.gpu_stage_begin(rings,self.gpu_stage_mode)
                 if trace_this:self.ep.urma_timeline_begin()
                 try:
                     start[i].record(); fn(); end[i].record()
