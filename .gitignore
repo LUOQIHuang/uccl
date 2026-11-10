@@ -158,3 +158,10 @@ test/**/*.bin
 !test/verbs_baseline/results/**/*.json
 !test/verbs_baseline/results/**/*.jsonl
 !test/verbs_baseline/results/**/*.csv
+
+# Dispatch probe definitions and selected two-backend diagnostic artifacts.
+!test/dispatch_diag/dispatch_sites.json
+!test/dispatch_diag/results/**/*.log
+!test/dispatch_diag/results/**/*.json
+!test/dispatch_diag/results/**/*.jsonl
+!test/dispatch_diag/results/**/*.csv

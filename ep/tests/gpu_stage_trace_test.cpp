@@ -21,6 +21,13 @@ int main(){
   threadIdx.x=1;{Span lane(s,1);ticks+=5;lane.finish();lane.finish();}
   assert(s->metrics[0][0][1][1].calls==1);
   {Span op(s,40);ticks+=5;}assert(!s->metrics[0][0][1][40].calls);
+  {Span role(s,53);ticks+=6;}assert(s->metrics[0][0][1][53].cycles==6);
+  control.dispatch_focus=true;
+  {Span notify_atomic(s,42);ticks+=8;}assert(!s->metrics[0][0][1][42].calls);
+  {DispatchScope main_dispatch(s);Span remote_atomic(s,42);ticks+=8;}
+  assert(s->metrics[0][0][1][42].cycles==8 && !s->dispatch_active[0][0][1]);
+  {Span later_notify(s,42);ticks+=8;}assert(s->metrics[0][0][1][42].calls==1);
+  control.dispatch_focus=false;
   threadIdx.x=32;{Span other_warp(s,1);ticks+=7;}
   assert(s->metrics[0][1][0][1].cycles==7 && s->metrics[0][0][0][1].cycles==40);
   blockIdx.x=1;{Span other_block(s,1);ticks+=9;}assert(s->metrics[1][1][0][1].cycles==9);

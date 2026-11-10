@@ -1,5 +1,7 @@
 # RDMA/verbs Normal：与URMA对应的GPU与CPU阶段插桩
 
+**当前只定位Dispatch时，使用[Dispatch专用打桩文档](../dispatch_diag/README.zh-CN.md)。它与URMA共用测点，单独验收FP8/BF16角色覆盖，不要求启用CPU逐请求时间线和布局采集。**
+
 **更新：旧v1插桩曾导致系统故障，请先按 [GPU插桩v2分步恢复文档](../gpu_stage_recovery/README.zh-CN.md) 验证，不直接运行下列全量诊断。v2不再记录GPU发布tick；旧文有关该项描述仅适用于v1。**
 
 

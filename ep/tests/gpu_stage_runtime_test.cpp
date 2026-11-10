@@ -21,5 +21,8 @@ int main(){
   auto result=end();assert(result.find("\"version\":2")!=std::string::npos && result.find("\"calls\":3")!=std::string::npos && fixture_allocations==0 && !control.state);
   begin("clock");assert(control.mode==2 && control.mask==(uint64_t{1}<<46));end();
   begin("operators");assert((control.mask&(uint64_t{1}<<41)) && !(control.mask&1));end();
+  begin("dispatch_access");assert(control.mode==1 && (control.mask&(uint64_t{1}<<53)) && !(control.mask&(uint64_t{1}<<45)));end();
+  begin("dispatch_clock");assert(control.mode==2 && control.mask==(uint64_t{1}<<46));end();
+  begin("dispatch");assert((control.mask&(uint64_t{1}<<12)) && (control.mask&(uint64_t{1}<<60)) && !(control.mask&(uint64_t{1}<<48)));end();
   assert(fixture_allocations==0);
 }

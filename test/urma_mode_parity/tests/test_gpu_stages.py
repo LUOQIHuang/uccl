@@ -23,6 +23,10 @@ class GpuStageTests(unittest.TestCase):
             self.assertEqual(s[i-2:i],'\n}');edits.extend([(m.start(),m.end()),(i-2,i)])
         for start,end in sorted(edits,reverse=True):s=s[:start]+s[end:]
         s=re.sub(r'\n  uccl::gpu_stages::Span gpu_kernel_stage\([^;]+;', '', s)
+        # Focused Dispatch probes add RAII timing only, without changing any
+        # original kernel statements, branches, barriers or memory operations.
+        s=re.sub(r'^ +uccl::gpu_stages::Span dispatch_\w+\([^;]+;\n','',s,flags=re.M)
+        s=re.sub(r'^ +uccl::gpu_stages::DispatchScope dispatch_operator_scope\([^;]+;\n','',s,flags=re.M)
         old=subprocess.check_output(['git','-C',str(REPO),'show','008dca1a:ep/src/internode.cu']).decode()
         self.assertEqual(s,old)
     def test_gpu_capture_every_sample_after_warmups(self):

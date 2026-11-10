@@ -11,6 +11,7 @@ class Measurements:
         self.warmups,self.samples=warmups,samples
         self.gpu_rings=gpu_rings;self.gpu_stage_mode=gpu_stage_mode
         self.timeline=timeline
+        self.dispatch_focus=False
         self.capture_layout=capture_layout
         self.dispatch_trial=dispatch_trial;self.dispatch_delay_us=dispatch_delay_us
 
@@ -54,11 +55,11 @@ class Measurements:
         end=[torch.cuda.Event(enable_timing=True) for _ in range(self.samples)]
         def timed():
             for i in range(self.samples):
-                trace_this=self.timeline and (self.gpu_rings is not None or (i==0 and label.startswith('dispatch_')))
+                trace_this=(self.dispatch_focus and self.gpu_rings is not None and label.startswith('dispatch_')) or (not self.dispatch_focus and self.timeline and (self.gpu_rings is not None or (i==0 and label.startswith('dispatch_'))))
                 if trace_this and self.gpu_rings is not None:self.dist.barrier()
                 rings=self.gpu_rings() if trace_this and self.gpu_rings is not None else None
                 if rings is not None:self.ep.gpu_stage_begin(rings,self.gpu_stage_mode)
-                if trace_this:self.ep.urma_timeline_begin()
+                if trace_this and self.timeline:self.ep.urma_timeline_begin()
                 try:
                     start[i].record(); fn(); end[i].record()
                 finally:
@@ -68,7 +69,7 @@ class Measurements:
                             if rings is not None:self.dist.barrier()
                         finally:
                             if rings is not None:self.append('gpu_stages.jsonl',dict(label=label,index=i,**json.loads(self.ep.gpu_stage_end(rings))))
-                            self.append('urma_timeline.jsonl',dict(label=label,index=i,backend='urma',**json.loads(self.ep.urma_timeline_end())))
+                            if self.timeline:self.append('urma_timeline.jsonl',dict(label=label,index=i,backend='urma',**json.loads(self.ep.urma_timeline_end())))
                 if post_fn is not None: post_fn()
             torch.cuda.synchronize()
         self.window(label,timed,self.samples)

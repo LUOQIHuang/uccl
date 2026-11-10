@@ -2584,6 +2584,7 @@ NB_MODULE(ep, m) {
     return uint32_t(0);
 #endif
   });
+  m.def("get_dispatch_trace_version", []() { return 1; });
   m.def("get_urma_ll_write_order", []() {
     return std::string(urma_ll_relaxed_write_from_env() ? "relax" : "strong");
   });

@@ -27,7 +27,8 @@ def parser():
     p.add_argument('--timeline',action='store_true')
     p.add_argument('--stage-suite',action='store_true')
     p.add_argument('--gpu-stages',action='store_true')
-    p.add_argument('--gpu-stage-mode',choices=('bypass','access','clock','kernels','waits','operators','all'),default='all')
+    p.add_argument('--dispatch-focus',action='store_true')
+    p.add_argument('--gpu-stage-mode',choices=('bypass','access','clock','kernels','waits','operators','all','dispatch_access','dispatch_clock','dispatch'),default='all')
     p.add_argument('--gpu-stage-build',action='store_true')
     p.add_argument('--notify-check',action='store_true')
     p.add_argument('--micro-layout',type=Path)
@@ -76,7 +77,10 @@ def parser():
     if args.cpu_light and (not args.cpu_diagnostics or args.timeline):p.error('--cpu-light requires CPU diagnostics without timeline')
     if args.timeline and not args.cpu_diagnostics:p.error('--timeline requires --cpu-diagnostics')
     if args.stage_suite and (args.variant!='current' or args.mode!='normal' or not args.no_profile or args.repeats!=1):p.error('--stage-suite requires current Normal --no-profile --repeats 1')
-    if args.gpu_stages and (not args.stage_suite or not args.timeline):p.error('--gpu-stages requires --stage-suite --timeline --cpu-diagnostics')
+    if args.dispatch_focus and (args.variant!='current' or args.mode!='normal' or not args.no_profile or args.repeats!=1 or args.cpu_diagnostics or args.timeline or args.stage_suite):p.error('dispatch focus requires current Normal no-profile repeats=1, without CPU/timeline/stage-suite')
+    if args.dispatch_focus and args.gpu_stages and args.gpu_stage_mode not in ('bypass','dispatch_access','dispatch_clock','dispatch'):p.error('invalid Dispatch focus GPU mode')
+    if args.gpu_stage_mode.startswith('dispatch') and not args.dispatch_focus:p.error('Dispatch GPU modes require --dispatch-focus')
+    if args.gpu_stages and not args.dispatch_focus and (not args.stage_suite or not args.timeline):p.error('--gpu-stages requires --stage-suite --timeline --cpu-diagnostics')
     if args.gpu_stage_build and args.action!='build':p.error('--gpu-stage-build is only for build; use --gpu-stages for checks/runs')
     if args.micro_suite=='notify' and args.action=='micro' and args.micro_threads!=4:p.error('notify suite requires four threads')
     args.output = args.output.resolve()
@@ -178,6 +182,7 @@ def preflight(args):
     if getattr(args,'campaign_check',False) and (info.get('verbs_diag_version')!=1 or not info.get('verbs_micro')):raise RuntimeError('CAMPAIGN_REQUIRES_REBUILD')
     if getattr(args,'cpu_diagnostics',False) and info.get('verbs_diag_version')!=1:raise RuntimeError('VERBS_DIAGNOSTICS_REQUIRES_REBUILD')
     if getattr(args,'gpu_stages',False) and info.get('gpu_stage_version')!=2:raise RuntimeError('GPU_STAGE_REQUIRES_REBUILD')
+    if getattr(args,'dispatch_focus',False) and info.get('dispatch_trace_version')!=1:raise RuntimeError('DISPATCH_FOCUS_REQUIRES_REBUILD')
     if getattr(args,'gid_index',None) is not None:
         port=Path('/sys/class/infiniband')/args.hca/'ports/1'
         if not (port/'gids'/str(getattr(args,'gid_index',None))).read_text().strip().replace(':','').strip('0'):raise RuntimeError('selected GID is zero')
@@ -242,6 +247,7 @@ def run_case(args, root, tag, mode, profile, module, module_sha):
                VB_CPU_LIGHT=str(int(getattr(args,'cpu_light',False))),VB_CPU_DIAG=str(int(getattr(args,'cpu_diagnostics',False))), VB_TIMELINE=str(int(getattr(args,'timeline',False))),
                UCCL_TORCHRUN_NODE_RANK=str(args.node_rank), UCCL_EXIT_GUARD='1')
     env.update(VB_NORMAL_TOKENS=str(getattr(args,'normal_tokens',4096)),VB_GPU_STAGE_MODE=getattr(args,'gpu_stage_mode','all'),VB_GPU_STAGES=str(int(getattr(args,'gpu_stages',False))),VB_STAGE_SUITE=str(int(getattr(args,'stage_suite',False))))
+    env['VB_DISPATCH_FOCUS']=str(int(getattr(args,'dispatch_focus',False)))
     for key, name in [('TMPDIR', 'tmpdir'), ('XDG_CACHE_HOME', 'cache')]:
         path = case / name
         path.mkdir()
@@ -284,7 +290,11 @@ def run_case(args, root, tag, mode, profile, module, module_sha):
         expected = 4 if mode == 'normal' else 2
         checks['profiles'] = text.count('VERBS_GPU_PROFILE ') == expected if profile else text.count('VERBS_PROFILE_SKIPPED ') == expected and (getattr(args,'gpu_stages',False) or not (case / 'gpu_stages.jsonl').exists())
         if getattr(args,'gpu_stages',False):checks['gpu_stages']=(case/'gpu_stages.jsonl').is_file()
-        if getattr(args,'stage_suite',False):checks['measurement_boundary']=(case/'measurement_boundary.json').is_file() and (case/'kernel_after_measurements.txt').is_file()
+        if getattr(args,'dispatch_focus',False) and getattr(args,'gpu_stages',False):
+            sys.path.insert(0,str(HERE.parent/'dispatch_diag'))
+            from dispatch_checks import validate_gpu
+            checks['dispatch_coverage']=validate_gpu(case,args.samples,args.gpu_stage_mode)
+        if getattr(args,'stage_suite',False) or getattr(args,'dispatch_focus',False):checks['measurement_boundary']=(case/'measurement_boundary.json').is_file() and (case/'kernel_after_measurements.txt').is_file()
         if profile:
             checks['traces'] = all((case / f'gpu_trace_{i}.json').is_file() and (case / f'gpu_trace_{i}.json').stat().st_size > 0 for i in range(expected))
         if rc == 0 and not all(checks.values()):
@@ -314,6 +324,7 @@ def run(args):
         (root / 'runtime.json').write_text(json.dumps(info, indent=2))
         (root / 'import.log').write_text(log)
         if getattr(args,'stage_suite',False):shutil.copy2(HERE.parent/'urma_mode_parity/gpu_stage_sites.json',root/'gpu_stage_sites.json')
+        if getattr(args,'dispatch_focus',False):shutil.copy2(HERE.parent/'dispatch_diag/dispatch_sites.json',root/'dispatch_sites.json')
         legacy.snapshot_host(root, args.hca)
         port = Path('/sys/class/infiniband') / args.hca / 'ports/1'
         port_paths = [p for p in port.glob('*') if p.is_file()]
@@ -335,6 +346,7 @@ def run(args):
             no_profile=args.no_profile, profile_only=args.profile_only, hca=args.hca, ifname=args.ifname, gpu=args.gpu)
         meta.update(cpu_light=getattr(args,'cpu_light',False),cpu_diagnostics=getattr(args,'cpu_diagnostics',False),timeline=getattr(args,'timeline',False),gid_index=getattr(args,'gid_index',None))
         meta.update(normal_tokens=getattr(args,'normal_tokens',4096),stage_suite=getattr(args,'stage_suite',False),gpu_stages=getattr(args,'gpu_stages',False),gpu_stage_mode=getattr(args,'gpu_stage_mode','all'))
+        meta['dispatch_focus']=getattr(args,'dispatch_focus',False)
     except Exception as exc:
         error = str(exc)
     (root / 'setup.json').write_text(json.dumps(dict(fingerprint=meta, error=error), indent=2))

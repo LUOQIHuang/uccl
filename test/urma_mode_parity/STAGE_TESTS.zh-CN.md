@@ -1,5 +1,7 @@
 # URMA 阶段时延与稳定性测试：phase_v1
 
+只定位Normal Dispatch主kernel时，请使用[两后端统一打桩文档](../dispatch_diag/README.zh-CN.md)，不直接运行旧全量阶段套件。
+
 本轮只使用已验证的 URMA 内核环境，不切换到 verbs 内核。目标是复测当前实现的稳定性，并把整体耗时与 GPU 阶段、Proxy 工作量和等待关联。保持 Normal 8 数据+1控制通道、LL 单通道、Normal RELAX / LL STRONG、原子 fence 和对齐修复不变。
 
 ## 1. 测什么，怎样比较

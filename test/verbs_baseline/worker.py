@@ -21,6 +21,7 @@ cpu_light=os.environ.get('VB_CPU_LIGHT')=='1'
 timeline=os.environ.get('VB_TIMELINE')=='1'
 gpu_stages=os.environ.get('VB_GPU_STAGES')=='1'
 stage_suite=os.environ.get('VB_STAGE_SUITE')=='1'
+dispatch_focus=os.environ.get('VB_DISPATCH_FOCUS')=='1'
 stage_proxies=[]
 warmups, samples = int(os.environ['VB_WARMUPS']), int(os.environ['VB_SAMPLES'])
 ep, runtime = common.load_extension(Path(os.environ['VB_MODULE']))
@@ -99,11 +100,12 @@ def measure(fn, label, post_fn=None):
         ep.verbs_diag_begin()
     host_begin=time.perf_counter_ns()
     for i in range(samples):
-        trace_this=globals().get("timeline",False) and (gpu_stages or (i==0 and label.startswith("dispatch_")))
+        focus_trace=globals().get('dispatch_focus',False) and gpu_stages and label.startswith('dispatch_')
+        trace_this=focus_trace or (not globals().get('dispatch_focus',False) and globals().get("timeline",False) and (gpu_stages or (i==0 and label.startswith("dispatch_"))))
         if trace_this and gpu_stages:dist.barrier()
         rings=stage_rings() if trace_this and gpu_stages else None
         if rings is not None:ep.gpu_stage_begin(rings,os.environ.get("VB_GPU_STAGE_MODE","all"))
-        if trace_this:ep.verbs_timeline_begin()
+        if trace_this and not globals().get('dispatch_focus',False):ep.verbs_timeline_begin()
         try:
             start[i].record()
             fn()
@@ -115,7 +117,7 @@ def measure(fn, label, post_fn=None):
                     if rings is not None:dist.barrier()
                 finally:
                     if rings is not None:append('gpu_stages.jsonl',dict(label=label,index=i,**json.loads(ep.gpu_stage_end(rings))))
-                    append("verbs_timeline.jsonl",dict(label=label,index=i,backend='verbs',**json.loads(ep.verbs_timeline_end())))
+                    if not globals().get('dispatch_focus',False):append("verbs_timeline.jsonl",dict(label=label,index=i,backend='verbs',**json.loads(ep.verbs_timeline_end())))
         if post_fn is not None:
             post_fn()
     torch.cuda.synchronize()
@@ -157,7 +159,7 @@ def measured_profile(fn, kernel_names, *args, **kwargs):
     # notify so the benchmark's best-config selection still executes. These
     # console tuning fields are placeholders, never GPU stage measurements.
     timing = measure(fn, label) if mode == 'normal' else None
-    if stage_suite and index==3:
+    if (stage_suite or globals().get('dispatch_focus',False)) and index==3:
         begin=time.time_ns()
         try:
             snapshot=subprocess.run(['journalctl','-b','-k','-n','400','--no-pager'],capture_output=True,text=True,timeout=20)

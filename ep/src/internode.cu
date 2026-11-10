@@ -571,6 +571,7 @@ __global__ void __launch_bounds__(
              int num_max_nvl_chunked_recv_tokens, int rank, int num_ranks,
              uint64_t const* d2h_channel_addrs, int num_d2h_channel_addrs,
              void* atomic_buffer_ptr) {
+  uccl::gpu_stages::DispatchScope dispatch_operator_scope(d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs));
   uccl::gpu_stages::Span gpu_kernel_stage(d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),46);
   enum class WarpRole {
     kRDMASender,
@@ -730,6 +731,7 @@ __global__ void __launch_bounds__(
   };
 
   if (warp_role == WarpRole::kRDMASender) {
+    uccl::gpu_stages::Span dispatch_sender_total(d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),53);
     // Get tasks
     int token_start_idx, token_end_idx;
     get_channel_task_range(num_tokens, num_channels, channel_id,
@@ -914,6 +916,7 @@ while (is_token_in_rank_uint64 != 0 and
 #endif
       __syncwarp();
 
+      uccl::gpu_stages::Span dispatch_sender_pack(d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),50);
       // Store RDMA head for combine
       if (lane_id < kNumRDMARanks and not kCachedMode)
         send_rdma_head[token_idx * kNumRDMARanks + lane_id] = rdma_tail_idx;
@@ -1067,6 +1070,7 @@ while (lane_id == 0 and rdma_send_next_token_idx != token_idx)
     lane_id == 0 ? (rdma_send_next_token_idx += 1) : 0;
 #endif
   } else if (warp_role == WarpRole::kRDMASenderCoordinator) {
+    uccl::gpu_stages::Span dispatch_sender_coordinator_total(d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),54);
     // NOTES: in case of splitting, the issued put at the end of the buffer
     EP_DEVICE_ASSERT(num_max_rdma_chunked_recv_tokens %
                          num_max_rdma_chunked_send_tokens ==
@@ -1138,6 +1142,7 @@ while (__any_sync(WARP_MASK, num_tokens_to_send > 0)) {
             num_tokens_processed < num_max_rdma_chunked_send_tokens)
           continue;
 
+        uccl::gpu_stages::Span dispatch_issue_chunk(d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),59);
         // Issue RDMA send
         auto num_tokens_to_issue =
             min(num_tokens_processed, num_max_rdma_chunked_send_tokens);
@@ -1209,6 +1214,7 @@ while (__any_sync(WARP_MASK, num_tokens_to_send > 0)) {
     }
 }
   } else if (warp_role == WarpRole::kRDMAAndNVLForwarder) {
+    uccl::gpu_stages::Span dispatch_forwarder_total(d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),55);
     // RDMA consumers and NVL producers
     auto const dst_nvl_rank = target_rank;
 
@@ -1420,6 +1426,7 @@ while (true) {
 }
         }
 
+        uccl::gpu_stages::Span dispatch_forward_copy(d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),51);
         // Get an empty slot
         int dst_slot_idx =
             (cached_nvl_channel_tail++) % num_max_nvl_chunked_recv_tokens;
@@ -1479,6 +1486,7 @@ while (true) {
   } else if (warp_role == WarpRole::kForwarderCoordinator) {
     // Extra warps for forwarder coordinator should exit directly
     if (target_rank > 0) return;
+    uccl::gpu_stages::Span dispatch_feedback_total(d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),56);
 
     // Forward warp coordinator
     EP_STATIC_ASSERT(kNumRDMARanks <= WARP_SIZE,
@@ -1513,6 +1521,7 @@ while (true) {
            clock64() - coordinator_stall_start > NUM_TIMEOUT_CYCLES / 100000);
       if (min_head != std::numeric_limits<int>::max() && should_advance &&
           lane_id < kNumRDMARanks) {
+        uccl::gpu_stages::Span dispatch_feedback_issue(d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),60);
         uccl::nvshmemi_ibgda_amo_nonfetch_add</*use_normal_mode=*/true>(
             reinterpret_cast<uint64_t>(rdma_channel_head.buffer(rdma_rank)),
             reinterpret_cast<uint64_t>(original_atomic_buffer_ptr),
@@ -1530,6 +1539,7 @@ while (true) {
 }
   } else {
     // NVL consumers
+    uccl::gpu_stages::Span dispatch_receiver_total(d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),57);
     // Retrieve rank offset from barrier results (each lane's register stores an
     // RDMA rank)
     int src_nvl_rank = target_rank, total_offset = 0;
@@ -1615,6 +1625,7 @@ while (true) {
       int num_recv_tokens = cached_channel_tail_idx - cached_channel_head_idx;
       for (int chunk_idx = 0; chunk_idx < num_recv_tokens;
            ++chunk_idx, --num_tokens_to_recv) {
+        uccl::gpu_stages::Span dispatch_output_copy(d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),52);
         int token_idx_in_buffer =
             (cached_channel_head_idx++) % num_max_nvl_chunked_recv_tokens;
         auto shifted =

@@ -25,7 +25,11 @@ void check_device(){int current=-1;check(cudaGetDevice(&current));if(current!=de
 uint64_t mask_for(std::string const& mode){
   uint64_t mask=0;
   for(unsigned i=0;i<kStages;++i){
-    bool use=(mode=="all" || mode=="access")? (i<24 || (i>=40 && i<=48)):
+    bool focus=mode=="dispatch" || mode=="dispatch_access";
+    bool use=focus?((i>=3 && i<=7) || i==9 || (i>=11 && i<=13) || i==15 || i==17 ||
+                   (i>=40 && i<=42) || i==46 || (i>=50 && i<=57) || i==59 || i==60):
+      mode=="dispatch_clock"?i==46:
+      (mode=="all" || mode=="access")? (i<24 || (i>=40 && i<=48)):
       mode=="clock"?i==46:mode=="kernels"?(i>=45 && i<=48):
       mode=="waits"?i<24:mode=="operators"?(i>=40 && i<=44):false;
     if(use)mask|=uint64_t{1}<<i;
@@ -46,7 +50,8 @@ void begin(std::string const& mode){
     if(mode!="bypass"){
       check(cudaMalloc(reinterpret_cast<void**>(&buffer),sizeof(State)));
       check(cudaMemset(buffer,0,sizeof(State)));
-      next.state=buffer;next.mask=mask_for(mode);next.mode=mode=="access"?1:2;
+      next.state=buffer;next.mask=mask_for(mode);next.mode=(mode=="access" || mode=="dispatch_access")?1:2;
+      next.dispatch_focus=mode.compare(0,8,"dispatch")==0;
     }
     check(cudaMemcpyToSymbol(control,&next,sizeof(next)));
   }catch(...){if(buffer){cudaFree(buffer);buffer=nullptr;}throw;}
@@ -82,7 +87,7 @@ std::string end(){
   if(buffer){host.resize(1);check(cudaMemcpy(host.data(),buffer,sizeof(State),cudaMemcpyDeviceToHost));check(cudaFree(buffer));buffer=nullptr;}
   active=false;
   int current;cudaDeviceProp props{};check(cudaGetDevice(&current));check(cudaGetDeviceProperties(&props,current));
-  std::ostringstream out;out<<"{\"version\":2,\"storage\":\"device_private_slots\",\"publication_correlation\":false,\"mode\":\""<<selected_mode<<"\",\"clock_domain\":\"per_thread_clock64_delta\",\"nominal_clock_khz\":"<<props.clockRate<<",\"records\":[";
+  std::ostringstream out;out<<"{\"version\":2,\"dispatch_trace_version\":1,\"storage\":\"device_private_slots\",\"publication_correlation\":false,\"mode\":\""<<selected_mode<<"\",\"clock_domain\":\"per_thread_clock64_delta\",\"nominal_clock_khz\":"<<props.clockRate<<",\"records\":[";
   bool comma=false;
   if(!host.empty())for(unsigned b=0;b<kBlocks;++b)for(unsigned w=0;w<kWarps;++w)for(unsigned lane=0;lane<2;++lane)for(unsigned stage=0;stage<kStages;++stage){
     auto const& m=host[0].metrics[b][w][lane][stage];if(!m.calls)continue;
