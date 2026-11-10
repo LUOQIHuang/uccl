@@ -1,0 +1,54 @@
+{
+  "fingerprint": {
+    "job": "urma_dispatch_trace_t128_01",
+    "backend": "urma",
+    "mode": "normal",
+    "shape": [
+      128,
+      128,
+      7168,
+      256,
+      8
+    ],
+    "sources_hash": "76ba219dc54411ff7e6a721b083e3242306141a50f0a470946077e4f0992b0f8",
+    "diagnostics_hash": "1ca5504a0a48a537e4f844db84d4071773f5e3695c1b16ffed00389ab8a28844",
+    "ifname": "enp33s0",
+    "kernel": "6.6.0-gdr_f00955680_diag",
+    "phase_suite": true,
+    "stage_profile": false,
+    "save_traces": false,
+    "warmups": 1,
+    "samples": 3,
+    "ll_hook_workload": "gemm",
+    "api_only": true,
+    "ll_write_order": "default",
+    "normal_write_order": "default",
+    "normal_completion": "all",
+    "capture_layout": false,
+    "dispatch_trial": false,
+    "dispatch_delay_us": 0,
+    "delay_node": 1,
+    "timeline": false,
+    "gpu_stages": true,
+    "gpu_stage_mode": "dispatch",
+    "device": "udmac0d1e2",
+    "gpu": "0",
+    "dispatch_focus": true,
+    "build_hash": "3851705215f455a75425a61a03f4bc4d8513f0197130a63f17588de312cd2b75",
+    "libraries": {
+      "libummu.so.1": "ad8bb0e5153549f4b76f1a8eeffcab62f503a1114e2373ceed8784c45e88105a",
+      "liburma.so": "56d6374553c2843c13eb7f7bc98a5bb65fa2fa4eb5f3b4a331f56cf126fb1f22",
+      "liburma.so.0": "56d6374553c2843c13eb7f7bc98a5bb65fa2fa4eb5f3b4a331f56cf126fb1f22",
+      "liburma.so.0.0.3": "56d6374553c2843c13eb7f7bc98a5bb65fa2fa4eb5f3b4a331f56cf126fb1f22",
+      "liburma_common.so": "c159fffbce1c82944ceccc98555d8e181fe405414384ed671e9ce3fb0b437fad",
+      "liburma_common.so.0": "c159fffbce1c82944ceccc98555d8e181fe405414384ed671e9ce3fb0b437fad",
+      "liburma_common.so.0.0.1": "c159fffbce1c82944ceccc98555d8e181fe405414384ed671e9ce3fb0b437fad"
+    },
+    "runtime_libraries": {
+      "libmcruntime.so": "bef5663d8c72272bccd8e2f23acc33345876a67c6325644285dff27737938807",
+      "libruntime_cu.so": "65a7974316536e3125bfd8e5bd6595ff71bdb7ac8e2b911c226bc3b2ba455f80"
+    },
+    "torch": "2.6.0+metax3.7.0.7"
+  },
+  "error": null
+}

@@ -1,0 +1,212 @@
+{
+  "version": 1,
+  "representative_lanes": [
+    0,
+    1
+  ],
+  "sites": [
+    {
+      "stage": 0,
+      "name": "notify_wait_rdma_counter",
+      "source": "ep/src/internode.cu",
+      "original_line": 310,
+      "expression": "ld_volatile_global(moe_recv_rdma_counter_mapped) != -1"
+    },
+    {
+      "stage": 1,
+      "name": "notify_wait_rank_counter",
+      "source": "ep/src/internode.cu",
+      "original_line": 342,
+      "expression": "ld_volatile_global(moe_recv_counter_mapped) != -1"
+    },
+    {
+      "stage": 2,
+      "name": "notify_wait_expert_counter",
+      "source": "ep/src/internode.cu",
+      "original_line": 354,
+      "expression": "ld_volatile_global(moe_recv_expert_counter_mapped + thread_id) !=\n             -1"
+    },
+    {
+      "stage": 3,
+      "name": "dispatch_sender_sequence_metax",
+      "source": "ep/src/internode.cu",
+      "original_line": 806,
+      "expression": "lane_id == 0 and rdma_send_next_token_idx != token_idx"
+    },
+    {
+      "stage": 4,
+      "name": "dispatch_sender_remote_head_metax",
+      "source": "ep/src/internode.cu",
+      "original_line": 816,
+      "expression": "rdma_tail_idx - cached_rdma_channel_head >=\n               num_max_rdma_chunked_recv_tokens"
+    },
+    {
+      "stage": 5,
+      "name": "dispatch_sender_remote_head_cuda",
+      "source": "ep/src/internode.cu",
+      "original_line": 866,
+      "expression": "is_token_in_rank_uint64 != 0 and\n             rdma_tail_idx - cached_rdma_channel_head >=\n                 num_max_rdma_chunked_recv_tokens"
+    },
+    {
+      "stage": 6,
+      "name": "dispatch_sender_prefix_reduce",
+      "source": "ep/src/internode.cu",
+      "original_line": 985,
+      "expression": "offset >= WARP_SIZE"
+    },
+    {
+      "stage": 7,
+      "name": "dispatch_sender_sequence",
+      "source": "ep/src/internode.cu",
+      "original_line": 1025,
+      "expression": "lane_id == 0 and rdma_send_next_token_idx != token_idx"
+    },
+    {
+      "stage": 8,
+      "name": "dispatch_sender_progress",
+      "source": "ep/src/internode.cu",
+      "original_line": 1071,
+      "expression": "__any_sync(WARP_MASK, num_tokens_to_send > 0)"
+    },
+    {
+      "stage": 9,
+      "name": "dispatch_wait_rdma_metadata",
+      "source": "ep/src/internode.cu",
+      "original_line": 1186,
+      "expression": "true"
+    },
+    {
+      "stage": 10,
+      "name": "dispatch_forwarder_progress",
+      "source": "ep/src/internode.cu",
+      "original_line": 1247,
+      "expression": "__any_sync(WARP_MASK, num_tokens_to_recv_from_rdma > 0)"
+    },
+    {
+      "stage": 11,
+      "name": "dispatch_wait_rdma_tail",
+      "source": "ep/src/internode.cu",
+      "original_line": 1268,
+      "expression": "true"
+    },
+    {
+      "stage": 12,
+      "name": "dispatch_wait_nvl_slot",
+      "source": "ep/src/internode.cu",
+      "original_line": 1322,
+      "expression": "true"
+    },
+    {
+      "stage": 13,
+      "name": "dispatch_wait_nvl_head",
+      "source": "ep/src/internode.cu",
+      "original_line": 1354,
+      "expression": "true"
+    },
+    {
+      "stage": 14,
+      "name": "dispatch_coordinator_progress",
+      "source": "ep/src/internode.cu",
+      "original_line": 1454,
+      "expression": "true"
+    },
+    {
+      "stage": 15,
+      "name": "dispatch_wait_nvl_prefix",
+      "source": "ep/src/internode.cu",
+      "original_line": 1503,
+      "expression": "lane_id < kNumRDMARanks"
+    },
+    {
+      "stage": 16,
+      "name": "dispatch_nvl_receive_progress",
+      "source": "ep/src/internode.cu",
+      "original_line": 1536,
+      "expression": "num_tokens_to_recv > 0"
+    },
+    {
+      "stage": 17,
+      "name": "dispatch_wait_nvl_tail",
+      "source": "ep/src/internode.cu",
+      "original_line": 1539,
+      "expression": "true"
+    },
+    {
+      "stage": 18,
+      "name": "combine_sender_progress",
+      "source": "ep/src/internode.cu",
+      "original_line": 2410,
+      "expression": "true"
+    },
+    {
+      "stage": 19,
+      "name": "combine_sender_wait_nvl_head",
+      "source": "ep/src/internode.cu",
+      "original_line": 2417,
+      "expression": "true"
+    },
+    {
+      "stage": 20,
+      "name": "combine_wait_remote_rdma_head",
+      "source": "ep/src/internode.cu",
+      "original_line": 2714,
+      "expression": "sub_warp_id == 0 and lane_id == 0"
+    },
+    {
+      "stage": 21,
+      "name": "combine_wait_nvl_tail",
+      "source": "ep/src/internode.cu",
+      "original_line": 2763,
+      "expression": "cached_nvl_channel_tail_idx <= expected_head"
+    },
+    {
+      "stage": 22,
+      "name": "combine_receiver_wait_rdma_tail",
+      "source": "ep/src/internode.cu",
+      "original_line": 2962,
+      "expression": "cached_channel_tail_idx <= expected_head"
+    },
+    {
+      "stage": 23,
+      "name": "combine_receiver_progress",
+      "source": "ep/src/internode.cu",
+      "original_line": 3024,
+      "expression": "true"
+    }
+  ],
+  "additional": {
+    "40": "gpu_command_enqueue",
+    "41": "gpu_write_operator",
+    "42": "gpu_atomic_operator",
+    "43": "gpu_quiet",
+    "44": "gpu_barrier",
+    "0": "notify_wait_rdma_counter",
+    "1": "notify_wait_rank_counter",
+    "2": "notify_wait_expert_counter",
+    "3": "dispatch_sender_sequence_metax",
+    "4": "dispatch_sender_remote_head_metax",
+    "5": "dispatch_sender_remote_head_cuda",
+    "6": "dispatch_sender_prefix_reduce",
+    "7": "dispatch_sender_sequence",
+    "8": "dispatch_sender_progress",
+    "9": "dispatch_wait_rdma_metadata",
+    "10": "dispatch_forwarder_progress",
+    "11": "dispatch_wait_rdma_tail",
+    "12": "dispatch_wait_nvl_slot",
+    "13": "dispatch_wait_nvl_head",
+    "14": "dispatch_coordinator_progress",
+    "15": "dispatch_wait_nvl_prefix",
+    "16": "dispatch_nvl_receive_progress",
+    "17": "dispatch_wait_nvl_tail",
+    "18": "combine_sender_progress",
+    "19": "combine_sender_wait_nvl_head",
+    "20": "combine_wait_remote_rdma_head",
+    "21": "combine_wait_nvl_tail",
+    "22": "combine_receiver_wait_rdma_tail",
+    "23": "combine_receiver_progress",
+    "45": "notify_kernel_range",
+    "46": "dispatch_kernel_range",
+    "47": "cached_notify_kernel_range",
+    "48": "combine_kernel_range"
+  }
+}
