@@ -1,0 +1,15 @@
+DIAG_ROOT=/home/h00918771
+DIAG_PYTHON=/home/h00918771/metax_dev/venv-maca-py312/bin/python
+BUILD_STARTED log=/home/h00918771/metax_dev/stage_recovery_build/urma_base_v2/build.log
+Traceback (most recent call last):
+  File "/home/h00918771/uccl-ep-xpu-integration-new/test/urma_mode_parity/driver.py", line 344, in <module>
+    if __name__=='__main__': main()
+                             ^^^^^^
+  File "/home/h00918771/uccl-ep-xpu-integration-new/test/urma_mode_parity/driver.py", line 242, in main
+    if args.action=='build': build(args); return
+                             ^^^^^^^^^^^
+  File "/home/h00918771/uccl-ep-xpu-integration-new/test/urma_mode_parity/driver.py", line 63, in build
+    subprocess.run(command,cwd=support.REPO/'ep',env=env,stdout=log,stderr=subprocess.STDOUT,check=True)
+  File "/home/h00918771/metax_dev/python/cpython-3.12.15-linux-aarch64-gnu/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['/home/h00918771/metax_dev/venv-maca-py312/bin/python', '/home/h00918771/uccl-ep-xpu-integration-new/ep/setup.py', 'build_ext', '--build-lib', '/home/h00918771/metax_dev/stage_recovery_build/urma_base_v2/lib', '--build-temp', '/home/h00918771/metax_dev/stage_recovery_build/urma_base_v2/objects']' returned non-zero exit status 1.
