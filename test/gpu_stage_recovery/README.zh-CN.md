@@ -2,6 +2,10 @@
 
 本文件替代旧STAGE_BREAKDOWN中的直接全量诊断流程。旧stage_trace_v1曾导致节点失联/重启，不再运行；新驱动要求gpu_stage_version=2，拒绝v1模块。新方案已做本地CPU模拟和CUDA编译检查，尚未在C500上验证，不能保证已消除系统故障。
 
+**当前性能定位优先使用已通过的base与CPU统计；GPU恢复实验不是拿到URMA/verbs性能结论的前置条件。**
+
+当前先收集已完成的4096-token普通基线原始结果。若需恢复构建，仅执行第3节第一条base构建；trace构建和第4节bypass/access等GPU恢复步骤暂缓，避免把GPU插桩调试变成性能定位的前置工作。
+
 ## 1. 本次修改及边界
 
 - 删除FIFO/ring中的GPU统计状态和发布tick记录，恢复生产队列数据结构；原有write/atomic、fence、quiet/barrier和pop/完成语义保留。
@@ -32,8 +36,8 @@ RANK=0  # 204改为1
 BACKEND=urma
 GID=3
 PY="$VERBS_DIAG_PYTHON"
-BASE=/home/h00918771/metax_dev/stage_recovery_build/${BACKEND}_base_v2
-TRACE=/home/h00918771/metax_dev/stage_recovery_build/${BACKEND}_trace_v2
+BASE=/home/h00918771/metax_dev/stage_recovery_build/${BACKEND}_base_v2_precision01
+TRACE=/home/h00918771/metax_dev/stage_recovery_build/${BACKEND}_trace_v2_precision01
 ROOT=/home/h00918771/metax_dev/stage_recovery_results
 mkdir -p "$ROOT"
 uname -r
@@ -48,6 +52,17 @@ fuser /dev/mxcd || true
 ## 3. 两端分别构建两份新模块
 
 必须新目录，不能用旧stage_base/trace_v1。代码更新后也不能复用旧manifest绕过哈希检查。
+
+本次针对MACA3.9的half/FP8编译错误：显式先包含cuda_fp16.h，并在编译命令中用-U清除Torch注入的禁用half宏。这延续ep_configs已有的数值类型策略，不修改SDK头文件、不关闭FP8。两种后端构建现在会先自动执行编译探针（precision头文件、v2 base桥接单元；只有trace构建额外编译trace桥接单元），不运行GPU；失败即停止，不继续完整构建。日志在BUILD/precision_probe_01.log及precision_probe_01/，collector会一并收集。日志中仍可出现Torch前缀-D宏，但其后必须有对应-U宏。
+
+若需要只验证编译问题，不构建整个扩展：
+
+```bash
+"$PY" test/gpu_stage_recovery/precision_probe.py \
+  --maca-path "$MACA_PATH" --output "$ROOT/precision_${BACKEND}_node${RANK}_01"
+```
+
+目录必须全新；成功标志MACA_PRECISION_PROBE_PASSED。失败时提供该目录中的request.json、precision.cu和compile_*.log，无需上传.o，也不继续GPU测试。探针通过仅证明这些编译单元通过，不证明完整扩展和运行ABI兼容。
 
 ```bash
 bash test/gpu_stage_recovery/run.sh --action build --backend "$BACKEND" \

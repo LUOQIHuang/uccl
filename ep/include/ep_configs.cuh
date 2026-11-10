@@ -78,6 +78,9 @@ typedef uint16_t __hip_fp8x2_storage_t;
 #define MAX_NUM_BARRIERS 24
 
 #elif defined(__MC_PLATFORM_MXCC__) || defined(__MCC__) || defined(__MXCC__)
+// MACA FP8 headers use half comparisons internally. Load half operators before
+// bf16/fp8 instead of relying on toolkit-specific transitive includes.
+#include <cuda_fp16.h>
 #include <cuda_bf16.h>
 #include <cuda_fp8.h>
 #define WARP_SIZE 64

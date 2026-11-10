@@ -23,7 +23,7 @@ def source_manifest():
 
 def diagnostic_manifest():
     paths=[]
-    for directory in ('ep/bench','ep/tests','test/urma_mode_parity','test/verbs_diag'):
+    for directory in ('ep/bench','ep/tests','test/urma_mode_parity','test/verbs_diag','test/gpu_stage_recovery'):
         paths.extend(p for p in (REPO/directory).rglob('*') if p.is_file() and p.suffix in ('.h','.hpp','.cuh','.cpp','.cc','.cu','.inc','.py','.sh')
                      and not any(part in ('results','bench_results','cache','tmpdir','__pycache__') for part in p.relative_to(REPO/directory).parts))
     if (REPO/'test/urma_mode_parity/gpu_stage_sites.json').is_file():paths.append(REPO/'test/urma_mode_parity/gpu_stage_sites.json')

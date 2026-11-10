@@ -53,6 +53,12 @@ def build(args):
     if request_path.exists() and json.loads(request_path.read_text())!=request:
         raise RuntimeError('BUILD_INPUTS_CHANGED: use a new build directory')
     request_path.write_text(json.dumps(request,indent=2))
+    probe_index=1
+    while (args.build_dir/f'precision_probe_{probe_index:02d}').exists():probe_index+=1
+    probe_dir=args.build_dir/f'precision_probe_{probe_index:02d}'
+    print('PRECISION_PROBE_STARTED log='+str(probe_dir.with_suffix('.log')),flush=True)
+    with probe_dir.with_suffix('.log').open('w') as log:
+        subprocess.run([sys.executable,str(support.REPO/'test/gpu_stage_recovery/precision_probe.py'),'--output',str(probe_dir)]+(['--trace-build'] if getattr(args,'gpu_stage_build',False) else []),env=env,stdout=log,stderr=subprocess.STDOUT,check=True)
     # Validate against the REAL private SDK before starting GPU compilation.
     command=[sys.executable,str(support.REPO/'ep/tests/run_urma_tests.py'),'--sdk-include',str(include)]
     with (args.build_dir/'host_tests.log').open('a') as log:

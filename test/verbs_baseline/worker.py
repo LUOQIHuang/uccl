@@ -17,6 +17,7 @@ bundle = case.parents[1] / 'benchmark'
 mode = os.environ['VB_MODE']
 profile = os.environ['VB_PROFILE'] == '1'
 cpu_diag=os.environ.get('VB_CPU_DIAG')=='1'
+cpu_light=os.environ.get('VB_CPU_LIGHT')=='1'
 timeline=os.environ.get('VB_TIMELINE')=='1'
 gpu_stages=os.environ.get('VB_GPU_STAGES')=='1'
 stage_suite=os.environ.get('VB_STAGE_SUITE')=='1'
@@ -93,7 +94,9 @@ def measure(fn, label, post_fn=None):
     end = [torch.cuda.Event(enable_timing=True) for _ in range(samples)]
     before=None
     if cpu_diag:
-        before=json.loads(ep.urma_phase_snapshot());ep.urma_layout_begin();ep.verbs_diag_begin()
+        before=json.loads(ep.urma_phase_snapshot())
+        if not globals().get('cpu_light',False):ep.urma_layout_begin()
+        ep.verbs_diag_begin()
     host_begin=time.perf_counter_ns()
     for i in range(samples):
         trace_this=globals().get("timeline",False) and (gpu_stages or (i==0 and label.startswith("dispatch_")))
@@ -120,7 +123,7 @@ def measure(fn, label, post_fn=None):
         ep.verbs_diag_end();after=json.loads(ep.urma_phase_snapshot())
         records=common.phase_support.snapshot_delta(before,after)
         append('verbs_phases.jsonl',dict(label=label,iterations=samples,records=records,host_window_begin_ns=host_begin,host_window_ns=time.perf_counter_ns()-host_begin))
-        append('write_layout.jsonl',dict(label=label,iterations=samples,**json.loads(ep.urma_layout_end())))
+        if not globals().get('cpu_light',False):append('write_layout.jsonl',dict(label=label,iterations=samples,**json.loads(ep.urma_layout_end())))
     values = [s.elapsed_time(e) * 1000 for s, e in zip(start, end)]
     for i, value in enumerate(values):
         append('api_samples.jsonl', dict(label=label, mode=mode, index=i, us=value, used=i > 0))

@@ -47,6 +47,7 @@ def parser():
     p.add_argument('--repeats', type=int, default=3)
     p.add_argument('--warmups', type=int, default=50)
     p.add_argument('--cpu-diagnostics',action='store_true')
+    p.add_argument('--cpu-light',action='store_true')
     p.add_argument('--campaign-check',action='store_true')
     p.add_argument('--gid-index',type=int)
     p.add_argument('--samples', type=int, default=50)
@@ -70,6 +71,7 @@ def parser():
     if getattr(args,'gid_index',None) is not None and not 0<=getattr(args,'gid_index',None)<256:p.error('invalid GID index')
     if getattr(args,'cpu_diagnostics',False) and (args.variant!='current' or args.mode!='normal' or not args.no_profile):p.error('CPU diagnostics requires current Normal --no-profile')
     if args.action=='micro' and (args.variant!='current' or args.mode!='normal' or getattr(args,'gid_index',None) is None or not args.micro_layout):p.error('micro requires current Normal, --gid-index and --micro-layout')
+    if args.cpu_light and (not args.cpu_diagnostics or args.timeline):p.error('--cpu-light requires CPU diagnostics without timeline')
     if args.timeline and not args.cpu_diagnostics:p.error('--timeline requires --cpu-diagnostics')
     if args.stage_suite and (args.variant!='current' or args.mode!='normal' or not args.no_profile or args.repeats!=1):p.error('--stage-suite requires current Normal --no-profile --repeats 1')
     if args.gpu_stages and (not args.stage_suite or not args.timeline):p.error('--gpu-stages requires --stage-suite --timeline --cpu-diagnostics')
@@ -119,6 +121,12 @@ def build(args):
     env = environment(args)
     env.update(flags, MAX_JOBS=str(args.build_jobs))
     for key in ('URMA_INCLUDE_DIR','URMA_LIBRARY_DIR'):env.pop(key,None)
+    probe_index=1
+    while (args.build_dir/f'precision_probe_{probe_index:02d}').exists():probe_index+=1
+    probe_dir=args.build_dir/f'precision_probe_{probe_index:02d}'
+    print('PRECISION_PROBE_STARTED log='+str(probe_dir.with_suffix('.log')),flush=True)
+    with probe_dir.with_suffix('.log').open('w') as log:
+        subprocess.run([sys.executable,str(REPO/'test/gpu_stage_recovery/precision_probe.py'),'--output',str(probe_dir)]+(['--trace-build'] if getattr(args,'gpu_stage_build',False) else []),env=env,stdout=log,stderr=subprocess.STDOUT,check=True)
     if args.variant=='current':
         with (args.build_dir/'host_tests.log').open('a') as log:
             subprocess.run([sys.executable,str(HERE/'host_tests.py')],env=env,stdout=log,stderr=subprocess.STDOUT,check=True)
@@ -223,7 +231,7 @@ def run_case(args, root, tag, mode, profile, module, module_sha):
     env = environment(args)
     env.update(VB_CASE=str(case), VB_MODULE=str(module), VB_SHA=module_sha, VB_MODE=mode,
                VB_PROFILE=str(int(profile)), VB_WARMUPS=str(args.warmups), VB_SAMPLES=str(args.samples),
-               VB_CPU_DIAG=str(int(getattr(args,'cpu_diagnostics',False))), VB_TIMELINE=str(int(getattr(args,'timeline',False))),
+               VB_CPU_LIGHT=str(int(getattr(args,'cpu_light',False))),VB_CPU_DIAG=str(int(getattr(args,'cpu_diagnostics',False))), VB_TIMELINE=str(int(getattr(args,'timeline',False))),
                UCCL_TORCHRUN_NODE_RANK=str(args.node_rank), UCCL_EXIT_GUARD='1')
     env.update(VB_NORMAL_TOKENS=str(getattr(args,'normal_tokens',4096)),VB_GPU_STAGE_MODE=getattr(args,'gpu_stage_mode','all'),VB_GPU_STAGES=str(int(getattr(args,'gpu_stages',False))),VB_STAGE_SUITE=str(int(getattr(args,'stage_suite',False))))
     for key, name in [('TMPDIR', 'tmpdir'), ('XDG_CACHE_HOME', 'cache')]:
@@ -257,13 +265,13 @@ def run_case(args, root, tag, mode, profile, module, module_sha):
             samples=common.validate_samples(case, mode, args.samples))
         checks['correctness'] = text.count('[testing] Running with') == 24 if mode == 'normal' else 'All correctness tests passed!' in text
         if getattr(args,'cpu_diagnostics',False):
-            checks['cpu_stages']=(case/'verbs_phases.jsonl').is_file() and (case/'write_layout.jsonl').is_file()
+            checks['cpu_stages']=(case/'verbs_phases.jsonl').is_file() and (getattr(args,'cpu_light',False) or (case/'write_layout.jsonl').is_file())
             if checks['cpu_stages']:
                 windows=[json.loads(x) for x in (case/'verbs_phases.jsonl').read_text().splitlines() if x.strip()]
                 metrics=[record['metrics'] for window in windows for record in window['records']]
                 checks['native_write_fadd_samples']=all(sum(m.get(name,{}).get('calls',0) for m in metrics)>0 for name in ('write_requests','fadd_requests','submit_to_observed_cqe_sampled'))
                 checks['no_verbs_diag_errors']=not any(m.get(name,{}).get('calls',0) for m in metrics for name in ('verbs_post_errors','verbs_completion_errors','verbs_tracking_overflow'))
-                checks['complete_wr_layout']=not any(json.loads(x)['dropped'] for x in (case/'write_layout.jsonl').read_text().splitlines() if x.strip())
+                checks['complete_wr_layout']=getattr(args,'cpu_light',False) or not any(json.loads(x)['dropped'] for x in (case/'write_layout.jsonl').read_text().splitlines() if x.strip())
         if getattr(args,'timeline',False):checks['timeline']=(case/'verbs_timeline.jsonl').is_file()
         expected = 4 if mode == 'normal' else 2
         checks['profiles'] = text.count('VERBS_GPU_PROFILE ') == expected if profile else text.count('VERBS_PROFILE_SKIPPED ') == expected and (getattr(args,'gpu_stages',False) or not (case / 'gpu_stages.jsonl').exists())
@@ -317,7 +325,7 @@ def run(args):
             libraries=info.get('selected_library_hashes', {}),
             mode=args.mode, repeats=args.repeats, warmups=args.warmups, samples=args.samples,
             no_profile=args.no_profile, profile_only=args.profile_only, hca=args.hca, ifname=args.ifname, gpu=args.gpu)
-        meta.update(cpu_diagnostics=getattr(args,'cpu_diagnostics',False),timeline=getattr(args,'timeline',False),gid_index=getattr(args,'gid_index',None))
+        meta.update(cpu_light=getattr(args,'cpu_light',False),cpu_diagnostics=getattr(args,'cpu_diagnostics',False),timeline=getattr(args,'timeline',False),gid_index=getattr(args,'gid_index',None))
         meta.update(normal_tokens=getattr(args,'normal_tokens',4096),stage_suite=getattr(args,'stage_suite',False),gpu_stages=getattr(args,'gpu_stages',False),gpu_stage_mode=getattr(args,'gpu_stage_mode','all'))
     except Exception as exc:
         error = str(exc)

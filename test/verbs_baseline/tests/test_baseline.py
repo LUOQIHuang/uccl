@@ -182,7 +182,7 @@ class BaselineTests(unittest.TestCase):
             def compiler(command, **kwargs):
                 self.assertEqual(kwargs['env']['USE_URMA'], '0')
                 self.assertNotIn('URMA_INCLUDE_DIR', kwargs['env'])
-                if 'host_tests.py' in command[1]:return
+                if 'host_tests.py' in command[1] or 'precision_probe.py' in command[1]:return
                 module = root / 'lib/ep.abi3.so'
                 module.parent.mkdir()
                 module.write_bytes(b'test extension')

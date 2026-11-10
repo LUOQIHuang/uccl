@@ -8,6 +8,14 @@ import shutil
 import site
 from pathlib import Path
 
+# PyTorch adds these -D switches before extra nvcc flags. Clear them before
+# any compiler-injected MACA headers, matching ep_configs.cuh's existing policy.
+METAX_PRECISION_UNDEFINES = (
+    '__CUDA_NO_HALF_OPERATORS__', '__CUDA_NO_HALF_CONVERSIONS__',
+    '__CUDA_NO_HALF2_OPERATORS__', '__CUDA_NO_BFLOAT16_CONVERSIONS__',
+    '__CUDA_NO_BFLOAT162_OPERATORS__',
+)
+
 # mcPyTorch exposes CUDA-compatible extension tooling through MACA cu-bridge.
 _legacy_urma_metax = int(os.getenv("USE_URMA_METAX", "0"))
 _use_metax_platform = (
@@ -219,6 +227,9 @@ if __name__ == "__main__":
         cxx_flags.extend(metax_flags)
         cxx_flags.append("-fno-strict-aliasing")
         nvcc_flags.extend(metax_flags)
+        precision_flags = ['-U' + name for name in METAX_PRECISION_UNDEFINES]
+        cxx_flags.extend(precision_flags)
+        nvcc_flags.extend(precision_flags)
         if sys.platform.startswith("linux"):
             libraries.append("dl")
     if use_urma:

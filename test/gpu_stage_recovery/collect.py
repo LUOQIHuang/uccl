@@ -14,6 +14,11 @@ def collect(root,rank,builds,destination):
         for name in ('build.log','host_tests.log','manifest.json','request.json','build_request.json'):
             p=build/name
             if p.is_file():pairs.append((p,destination/f'build/node{rank}'/kind/name))
+        for probe in build.glob('precision_probe_*'):
+            candidates=probe.rglob('*') if probe.is_dir() else [probe]
+            for p in candidates:
+                if p.is_file() and p.suffix in ('.log','.json','.cu'):
+                    pairs.append((p,destination/f'build/node{rank}'/kind/p.relative_to(build)))
     if not pairs:raise ValueError('no recovery logs')
     for p,q in pairs:
         if q.exists() and q.read_bytes()!=p.read_bytes():raise ValueError('result conflict: '+str(q))
