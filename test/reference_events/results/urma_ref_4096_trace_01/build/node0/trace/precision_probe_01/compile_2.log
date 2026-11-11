@@ -1,0 +1,28 @@
+/home/h00918771/uccl-ep-xpu-integration-new/ep/src/reference_event_trace.cu:55:32: warning: reference to __device__ variable 'trace' in __host__ function [-Wmaca-compat]
+   55 |   if(!rc)rc=cudaMemcpyToSymbol(trace,zero.get(),sizeof(Trace));
+      |                                ^
+/home/h00918771/uccl-ep-xpu-integration-new/ep/src/reference_event_trace.cu:56:32: warning: reference to __device__ variable 'epoch' in __host__ function [-Wmaca-compat]
+   56 |   if(!rc)rc=cudaMemcpyToSymbol(epoch,&value,sizeof(value));
+      |                                ^
+/home/h00918771/uccl-ep-xpu-integration-new/ep/src/reference_event_trace.cu:58:32: warning: reference to __device__ variable 'host_clock' in __host__ function [-Wmaca-compat]
+   58 |   if(!rc)rc=cudaMemcpyToSymbol(host_clock,&mapped,sizeof(mapped));
+      |                                ^
+/home/h00918771/uccl-ep-xpu-integration-new/ep/src/reference_event_trace.cu:60:42: warning: reference to __device__ variable 'enabled' in __host__ function [-Wmaca-compat]
+   60 |   if(!rc){int on=1;rc=cudaMemcpyToSymbol(enabled,&on,sizeof(on));}
+      |                                          ^
+/home/h00918771/uccl-ep-xpu-integration-new/ep/src/reference_event_trace.cu:64:30: warning: reference to __device__ variable 'enabled' in __host__ function [-Wmaca-compat]
+   64 |     int a=cudaMemcpyToSymbol(enabled,&disabled,sizeof(disabled));
+      |                              ^
+/home/h00918771/uccl-ep-xpu-integration-new/ep/src/reference_event_trace.cu:65:30: warning: reference to __device__ variable 'host_clock' in __host__ function [-Wmaca-compat]
+   65 |     int b=cudaMemcpyToSymbol(host_clock,&off,sizeof(off));
+      |                              ^
+/home/h00918771/uccl-ep-xpu-integration-new/ep/src/reference_event_trace.cu:84:34: warning: reference to __device__ variable 'trace' in __host__ function [-Wmaca-compat]
+   84 |   rc=cudaMemcpyFromSymbol(output,trace,sizeof(Trace));
+      |                                  ^
+/home/h00918771/uccl-ep-xpu-integration-new/ep/src/reference_event_trace.cu:86:28: warning: reference to __device__ variable 'enabled' in __host__ function [-Wmaca-compat]
+   86 |   int a=cudaMemcpyToSymbol(enabled,&off,sizeof(off));
+      |                            ^
+/home/h00918771/uccl-ep-xpu-integration-new/ep/src/reference_event_trace.cu:87:28: warning: reference to __device__ variable 'host_clock' in __host__ function [-Wmaca-compat]
+   87 |   int b=cudaMemcpyToSymbol(host_clock,&nil,sizeof(nil));
+      |                            ^
+9 warnings generated when compiling for host.
