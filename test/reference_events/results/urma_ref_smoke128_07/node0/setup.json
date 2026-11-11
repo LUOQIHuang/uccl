@@ -1,0 +1,57 @@
+{
+  "fingerprint": {
+    "job": "urma_ref_smoke128_07",
+    "backend": "urma",
+    "mode": "normal",
+    "shape": [
+      128,
+      128,
+      7168,
+      256,
+      8
+    ],
+    "sources_hash": "75c06eec94f73033c5ff4cca3531e8bd6327bfb689a8d24e20a397172bef9407",
+    "diagnostics_hash": "b3c0232b16acf89cb980a27221591a499a5fbb0918070870ea8dd49a856b3443",
+    "ifname": "enp33s0",
+    "kernel": "6.6.0-gdr_f00955680_diag",
+    "phase_suite": true,
+    "stage_profile": false,
+    "save_traces": false,
+    "warmups": 1,
+    "samples": 3,
+    "ll_hook_workload": "gemm",
+    "api_only": true,
+    "ll_write_order": "default",
+    "normal_write_order": "default",
+    "normal_completion": "all",
+    "capture_layout": false,
+    "dispatch_trial": false,
+    "dispatch_delay_us": 0,
+    "delay_node": 1,
+    "timeline": false,
+    "gpu_stages": false,
+    "gpu_stage_mode": "all",
+    "device": "udmac0d1e2",
+    "gpu": "0",
+    "dispatch_focus": true,
+    "dispatch_compiled_off": false,
+    "gpu_stage_roles_only": false,
+    "reference_events": "on",
+    "build_hash": "f11581ff78a377f2e8ed8127beef88bfaaed5e13732c29f18fae0c8882c29a8a",
+    "libraries": {
+      "libummu.so.1": "ad8bb0e5153549f4b76f1a8eeffcab62f503a1114e2373ceed8784c45e88105a",
+      "liburma.so": "56d6374553c2843c13eb7f7bc98a5bb65fa2fa4eb5f3b4a331f56cf126fb1f22",
+      "liburma.so.0": "56d6374553c2843c13eb7f7bc98a5bb65fa2fa4eb5f3b4a331f56cf126fb1f22",
+      "liburma.so.0.0.3": "56d6374553c2843c13eb7f7bc98a5bb65fa2fa4eb5f3b4a331f56cf126fb1f22",
+      "liburma_common.so": "c159fffbce1c82944ceccc98555d8e181fe405414384ed671e9ce3fb0b437fad",
+      "liburma_common.so.0": "c159fffbce1c82944ceccc98555d8e181fe405414384ed671e9ce3fb0b437fad",
+      "liburma_common.so.0.0.1": "c159fffbce1c82944ceccc98555d8e181fe405414384ed671e9ce3fb0b437fad"
+    },
+    "runtime_libraries": {
+      "libmcruntime.so": "bef5663d8c72272bccd8e2f23acc33345876a67c6325644285dff27737938807",
+      "libruntime_cu.so": "65a7974316536e3125bfd8e5bd6595ff71bdb7ac8e2b911c226bc3b2ba455f80"
+    },
+    "torch": "2.6.0+metax3.7.0.7"
+  },
+  "error": null
+}

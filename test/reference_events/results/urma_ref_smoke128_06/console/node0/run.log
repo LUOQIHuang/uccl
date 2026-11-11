@@ -1,0 +1,17 @@
+DIAG_ROOT=/home/h00918771
+DIAG_PYTHON=/home/h00918771/metax_dev/venv-maca-py312/bin/python
+CASE_BEGIN normal
+CASE_END normal rc=1 checks={'mode': False, 'done': False, 'exit_ack': False, 'no_errors': False, 'correctness': False, 'profiles': False, 'tuning': False, 'no_gpu_profiler': False, 'measurement_boundary': False, 'reference_correctness': False, 'reference_events': False, 'native_mode': True, 'device': True, 'normal_completion': True, 'phase_files': False, 'samples': False}
+Traceback (most recent call last):
+  File "/home/h00918771/uccl-ep-xpu-integration-new/test/urma_mode_parity/driver.py", line 399, in <module>
+    if __name__=='__main__': main()
+                             ^^^^^^
+  File "/home/h00918771/uccl-ep-xpu-integration-new/test/urma_mode_parity/driver.py", line 396, in main
+    legacy.pair(args,dict(stage='done',job=args.job,mode=mode,rc=rc))
+  File "/home/h00918771/uccl-ep-xpu-integration-new/test/verbs_diag/driver.py", line 35, in pair
+    connection, _ = server.accept()
+                    ^^^^^^^^^^^^^^^
+  File "/home/h00918771/metax_dev/python/cpython-3.12.15-linux-aarch64-gnu/lib/python3.12/socket.py", line 295, in accept
+    fd, addr = self._accept()
+               ^^^^^^^^^^^^^^
+TimeoutError: timed out
