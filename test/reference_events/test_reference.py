@@ -8,6 +8,7 @@ import json
 import os
 from pathlib import Path
 import re
+import shutil
 import sys
 import tempfile
 from types import SimpleNamespace as NS
@@ -16,7 +17,7 @@ from unittest.mock import Mock,patch
 
 HERE=Path(__file__).resolve().parent
 sys.path.insert(0,str(HERE));sys.path.append(str(HERE.parent/'dispatch_diag'));sys.path.append(str(HERE.parent/'urma_mode_parity'))
-from event_runtime import Trace,Clock,LABELS,NAMES,validate,measure
+from event_runtime import Trace,Clock,LABELS,NAMES,validate,measure,validate_control,control_marker
 from correctness import install
 import test_dispatch as fixtures
 from test_dispatch import dump,lines
@@ -33,6 +34,67 @@ def window(label,index=0):
 
 
 class ReferenceTests(unittest.TestCase):
+    def test_batch_control_uses_original_continuous_runtime_and_no_timeline(self):
+        from phase_runtime import Measurements
+        class Event:
+            def __init__(self,**kw):pass
+            def record(self):pass
+            def elapsed_time(self,other):return 1
+        torch=NS(cuda=NS(synchronize=Mock(),current_device=lambda:0,Event=Event),empty=lambda *a,**k:NS(zero_=Mock()),int=0)
+        ep=NS(urma_phase_snapshot=lambda:'{"records":[]}',urma_phase_enable=Mock(),urma_timeline_begin=Mock())
+        dist=NS(barrier=Mock());fn=Mock()
+        with tempfile.TemporaryDirectory() as tmp,redirect_stdout(io.StringIO()):
+            case=Path(tmp);m=Measurements(torch,dist,ep,case,'normal',False,1,3)
+            m.reference_control='batch'
+            for label in LABELS:m.api(fn,label)
+            self.assertTrue(validate_control(case,'batch',1,3))
+            self.assertEqual(fn.call_count,8)
+            self.assertEqual(dist.barrier.call_count,4) # once before/after each group
+        ep.urma_timeline_begin.assert_not_called()
+
+    def test_paced_control_runs_same_samples_without_loading_capture_or_cpu_timeline(self):
+        class Event:
+            def __init__(self,**kw):pass
+            def record(self):pass
+            def elapsed_time(self,other):return 1
+        torch=NS(cuda=NS(synchronize=Mock(),current_device=lambda:0,Event=Event),empty=lambda *a,**k:NS(zero_=Mock()),int=0)
+        ep=NS(__file__='fake.so',urma_timeline_begin=Mock(),urma_timeline_end=Mock())
+        factory=Mock(side_effect=AssertionError('inactive control must not load capture'))
+        dist=NS(barrier=Mock());fn=Mock()
+        with tempfile.TemporaryDirectory() as tmp,redirect_stdout(io.StringIO()):
+            case=Path(tmp)
+            for label in LABELS:
+                measure(torch,dist,ep,case,fn,label,1,3,capture_factory=factory,record_events=False)
+            self.assertTrue(validate_control(case,'paced',1,3))
+            self.assertEqual(fn.call_count,8)
+            self.assertEqual(dist.barrier.call_count,24)
+            self.assertEqual(len((case/'api_samples.jsonl').read_text().splitlines()),6)
+            (case/'event_trace.jsonl').write_text('{}\n')
+            with self.assertRaises(ValueError):validate_control(case,'paced',1,3)
+        factory.assert_not_called();ep.urma_timeline_begin.assert_not_called();ep.urma_timeline_end.assert_not_called()
+
+    def test_cadence_summary_validates_two_inactive_profiles(self):
+        spec=importlib.util.spec_from_file_location('cadence_summary',HERE/'summarize_cadence.py')
+        cadence=importlib.util.module_from_spec(spec);spec.loader.exec_module(cadence)
+        with tempfile.TemporaryDirectory() as tmp,redirect_stdout(io.StringIO()):
+            for backend in ('urma','verbs'):
+                root=Path(tmp)/backend;_,template,_=fixtures.DispatchTests().fixture(root,backend)
+                for mode in ('batch','paced'):
+                    shutil.copytree(template,root/mode)
+                    for rank in (0,1):
+                        node=root/mode/f'node{rank}';case=node/('normal' if backend=='urma' else 'r01_baseline/normal')
+                        data=json.loads((node/'setup.json').read_text());data['fingerprint'].update(gpu_stages=False,reference_events=mode);dump(node/'setup.json',data)
+                        data=json.loads((case/'runtime.json').read_text());data.update(gpu_stage_version=0,reference_events_version=1);dump(case/'runtime.json',data)
+                        data=json.loads((case/'status.json').read_text());data['checks']['reference_control']=True;dump(case/'status.json',data)
+                        manifest=node/('build_manifest.json' if backend=='urma' else 'module_manifest.json')
+                        data=json.loads(manifest.read_text());data['flags'].update(UCCL_GPU_STAGE_TRACE='0',UCCL_REFERENCE_EVENTS='1');dump(manifest,data)
+                        (case/'gpu_stages.jsonl').unlink()
+                        for label in LABELS:control_marker(case,label,mode,5,10)
+                result=cadence.summarize(root/'batch',root/'paced',root/'summary')
+                self.assertEqual(len(result),10);self.assertTrue(all(r['stable'] and r['within_5pct'] for r in result))
+                (case/'event_trace.jsonl').write_text('{}\n')
+                with self.assertRaises(ValueError):cadence.summarize(root/'batch',root/'paced',root/'bad')
+
     def test_correctness_capture_restores_dispatch_before_timing(self):
         class Buffer:
             def dispatch(self,value):return value*2
@@ -96,7 +158,9 @@ class ReferenceTests(unittest.TestCase):
             exec(compile(ast.Module(body=[fn],type_ignores=[]),str(path),'exec'),ns)
             args=['driver','--job','reference','--node-rank','0','--mode','normal','--dispatch-focus','--reference-events','on']
             args+=['--phase-suite','--api-only'] if backend=='urma' else ['--variant','current','--no-profile','--repeats','1']
-            with patch.object(sys,'argv',args):self.assertEqual(ns['parser']().reference_events,'on')
+            for mode in ('on','batch','paced'):
+                changed=list(args);changed[changed.index('--reference-events')+1]=mode
+                with patch.object(sys,'argv',changed):self.assertEqual(ns['parser']().reference_events,mode)
             for extra in (['--gpu-stages'],['--action','build'],['--timeline']):
                 with patch.object(sys,'argv',args+extra),patch('sys.stderr',io.StringIO()),self.assertRaises(SystemExit):ns['parser']()
 

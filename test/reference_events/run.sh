@@ -13,11 +13,11 @@ while [ "$#" -gt 0 ];do
  esac
 done
 [[ "$BACKEND" == urma || "$BACKEND" == verbs ]] && [[ "$RANK" == 0 || "$RANK" == 1 ]] && [[ "$JOB" =~ ^[a-zA-Z0-9_-]+$ ]] && [ -n "$BUILD" ] || { echo 'backend/rank/build/job required' >&2;exit 2; }
-case "$STEP" in baseline|trace|post|off);;*) echo 'step must be baseline/trace/post/off' >&2;exit 2;;esac
+case "$STEP" in baseline|trace|post|off|batch|paced);;*) echo 'step must be baseline/trace/post/off/batch/paced' >&2;exit 2;;esac
 case "$ACTION" in build|check|run);;*) exit 2;;esac
 [[ "$TOKENS" == 128 || "$TOKENS" == 4096 ]] || exit 2
 WARMUPS=50 SAMPLES=50
-if [ "$STEP" = trace ];then WARMUPS=5 SAMPLES=10;fi
+if [[ "$STEP" == trace || "$STEP" == batch || "$STEP" == paced ]];then WARMUPS=5 SAMPLES=10;fi
 if [ "$TOKENS" = 128 ];then WARMUPS=1 SAMPLES=3;fi
 COMMON=(--node-rank "$RANK" --job "$JOB" --mode normal --build-dir "$BUILD" --master-addr "$MASTER" --port "$PORT" --output "$ROOT" --normal-tokens "$TOKENS" --warmups "$WARMUPS" --samples "$SAMPLES" --build-jobs 1)
 if [ "$BACKEND" = urma ];then
@@ -27,8 +27,8 @@ else
  ENTRY="$HERE/../verbs_baseline/run.sh";COMMON+=(--variant current --gid-index "$GID" --expected-kernel 6.6.0-145.3.34.165.oe2403sp3.aarch64)
  if [ "$ACTION" != build ];then COMMON+=(--no-profile --repeats 1 --dispatch-focus);fi
 fi
-if [[ "$STEP" == trace || "$STEP" == off ]];then
- MODE=on;[ "$STEP" != off ] || MODE=off;[ "$ACTION" != build ] || MODE=build
+if [[ "$STEP" == trace || "$STEP" == off || "$STEP" == batch || "$STEP" == paced ]];then
+ MODE=$STEP;[ "$STEP" != trace ] || MODE=on;[ "$ACTION" != build ] || MODE=build
  COMMON+=(--reference-events "$MODE")
 fi
 CONSOLE="$ROOT/$JOB/console/node$RANK";mkdir -p "$CONSOLE"

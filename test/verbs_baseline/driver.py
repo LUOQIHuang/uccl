@@ -30,7 +30,7 @@ def parser():
     p.add_argument('--timeline',action='store_true')
     p.add_argument('--stage-suite',action='store_true')
     p.add_argument('--gpu-stages',action='store_true')
-    p.add_argument('--reference-events',choices=('build','off','on'),help='reference event-style Normal tracing')
+    p.add_argument('--reference-events',choices=('build','off','on','batch','paced'),help='reference events or inactive batch/paced controls')
     p.add_argument('--dispatch-focus',action='store_true')
     p.add_argument('--dispatch-compiled-off',action='store_true',help='Dispatch trace build with capture completely disabled; same API timing boundary as baseline')
     p.add_argument('--gpu-stage-roles-only',action='store_true',help='sparse compile-time role probes; currently only build or compiled-off validation')
@@ -263,6 +263,7 @@ def run_case(args, root, tag, mode, profile, module, module_sha):
     env.update(VB_NORMAL_TOKENS=str(getattr(args,'normal_tokens',4096)),VB_GPU_STAGE_MODE=getattr(args,'gpu_stage_mode','all'),VB_GPU_STAGES=str(int(getattr(args,'gpu_stages',False))),VB_STAGE_SUITE=str(int(getattr(args,'stage_suite',False))))
     env['VB_DISPATCH_FOCUS']=str(int(getattr(args,'dispatch_focus',False)))
     env['VB_REFERENCE_EVENTS']=str(int(getattr(args,'reference_events',None)=='on'))
+    env['VB_REFERENCE_CONTROL']=args.reference_events if getattr(args,'reference_events',None) in ('batch','paced') else ''
     for key, name in [('TMPDIR', 'tmpdir'), ('XDG_CACHE_HOME', 'cache')]:
         path = case / name
         path.mkdir()
@@ -310,6 +311,10 @@ def run_case(args, root, tag, mode, profile, module, module_sha):
             from event_runtime import validate,correctness_passed
             checks['reference_correctness']='REFERENCE_CORRECTNESS_EVENTS_PASSED' in text and correctness_passed(case)
             checks['reference_events']=validate(case,args.samples)
+        if getattr(args,'reference_events',None) in ('batch','paced'):
+            sys.path.insert(0,str(HERE.parent/'reference_events'))
+            from event_runtime import validate_control
+            checks['reference_control']=validate_control(case,args.reference_events,args.warmups,args.samples)
         if getattr(args,'dispatch_focus',False) and getattr(args,'gpu_stages',False):
             sys.path.insert(0,str(HERE.parent/'dispatch_diag'))
             from dispatch_checks import validate_gpu

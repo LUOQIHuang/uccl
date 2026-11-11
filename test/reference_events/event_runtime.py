@@ -45,9 +45,9 @@ class Capture:
             counts=list(t.count),clock_stats={k:getattr(c,k) for k,_ in c._fields_ if k!='reserved'},records=records)
 
 
-def measure(torch,dist,ep,case,fn,label,warmups,samples,post_fn=None,capture_factory=None):
+def measure(torch,dist,ep,case,fn,label,warmups,samples,post_fn=None,capture_factory=None,record_events=True):
     """Capture only fixed Normal points, keeping layouts on the existing timer."""
-    capture=(capture_factory or Capture)(ep.__file__)
+    capture=(capture_factory or Capture)(ep.__file__) if record_events else None
     torch.cuda.synchronize()
     cache=torch.empty(int(256e6//4),dtype=torch.int,device='cuda:'+str(torch.cuda.current_device()))
     for _ in range(warmups):
@@ -55,23 +55,25 @@ def measure(torch,dist,ep,case,fn,label,warmups,samples,post_fn=None,capture_fac
         if post_fn is not None:post_fn()
     cache.zero_();torch.cuda.synchronize();raw=[]
     for i in range(samples):
-        torch.cuda.synchronize();dist.barrier();capture.begin()
+        torch.cuda.synchronize();dist.barrier()
+        if capture is not None:capture.begin()
         cpu_active=False;gpu=None
         try:
             dist.barrier();torch.cuda.synchronize() # both clocks/reset copies ready before timing
-            ep.urma_timeline_begin();cpu_active=True
+            if capture is not None:ep.urma_timeline_begin();cpu_active=True
             begin=torch.cuda.Event(enable_timing=True);end=torch.cuda.Event(enable_timing=True)
             begin.record();fn();end.record();torch.cuda.synchronize()
             dist.barrier() # retain late local completions until both peers finish
-            cpu=json.loads(ep.urma_timeline_end());cpu_active=False
+            if cpu_active:cpu=json.loads(ep.urma_timeline_end());cpu_active=False
         finally:
             try:
                 if cpu_active:ep.urma_timeline_end()
-            finally:gpu=capture.end()
+            finally:
+                if capture is not None:gpu=capture.end()
         value=begin.elapsed_time(end)*1000
         if post_fn is not None:post_fn()
         raw.append(value)
-        append(case/'event_trace.jsonl',dict(label=label,index=i,us=value,gpu=gpu,cpu=cpu))
+        if capture is not None:append(case/'event_trace.jsonl',dict(label=label,index=i,us=value,gpu=gpu,cpu=cpu))
         append(case/'api_samples.jsonl',dict(label=label,index=i,us=value,used=i>0,mode='normal'))
         dist.barrier()
     values=raw[1:];mean=statistics.mean(values)
@@ -80,12 +82,28 @@ def measure(torch,dist,ep,case,fn,label,warmups,samples,post_fn=None,capture_fac
     append(case/'sample_summary.jsonl',summary)
     print('MODE_PARITY_SAMPLES '+json.dumps(summary),flush=True)
     # URMA phase-suite acceptance requires a phase file; no CPU counters active.
-    append(case/'phases.jsonl',dict(label=label,enabled=False,records=[],note='reference event window; CPU events are in event_trace.jsonl'))
+    append(case/'phases.jsonl',dict(label=label,enabled=False,records=[],note='reference events' if record_events else 'paced control without events/clock'))
+    if not record_events:control_marker(case,label,'paced',warmups,samples)
     return mean/1e6,min(values)/1e6,max(values)/1e6
 
 
 def append(path,data):
     with path.open('a') as stream:stream.write(json.dumps(data)+'\n')
+
+
+def control_marker(case,label,mode,warmups,samples):
+    append(case/'reference_control.jsonl',dict(label=label,mode=mode,warmups=warmups,samples=samples,
+        gpu_events=False,cpu_events=False,host_clock=False))
+
+
+def validate_control(case,mode,warmups,samples):
+    case=Path(case)
+    if mode not in ('batch','paced'):raise ValueError('unknown reference control')
+    expected=[dict(label=l,mode=mode,warmups=warmups,samples=samples,gpu_events=False,cpu_events=False,host_clock=False) for l in sorted(LABELS)]
+    actual=[json.loads(s) for s in (case/'reference_control.jsonl').read_text().splitlines()]
+    if sorted(actual,key=lambda r:r['label'])!=expected:raise ValueError('missing/wrong reference control execution markers')
+    if any((case/name).exists() for name in ('event_trace.jsonl','reference_correctness.json','gpu_stages.jsonl','urma_timeline.jsonl','verbs_timeline.jsonl')):raise ValueError('control unexpectedly enabled tracing')
+    return True
 
 
 def correctness_passed(case):

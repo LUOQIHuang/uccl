@@ -23,6 +23,7 @@ gpu_stages=os.environ.get('VB_GPU_STAGES')=='1'
 stage_suite=os.environ.get('VB_STAGE_SUITE')=='1'
 dispatch_focus=os.environ.get('VB_DISPATCH_FOCUS')=='1'
 reference_events=os.environ.get('VB_REFERENCE_EVENTS')=='1'
+reference_control=os.environ.get('VB_REFERENCE_CONTROL','')
 stage_proxies=[]
 warmups, samples = int(os.environ['VB_WARMUPS']), int(os.environ['VB_SAMPLES'])
 ep, runtime = common.load_extension(Path(os.environ['VB_MODULE']))
@@ -84,10 +85,14 @@ def append(name, data):
 
 
 def measure(fn, label, post_fn=None):
-    if globals().get('reference_events',False) and label.startswith('dispatch_'):
+    if (globals().get('reference_events',False) or globals().get('reference_control')=='paced') and label.startswith('dispatch_'):
         sys.path.insert(0,str(common.HERE.parent/'reference_events'))
         from event_runtime import measure as reference_measure
-        return reference_measure(torch,dist,ep,case,fn,label,warmups,samples,post_fn)
+        return reference_measure(torch,dist,ep,case,fn,label,warmups,samples,post_fn,record_events=globals().get('reference_events',False))
+    if globals().get('reference_control')=='batch' and label.startswith('dispatch_'):
+        sys.path.insert(0,str(common.HERE.parent/'reference_events'))
+        from event_runtime import control_marker
+        control_marker(case,label,'batch',warmups,samples)
     torch.cuda.synchronize()
     dist.barrier()
     cache = torch.empty(int(256e6 // 4), dtype=torch.int, device=f'cuda:{torch.cuda.current_device()}')

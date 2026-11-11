@@ -45,12 +45,18 @@ class Measurements:
             self.dist.barrier()
 
     def api(self,fn,label,post_fn=None):
-        if getattr(self,'reference_events',False) and label.startswith('dispatch_'):
+        if (getattr(self,'reference_events',False) or getattr(self,'reference_control',None)=='paced') and label.startswith('dispatch_'):
             import sys
             from pathlib import Path
             sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'reference_events'))
             from event_runtime import measure
-            return measure(self.torch,self.dist,self.ep,self.case,fn,label,self.warmups,self.samples,post_fn)
+            return measure(self.torch,self.dist,self.ep,self.case,fn,label,self.warmups,self.samples,post_fn,record_events=getattr(self,'reference_events',False))
+        if getattr(self,'reference_control',None)=='batch' and label.startswith('dispatch_'):
+            import sys
+            from pathlib import Path
+            sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'reference_events'))
+            from event_runtime import control_marker
+            control_marker(self.case,label,'batch',self.warmups,self.samples)
         if self.dispatch_trial:return self.isolated_api(fn,label,post_fn)
         torch=self.torch
         torch.cuda.synchronize()

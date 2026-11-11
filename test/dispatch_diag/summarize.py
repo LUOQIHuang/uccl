@@ -35,7 +35,7 @@ def case_data(root,rank,trace,compiled_off=False,reference_events=None):
     if c.get('reference_events')!=reference_events or runtime.get('reference_events_version',0)!=int(bool(reference_events)):raise ValueError('wrong reference event configuration')
     shape_ok=c['normal_tokens']==4096 if backend=='verbs' else c['shape']==[4096,128,7168,256,8]
     if not shape_ok:raise ValueError('formal comparison requires fixed 4096 shape')
-    if (c['warmups'],c['samples'])!=((5,10) if trace or reference_events=='on' else (50,50)):raise ValueError('wrong formal samples')
+    if (c['warmups'],c['samples'])!=((5,10) if trace or reference_events in ('on','batch','paced') else (50,50)):raise ValueError('wrong formal samples')
     if backend=='urma':
         if not c['api_only'] or c['normal_completion']!='all' or c['normal_write_order']!='default' or c['ll_write_order']!='default' or runtime.get('normal_write_order')!='relax':raise ValueError('changed URMA semantics')
     elif c['variant']!='current' or not c['no_profile'] or c['repeats']!=1:raise ValueError('wrong verbs configuration')
@@ -57,6 +57,11 @@ def case_data(root,rank,trace,compiled_off=False,reference_events=None):
         from event_runtime import validate,correctness_passed
         if not status['checks'].get('reference_events') or not status['checks'].get('reference_correctness') or not correctness_passed(case) or not validate(case,10):raise ValueError('unvalidated reference events/correctness')
     elif (case/'event_trace.jsonl').exists():raise ValueError('unexpected reference events')
+    if reference_events in ('batch','paced'):
+        import sys
+        sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'reference_events'))
+        from event_runtime import validate_control
+        if not status['checks'].get('reference_control') or not validate_control(case,reference_events,5,10):raise ValueError('unvalidated sampling control')
     raw=rows(case/'api_samples.jsonl');saved=rows(case/'sample_summary.jsonl');means={}
     if len(raw)!=5*c['samples'] or {r['label'] for r in raw}!=ALL_LABELS or len(saved)!=5 or {r['label'] for r in saved}!=ALL_LABELS:raise ValueError('incomplete Normal samples')
     for label in ALL_LABELS:

@@ -1,5 +1,7 @@
 # 下一项只测：事件模块关闭采集，4096 tokens
 
+本项已完成，两端Dispatch偏差仅+0.12%～+0.19%，不要重跑。见[OFF核查](results/OFF_CONTROL_ANALYSIS.zh-CN.md)及下一步[采样方式对照](CADENCE_CONTROL.zh-CN.md)。以下保留本轮原操作记录。
+
 已有128验证和4096的base/trace/post全部完成，不重复运行。完整复核见[结果报告](results/FORMAL4096_ANALYSIS.zh-CN.md)。本项不是继续找URMA/verbs差额，而是用最少一项对照弄清现有测量差异，避免拿受扰动数据继续归因。
 
 ## 目的与边界

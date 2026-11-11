@@ -1,5 +1,7 @@
 # 4096-token参考事件：记录完整，性能代表性部分通过
 
+更新：OFF对照也已完成，四个Dispatch偏差均小于0.2%，见[OFF核查](OFF_CONTROL_ANALYSIS.zh-CN.md)。后续只补[采样方式控制](../CADENCE_CONTROL.zh-CN.md)，下文保留原on阶段核查，不重复已完成任务。
+
 截至提交42d20a50，urma_ref_4096_base_01、urma_ref_4096_trace_01、urma_ref_post_01两端全部齐全，另有上传汇总urma_ref_summary_01。已独立重跑summarize.py，结果同样为REFERENCE_EVENT_SUMMARY_PASSED usable=False。128-token的成功采集另见[功能验证核查](SMOKE128_ANALYSIS.zh-CN.md)。本报告不以提交说明中的PASS代替原始数据检查。
 
 ## 功能和数据完整性已通过
@@ -77,4 +79,4 @@ post和汇总已全部收到，不需要重跑。可离线复算（输出目录�
   --output "$DEST/urma_ref_summary_recheck_01"
 ```
 
-下一步若继续服务器实验，只补同一事件模块`--step off`的一项4096对照，不重建、不重复三项。它沿用base/post的连续采样节奏，完全关闭新事件和主机时钟；用于先区分“编译差异”与“激活采集/逐样本节奏”。操作及判定见[OFF_CONTROL.zh-CN.md](../OFF_CONTROL.zh-CN.md)。如果off与基线一致，再检查匹配逐样本节奏的控制；不直接重跑当前on任务或扩展LL/Combine扫描。
+原计划的`--step off`对照已完成，无需重跑，见[OFF核查](OFF_CONTROL_ANALYSIS.zh-CN.md)。下一步只补关闭采集的batch/paced采样方式控制，操作见[CADENCE_CONTROL.zh-CN.md](../CADENCE_CONTROL.zh-CN.md)。

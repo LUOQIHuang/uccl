@@ -89,7 +89,7 @@ def parser():
     p.add_argument('--notification-check',action='store_true')
     p.add_argument('--timeline',action='store_true')
     p.add_argument('--gpu-stages',action='store_true')
-    p.add_argument('--reference-events',choices=('build','off','on'),help='reference event-style Normal tracing, independent of old GPU scopes')
+    p.add_argument('--reference-events',choices=('build','off','on','batch','paced'),help='reference events or inactive batch/paced controls')
     p.add_argument('--dispatch-focus',action='store_true')
     p.add_argument('--dispatch-compiled-off',action='store_true',help='Dispatch trace build with capture completely disabled; same API timing boundary as baseline')
     p.add_argument('--gpu-stage-roles-only',action='store_true',help='sparse compile-time role probes; currently only build or compiled-off validation')
@@ -322,6 +322,7 @@ def main():
         env.update(PARITY_CASE=str(case),PARITY_MODULE=str(module),PARITY_MODULE_SHA=manifest['module_sha'],PARITY_MODE=mode,PARITY_TOKENS=str(args.normal_tokens if mode=='normal' else args.ll_tokens),PARITY_HIDDEN=str(args.hidden),PARITY_EXPERTS=str(args.experts),PARITY_TOPK=str(args.topk),UCCL_TORCHRUN_NODE_RANK=str(args.node_rank),UCCL_EXIT_GUARD='1')
         env.update(PARITY_PHASE_SUITE=str(int(args.phase_suite)),PARITY_STAGE_PROFILE=str(int(args.stage_profile)),
                    PARITY_REFERENCE_EVENTS=str(int(args.reference_events=='on')),
+                   PARITY_REFERENCE_CONTROL=args.reference_events if args.reference_events in ('batch','paced') else '',
                    PARITY_DISPATCH_FOCUS=str(int(args.dispatch_focus)),
                    PARITY_DISPATCH_TRIAL=str(int(args.dispatch_trial)),PARITY_DISPATCH_DELAY_US=str(args.dispatch_delay_us if args.node_rank==1 else 0),
                    PARITY_GPU_STAGES=str(int(getattr(args,'gpu_stages',False))), PARITY_GPU_STAGE_MODE=args.gpu_stage_mode, PARITY_API_ONLY=str(int(args.api_only)), PARITY_TIMELINE=str(int(getattr(args,'timeline',False))),
@@ -358,6 +359,13 @@ def main():
             try:checks['reference_events']=validate(case,args.samples)
             except Exception as exc:
                 checks['reference_events']=False
+                (case/'reference_validation_error.txt').write_text(str(exc))
+        if args.reference_events in ('batch','paced'):
+            sys.path.insert(0,str(HERE.parent/'reference_events'))
+            from event_runtime import validate_control
+            try:checks['reference_control']=validate_control(case,args.reference_events,args.warmups,args.samples)
+            except Exception as exc:
+                checks['reference_control']=False
                 (case/'reference_validation_error.txt').write_text(str(exc))
         if args.dispatch_focus and args.gpu_stages:
             sys.path.insert(0,str(HERE.parent/'dispatch_diag'))

@@ -1,6 +1,6 @@
 # 参考版本移植：Normal Dispatch 事件打点
 
-两端128-token及4096-token的base/trace/post已全部收到，离线复算为`usable=False`（四个Dispatch测点两项通过、两项不通过），详见[完整核查](results/FORMAL4096_ANALYSIS.zh-CN.md)。不重复已完成任务；下一步只补[关闭事件的编译对照](OFF_CONTROL.zh-CN.md)，复用现有模块。功能和记录完整性通过不等于性能代表性通过。128-token详见[功能验证核查](results/SMOKE128_ANALYSIS.zh-CN.md)。
+两端128-token及4096-token的base/on/post/off均已收到。off回到基线附近，见[OFF核查](results/OFF_CONTROL_ANALYSIS.zh-CN.md)；下一步只做[关闭采集的采样方式对照](CADENCE_CONTROL.zh-CN.md)，无需重编译，不重复既有实验。on的完整核查见[4096报告](results/FORMAL4096_ANALYSIS.zh-CN.md)，功能和记录完整性通过不等于性能代表性通过。
 
 本次smoke128若出现`urma_bind_jetty rc=4096`，先按[建连失败排查流程](RECOVERY.zh-CN.md)处理；保留现有模块，先做一次关闭所有新打桩的128-token对照，不直接重跑4096或重新编译。
 

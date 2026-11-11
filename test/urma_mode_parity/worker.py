@@ -35,6 +35,7 @@ measurements=Measurements(torch,dist,ep,case,mode,stage_profile,
     int(os.environ.get('PARITY_DISPATCH_DELAY_US','0')),os.environ.get('PARITY_TIMELINE')=='1')
 measurements.dispatch_focus=os.environ.get('PARITY_DISPATCH_FOCUS')=='1'
 measurements.reference_events=os.environ.get('PARITY_REFERENCE_EVENTS')=='1'
+measurements.reference_control=os.environ.get('PARITY_REFERENCE_CONTROL','')
 if os.environ.get('PARITY_GPU_STAGES')=='1':
     import buffer as stage_buffer
     stage_proxies=[];original_buffer_init=stage_buffer.Buffer.__init__
