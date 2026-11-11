@@ -1,5 +1,7 @@
 # 下一轮：编译期精简打桩的关闭代价验证
 
+**本轮已完成：[分析报告](results/urma_dispatch_rolesoff_01_summary/ANALYSIS.zh-CN.md)。Dispatch关闭代价仍超过门槛，暂不启动采集。下一步按 [CODEGEN.zh-CN.md](CODEGEN.zh-CN.md) 只读取现有编译产物，不重跑以下benchmark。**
+
 ## 为什么还需要这一步
 
 最新compiled-off结果确认：完整打桩模块即使不启动采集，FP8 Dispatch仍慢约92.7%、BF16慢约56.0%，Combine慢约28.5%。这属于测量模块引入的扰动，原始URMA/verbs瓶颈尚未证明。不能继续分析旧trace内部时间。
