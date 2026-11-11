@@ -1,0 +1,400 @@
+11月 12 05:19:13 worker1 kernel: ubase 0000c: Change the entity status to normal
+11月 12 05:19:13 worker1 kernel: ubase 0000c: (pid 3841) The firmware version is 6.0.21.27
+11月 12 05:19:13 worker1 kernel: ubase 0000c: (pid 3841) udev cap_bits[0] = 0x1aa23d
+11月 12 05:19:13 worker1 kernel: ubase 0000c: (pid 3841) udev cap_bits[1] = 0x0
+11月 12 05:19:13 worker1 kernel: ubase 0000c: (pid 3841) udev cap_bits[2] = 0x0
+11月 12 05:19:13 worker1 kernel: ubase 0000c: device id alloc success, id: 53253.
+11月 12 05:19:13 worker1 kernel: ubase 0000c: (pid 27487) ubase ae task start.
+11月 12 05:19:13 worker1 kernel: ubase 0000c: (pid 3841) pre-alloc memory feature is enabled.
+11月 12 05:19:13 worker1 kernel: udma.udma ubase.udma.7: UDMA: udma init dev called, matched aux dev(udma.7).
+11月 12 05:19:13 worker1 kernel: URMA|ubcore|3841|3841|ubcore_register_device:[1341]|ubcore device: udmac1d1e4 register success.
+11月 12 05:19:13 worker1 kernel: URMA|ubcore|3841|3841|ubmad_ubc_eid_ops:[305]|Invalid eid 0000:0000:0040:0400:0010:0000:df04:4100.
+11月 12 05:19:13 worker1 kernel: URMA|ubcore|2082|2082|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0x0, cfg->len = 65536, cfg->token_value.token = 0, udate = 1 
+11月 12 05:19:13 worker1 kernel: URMA|ubcore|3841|3841|ubcore_dispatch_mgmt_event:[2645]|cast eid to ubcm failed.
+11月 12 05:19:13 worker1 kernel: ubase 0000c: UDMA: MAPT END:kernel_mode = 1
+11月 12 05:19:13 worker1 kernel: URMA|ubcore|3841|3841|ubmad_ubc_eid_ops:[305]|Invalid eid 0000:0000:0048:0400:0010:0000:df04:4900.
+11月 12 05:19:13 worker1 kernel: URMA|ubcore|27451|27451|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0x0, cfg->len = 65536, cfg->token_value.token = 0, udate = 1 
+11月 12 05:19:13 worker1 kernel: ubase 0000c: UDMA: MAPT END:kernel_mode = 1
+11月 12 05:19:13 worker1 kernel: URMA|ubcore|27451|27451|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0x0, cfg->len = 65536, cfg->token_value.token = 0, udate = 1 
+11月 12 05:19:13 worker1 kernel: ubase 0000c: UDMA: MAPT END:kernel_mode = 1
+11月 12 05:19:13 worker1 kernel: URMA|ubcore|27451|27451|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0x0, cfg->len = 65536, cfg->token_value.token = 0, udate = 1 
+11月 12 05:19:13 worker1 kernel: ubase 0000c: UDMA: MAPT END:kernel_mode = 1
+11月 12 05:19:13 worker1 kernel: ipourma5: ipourma create jetty set priority : 6, ty_type : ctp
+11月 12 05:19:13 worker1 kernel: ipourma5:  get a new eid, index:1, eid:0000:0000:0048:0400:0010:0000:df04:4900
+11月 12 05:19:13 worker1 kernel: URMA|ubcore|2082|2082|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0x0, cfg->len = 65536, cfg->token_value.token = 0, udate = 1 
+11月 12 05:19:13 worker1 kernel: URMA|ubcore|3841|3841|ubcore_dispatch_mgmt_event:[2645]|cast eid to ubcm failed.
+11月 12 05:19:13 worker1 kernel: ubase 0000c: UDMA: MAPT END:kernel_mode = 1
+11月 12 05:19:13 worker1 kernel: ubase 0000c: UDMA: init udma successfully.
+11月 12 05:19:13 worker1 kernel: URMA|ubcore|2082|2082|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0x0, cfg->len = 65536, cfg->token_value.token = 0, udate = 1 
+11月 12 05:19:13 worker1 kernel: ubase 0000c: (pid 3841) udma.7 updated adev status, status = 0x0.
+11月 12 05:19:13 worker1 kernel: ubase 0000c: UDMA: MAPT END:kernel_mode = 1
+11月 12 05:19:13 worker1 kernel: ubase 0000c: register share port at 2 success
+11月 12 05:19:13 worker1 kernel: ipourma5: ipourma create jetty set priority : 6, ty_type : ctp
+11月 12 05:19:13 worker1 kernel: ipourma5: Device opened.
+11月 12 05:19:13 worker1 kernel: URMA|ubagg|27392|27392|ubagg_cmd_set_topo_info:[1499]|Finish to set topo info, node_num: 8.
+11月 12 05:19:15 worker1 kernel: [sentry][urma]: urma 1 dev is not exist, ignore to release the urma source.
+11月 12 05:19:15 worker1 kernel: URMA|ubcore|24636|24636|ubcore_unregister_client:[416]|ubcore client: sentry_ubcore_client unregister success.
+11月 12 05:19:15 worker1 kernel: URMA|ubcore|24636|24636|ubcore_register_client:[369]|ubcore client: sentry_ubcore_client register success.
+11月 12 05:19:15 worker1 kernel: [sentry][urma]: ubcore_register_client success
+11月 12 05:19:15 worker1 kernel: [sentry][urma]: ubcore init success
+11月 12 05:19:15 worker1 kernel: [sentry][urma]: Match device udmac0d1e2, use it to send/recv data
+11月 12 05:19:15 worker1 kernel: [sentry][urma]: ubcore_create_jfc success
+11月 12 05:19:15 worker1 kernel: [sentry][urma]: ubcore_create_jfc success
+11月 12 05:19:15 worker1 kernel: [sentry][urma]: ubcore_create_jfr success
+11月 12 05:19:15 worker1 kernel: URMA|ubcore|24636|24636|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0x0, cfg->len = 131072, cfg->token_value.token = 0, udate = 1 
+11月 12 05:19:15 worker1 kernel: ubase 00007: UDMA: MAPT END:kernel_mode = 1
+11月 12 05:19:15 worker1 kernel: URMA|ubcore|24636|24636|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0x0, cfg->len = 131072, cfg->token_value.token = 0, udate = 1 
+11月 12 05:19:15 worker1 kernel: ubase 00007: UDMA: MAPT END:kernel_mode = 1
+11月 12 05:19:15 worker1 kernel: [sentry][urma]: ubcore_register_seg success
+11月 12 05:19:15 worker1 kernel: [sentry][urma]: Match device udmac1d1e2, use it to send/recv data
+11月 12 05:19:15 worker1 kernel: [sentry][urma]: ubcore_create_jfc success
+11月 12 05:19:15 worker1 kernel: [sentry][urma]: ubcore_create_jfc success
+11月 12 05:19:15 worker1 kernel: [sentry][urma]: ubcore_create_jfr success
+11月 12 05:19:15 worker1 kernel: URMA|ubcore|24636|24636|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0x0, cfg->len = 131072, cfg->token_value.token = 0, udate = 1 
+11月 12 05:19:15 worker1 kernel: ubase 0000a: UDMA: MAPT END:kernel_mode = 1
+11月 12 05:19:15 worker1 kernel: URMA|ubcore|24636|24636|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0x0, cfg->len = 131072, cfg->token_value.token = 0, udate = 1 
+11月 12 05:19:15 worker1 kernel: ubase 0000a: UDMA: MAPT END:kernel_mode = 1
+11月 12 05:19:15 worker1 kernel: [sentry][urma]: ubcore_register_seg success
+11月 12 05:19:15 worker1 kernel: [UVB]: register cis func for callid=c00b2010 recvid=10000000 success
+11月 12 05:19:15 worker1 kernel: [sentry][urma]: proc_client_info_write kbuf is 0000:0000:003f:0200:0010:0000:df00:4b00,0000:0000:003f:0200:0010:0000:df01:cb00,0000:0000:003f:0200:0010:0000:df01:8b00,0000:0000:003f:0200:0010:0000:df01:4b00,0000:0000:003f:0200:0010:0000:df00:cb00,0000:0000:003f:0200:0010:0000:df01:0b00,0000:0000:003f:0200:0010:0000:df00:8b00,0000:0000:003f:0200:0010:0000:df00:0b00;0000:0000:007f:0200:0010:0000:df04:4b00,0000:0000:007f:0200:0010:0000:df05:cb00,0000:0000:007f:0200:0010:0000:df05:8b00,0000:0000:007f:0200:0010:0000:df05:4b00,0000:0000:007f:0200:0010:0000:df04:cb00,0000:0000:007f:0200:0010:0000:df05:0b00,0000:0000:007f:0200:0010:0000:df04:8b00,0000:0000:007f:0200:0010:0000:df04:0b00 1000
+11月 12 05:19:15 worker1 kernel: [sentry][urma]: client_jetty_id is 1000
+11月 12 05:19:15 worker1 kernel: [sentry][urma]: create jetty set priority : 1, tp_type : ctp
+11月 12 05:19:15 worker1 kernel: [sentry][urma]: ubcore_create_jetty success for device udmac0d1e2
+11月 12 05:19:15 worker1 kernel: [sentry][urma]: import: 7/7 success for device udmac0d1e2
+11月 12 05:19:15 worker1 kernel: [sentry][urma]: create jetty set priority : 1, tp_type : ctp
+11月 12 05:19:15 worker1 kernel: [sentry][urma]: ubcore_create_jetty success for device udmac1d1e2
+11月 12 05:19:15 worker1 kernel: [sentry][urma]: import: 7/7 success for device udmac1d1e2
+11月 12 05:19:42 worker1 kernel: URMA|ubcore|3841|3841|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0x0, cfg->len = 65536, cfg->token_value.token = 0, udate = 1 
+11月 12 05:19:42 worker1 kernel: ubase 00009: UDMA: MAPT END:kernel_mode = 1
+11月 12 05:19:42 worker1 kernel: URMA|ubcore|3841|3841|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0x0, cfg->len = 65536, cfg->token_value.token = 0, udate = 1 
+11月 12 05:19:42 worker1 kernel: ubase 00009: UDMA: MAPT END:kernel_mode = 1
+11月 12 05:19:42 worker1 kernel: URMA|ubcore|3841|3841|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0x0, cfg->len = 65536, cfg->token_value.token = 0, udate = 1 
+11月 12 05:19:42 worker1 kernel: ubase 00009: UDMA: MAPT END:kernel_mode = 1
+11月 12 05:19:42 worker1 kernel: ipourma2: ipourma create jetty set priority : 6, ty_type : ctp
+11月 12 05:19:42 worker1 kernel: ipourma2: create redundant jetty id: 2 by eid: 0!
+11月 12 05:19:42 worker1 kernel: URMA|ubcore|3841|3841|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0x0, cfg->len = 65536, cfg->token_value.token = 0, udate = 1 
+11月 12 05:19:42 worker1 kernel: ubase 00009: UDMA: MAPT END:kernel_mode = 1
+11月 12 05:19:42 worker1 kernel: URMA|ubcore|3841|3841|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0x0, cfg->len = 65536, cfg->token_value.token = 0, udate = 1 
+11月 12 05:19:42 worker1 kernel: ubase 00009: UDMA: MAPT END:kernel_mode = 1
+11月 12 05:19:42 worker1 kernel: URMA|ubcore|3841|3841|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0x0, cfg->len = 65536, cfg->token_value.token = 0, udate = 1 
+11月 12 05:19:42 worker1 kernel: ubase 00009: UDMA: MAPT END:kernel_mode = 1
+11月 12 05:19:42 worker1 kernel: ipourma2: ipourma create jetty set priority : 6, ty_type : ctp
+11月 12 05:19:42 worker1 kernel: ipourma2: create redundant jetty id: 3 by eid: 0!
+11月 12 05:19:42 worker1 kernel: URMA|ubcore|3841|3841|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0x0, cfg->len = 65536, cfg->token_value.token = 0, udate = 1 
+11月 12 05:19:42 worker1 kernel: ubase 00009: UDMA: MAPT END:kernel_mode = 1
+11月 12 05:19:42 worker1 kernel: URMA|ubcore|3841|3841|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0x0, cfg->len = 65536, cfg->token_value.token = 0, udate = 1 
+11月 12 05:19:42 worker1 kernel: ubase 00009: UDMA: MAPT END:kernel_mode = 1
+11月 12 05:19:42 worker1 kernel: URMA|ubcore|3841|3841|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0x0, cfg->len = 65536, cfg->token_value.token = 0, udate = 1 
+11月 12 05:19:42 worker1 kernel: ubase 00009: UDMA: MAPT END:kernel_mode = 1
+11月 12 05:19:42 worker1 kernel: ipourma2: ipourma create jetty set priority : 6, ty_type : ctp
+11月 12 05:19:42 worker1 kernel: ipourma2: create redundant jetty id: 4 by eid: 0!
+11月 12 05:19:42 worker1 kernel: URMA|ubcore|3841|3841|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0x0, cfg->len = 65536, cfg->token_value.token = 0, udate = 1 
+11月 12 05:19:42 worker1 kernel: ubase 00009: UDMA: MAPT END:kernel_mode = 1
+11月 12 05:19:42 worker1 kernel: URMA|ubcore|3841|3841|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0x0, cfg->len = 65536, cfg->token_value.token = 0, udate = 1 
+11月 12 05:19:42 worker1 kernel: ubase 00009: UDMA: MAPT END:kernel_mode = 1
+11月 12 05:19:42 worker1 kernel: URMA|ubcore|3841|3841|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0x0, cfg->len = 65536, cfg->token_value.token = 0, udate = 1 
+11月 12 05:19:42 worker1 kernel: ubase 00009: UDMA: MAPT END:kernel_mode = 1
+11月 12 05:19:42 worker1 kernel: ipourma2: ipourma create jetty set priority : 6, ty_type : ctp
+11月 12 05:19:42 worker1 kernel: ipourma2: create redundant jetty id: 5 by eid: 0!
+11月 12 05:19:42 worker1 kernel: URMA|ubcore|3841|3841|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0x0, cfg->len = 65536, cfg->token_value.token = 0, udate = 1 
+11月 12 05:19:42 worker1 kernel: ubase 00009: UDMA: MAPT END:kernel_mode = 1
+11月 12 05:19:42 worker1 kernel: URMA|ubcore|3841|3841|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0x0, cfg->len = 65536, cfg->token_value.token = 0, udate = 1 
+11月 12 05:19:42 worker1 kernel: ubase 00009: UDMA: MAPT END:kernel_mode = 1
+11月 12 05:19:42 worker1 kernel: URMA|ubcore|3841|3841|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0x0, cfg->len = 65536, cfg->token_value.token = 0, udate = 1 
+11月 12 05:19:42 worker1 kernel: ubase 00009: UDMA: MAPT END:kernel_mode = 1
+11月 12 05:19:42 worker1 kernel: ipourma2: ipourma create jetty set priority : 6, ty_type : ctp
+11月 12 05:19:42 worker1 kernel: ipourma2: create redundant jetty id: 6 by eid: 0!
+11月 12 05:19:42 worker1 kernel: URMA|ubcore|3841|3841|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0x0, cfg->len = 65536, cfg->token_value.token = 0, udate = 1 
+11月 12 05:19:42 worker1 kernel: ubase 00009: UDMA: MAPT END:kernel_mode = 1
+11月 12 05:19:42 worker1 kernel: URMA|ubcore|3841|3841|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0x0, cfg->len = 65536, cfg->token_value.token = 0, udate = 1 
+11月 12 05:19:42 worker1 kernel: ubase 00009: UDMA: MAPT END:kernel_mode = 1
+11月 12 05:19:42 worker1 kernel: URMA|ubcore|3841|3841|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0x0, cfg->len = 65536, cfg->token_value.token = 0, udate = 1 
+11月 12 05:19:42 worker1 kernel: ubase 00009: UDMA: MAPT END:kernel_mode = 1
+11月 12 05:19:42 worker1 kernel: ipourma2: ipourma create jetty set priority : 6, ty_type : ctp
+11月 12 05:19:42 worker1 kernel: ipourma2: create redundant jetty id: 7 by eid: 0!
+11月 12 05:19:42 worker1 kernel: URMA|ubcore|3841|3841|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0x0, cfg->len = 65536, cfg->token_value.token = 0, udate = 1 
+11月 12 05:19:42 worker1 kernel: ubase 00009: UDMA: MAPT END:kernel_mode = 1
+11月 12 05:19:42 worker1 kernel: URMA|ubcore|3841|3841|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0x0, cfg->len = 65536, cfg->token_value.token = 0, udate = 1 
+11月 12 05:19:42 worker1 kernel: ubase 00009: UDMA: MAPT END:kernel_mode = 1
+11月 12 05:19:42 worker1 kernel: URMA|ubcore|3841|3841|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0x0, cfg->len = 65536, cfg->token_value.token = 0, udate = 1 
+11月 12 05:19:42 worker1 kernel: ubase 00009: UDMA: MAPT END:kernel_mode = 1
+11月 12 05:19:42 worker1 kernel: ipourma2: ipourma create jetty set priority : 6, ty_type : ctp
+11月 12 05:19:42 worker1 kernel: ipourma2: create redundant jetty id: 8 by eid: 0!
+11月 12 05:19:44 worker1 kernel: URMA|ubcore|3841|3841|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0x0, cfg->len = 65536, cfg->token_value.token = 0, udate = 1 
+11月 12 05:19:44 worker1 kernel: ubase 0000c: UDMA: MAPT END:kernel_mode = 1
+11月 12 05:19:44 worker1 kernel: URMA|ubcore|3841|3841|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0x0, cfg->len = 65536, cfg->token_value.token = 0, udate = 1 
+11月 12 05:19:44 worker1 kernel: ubase 0000c: UDMA: MAPT END:kernel_mode = 1
+11月 12 05:19:44 worker1 kernel: URMA|ubcore|3841|3841|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0x0, cfg->len = 65536, cfg->token_value.token = 0, udate = 1 
+11月 12 05:19:44 worker1 kernel: ubase 0000c: UDMA: MAPT END:kernel_mode = 1
+11月 12 05:19:44 worker1 kernel: ipourma5: ipourma create jetty set priority : 6, ty_type : ctp
+11月 12 05:19:44 worker1 kernel: ipourma5: create redundant jetty id: 2 by eid: 0!
+11月 12 05:19:44 worker1 kernel: URMA|ubcore|3841|3841|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0x0, cfg->len = 65536, cfg->token_value.token = 0, udate = 1 
+11月 12 05:19:44 worker1 kernel: ubase 0000c: UDMA: MAPT END:kernel_mode = 1
+11月 12 05:19:44 worker1 kernel: URMA|ubcore|3841|3841|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0x0, cfg->len = 65536, cfg->token_value.token = 0, udate = 1 
+11月 12 05:19:44 worker1 kernel: ubase 0000c: UDMA: MAPT END:kernel_mode = 1
+11月 12 05:19:44 worker1 kernel: URMA|ubcore|3841|3841|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0x0, cfg->len = 65536, cfg->token_value.token = 0, udate = 1 
+11月 12 05:19:44 worker1 kernel: ubase 0000c: UDMA: MAPT END:kernel_mode = 1
+11月 12 05:19:44 worker1 kernel: ipourma5: ipourma create jetty set priority : 6, ty_type : ctp
+11月 12 05:19:44 worker1 kernel: ipourma5: create redundant jetty id: 3 by eid: 0!
+11月 12 05:19:44 worker1 kernel: URMA|ubcore|3841|3841|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0x0, cfg->len = 65536, cfg->token_value.token = 0, udate = 1 
+11月 12 05:19:44 worker1 kernel: ubase 0000c: UDMA: MAPT END:kernel_mode = 1
+11月 12 05:19:44 worker1 kernel: URMA|ubcore|3841|3841|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0x0, cfg->len = 65536, cfg->token_value.token = 0, udate = 1 
+11月 12 05:19:44 worker1 kernel: ubase 0000c: UDMA: MAPT END:kernel_mode = 1
+11月 12 05:19:44 worker1 kernel: URMA|ubcore|3841|3841|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0x0, cfg->len = 65536, cfg->token_value.token = 0, udate = 1 
+11月 12 05:19:44 worker1 kernel: ubase 0000c: UDMA: MAPT END:kernel_mode = 1
+11月 12 05:19:44 worker1 kernel: ipourma5: ipourma create jetty set priority : 6, ty_type : ctp
+11月 12 05:19:44 worker1 kernel: ipourma5: create redundant jetty id: 4 by eid: 0!
+11月 12 05:19:44 worker1 kernel: URMA|ubcore|3841|3841|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0x0, cfg->len = 65536, cfg->token_value.token = 0, udate = 1 
+11月 12 05:19:44 worker1 kernel: ubase 0000c: UDMA: MAPT END:kernel_mode = 1
+11月 12 05:19:44 worker1 kernel: URMA|ubcore|3841|3841|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0x0, cfg->len = 65536, cfg->token_value.token = 0, udate = 1 
+11月 12 05:19:44 worker1 kernel: ubase 0000c: UDMA: MAPT END:kernel_mode = 1
+11月 12 05:19:44 worker1 kernel: URMA|ubcore|3841|3841|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0x0, cfg->len = 65536, cfg->token_value.token = 0, udate = 1 
+11月 12 05:19:44 worker1 kernel: ubase 0000c: UDMA: MAPT END:kernel_mode = 1
+11月 12 05:19:44 worker1 kernel: ipourma5: ipourma create jetty set priority : 6, ty_type : ctp
+11月 12 05:19:44 worker1 kernel: ipourma5: create redundant jetty id: 5 by eid: 0!
+11月 12 05:19:44 worker1 kernel: URMA|ubcore|3841|3841|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0x0, cfg->len = 65536, cfg->token_value.token = 0, udate = 1 
+11月 12 05:19:44 worker1 kernel: ubase 0000c: UDMA: MAPT END:kernel_mode = 1
+11月 12 05:19:44 worker1 kernel: URMA|ubcore|3841|3841|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0x0, cfg->len = 65536, cfg->token_value.token = 0, udate = 1 
+11月 12 05:19:44 worker1 kernel: ubase 0000c: UDMA: MAPT END:kernel_mode = 1
+11月 12 05:19:44 worker1 kernel: URMA|ubcore|3841|3841|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0x0, cfg->len = 65536, cfg->token_value.token = 0, udate = 1 
+11月 12 05:19:44 worker1 kernel: ubase 0000c: UDMA: MAPT END:kernel_mode = 1
+11月 12 05:19:44 worker1 kernel: ipourma5: ipourma create jetty set priority : 6, ty_type : ctp
+11月 12 05:19:44 worker1 kernel: ipourma5: create redundant jetty id: 6 by eid: 0!
+11月 12 05:19:44 worker1 kernel: URMA|ubcore|3841|3841|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0x0, cfg->len = 65536, cfg->token_value.token = 0, udate = 1 
+11月 12 05:19:44 worker1 kernel: ubase 0000c: UDMA: MAPT END:kernel_mode = 1
+11月 12 05:19:44 worker1 kernel: URMA|ubcore|3841|3841|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0x0, cfg->len = 65536, cfg->token_value.token = 0, udate = 1 
+11月 12 05:19:44 worker1 kernel: ubase 0000c: UDMA: MAPT END:kernel_mode = 1
+11月 12 05:19:44 worker1 kernel: URMA|ubcore|3841|3841|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0x0, cfg->len = 65536, cfg->token_value.token = 0, udate = 1 
+11月 12 05:19:44 worker1 kernel: ubase 0000c: UDMA: MAPT END:kernel_mode = 1
+11月 12 05:19:44 worker1 kernel: ipourma5: ipourma create jetty set priority : 6, ty_type : ctp
+11月 12 05:19:44 worker1 kernel: ipourma5: create redundant jetty id: 7 by eid: 0!
+11月 12 05:19:44 worker1 kernel: URMA|ubcore|3841|3841|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0x0, cfg->len = 65536, cfg->token_value.token = 0, udate = 1 
+11月 12 05:19:44 worker1 kernel: ubase 0000c: UDMA: MAPT END:kernel_mode = 1
+11月 12 05:19:44 worker1 kernel: URMA|ubcore|3841|3841|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0x0, cfg->len = 65536, cfg->token_value.token = 0, udate = 1 
+11月 12 05:19:44 worker1 kernel: ubase 0000c: UDMA: MAPT END:kernel_mode = 1
+11月 12 05:19:44 worker1 kernel: URMA|ubcore|3841|3841|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0x0, cfg->len = 65536, cfg->token_value.token = 0, udate = 1 
+11月 12 05:19:44 worker1 kernel: ubase 0000c: UDMA: MAPT END:kernel_mode = 1
+11月 12 05:19:44 worker1 kernel: ipourma5: ipourma create jetty set priority : 6, ty_type : ctp
+11月 12 05:19:44 worker1 kernel: ipourma5: create redundant jetty id: 8 by eid: 0!
+11月 12 05:22:00 worker1 kernel: URMA|ubagg|27359|27359|ubagg_cmd_set_topo_info:[1499]|Finish to set topo info, node_num: 8.
+11月 12 05:22:01 worker1 kernel: URMA|ubagg|27393|27393|ubagg_cmd_set_topo_info:[1499]|Finish to set topo info, node_num: 8.
+11月 12 05:24:26 worker1 kernel: fwctl fwctl1: no corresponding query was found.
+11月 12 05:24:26 worker1 kernel: fwctl fwctl0: no corresponding query was found.
+11月 12 05:24:35 worker1 kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+11月 12 05:24:35 worker1 kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+11月 12 05:24:35 worker1 kernel: URMA|ubcore|70758|70758|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xfffbfa5b3000, cfg->len = 8192, cfg->token_value.token = 0, udate = 0 
+11月 12 05:24:35 worker1 kernel: ubase 00007: UDMA: MATT START:kernel_mode=0
+11月 12 05:24:35 worker1 kernel: platform ummu_vdev.16.auto: Adding to iommu group 14
+11月 12 05:24:35 worker1 kernel: URMA|ubcore|70758|70758|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xfffbfa5b6000, cfg->len = 64, cfg->token_value.token = 0, udate = 0 
+11月 12 05:24:35 worker1 kernel: ubase 00007: UDMA: MATT START:kernel_mode=0
+11月 12 05:24:35 worker1 kernel: platform ummu_vdev.17.auto: Adding to iommu group 15
+11月 12 05:24:35 worker1 kernel: URMA|ubcore|70759|70759|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xfffb7809b000, cfg->len = 8192, cfg->token_value.token = 0, udate = 0 
+11月 12 05:24:35 worker1 kernel: ubase 00007: UDMA: MATT START:kernel_mode=0
+11月 12 05:24:35 worker1 kernel: platform ummu_vdev.18.auto: Adding to iommu group 16
+11月 12 05:24:35 worker1 kernel: URMA|ubcore|70760|70760|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xfffb6c09b000, cfg->len = 8192, cfg->token_value.token = 0, udate = 0 
+11月 12 05:24:35 worker1 kernel: ubase 00007: UDMA: MATT START:kernel_mode=0
+11月 12 05:24:35 worker1 kernel: platform ummu_vdev.19.auto: Adding to iommu group 17
+11月 12 05:24:35 worker1 kernel: URMA|ubcore|70761|70761|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xfffb7009b000, cfg->len = 8192, cfg->token_value.token = 0, udate = 0 
+11月 12 05:24:35 worker1 kernel: ubase 00007: UDMA: MATT START:kernel_mode=0
+11月 12 05:24:35 worker1 kernel: platform ummu_vdev.20.auto: Adding to iommu group 18
+11月 12 05:24:35 worker1 kernel: URMA|ubcore|70758|70758|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xa04400000, cfg->len = 483892608, cfg->token_value.token = 0, udate = 0 
+11月 12 05:24:35 worker1 kernel: ubase 00007: UDMA: MATT START:kernel_mode=0
+11月 12 05:24:35 worker1 kernel: udma_metax_p2p_bridge: pin OK va=0xa04400000->0xa04400000 len=0x1cd79d80->0x1cd7a000 page=0x2000 bus_off=0x0 apply_off=0 nents=1 first_pa=0xa0000ce00000
+11月 12 05:24:35 worker1 kernel: ubase 00007: UDMA: [GPU-TRACE] pin OK provider=metax gpu_va=0xa04400000 mapped=0x1cd7a000 page_size=0x2000 bus_off=0x0 nents=1 first_pa=0xa0000ce00000
+11月 12 05:24:35 worker1 kernel: UDMA GPU map: l_tid=1048575 r_tid=193 mm=ffff08014359d800 current_mm=ffff08014359d800 iova=0xa04400000 first_pa=0xa0000ce00000 nents=1
+11月 12 05:24:35 worker1 kernel: UDMA GPU map: l_tid=187 r_tid=1048575 mm=ffff08014359d800 current_mm=ffff08014359d800 iova=0xa04400000 first_pa=0xa0000ce00000 nents=1
+11月 12 05:24:35 worker1 kernel: platform ummu_vdev.21.auto: Adding to iommu group 19
+11月 12 05:24:35 worker1 kernel: URMA|ubcore|70758|70758|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xa24200000, cfg->len = 81960, cfg->token_value.token = 0, udate = 0 
+11月 12 05:24:35 worker1 kernel: ubase 00007: UDMA: MATT START:kernel_mode=0
+11月 12 05:24:35 worker1 kernel: udma_metax_p2p_bridge: pin OK va=0xa24200000->0xa24200000 len=0x14028->0x15000 page=0x1000 bus_off=0x0 apply_off=0 nents=1 first_pa=0xa00001600000
+11月 12 05:24:35 worker1 kernel: ubase 00007: UDMA: [GPU-TRACE] pin OK provider=metax gpu_va=0xa24200000 mapped=0x15000 page_size=0x1000 bus_off=0x0 nents=1 first_pa=0xa00001600000
+11月 12 05:24:35 worker1 kernel: UDMA GPU map: l_tid=1048575 r_tid=194 mm=ffff08014359d800 current_mm=ffff08014359d800 iova=0xa24200000 first_pa=0xa00001600000 nents=1
+11月 12 05:24:35 worker1 kernel: UDMA GPU map: l_tid=187 r_tid=1048575 mm=ffff08014359d800 current_mm=ffff08014359d800 iova=0xa24200000 first_pa=0xa00001600000 nents=1
+11月 12 05:24:35 worker1 kernel: platform ummu_vdev.22.auto: Adding to iommu group 20
+11月 12 05:24:35 worker1 kernel: URMA|ubcore|26929|26929|ubmad_send_work_handler:[1689]|Tx status error. cr_cnt 1, status 4, comp_len 0, user_ctx: 0xffff80013a402000.
+11月 12 05:24:35 worker1 kernel: URMA|ubcore|70760|70760|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xfffb6c09f000, cfg->len = 64, cfg->token_value.token = 0, udate = 0 
+11月 12 05:24:35 worker1 kernel: URMA|ubcore|2492|2492|ubmad_send_work_handler:[1689]|Tx status error. cr_cnt 1, status 4, comp_len 0, user_ctx: 0xffff80013a402000.
+11月 12 05:24:35 worker1 kernel: URMA|ubcore|70921|70921|ubmad_send_work_handler:[1689]|Tx status error. cr_cnt 1, status 4, comp_len 0, user_ctx: 0xffff80013a402000.
+11月 12 05:24:35 worker1 kernel: URMA|ubcore|26929|26929|ubmad_send_work_handler:[1689]|Tx status error. cr_cnt 1, status 4, comp_len 0, user_ctx: 0xffff80013a402000.
+11月 12 05:24:35 worker1 kernel: ubase 00007: UDMA: MATT START:kernel_mode=0
+11月 12 05:24:35 worker1 kernel: URMA|ubcore|26929|26929|ubmad_send_work_handler:[1689]|Tx status error. cr_cnt 1, status 4, comp_len 0, user_ctx: 0xffff80013a402000.
+11月 12 05:24:35 worker1 kernel: platform ummu_vdev.23.auto: Adding to iommu group 21
+11月 12 05:24:35 worker1 kernel: URMA|ubcore|26929|26929|ubmad_send_work_handler:[1689]|Tx status error. cr_cnt 1, status 4, comp_len 0, user_ctx: 0xffff80013a402000.
+11月 12 05:24:35 worker1 kernel: URMA|ubcore|70761|70761|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xfffb7009f000, cfg->len = 64, cfg->token_value.token = 0, udate = 0 
+11月 12 05:24:35 worker1 kernel: ubase 00007: UDMA: MATT START:kernel_mode=0
+11月 12 05:24:35 worker1 kernel: platform ummu_vdev.24.auto: Adding to iommu group 22
+11月 12 05:24:35 worker1 kernel: URMA|ubcore|70759|70759|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xfffb7809f000, cfg->len = 64, cfg->token_value.token = 0, udate = 0 
+11月 12 05:24:35 worker1 kernel: ubase 00007: UDMA: MATT START:kernel_mode=0
+11月 12 05:24:35 worker1 kernel: URMA|ubcore|26929|26929|ubmad_send_work_handler:[1689]|Tx status error. cr_cnt 1, status 4, comp_len 0, user_ctx: 0xffff80013a402000.
+11月 12 05:24:35 worker1 kernel: URMA|ubcore|70921|70921|ubmad_send_work_handler:[1689]|Tx status error. cr_cnt 1, status 4, comp_len 0, user_ctx: 0xffff80013a402000.
+11月 12 05:24:35 worker1 kernel: URMA|ubcore|70920|70920|ubmad_send_work_handler:[1689]|Tx status error. cr_cnt 1, status 4, comp_len 0, user_ctx: 0xffff80013a402000.
+11月 12 05:24:35 worker1 kernel: URMA|ubcore|70920|70920|ubmad_send_work_handler:[1689]|Tx status error. cr_cnt 1, status 4, comp_len 0, user_ctx: 0xffff80013a402000.
+11月 12 05:24:35 worker1 kernel: URMA|ubcore|26929|26929|ubmad_send_work_handler:[1689]|Tx status error. cr_cnt 1, status 4, comp_len 0, user_ctx: 0xffff80013a402000.
+11月 12 05:24:35 worker1 kernel: URMA|ubcore|70999|70999|ubmad_send_work_handler:[1689]|Tx status error. cr_cnt 1, status 4, comp_len 0, user_ctx: 0xffff80013a402800.
+11月 12 05:24:35 worker1 kernel: URMA|ubcore|70999|70999|ubmad_send_work_handler:[1689]|Tx status error. cr_cnt 1, status 4, comp_len 0, user_ctx: 0xffff80013a402000.
+11月 12 05:24:35 worker1 kernel: URMA|ubcore|70921|70921|ubmad_send_work_handler:[1689]|Tx status error. cr_cnt 1, status 4, comp_len 0, user_ctx: 0xffff80013a402000.
+11月 12 05:24:35 worker1 kernel: URMA|ubcore|70999|70999|ubmad_send_work_handler:[1689]|Tx status error. cr_cnt 1, status 4, comp_len 0, user_ctx: 0xffff80013a402800.
+11月 12 05:24:35 worker1 kernel: URMA|ubcore|2492|2492|ubmad_send_work_handler:[1689]|Tx status error. cr_cnt 1, status 4, comp_len 0, user_ctx: 0xffff80013a403000.
+11月 12 05:24:35 worker1 kernel: URMA|ubcore|26929|26929|ubmad_send_work_handler:[1689]|Tx status error. cr_cnt 1, status 4, comp_len 0, user_ctx: 0xffff80013a402000.
+11月 12 05:24:35 worker1 kernel: URMA|ubcore|2492|2492|ubmad_send_work_handler:[1689]|Tx status error. cr_cnt 1, status 4, comp_len 0, user_ctx: 0xffff80013a402800.
+11月 12 05:24:35 worker1 kernel: URMA|ubcore|70920|70920|ubmad_send_work_handler:[1689]|Tx status error. cr_cnt 1, status 4, comp_len 0, user_ctx: 0xffff80013a402000.
+11月 12 05:24:35 worker1 kernel: URMA|ubcore|70920|70920|ubmad_send_work_handler:[1689]|Tx status error. cr_cnt 1, status 4, comp_len 0, user_ctx: 0xffff80013a402000.
+11月 12 05:24:35 worker1 kernel: URMA|ubcore|70921|70921|ubmad_send_work_handler:[1689]|Tx status error. cr_cnt 1, status 4, comp_len 0, user_ctx: 0xffff80013a402800.
+11月 12 05:24:35 worker1 kernel: URMA|ubcore|70999|70999|ubmad_send_work_handler:[1689]|Tx status error. cr_cnt 1, status 4, comp_len 0, user_ctx: 0xffff80013a403000.
+11月 12 05:24:35 worker1 kernel: URMA|ubcore|26929|26929|ubmad_send_work_handler:[1689]|Tx status error. cr_cnt 1, status 4, comp_len 0, user_ctx: 0xffff80013a402000.
+11月 12 05:24:35 worker1 kernel: URMA|ubcore|71043|71043|ubmad_send_work_handler:[1689]|Tx status error. cr_cnt 1, status 4, comp_len 0, user_ctx: 0xffff80013a402000.
+11月 12 05:24:35 worker1 kernel: URMA|ubcore|2492|2492|ubmad_send_work_handler:[1689]|Tx status error. cr_cnt 1, status 4, comp_len 0, user_ctx: 0xffff80013a402800.
+11月 12 05:24:35 worker1 kernel: URMA|ubcore|70920|70920|ubmad_send_work_handler:[1689]|Tx status error. cr_cnt 1, status 4, comp_len 0, user_ctx: 0xffff80013a402000.
+11月 12 05:24:35 worker1 kernel: URMA|ubcore|26929|26929|ubmad_send_work_handler:[1689]|Tx status error. cr_cnt 1, status 4, comp_len 0, user_ctx: 0xffff80013a402000.
+11月 12 05:24:35 worker1 kernel: URMA|ubcore|70920|70920|ubmad_send_work_handler:[1689]|Tx status error. cr_cnt 1, status 4, comp_len 0, user_ctx: 0xffff80013a402000.
+11月 12 05:24:35 worker1 kernel: URMA|ubcore|70999|70999|ubmad_send_work_handler:[1689]|Tx status error. cr_cnt 1, status 4, comp_len 0, user_ctx: 0xffff80013a402800.
+11月 12 05:24:36 worker1 kernel: URMA|ubcore|26929|26929|ubmad_send_work_handler:[1689]|Tx status error. cr_cnt 1, status 4, comp_len 0, user_ctx: 0xffff80013a402000.
+11月 12 05:24:36 worker1 kernel: URMA|ubcore|2492|2492|ubmad_send_work_handler:[1689]|Tx status error. cr_cnt 1, status 4, comp_len 0, user_ctx: 0xffff80013a402000.
+11月 12 05:24:36 worker1 kernel: URMA|ubcore|70999|70999|ubmad_send_work_handler:[1689]|Tx status error. cr_cnt 1, status 4, comp_len 0, user_ctx: 0xffff80013a402800.
+11月 12 05:24:36 worker1 kernel: URMA|ubcore|2492|2492|ubmad_send_work_handler:[1689]|Tx status error. cr_cnt 1, status 4, comp_len 0, user_ctx: 0xffff80013a402000.
+11月 12 05:24:36 worker1 kernel: URMA|ubcore|2492|2492|ubmad_send_work_handler:[1689]|Tx status error. cr_cnt 1, status 4, comp_len 0, user_ctx: 0xffff80013a402000.
+11月 12 05:24:36 worker1 kernel: URMA|ubcore|26929|26929|ubmad_send_work_handler:[1689]|Tx status error. cr_cnt 1, status 4, comp_len 0, user_ctx: 0xffff80013a402000.
+11月 12 05:24:36 worker1 kernel: URMA|ubcore|71043|71043|ubmad_send_work_handler:[1689]|Tx status error. cr_cnt 1, status 4, comp_len 0, user_ctx: 0xffff80013a402800.
+11月 12 05:24:36 worker1 kernel: URMA|ubcore|26929|26929|ubmad_send_work_handler:[1689]|Tx status error. cr_cnt 1, status 4, comp_len 0, user_ctx: 0xffff80013a402000.
+11月 12 05:24:36 worker1 kernel: URMA|ubcore|26929|26929|ubmad_send_work_handler:[1689]|Tx status error. cr_cnt 1, status 4, comp_len 0, user_ctx: 0xffff80013a402000.
+11月 12 05:24:36 worker1 kernel: URMA|ubcore|2492|2492|ubmad_send_work_handler:[1689]|Tx status error. cr_cnt 1, status 4, comp_len 0, user_ctx: 0xffff80013a402000.
+11月 12 05:24:36 worker1 kernel: URMA|ubcore|70999|70999|ubmad_send_work_handler:[1689]|Tx status error. cr_cnt 1, status 4, comp_len 0, user_ctx: 0xffff80013a402800.
+11月 12 05:24:37 worker1 kernel: URMA|ubcore|2492|2492|ubmad_send_work_handler:[1689]|Tx status error. cr_cnt 1, status 4, comp_len 0, user_ctx: 0xffff80013a402000.
+11月 12 05:24:37 worker1 kernel: URMA|ubcore|2492|2492|ubmad_send_work_handler:[1689]|Tx status error. cr_cnt 1, status 4, comp_len 0, user_ctx: 0xffff80013a402000.
+11月 12 05:24:37 worker1 kernel: URMA|ubcore|26929|26929|ubmad_send_work_handler:[1689]|Tx status error. cr_cnt 1, status 4, comp_len 0, user_ctx: 0xffff80013a402800.
+11月 12 05:24:37 worker1 kernel: URMA|ubcore|2492|2492|ubmad_send_work_handler:[1689]|Tx status error. cr_cnt 1, status 4, comp_len 0, user_ctx: 0xffff80013a402000.
+11月 12 05:24:39 worker1 kernel: URMA|ubcore|26929|26929|ubmad_send_work_handler:[1689]|Tx status error. cr_cnt 1, status 4, comp_len 0, user_ctx: 0xffff80013a402000.
+11月 12 05:24:40 worker1 kernel: URMA|ubcore|26929|26929|ubmad_send_work_handler:[1689]|Tx status error. cr_cnt 1, status 4, comp_len 0, user_ctx: 0xffff80013a402000.
+11月 12 05:24:40 worker1 kernel: URMA|ubcore|2492|2492|ubmad_send_work_handler:[1689]|Tx status error. cr_cnt 1, status 4, comp_len 0, user_ctx: 0xffff80013a402800.
+11月 12 05:24:40 worker1 kernel: URMA|ubcore|2492|2492|ubmad_send_work_handler:[1689]|Tx status error. cr_cnt 1, status 4, comp_len 0, user_ctx: 0xffff80013a403000.
+11月 12 05:25:05 worker1 kernel: URMA|ubcore|2485|2485|ubcore_session_timeout[128]|Session 1 timeout
+11月 12 05:25:05 worker1 kernel: URMA|ubcore|70758|70758|ubcore_exchange_tp_info[835]|Failed to send create req message, ret: -1.
+11月 12 05:25:05 worker1 kernel: URMA|ubcore|70758|70758|ubcore_bind_jetty_reuse_compat[2268]|Failed to exchange tp info, ret: -1.
+11月 12 05:25:05 worker1 kernel: URMA|uburma|70758|70758|uburma_cmd_bind_jetty_ex:[3756]|bind jetty failed, ret: -1.
+11月 12 05:25:07 worker1 kernel: URMA|ubcore|2485|2485|ubcore_session_timeout[128]|Session 2 timeout
+11月 12 05:25:07 worker1 kernel: URMA|ubcore|70760|70760|ubcore_exchange_tp_info[835]|Failed to send create req message, ret: -1.
+11月 12 05:25:07 worker1 kernel: URMA|ubcore|2485|2485|ubcore_session_timeout[128]|Session 4 timeout
+11月 12 05:25:07 worker1 kernel: URMA|ubcore|70760|70760|ubcore_bind_jetty_reuse_compat[2268]|Failed to exchange tp info, ret: -1.
+11月 12 05:25:07 worker1 kernel: URMA|uburma|70760|70760|uburma_cmd_bind_jetty_ex:[3756]|bind jetty failed, ret: -1.
+11月 12 05:25:07 worker1 kernel: URMA|ubcore|70759|70759|ubcore_exchange_tp_info[835]|Failed to send create req message, ret: -1.
+11月 12 05:25:07 worker1 kernel: URMA|ubcore|2485|2485|ubcore_session_timeout[128]|Session 3 timeout
+11月 12 05:25:07 worker1 kernel: URMA|ubcore|70759|70759|ubcore_bind_jetty_reuse_compat[2268]|Failed to exchange tp info, ret: -1.
+11月 12 05:25:07 worker1 kernel: URMA|ubcore|70761|70761|ubcore_exchange_tp_info[835]|Failed to send create req message, ret: -1.
+11月 12 05:25:07 worker1 kernel: URMA|uburma|70759|70759|uburma_cmd_bind_jetty_ex:[3756]|bind jetty failed, ret: -1.
+11月 12 05:25:07 worker1 kernel: URMA|ubcore|70761|70761|ubcore_bind_jetty_reuse_compat[2268]|Failed to exchange tp info, ret: -1.
+11月 12 05:25:07 worker1 kernel: URMA|uburma|70761|70761|uburma_cmd_bind_jetty_ex:[3756]|bind jetty failed, ret: -1.
+11月 12 05:25:35 worker1 kernel: UDMA GPU unmap: l_tid=1048575 r_tid=194 mm=ffff08014359d800 current_mm=0000000000000000 iova=0xa24200000 size=0x15000
+11月 12 05:25:35 worker1 kernel: UDMA GPU unmap: l_tid=187 r_tid=1048575 mm=ffff08014359d800 current_mm=0000000000000000 iova=0xa24200000 size=0x15000
+11月 12 05:25:35 worker1 kernel: UDMA GPU unmap: l_tid=1048575 r_tid=193 mm=ffff08014359d800 current_mm=0000000000000000 iova=0xa04400000 size=0x1cd7a000
+11月 12 05:25:35 worker1 kernel: UDMA GPU unmap: l_tid=187 r_tid=1048575 mm=ffff08014359d800 current_mm=0000000000000000 iova=0xa04400000 size=0x1cd7a000
+11月 12 05:25:36 worker1 kernel: ubase 00007: UDMA: current mm released.
+11月 12 05:25:36 worker1 kernel: ubase 00007: UDMA: current mm released.
+11月 12 05:25:36 worker1 kernel: ubase 00007: UDMA: current mm released.
+11月 12 05:25:36 worker1 kernel: ubase 00007: UDMA: current mm released.
+11月 12 05:25:36 worker1 kernel: ubase 00007: UDMA: current mm released.
+11月 12 05:25:36 worker1 kernel: ubase 00007: UDMA: JFR sleep time = 1000 us.
+11月 12 05:25:36 worker1 kernel: ubase 00007: UDMA: current mm released.
+11月 12 05:25:36 worker1 kernel: ubase 00007: UDMA: current mm released.
+11月 12 05:25:36 worker1 kernel: ubase 00007: UDMA: current mm released.
+11月 12 05:25:36 worker1 kernel: ubase 00007: UDMA: current mm released.
+11月 12 05:25:36 worker1 kernel: ubase 00007: UDMA: current mm released.
+11月 12 05:25:36 worker1 kernel: ubase 00007: UDMA: current mm released.
+11月 12 05:25:36 worker1 kernel: ubase 00007: UDMA: current mm released.
+11月 12 05:25:39 worker1 kernel: fwctl fwctl1: no corresponding query was found.
+11月 12 05:25:39 worker1 kernel: fwctl fwctl0: no corresponding query was found.
+11月 12 05:35:25 worker1 kernel: fwctl fwctl1: no corresponding query was found.
+11月 12 05:35:25 worker1 kernel: fwctl fwctl0: no corresponding query was found.
+11月 12 05:35:33 worker1 kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+11月 12 05:35:33 worker1 kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+11月 12 05:35:33 worker1 kernel: URMA|ubcore|83300|83300|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xfffc3ded2000, cfg->len = 8192, cfg->token_value.token = 0, udate = 0 
+11月 12 05:35:33 worker1 kernel: ubase 00007: UDMA: MATT START:kernel_mode=0
+11月 12 05:35:33 worker1 kernel: platform ummu_vdev.16.auto: Adding to iommu group 14
+11月 12 05:35:33 worker1 kernel: URMA|ubcore|83300|83300|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xfffc3ded5000, cfg->len = 64, cfg->token_value.token = 0, udate = 0 
+11月 12 05:35:33 worker1 kernel: ubase 00007: UDMA: MATT START:kernel_mode=0
+11月 12 05:35:33 worker1 kernel: platform ummu_vdev.17.auto: Adding to iommu group 15
+11月 12 05:35:33 worker1 kernel: URMA|ubcore|83303|83303|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xfffb9409b000, cfg->len = 8192, cfg->token_value.token = 0, udate = 0 
+11月 12 05:35:33 worker1 kernel: ubase 00007: UDMA: MATT START:kernel_mode=0
+11月 12 05:35:33 worker1 kernel: platform ummu_vdev.18.auto: Adding to iommu group 16
+11月 12 05:35:33 worker1 kernel: URMA|ubcore|83301|83301|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xfffb9c09b000, cfg->len = 8192, cfg->token_value.token = 0, udate = 0 
+11月 12 05:35:33 worker1 kernel: ubase 00007: UDMA: MATT START:kernel_mode=0
+11月 12 05:35:33 worker1 kernel: platform ummu_vdev.19.auto: Adding to iommu group 17
+11月 12 05:35:33 worker1 kernel: URMA|ubcore|83302|83302|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xfffba009b000, cfg->len = 8192, cfg->token_value.token = 0, udate = 0 
+11月 12 05:35:33 worker1 kernel: ubase 00007: UDMA: MATT START:kernel_mode=0
+11月 12 05:35:33 worker1 kernel: platform ummu_vdev.20.auto: Adding to iommu group 18
+11月 12 05:35:34 worker1 kernel: URMA|ubcore|83300|83300|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xa04400000, cfg->len = 483892608, cfg->token_value.token = 0, udate = 0 
+11月 12 05:35:34 worker1 kernel: ubase 00007: UDMA: MATT START:kernel_mode=0
+11月 12 05:35:34 worker1 kernel: udma_metax_p2p_bridge: pin OK va=0xa04400000->0xa04400000 len=0x1cd79d80->0x1cd7a000 page=0x2000 bus_off=0x0 apply_off=0 nents=1 first_pa=0xa0000ce00000
+11月 12 05:35:34 worker1 kernel: ubase 00007: UDMA: [GPU-TRACE] pin OK provider=metax gpu_va=0xa04400000 mapped=0x1cd7a000 page_size=0x2000 bus_off=0x0 nents=1 first_pa=0xa0000ce00000
+11月 12 05:35:34 worker1 kernel: UDMA GPU map: l_tid=1048575 r_tid=193 mm=ffff0800b52c1600 current_mm=ffff0800b52c1600 iova=0xa04400000 first_pa=0xa0000ce00000 nents=1
+11月 12 05:35:34 worker1 kernel: UDMA GPU map: l_tid=187 r_tid=1048575 mm=ffff0800b52c1600 current_mm=ffff0800b52c1600 iova=0xa04400000 first_pa=0xa0000ce00000 nents=1
+11月 12 05:35:34 worker1 kernel: platform ummu_vdev.21.auto: Adding to iommu group 19
+11月 12 05:35:34 worker1 kernel: URMA|ubcore|83300|83300|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xa24200000, cfg->len = 81960, cfg->token_value.token = 0, udate = 0 
+11月 12 05:35:34 worker1 kernel: ubase 00007: UDMA: MATT START:kernel_mode=0
+11月 12 05:35:34 worker1 kernel: udma_metax_p2p_bridge: pin OK va=0xa24200000->0xa24200000 len=0x14028->0x15000 page=0x1000 bus_off=0x0 apply_off=0 nents=1 first_pa=0xa00001600000
+11月 12 05:35:34 worker1 kernel: ubase 00007: UDMA: [GPU-TRACE] pin OK provider=metax gpu_va=0xa24200000 mapped=0x15000 page_size=0x1000 bus_off=0x0 nents=1 first_pa=0xa00001600000
+11月 12 05:35:34 worker1 kernel: UDMA GPU map: l_tid=1048575 r_tid=194 mm=ffff0800b52c1600 current_mm=ffff0800b52c1600 iova=0xa24200000 first_pa=0xa00001600000 nents=1
+11月 12 05:35:34 worker1 kernel: UDMA GPU map: l_tid=187 r_tid=1048575 mm=ffff0800b52c1600 current_mm=ffff0800b52c1600 iova=0xa24200000 first_pa=0xa00001600000 nents=1
+11月 12 05:35:34 worker1 kernel: platform ummu_vdev.22.auto: Adding to iommu group 20
+11月 12 05:35:34 worker1 kernel: URMA|ubcore|83301|83301|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xfffb9c09f000, cfg->len = 64, cfg->token_value.token = 0, udate = 0 
+11月 12 05:35:34 worker1 kernel: ubase 00007: UDMA: MATT START:kernel_mode=0
+11月 12 05:35:34 worker1 kernel: platform ummu_vdev.23.auto: Adding to iommu group 21
+11月 12 05:35:34 worker1 kernel: URMA|ubcore|83302|83302|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xfffba009f000, cfg->len = 64, cfg->token_value.token = 0, udate = 0 
+11月 12 05:35:34 worker1 kernel: ubase 00007: UDMA: MATT START:kernel_mode=0
+11月 12 05:35:34 worker1 kernel: platform ummu_vdev.24.auto: Adding to iommu group 22
+11月 12 05:35:34 worker1 kernel: URMA|ubcore|83303|83303|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xfffb9409f000, cfg->len = 64, cfg->token_value.token = 0, udate = 0 
+11月 12 05:35:34 worker1 kernel: ubase 00007: UDMA: MATT START:kernel_mode=0
+11月 12 05:38:07 worker1 kernel: UDMA GPU unmap: l_tid=1048575 r_tid=193 mm=ffff0800b52c1600 current_mm=ffff0800b52c1600 iova=0xa04400000 size=0x1cd7a000
+11月 12 05:38:07 worker1 kernel: UDMA GPU unmap: l_tid=187 r_tid=1048575 mm=ffff0800b52c1600 current_mm=ffff0800b52c1600 iova=0xa04400000 size=0x1cd7a000
+11月 12 05:38:07 worker1 kernel: UDMA GPU unmap: l_tid=1048575 r_tid=194 mm=ffff0800b52c1600 current_mm=ffff0800b52c1600 iova=0xa24200000 size=0x15000
+11月 12 05:38:07 worker1 kernel: UDMA GPU unmap: l_tid=187 r_tid=1048575 mm=ffff0800b52c1600 current_mm=ffff0800b52c1600 iova=0xa24200000 size=0x15000
+11月 12 05:38:08 worker1 kernel: ubase 00007: UDMA: trigger TP level AE, event type is 16, sub type is 0, queue_num is 160.
+11月 12 05:38:08 worker1 kernel: ubase 00007: UDMA: trigger TP level AE, event type is 16, sub type is 0, queue_num is 161.
+11月 12 05:38:08 worker1 kernel: ubase 00007: UDMA: trigger TP level AE, event type is 16, sub type is 0, queue_num is 162.
+11月 12 05:38:08 worker1 kernel: ubase 00007: UDMA: trigger TP level AE, event type is 16, sub type is 0, queue_num is 163.
+11月 12 05:38:08 worker1 kernel: ubase 00007: UDMA: trigger TP level AE, event type is 16, sub type is 0, queue_num is 164.
+11月 12 05:38:08 worker1 kernel: ubase 00007: UDMA: trigger TP level AE, event type is 16, sub type is 0, queue_num is 165.
+11月 12 05:38:08 worker1 kernel: ubase 00007: UDMA: trigger TP level AE, event type is 16, sub type is 0, queue_num is 166.
+11月 12 05:38:08 worker1 kernel: ubase 00007: UDMA: trigger TP level AE, event type is 16, sub type is 0, queue_num is 167.
+11月 12 05:38:08 worker1 kernel: ubase 00007: UDMA: trigger TP level AE, event type is 16, sub type is 0, queue_num is 168.
+11月 12 05:38:08 worker1 kernel: ubase 00007: UDMA: trigger TP level AE, event type is 16, sub type is 0, queue_num is 169.
+11月 12 05:38:08 worker1 kernel: ubase 00007: (pid 79919) ctrlq recv notice req: seq=32776, ser_type=1, ser_ver=1, opc=0x28.
+11月 12 05:38:08 worker1 kernel: ubase 00007: (pid 79919) ctrlq recv notice req: seq=32777, ser_type=1, ser_ver=1, opc=0x28.
+11月 12 05:38:08 worker1 kernel: ubase 00007: (pid 79919) ctrlq recv notice req: seq=32778, ser_type=1, ser_ver=1, opc=0x28.
+11月 12 05:38:08 worker1 kernel: ubase 00007: (pid 79919) ctrlq recv notice req: seq=32779, ser_type=1, ser_ver=1, opc=0x28.
+11月 12 05:38:08 worker1 kernel: ubase 00007: (pid 79919) ctrlq recv notice req: seq=32780, ser_type=1, ser_ver=1, opc=0x28.
+11月 12 05:38:08 worker1 kernel: ubase 00007: (pid 79919) ctrlq recv notice req: seq=32781, ser_type=1, ser_ver=1, opc=0x28.
+11月 12 05:38:08 worker1 kernel: ubase 00007: (pid 79919) ctrlq recv notice req: seq=32782, ser_type=1, ser_ver=1, opc=0x28.
+11月 12 05:38:08 worker1 kernel: MXCD.EVENT.ERROR error signal evt id 2221
+11月 12 05:38:08 worker1 kernel: ubase 00007: (pid 79919) ctrlq recv notice req: seq=32783, ser_type=1, ser_ver=1, opc=0x28.
+11月 12 05:38:08 worker1 kernel: ubase 00007: (pid 79919) ctrlq recv notice req: seq=32784, ser_type=1, ser_ver=1, opc=0x28.
+11月 12 05:38:08 worker1 kernel: ubase 00007: (pid 79919) ctrlq recv notice req: seq=32785, ser_type=1, ser_ver=1, opc=0x28.
+11月 12 05:38:08 worker1 kernel: ubase 00007: (pid 79919) ctrlq recv notice req: seq=32786, ser_type=1, ser_ver=1, opc=0x28.
+11月 12 05:38:08 worker1 kernel: ubase 00007: (pid 79919) ctrlq recv notice req: seq=32787, ser_type=1, ser_ver=1, opc=0x28.
+11月 12 05:38:08 worker1 kernel: ubase 00007: (pid 79919) ctrlq recv notice req: seq=32788, ser_type=1, ser_ver=1, opc=0x28.
+11月 12 05:38:08 worker1 kernel: ubase 00007: (pid 79919) ctrlq recv notice req: seq=32789, ser_type=1, ser_ver=1, opc=0x28.
+11月 12 05:38:08 worker1 kernel: ubase 00007: (pid 79919) ctrlq recv notice req: seq=32790, ser_type=1, ser_ver=1, opc=0x28.
+11月 12 05:38:08 worker1 kernel: ubase 00007: (pid 79919) ctrlq recv notice req: seq=32791, ser_type=1, ser_ver=1, opc=0x28.
+11月 12 05:38:08 worker1 kernel: ubase 00007: (pid 79919) ctrlq recv notice req: seq=32792, ser_type=1, ser_ver=1, opc=0x28.
+11月 12 05:38:08 worker1 kernel: ubase 00007: (pid 79919) ctrlq recv notice req: seq=32793, ser_type=1, ser_ver=1, opc=0x28.
+11月 12 05:38:08 worker1 kernel: ubase 00007: (pid 79919) ctrlq recv notice req: seq=32794, ser_type=1, ser_ver=1, opc=0x28.
+11月 12 05:38:08 worker1 kernel: ubase 00007: (pid 79919) ctrlq recv notice req: seq=32795, ser_type=1, ser_ver=1, opc=0x28.
+11月 12 05:38:08 worker1 kernel: ubase 00007: (pid 79919) ctrlq recv notice req: seq=32796, ser_type=1, ser_ver=1, opc=0x28.
+11月 12 05:38:08 worker1 kernel: ubase 00007: (pid 79919) ctrlq recv notice req: seq=32797, ser_type=1, ser_ver=1, opc=0x28.
+11月 12 05:38:08 worker1 kernel: ubase 00007: (pid 79919) ctrlq recv notice req: seq=32798, ser_type=1, ser_ver=1, opc=0x28.
+11月 12 05:38:08 worker1 kernel: ubase 00007: (pid 79919) ctrlq recv notice req: seq=32799, ser_type=1, ser_ver=1, opc=0x28.
+11月 12 05:38:08 worker1 kernel: ubase 00007: (pid 79919) ctrlq recv notice req: seq=32800, ser_type=1, ser_ver=1, opc=0x28.
+11月 12 05:38:08 worker1 kernel: ubase 00007: (pid 79919) ctrlq recv notice req: seq=32801, ser_type=1, ser_ver=1, opc=0x28.
+11月 12 05:38:08 worker1 kernel: ubase 00007: (pid 79919) ctrlq recv notice req: seq=32802, ser_type=1, ser_ver=1, opc=0x28.
+11月 12 05:38:08 worker1 kernel: ubase 00007: (pid 79919) ctrlq recv notice req: seq=32803, ser_type=1, ser_ver=1, opc=0x28.
+11月 12 05:38:08 worker1 kernel: ubase 00007: (pid 79919) ctrlq recv notice req: seq=32804, ser_type=1, ser_ver=1, opc=0x28.
+11月 12 05:38:08 worker1 kernel: ubase 00007: (pid 79919) ctrlq recv notice req: seq=32805, ser_type=1, ser_ver=1, opc=0x28.
+11月 12 05:38:08 worker1 kernel: ubase 00007: (pid 79919) ctrlq recv notice req: seq=32806, ser_type=1, ser_ver=1, opc=0x28.
+11月 12 05:38:08 worker1 kernel: ubase 00007: (pid 79919) ctrlq recv notice req: seq=32807, ser_type=1, ser_ver=1, opc=0x28.
+11月 12 05:38:08 worker1 kernel: ubase 00007: (pid 79919) ctrlq recv notice req: seq=32808, ser_type=1, ser_ver=1, opc=0x28.
+11月 12 05:38:08 worker1 kernel: ubase 00007: (pid 79919) ctrlq recv notice req: seq=32809, ser_type=1, ser_ver=1, opc=0x28.
+11月 12 05:38:08 worker1 kernel: ubase 00007: (pid 79919) ctrlq recv notice req: seq=32810, ser_type=1, ser_ver=1, opc=0x28.
+11月 12 05:38:08 worker1 kernel: ubase 00007: (pid 79919) ctrlq recv notice req: seq=32811, ser_type=1, ser_ver=1, opc=0x28.
+11月 12 05:38:15 worker1 kernel: fwctl fwctl1: no corresponding query was found.
+11月 12 05:38:15 worker1 kernel: fwctl fwctl0: no corresponding query was found.
+11月 12 05:41:10 worker1 kernel: fwctl fwctl1: no corresponding query was found.
+11月 12 05:41:10 worker1 kernel: fwctl fwctl0: no corresponding query was found.

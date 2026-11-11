@@ -1,0 +1,11 @@
+{
+  "classification": "INSPECT_RUN_STATUS",
+  "primary_error": null,
+  "dmesg_scope": "appended_during_run",
+  "evidence": {
+    "tp_exchange": [],
+    "mad_tx": [],
+    "device_activation": []
+  },
+  "note": "TP/MAD evidence narrows the failure to connection setup. It does not prove reboot age, firmware failure, a specific port, or that trace activation is unrelated. Compare the no-trace baseline first."
+}
