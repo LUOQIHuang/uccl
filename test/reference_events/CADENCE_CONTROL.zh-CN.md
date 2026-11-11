@@ -1,5 +1,7 @@
 # 下一组：关闭采集，只比较连续调用与逐样本同步
 
+本组已完成，不重跑。paced在关闭全部采集时复现204 BF16约16%下降，见[结果分析](results/CADENCE_CONTROL_ANALYSIS.zh-CN.md)；后续只补[匹配方式的一次on](MATCHED_TRACE.zh-CN.md)。以下保留原操作记录。
+
 OFF结果已收到，见[核查报告](results/OFF_CONTROL_ANALYSIS.zh-CN.md)。同一事件模块关闭采集后，两端Dispatch距前后基线只有+0.12%～+0.19%，不支持大幅变化由编译进新探针本身造成。现在只补一个采样方式对照，不再重跑完整baseline/on/post，不重建GPU模块。
 
 ## 两项各测什么
