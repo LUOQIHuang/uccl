@@ -255,6 +255,11 @@ if __name__ == "__main__":
             raise RuntimeError("GPU stage v2 currently requires MetaX RDC build")
         cxx_flags.append("-DUCCL_GPU_STAGE_TRACE")
         nvcc_flags.append("-DUCCL_GPU_STAGE_TRACE")
+    if int(os.getenv("UCCL_REFERENCE_EVENTS", "0")):
+        if not use_metax or int(os.getenv("UCCL_GPU_STAGE_TRACE", "0")):
+            raise RuntimeError("reference events require MetaX and the old GPU trace build disabled")
+        cxx_flags.append("-DUCCL_REFERENCE_EVENTS")
+        nvcc_flags.append("-DUCCL_REFERENCE_EVENTS")
     if int(os.getenv("UCCL_GPU_STAGE_ROLES_ONLY", "0")):
         if not int(os.getenv("UCCL_GPU_STAGE_TRACE", "0")):
             raise RuntimeError("UCCL_GPU_STAGE_ROLES_ONLY requires UCCL_GPU_STAGE_TRACE")

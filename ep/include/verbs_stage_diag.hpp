@@ -13,7 +13,26 @@ inline thread_local std::map<std::pair<uint32_t,uint64_t>,Pending> pending;
 inline void refresh(){auto e=epoch.load();if(e!=local_epoch){pending.clear();local_epoch=e;}}
 inline int post(ibv_qp* qp,ibv_send_wr* wr,ibv_send_wr** bad) {
   namespace d=uccl::urma_diag;
-  if(!d::enabled.load(std::memory_order_relaxed))return ibv_post_send(qp,wr,bad);
+  if(!d::enabled.load(std::memory_order_relaxed)){
+#ifdef UCCL_REFERENCE_EVENTS
+    if(verbs_timeline::active.load(std::memory_order_relaxed)){
+      for(auto* w=wr;w;w=w->next){
+        bool write=w->opcode==IBV_WR_RDMA_WRITE || w->opcode==IBV_WR_RDMA_WRITE_WITH_IMM;
+        bool atomic=w->opcode==IBV_WR_ATOMIC_FETCH_AND_ADD || w->opcode==IBV_WR_ATOMIC_CMP_AND_SWP;
+        if(write){
+          uint64_t bytes=0;for(int i=0;i<w->num_sge;++i)bytes+=w->sg_list[i].length;
+          verbs_timeline::record("payload_bytes",w->wr_id,qp->qp_num,bytes);
+          verbs_timeline::record("remote_address",w->wr_id,qp->qp_num,w->wr.rdma.remote_addr);
+        }else if(atomic)verbs_timeline::record("atomic_value",w->wr_id,qp->qp_num,w->wr.atomic.compare_add);
+        verbs_timeline::record("post_begin",w->wr_id,qp->qp_num,w->opcode);
+      }
+      int rc=ibv_post_send(qp,wr,bad);
+      for(auto* w=wr;w;w=w->next)verbs_timeline::record("post_end",w->wr_id,qp->qp_num,rc);
+      return rc;
+    }
+#endif
+    return ibv_post_send(qp,wr,bad);
+  }
   refresh();uint64_t count=0;
   for(auto* w=wr;w;w=w->next) {
     ++count;bool write=w->opcode==IBV_WR_RDMA_WRITE || w->opcode==IBV_WR_RDMA_WRITE_WITH_IMM;
@@ -42,7 +61,13 @@ inline int post(ibv_qp* qp,ibv_send_wr* wr,ibv_send_wr** bad) {
 inline int poll(ibv_cq* cq,int max,ibv_wc* wc) {
   namespace d=uccl::urma_diag;
   int n=ibv_poll_cq(cq,max,wc);
-  if(!d::enabled.load(std::memory_order_relaxed))return n;
+  if(!d::enabled.load(std::memory_order_relaxed)){
+#ifdef UCCL_REFERENCE_EVENTS
+    if(verbs_timeline::active.load(std::memory_order_relaxed))
+      for(int i=0;i<n;++i)if(!(wc[i].opcode&IBV_WC_RECV))verbs_timeline::record("cqe",wc[i].wr_id,wc[i].qp_num,wc[i].status);
+#endif
+    return n;
+  }
   refresh();if(n<0){d::count(d::VerbsCompletionErrors);return n;}
   if(!n)d::count(d::EmptyPoll);
   for(int i=0;i<n;++i){

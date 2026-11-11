@@ -21,7 +21,7 @@ def write(p,data):
         if data:
             w=csv.DictWriter(f,fieldnames=list(data[0]));w.writeheader();w.writerows(data)
 
-def case_data(root,rank,trace,compiled_off=False):
+def case_data(root,rank,trace,compiled_off=False,reference_events=None):
     node=root/f'node{rank}';c=read(node/'setup.json')
     if c['error']:raise ValueError('failed setup '+str(node))
     c=c['fingerprint'];backend=c.get('backend','verbs')
@@ -32,9 +32,10 @@ def case_data(root,rank,trace,compiled_off=False):
     if not c.get('dispatch_focus') or c['mode']!='normal' or c.get('gpu_stages',False)!=trace or c.get('timeline') or c.get('stage_profile') or c.get('cpu_diagnostics') or c.get('capture_layout') or c.get('dispatch_trial') or c.get('save_traces'):raise ValueError('wrong focused configuration')
     if (trace and compiled_off) or bool(c.get('dispatch_compiled_off'))!=compiled_off:raise ValueError('wrong compiled-off configuration')
     if runtime.get('dispatch_trace_version')!=1 or runtime['queue_backend']!='fifo' or runtime['gpu_stage_version']!=(2 if trace or compiled_off else 0):raise ValueError('wrong runtime capability')
+    if c.get('reference_events')!=reference_events or runtime.get('reference_events_version',0)!=int(bool(reference_events)):raise ValueError('wrong reference event configuration')
     shape_ok=c['normal_tokens']==4096 if backend=='verbs' else c['shape']==[4096,128,7168,256,8]
     if not shape_ok:raise ValueError('formal comparison requires fixed 4096 shape')
-    if (c['warmups'],c['samples'])!=((5,10) if trace else (50,50)):raise ValueError('wrong formal samples')
+    if (c['warmups'],c['samples'])!=((5,10) if trace or reference_events=='on' else (50,50)):raise ValueError('wrong formal samples')
     if backend=='urma':
         if not c['api_only'] or c['normal_completion']!='all' or c['normal_write_order']!='default' or c['ll_write_order']!='default' or runtime.get('normal_write_order')!='relax':raise ValueError('changed URMA semantics')
     elif c['variant']!='current' or not c['no_profile'] or c['repeats']!=1:raise ValueError('wrong verbs configuration')
@@ -47,8 +48,15 @@ def case_data(root,rank,trace,compiled_off=False):
     manifest=read(node/('build_manifest.json' if backend=='urma' else 'module_manifest.json'))
     flags=dict(manifest['flags']);compiled=flags.pop('UCCL_GPU_STAGE_TRACE','0')
     roles=flags.pop('UCCL_GPU_STAGE_ROLES_ONLY','0')
+    if flags.pop('UCCL_REFERENCE_EVENTS','0')!=str(int(bool(reference_events))):raise ValueError('wrong event compile flag')
     if roles not in ('0','1') or roles!=str(int(bool(c.get('gpu_stage_roles_only')))) or (roles=='1' and not compiled_off):raise ValueError('wrong sparse probe build or unvalidated sparse capture')
     if compiled!=('1' if trace or compiled_off else '0') or manifest['module_sha']!=runtime['module_sha']:raise ValueError('module/compile flag mismatch')
+    if reference_events=='on':
+        import sys
+        sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'reference_events'))
+        from event_runtime import validate,correctness_passed
+        if not status['checks'].get('reference_events') or not status['checks'].get('reference_correctness') or not correctness_passed(case) or not validate(case,10):raise ValueError('unvalidated reference events/correctness')
+    elif (case/'event_trace.jsonl').exists():raise ValueError('unexpected reference events')
     raw=rows(case/'api_samples.jsonl');saved=rows(case/'sample_summary.jsonl');means={}
     if len(raw)!=5*c['samples'] or {r['label'] for r in raw}!=ALL_LABELS or len(saved)!=5 or {r['label'] for r in saved}!=ALL_LABELS:raise ValueError('incomplete Normal samples')
     for label in ALL_LABELS:

@@ -16,6 +16,13 @@ int main(){
   ibv_send_wr w{},a{},*bad=nullptr;w.opcode=IBV_WR_RDMA_WRITE;w.wr_id=1;w.sg_list=&sge;w.num_sge=1;w.send_flags=IBV_SEND_SIGNALED;w.wr.rdma.remote_addr=0x10000;w.next=&a;
   a.opcode=IBV_WR_ATOMIC_FETCH_AND_ADD;a.wr_id=2;a.send_flags=IBV_SEND_SIGNALED;
   ibv_wc out[4];v::post(&qp,&w,&bad);assert(v::poll(&cq,4,out)==2 && d::records.empty());
+#ifdef UCCL_REFERENCE_EVENTS
+  uccl::verbs_timeline::begin();v::post(&qp,&w,&bad);v::poll(&cq,4,out);
+  auto event_only=uccl::verbs_timeline::end();
+  assert(d::records.empty() && v::pending.empty());
+  assert(event_only.find("post_begin")!=std::string::npos && event_only.find("cqe")!=std::string::npos);
+  assert(event_only.find("CLOCK_MONOTONIC_RAW")!=std::string::npos);
+#endif
   d::identity(0,2);uccl::urma_layout::begin();v::begin();uccl::verbs_timeline::begin();
   for(int i=0;i<128;++i){assert(v::post(&qp,&w,&bad)==0);assert(v::poll(&cq,4,out)==2);}
   assert(v::pending.empty());v::end();auto timeline=uccl::verbs_timeline::end();

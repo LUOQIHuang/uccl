@@ -12,6 +12,7 @@ def mask(s):return re.sub(r'//[^\n]*|/\*[\s\S]*?\*/|"(?:\\.|[^"\\])*"|\'(?:\\.|[
 class GpuStageTests(unittest.TestCase):
     def test_annotations_preserve_original_kernel_statements(self):
         s=(REPO/'ep/src/internode.cu').read_text()
+        s=re.sub(r'// REFERENCE_EVENT_BEGIN\n[\s\S]*?// REFERENCE_EVENT_END\n','',s)
         s=re.sub(r'UCCL_GPU_STAGE_DETAIL\((\w+),',r'uccl::gpu_stages::Span \1(',s)
         s=s.replace('UCCL_GPU_STAGE_DISPATCH_SCOPE(dispatch_operator_scope,','uccl::gpu_stages::DispatchScope dispatch_operator_scope(')
         s=re.sub(r'// GPU_STAGE_V2_LAUNCH_GUARD_BEGIN[\s\S]*?// GPU_STAGE_V2_LAUNCH_GUARD_END\n\n','',s);masked=mask(s);edits=[]

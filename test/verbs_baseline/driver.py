@@ -17,6 +17,7 @@ BUILD_FLAGS = dict(USE_METAX='1', USE_URMA='0', USE_URMA_METAX='0', USE_LIBFABRI
 def build_flags(args):
     flags=dict(BUILD_FLAGS, UCCL_GPU_STAGE_TRACE=str(int(bool(getattr(args,'gpu_stage_build',False) or getattr(args,'gpu_stages',False) or getattr(args,'dispatch_compiled_off',False)))))
     if getattr(args,'gpu_stage_roles_only',False):flags['UCCL_GPU_STAGE_ROLES_ONLY']='1'
+    if getattr(args,'reference_events',None):flags['UCCL_REFERENCE_EVENTS']='1'
     return flags
 
 
@@ -29,6 +30,7 @@ def parser():
     p.add_argument('--timeline',action='store_true')
     p.add_argument('--stage-suite',action='store_true')
     p.add_argument('--gpu-stages',action='store_true')
+    p.add_argument('--reference-events',choices=('build','off','on'),help='reference event-style Normal tracing')
     p.add_argument('--dispatch-focus',action='store_true')
     p.add_argument('--dispatch-compiled-off',action='store_true',help='Dispatch trace build with capture completely disabled; same API timing boundary as baseline')
     p.add_argument('--gpu-stage-roles-only',action='store_true',help='sparse compile-time role probes; currently only build or compiled-off validation')
@@ -83,6 +85,10 @@ def parser():
     if args.stage_suite and (args.variant!='current' or args.mode!='normal' or not args.no_profile or args.repeats!=1):p.error('--stage-suite requires current Normal --no-profile --repeats 1')
     if args.dispatch_focus and (args.variant!='current' or args.mode!='normal' or not args.no_profile or args.repeats!=1 or args.cpu_diagnostics or args.timeline or args.stage_suite):p.error('dispatch focus requires current Normal no-profile repeats=1, without CPU/timeline/stage-suite')
     if args.dispatch_focus and args.gpu_stages and args.gpu_stage_mode not in ('bypass','dispatch_access','dispatch_clock','dispatch'):p.error('invalid Dispatch focus GPU mode')
+    if args.reference_events:
+        if args.gpu_stages or args.gpu_stage_build or args.gpu_stage_roles_only or args.dispatch_compiled_off:p.error('reference events exclude old GPU tracing')
+        if (args.reference_events=='build')!=(args.action=='build'):p.error('reference-events build is for build only; off/on require check/run')
+        if args.action!='build' and (args.action not in ('check','run') or not args.dispatch_focus):p.error('reference events require Normal Dispatch focus check/run')
     if args.dispatch_compiled_off and (not args.dispatch_focus or args.gpu_stages or args.gpu_stage_build or args.action not in ('check','run')):p.error('compiled-off requires Dispatch focus check/run without GPU capture/build switches')
     if args.gpu_stage_roles_only and not ((args.action=='build' and args.gpu_stage_build) or args.dispatch_compiled_off):p.error('roles-only currently requires trace build or compiled-off; active capture is gated on the disabled-cost result')
     if args.gpu_stage_mode.startswith('dispatch') and not args.dispatch_focus:p.error('Dispatch GPU modes require --dispatch-focus')
@@ -189,6 +195,7 @@ def preflight(args):
     if getattr(args,'cpu_diagnostics',False) and info.get('verbs_diag_version')!=1:raise RuntimeError('VERBS_DIAGNOSTICS_REQUIRES_REBUILD')
     if getattr(args,'gpu_stages',False) and info.get('gpu_stage_version')!=2:raise RuntimeError('GPU_STAGE_REQUIRES_REBUILD')
     if getattr(args,'dispatch_focus',False) and info.get('dispatch_trace_version')!=1:raise RuntimeError('DISPATCH_FOCUS_REQUIRES_REBUILD')
+    if info.get('reference_events_version',0)!=int(bool(getattr(args,'reference_events',None))):raise RuntimeError('REFERENCE_EVENT_BUILD_MISMATCH')
     if getattr(args,'dispatch_compiled_off',False) and info.get('gpu_stage_version')!=2:raise RuntimeError('COMPILED_OFF_REQUIRES_TRACE_BUILD_V2')
     if getattr(args,'gid_index',None) is not None:
         port=Path('/sys/class/infiniband')/args.hca/'ports/1'
@@ -255,6 +262,7 @@ def run_case(args, root, tag, mode, profile, module, module_sha):
                UCCL_TORCHRUN_NODE_RANK=str(args.node_rank), UCCL_EXIT_GUARD='1')
     env.update(VB_NORMAL_TOKENS=str(getattr(args,'normal_tokens',4096)),VB_GPU_STAGE_MODE=getattr(args,'gpu_stage_mode','all'),VB_GPU_STAGES=str(int(getattr(args,'gpu_stages',False))),VB_STAGE_SUITE=str(int(getattr(args,'stage_suite',False))))
     env['VB_DISPATCH_FOCUS']=str(int(getattr(args,'dispatch_focus',False)))
+    env['VB_REFERENCE_EVENTS']=str(int(getattr(args,'reference_events',None)=='on'))
     for key, name in [('TMPDIR', 'tmpdir'), ('XDG_CACHE_HOME', 'cache')]:
         path = case / name
         path.mkdir()
@@ -297,6 +305,11 @@ def run_case(args, root, tag, mode, profile, module, module_sha):
         expected = 4 if mode == 'normal' else 2
         checks['profiles'] = text.count('VERBS_GPU_PROFILE ') == expected if profile else text.count('VERBS_PROFILE_SKIPPED ') == expected and (getattr(args,'gpu_stages',False) or not (case / 'gpu_stages.jsonl').exists())
         if getattr(args,'gpu_stages',False):checks['gpu_stages']=(case/'gpu_stages.jsonl').is_file()
+        if getattr(args,'reference_events',None)=='on':
+            sys.path.insert(0,str(HERE.parent/'reference_events'))
+            from event_runtime import validate,correctness_passed
+            checks['reference_correctness']='REFERENCE_CORRECTNESS_EVENTS_PASSED' in text and correctness_passed(case)
+            checks['reference_events']=validate(case,args.samples)
         if getattr(args,'dispatch_focus',False) and getattr(args,'gpu_stages',False):
             sys.path.insert(0,str(HERE.parent/'dispatch_diag'))
             from dispatch_checks import validate_gpu
@@ -354,6 +367,7 @@ def run(args):
         meta.update(cpu_light=getattr(args,'cpu_light',False),cpu_diagnostics=getattr(args,'cpu_diagnostics',False),timeline=getattr(args,'timeline',False),gid_index=getattr(args,'gid_index',None))
         meta.update(normal_tokens=getattr(args,'normal_tokens',4096),stage_suite=getattr(args,'stage_suite',False),gpu_stages=getattr(args,'gpu_stages',False),gpu_stage_mode=getattr(args,'gpu_stage_mode','all'))
         meta['dispatch_focus']=getattr(args,'dispatch_focus',False)
+        meta['reference_events']=getattr(args,'reference_events',None)
         meta['dispatch_compiled_off']=getattr(args,'dispatch_compiled_off',False)
         meta['gpu_stage_roles_only']=getattr(args,'gpu_stage_roles_only',False)
     except Exception as exc:

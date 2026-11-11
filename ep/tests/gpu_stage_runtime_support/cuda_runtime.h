@@ -4,10 +4,18 @@
 #include <cstring>
 #define __device__
 #define __constant__
+#ifndef __forceinline__
+#define __forceinline__ inline
+#endif
 using cudaError_t=int;
 constexpr int cudaSuccess=0,cudaMemcpyDeviceToHost=1;
 struct cudaDeviceProp {int clockRate=1600000;};
 inline int fixture_device=0,fixture_allocations=0;
+inline int fixture_host_error=0,fixture_mapping_error=0;
+constexpr int cudaHostAllocMapped=2;
+inline int cudaHostAlloc(void** p,size_t n,int){if(fixture_host_error)return fixture_host_error;*p=std::malloc(n);++fixture_allocations;return *p?0:1;}
+inline int cudaHostGetDevicePointer(void** d,void* h,int){if(fixture_mapping_error)return fixture_mapping_error;*d=h;return 0;}
+inline int cudaFreeHost(void* p){std::free(p);--fixture_allocations;return 0;}
 inline int cudaGetDevice(int* d){*d=fixture_device;return 0;}
 inline int cudaDeviceSynchronize(){return 0;}
 inline char const* cudaGetErrorString(int){return "fixture";}
@@ -17,3 +25,4 @@ inline int cudaFree(void* p){std::free(p);--fixture_allocations;return 0;}
 inline int cudaMemset(void* p,int v,size_t n){std::memset(p,v,n);return 0;}
 inline int cudaMemcpy(void* dst,void const* src,size_t n,int){std::memcpy(dst,src,n);return 0;}
 template<class T>int cudaMemcpyToSymbol(T& dst,void const* src,size_t n){std::memcpy(&dst,src,n);return 0;}
+template<class T>int cudaMemcpyFromSymbol(void* dst,T const& src,size_t n){std::memcpy(dst,&src,n);return 0;}

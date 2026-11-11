@@ -27,6 +27,12 @@ with tempfile.TemporaryDirectory(prefix='uccl-urma-test-') as tmp:
     runtime_test=tmp/'gpu_stage_runtime_test'
     subprocess.run([os.environ.get('CXX','c++'),'-std=c++17','-pthread','-Wall','-Wextra','-Werror','-I'+str(ep/'tests/gpu_stage_runtime_support'),'-I'+str(ep/'include'),str(ep/'tests/gpu_stage_runtime_test.cpp'),'-o',str(runtime_test)],check=True)
     subprocess.run([str(runtime_test)],check=True)
+    reference_test=tmp/'reference_event_test'
+    subprocess.run([os.environ.get('CXX','c++'),'-std=c++17','-pthread','-Wall','-Wextra','-Werror','-I'+str(ep/'tests/gpu_stage_runtime_support'),'-I'+str(ep/'include'),str(ep/'tests/reference_event_test.cpp'),'-o',str(reference_test)],check=True)
+    subprocess.run([str(reference_test)],check=True)
+    reference_cpu_test=tmp/'reference_timeline_test'
+    subprocess.run([os.environ.get('CXX','c++'),'-std=c++17','-pthread','-Wall','-Wextra','-Werror','-I'+str(ep/'include'),str(ep/'tests/reference_timeline_test.cpp'),'-o',str(reference_cpu_test)],check=True)
+    subprocess.run([str(reference_cpu_test)],check=True)
     fifo_source=(ep/'src/fifo.cpp').read_text()
     (tmp/'fifo_implementation.inc').write_text(fifo_source[fifo_source.index('namespace mscclpp {'):])
     notify_source=(ep/'src/proxy.cpp').read_text()

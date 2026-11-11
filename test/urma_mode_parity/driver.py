@@ -42,6 +42,8 @@ def build(args):
     env['UCCL_URMA_NORMAL_COMPLETION']='all'
     flags=dict(UCCL_GPU_STAGE_TRACE=str(int(getattr(args,'gpu_stage_build',False))),USE_METAX='1',USE_URMA='1',USE_URMA_METAX='0',USE_LIBFABRIC_CXI='0',USE_DMABUF='1',MAX_NUM_GPUS='1',NUM_MAX_NVL_PEERS='1',PER_EXPERT_BATCHING=str(args.per_expert_batching),MAX_JOBS=str(args.build_jobs),URMA_INCLUDE_DIR=str(include),URMA_LIBRARY_DIR=str(args.urma_lib_dir.resolve()))
     env.update(flags)
+    if getattr(args,'reference_events',None):flags['UCCL_REFERENCE_EVENTS']='1';env['UCCL_REFERENCE_EVENTS']='1'
+    else:env.pop('UCCL_REFERENCE_EVENTS',None)
     if getattr(args,'gpu_stage_roles_only',False):
         flags['UCCL_GPU_STAGE_ROLES_ONLY']='1';env['UCCL_GPU_STAGE_ROLES_ONLY']='1'
     else:env.pop('UCCL_GPU_STAGE_ROLES_ONLY',None)
@@ -87,6 +89,7 @@ def parser():
     p.add_argument('--notification-check',action='store_true')
     p.add_argument('--timeline',action='store_true')
     p.add_argument('--gpu-stages',action='store_true')
+    p.add_argument('--reference-events',choices=('build','off','on'),help='reference event-style Normal tracing, independent of old GPU scopes')
     p.add_argument('--dispatch-focus',action='store_true')
     p.add_argument('--dispatch-compiled-off',action='store_true',help='Dispatch trace build with capture completely disabled; same API timing boundary as baseline')
     p.add_argument('--gpu-stage-roles-only',action='store_true',help='sparse compile-time role probes; currently only build or compiled-off validation')
@@ -157,6 +160,10 @@ def parser():
     if args.timeline and (args.backend!='urma' or args.mode!='normal' or not args.api_only or not args.stage_profile or args.dispatch_trial or args.normal_completion!='all'):p.error('timeline requires URMA Normal API-only stage profile all; excludes delay trial')
     if args.dispatch_focus and (args.mode!='normal' or not args.api_only or args.stage_profile or args.timeline or args.capture_layout or args.dispatch_trial or args.normal_completion!='all' or args.normal_write_order!='default' or args.ll_write_order!='default'):p.error('dispatch focus requires Normal API-only default ordering/completion=all without CPU/timeline/layout/trial')
     if args.dispatch_focus and args.gpu_stages and args.gpu_stage_mode not in ('bypass','dispatch_access','dispatch_clock','dispatch'):p.error('invalid Dispatch focus GPU mode')
+    if args.reference_events:
+        if args.gpu_stages or args.gpu_stage_build or args.gpu_stage_roles_only or args.dispatch_compiled_off:p.error('reference events exclude old GPU tracing')
+        if (args.reference_events=='build')!=(args.action=='build'):p.error('reference-events build is for build only; off/on require check/run')
+        if args.action!='build' and (args.action not in ('check','run') or not args.dispatch_focus):p.error('reference events require Normal Dispatch focus check/run')
     if args.dispatch_compiled_off and (not args.dispatch_focus or args.gpu_stages or args.gpu_stage_build or args.action not in ('check','run')):p.error('compiled-off requires Dispatch focus check/run without GPU capture/build switches')
     if args.gpu_stage_roles_only and not ((args.action=='build' and args.gpu_stage_build) or args.dispatch_compiled_off):p.error('roles-only currently requires trace build or compiled-off; active capture is gated on the disabled-cost result')
     if args.gpu_stage_mode.startswith('dispatch') and not args.dispatch_focus:p.error('Dispatch GPU modes require --dispatch-focus')
@@ -217,6 +224,7 @@ def preflight(args):
         if metadata.get('gpu_stage_version')!=2 or manifest['flags'].get('UCCL_GPU_STAGE_TRACE')!='1':raise RuntimeError('COMPILED_OFF_REQUIRES_TRACE_BUILD_V2')
     elif not getattr(args,'gpu_stages',False) and metadata.get('gpu_stage_version',0):raise RuntimeError('CPU_OR_BASELINE_REQUIRES_GPU_TRACE_OFF_BUILD')
     if manifest.get('flags',{}).get('UCCL_GPU_STAGE_ROLES_ONLY','0')!=str(int(getattr(args,'gpu_stage_roles_only',False))):raise RuntimeError('GPU_STAGE_ROLE_BUILD_MISMATCH')
+    if metadata.get('reference_events_version',0)!=int(bool(getattr(args,'reference_events',None))) or manifest.get('flags',{}).get('UCCL_REFERENCE_EVENTS','0')!=str(int(bool(getattr(args,'reference_events',None)))):raise RuntimeError('REFERENCE_EVENT_BUILD_MISMATCH')
     return module,manifest,dict(libraries=libraries,hardware=hardware,import_log=probe.stdout+probe.stderr,runtime=metadata)
 
 def collect(args):
@@ -286,6 +294,7 @@ def main():
         dispatch_trial=args.dispatch_trial,dispatch_delay_us=args.dispatch_delay_us,delay_node=1,timeline=getattr(args,'timeline',False),gpu_stages=getattr(args,'gpu_stages',False),gpu_stage_mode=args.gpu_stage_mode,device=args.urma_device,gpu=args.gpu,dispatch_focus=args.dispatch_focus,dispatch_compiled_off=args.dispatch_compiled_off,gpu_stage_roles_only=args.gpu_stage_roles_only)
     try:
         module,manifest,info=preflight(args)
+        fingerprint['reference_events']=args.reference_events
         fingerprint.update(build_hash=support.digest({key:manifest[key] for key in ('sources','sdk','flags')}),libraries=info['libraries'],runtime_libraries=info['runtime'].get('selected_runtime_hashes',{}),torch=info['runtime']['torch'])
         (root/'preflight.json').write_text(json.dumps(info,indent=2))
         (root/'build_manifest.json').write_text(json.dumps(manifest,indent=2))
@@ -312,6 +321,7 @@ def main():
         env=environment(args)
         env.update(PARITY_CASE=str(case),PARITY_MODULE=str(module),PARITY_MODULE_SHA=manifest['module_sha'],PARITY_MODE=mode,PARITY_TOKENS=str(args.normal_tokens if mode=='normal' else args.ll_tokens),PARITY_HIDDEN=str(args.hidden),PARITY_EXPERTS=str(args.experts),PARITY_TOPK=str(args.topk),UCCL_TORCHRUN_NODE_RANK=str(args.node_rank),UCCL_EXIT_GUARD='1')
         env.update(PARITY_PHASE_SUITE=str(int(args.phase_suite)),PARITY_STAGE_PROFILE=str(int(args.stage_profile)),
+                   PARITY_REFERENCE_EVENTS=str(int(args.reference_events=='on')),
                    PARITY_DISPATCH_FOCUS=str(int(args.dispatch_focus)),
                    PARITY_DISPATCH_TRIAL=str(int(args.dispatch_trial)),PARITY_DISPATCH_DELAY_US=str(args.dispatch_delay_us if args.node_rank==1 else 0),
                    PARITY_GPU_STAGES=str(int(getattr(args,'gpu_stages',False))), PARITY_GPU_STAGE_MODE=args.gpu_stage_mode, PARITY_API_ONLY=str(int(args.api_only)), PARITY_TIMELINE=str(int(getattr(args,'timeline',False))),
@@ -341,6 +351,14 @@ def main():
             checks['measurement_boundary']=(case/'measurement_boundary.json').is_file() and (case/'kernel_after_measurements.txt').is_file()
         if args.capture_layout:checks['layout_capture']=(case/'write_layout.jsonl').is_file()
         if getattr(args,'gpu_stages',False):checks['gpu_stages']=(case/'gpu_stages.jsonl').is_file()
+        if args.reference_events=='on':
+            sys.path.insert(0,str(HERE.parent/'reference_events'))
+            from event_runtime import validate,correctness_passed
+            checks['reference_correctness']='REFERENCE_CORRECTNESS_EVENTS_PASSED' in text and correctness_passed(case)
+            try:checks['reference_events']=validate(case,args.samples)
+            except Exception as exc:
+                checks['reference_events']=False
+                (case/'reference_validation_error.txt').write_text(str(exc))
         if args.dispatch_focus and args.gpu_stages:
             sys.path.insert(0,str(HERE.parent/'dispatch_diag'))
             from dispatch_checks import validate_gpu

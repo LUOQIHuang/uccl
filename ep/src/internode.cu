@@ -8,6 +8,11 @@
 #include <optional>
 // #include "ibgda_device.cuh"
 #include "internode.cuh"
+// REFERENCE_EVENT_BEGIN
+#ifdef UCCL_REFERENCE_EVENTS
+#include "reference_event_trace.cuh"
+#endif
+// REFERENCE_EVENT_END
 
 // GPU_STAGE_V2_LAUNCH_GUARD_BEGIN
 #include "gpu_stage_trace_host.hpp"
@@ -921,6 +926,11 @@ while (is_token_in_rank_uint64 != 0 and
       if (lane_id < kNumRDMARanks and not kCachedMode)
         send_rdma_head[token_idx * kNumRDMARanks + lane_id] = rdma_tail_idx;
 
+// REFERENCE_EVENT_BEGIN
+#ifdef UCCL_REFERENCE_EVENTS
+      if(token_idx==token_start_idx && lane_id==0) uccl::reference_events::tick(0);
+#endif
+// REFERENCE_EVENT_END
       // Broadcast tails
       SourceMeta src_meta;
       int num_topk_ranks = 0, topk_ranks[kNumTopkRDMARanks];
@@ -1165,6 +1175,11 @@ while (__any_sync(WARP_MASK, num_tokens_to_send > 0)) {
           auto const src_ptr = reinterpret_cast<uint64_t>(
               rdma_channel_data.send_buffer(dst_rdma_rank) +
               dst_slot_idx * num_bytes_per_token);
+// REFERENCE_EVENT_BEGIN
+#ifdef UCCL_REFERENCE_EVENTS
+          if(lane_id==0 && synced_last_issued_tail==0) uccl::reference_events::tick(1);
+#endif
+// REFERENCE_EVENT_END
           uccl::nvshmemi_ibgda_put_nbi_warp</*use_normal_mode=*/true>(
               dst_ptr - reinterpret_cast<uint64_t>(original_rdma_buffer_ptr),
               src_ptr - reinterpret_cast<uint64_t>(original_rdma_buffer_ptr),
@@ -1384,6 +1399,12 @@ while (true) {
 }
           }
         }
+// REFERENCE_EVENT_BEGIN
+#ifdef UCCL_REFERENCE_EVENTS
+        int trace_remaining=__shfl_sync(WARP_MASK,num_tokens_to_recv_from_rdma,src_rdma_rank);
+        if(lane_id==0 && src_rdma_rank!=rdma_rank && trace_remaining==1) uccl::reference_events::tick(2);
+#endif
+// REFERENCE_EVENT_END
         if (seen_bits == 0) trap();
         lane_id == src_rdma_rank ? (num_tokens_to_recv_from_rdma -= 1) : 0;
         bool is_in_dst_nvl_rank = (seen_bits >> dst_nvl_rank) & 1;

@@ -45,6 +45,12 @@ class Measurements:
             self.dist.barrier()
 
     def api(self,fn,label,post_fn=None):
+        if getattr(self,'reference_events',False) and label.startswith('dispatch_'):
+            import sys
+            from pathlib import Path
+            sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'reference_events'))
+            from event_runtime import measure
+            return measure(self.torch,self.dist,self.ep,self.case,fn,label,self.warmups,self.samples,post_fn)
         if self.dispatch_trial:return self.isolated_api(fn,label,post_fn)
         torch=self.torch
         torch.cuda.synchronize()

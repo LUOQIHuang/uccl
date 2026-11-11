@@ -1009,9 +1009,15 @@ void Proxy::post_gpu_command(uint64_t& my_tail, size_t& seen) {
       }
       auto trig = fifo->poll();
       if (trig.fst == 0) break;
+#ifdef UCCL_REFERENCE_EVENTS
+      auto trace_polled=uccl::transport_timeline::active.load()?uccl::transport_timeline::now():0;
+#endif
       uccl::urma_diag::Scope diagnostic(uccl::urma_diag::Collect,1);
       adaptive_sleeper_.update_timer();
       TransferCmd cmd = d2hq::decode_from_trigger(trig);
+#ifdef UCCL_REFERENCE_EVENTS
+      auto trace_decoded=uccl::transport_timeline::active.load()?uccl::transport_timeline::now():0;
+#endif
 
       /* For some reason, this is important for correctness */
       /* It cannot be if (ctx_.barrier_inflight) */
@@ -1026,6 +1032,12 @@ void Proxy::post_gpu_command(uint64_t& my_tail, size_t& seen) {
 
       uint64_t unique_wr_id = (static_cast<uint64_t>(rb_idx) << 32) |
                               (fifo_seq_[rb_idx]++ & 0xFFFFFFFFULL);
+#ifdef UCCL_REFERENCE_EVENTS
+      if(trace_polled){
+        uccl::transport_timeline::record_at("poll",unique_wr_id,trace_polled);
+        uccl::transport_timeline::record_at("decoded",unique_wr_id,trace_decoded);
+      }
+#endif
       uccl::transport_timeline::record("collect",unique_wr_id);
       wrs_to_post.push_back(unique_wr_id);
       cmds_to_post.push_back(cmd);

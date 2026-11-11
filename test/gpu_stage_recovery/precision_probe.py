@@ -36,7 +36,10 @@ __global__ void precision_compile_probe(float* out) {
     for trace in ((False,True) if trace_build else (False,)):
         defines=(['-DUCCL_GPU_STAGE_TRACE'] if trace else [])+(['-DUCCL_GPU_STAGE_ROLES_ONLY'] if trace and os.environ.get('UCCL_GPU_STAGE_ROLES_ONLY')=='1' else [])
         commands.append(common+defines+['-c',str(REPO/'ep/src/gpu_stage_trace.cu'),'-o',str(output/('trace.o' if trace else 'base.o'))])
+    if os.environ.get('UCCL_REFERENCE_EVENTS')=='1':
+        commands.append(common+['-DUCCL_REFERENCE_EVENTS','-c',str(REPO/'ep/src/reference_event_trace.cu'),'-o',str(output/'reference_events.o')])
     inputs=['ep/setup.py','ep/include/ep_configs.cuh','ep/include/gpu_stage_trace.cuh','ep/src/gpu_stage_trace.cu']
+    if os.environ.get('UCCL_REFERENCE_EVENTS')=='1':inputs+=['ep/include/reference_event_trace.cuh','ep/src/reference_event_trace.cu']
     (output/'request.json').write_text(json.dumps(dict(maca=str(maca),commands=commands,sources={p:hashlib.sha256((REPO/p).read_bytes()).hexdigest() for p in inputs}),indent=2))
     for index,command in enumerate(commands):
         with (output/f'compile_{index}.log').open('w') as log:

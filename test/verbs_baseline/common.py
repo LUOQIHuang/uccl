@@ -57,6 +57,7 @@ def diagnostics():
     paths += [HERE.parent/'urma_mode_parity'/n for n in ('split_support.py','micro_support.py','timeline_support.py','gpu_stage_sites.json')]
     paths += [REPO/'ep/tests/verbs_diag_test.cpp',REPO/'ep/tests/verbs_notify_test.cpp',REPO/'ep/tests/urma_support/ep_shim.hpp']
     paths += list((HERE.parent/'dispatch_diag').glob('*.py')) + list((HERE.parent/'dispatch_diag').glob('*.sh')) + [HERE.parent/'dispatch_diag/dispatch_sites.json']
+    paths += list((HERE.parent/'reference_events').glob('*.py')) + list((HERE.parent/'reference_events').glob('*.sh')) + [REPO/'ep/tests/reference_event_test.cpp',REPO/'ep/tests/reference_timeline_test.cpp']
     paths += [REPO/'ep/tests/gpu_stage_trace_test.cpp',REPO/'ep/tests/gpu_stage_roles_test.cpp',REPO/'ep/tests/fifo_stage_test.cpp',REPO/'ep/tests/gpu_stage_runtime_test.cpp',REPO/'ep/tests/gpu_stage_runtime_support/cuda_runtime.h']
     return {p.relative_to(REPO).as_posix(): sha(p) for p in paths}
 
@@ -116,6 +117,7 @@ def load_extension(module):
                           queue_backend=extension.get_d2h_backend() if hasattr(extension,'get_d2h_backend') else None,
                           gpu_stage_version=extension.get_gpu_stage_version() if hasattr(extension,'get_gpu_stage_version') else 0,
                           dispatch_trace_version=extension.get_dispatch_trace_version() if hasattr(extension,'get_dispatch_trace_version') else 0,
+                          reference_events_version=extension.get_reference_events_version() if hasattr(extension,'get_reference_events_version') else 0,
                           verbs_diag_version=extension.get_verbs_diag_version() if hasattr(extension,'get_verbs_diag_version') else 0,
                           verbs_micro=hasattr(extension,'VerbsWriteSession'),
                           verbs_notify_version=extension.get_verbs_notify_version() if hasattr(extension,'get_verbs_notify_version') else 0)

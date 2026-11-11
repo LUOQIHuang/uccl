@@ -23,7 +23,7 @@ def source_manifest():
 
 def diagnostic_manifest():
     paths=[]
-    for directory in ('ep/bench','ep/tests','test/urma_mode_parity','test/verbs_diag','test/gpu_stage_recovery','test/dispatch_diag'):
+    for directory in ('ep/bench','ep/tests','test/urma_mode_parity','test/verbs_diag','test/gpu_stage_recovery','test/dispatch_diag','test/reference_events'):
         paths.extend(p for p in (REPO/directory).rglob('*') if p.is_file() and p.suffix in ('.h','.hpp','.cuh','.cpp','.cc','.cu','.inc','.py','.sh')
                      and not any(part in ('results','bench_results','cache','tmpdir','__pycache__') for part in p.relative_to(REPO/directory).parts))
     if (REPO/'test/urma_mode_parity/gpu_stage_sites.json').is_file():paths.append(REPO/'test/urma_mode_parity/gpu_stage_sites.json')
@@ -57,6 +57,7 @@ def load_extension(module):
                           queue_backend=extension.get_d2h_backend() if hasattr(extension,'get_d2h_backend') else None,
                           gpu_stage_version=extension.get_gpu_stage_version() if hasattr(extension,'get_gpu_stage_version') else 0,
                           dispatch_trace_version=extension.get_dispatch_trace_version() if hasattr(extension,'get_dispatch_trace_version') else 0,
+                          reference_events_version=extension.get_reference_events_version() if hasattr(extension,'get_reference_events_version') else 0,
                           notify_version=extension.get_urma_notify_version() if hasattr(extension,'get_urma_notify_version') else 0,
                           dispatch_trial=all(hasattr(extension,n) for n in ('urma_dispatch_trial_begin','urma_dispatch_trial_end')),
                           micro_version=extension.get_urma_micro_version() if hasattr(extension,'get_urma_micro_version') else 1,

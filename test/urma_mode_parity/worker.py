@@ -34,6 +34,7 @@ measurements=Measurements(torch,dist,ep,case,mode,stage_profile,
     os.environ.get('PARITY_CAPTURE_LAYOUT')=='1',os.environ.get('PARITY_DISPATCH_TRIAL')=='1',
     int(os.environ.get('PARITY_DISPATCH_DELAY_US','0')),os.environ.get('PARITY_TIMELINE')=='1')
 measurements.dispatch_focus=os.environ.get('PARITY_DISPATCH_FOCUS')=='1'
+measurements.reference_events=os.environ.get('PARITY_REFERENCE_EVENTS')=='1'
 if os.environ.get('PARITY_GPU_STAGES')=='1':
     import buffer as stage_buffer
     stage_proxies=[];original_buffer_init=stage_buffer.Buffer.__init__
@@ -85,9 +86,16 @@ utils.bench=measured_api
 
 original_profile=utils.bench_kineto
 count=0
+reference_correctness_finish=None
+if measurements.reference_events:
+    sys.path.insert(0,str(bench.parents[1]/'test/reference_events'))
+    import buffer as reference_buffer
+    from correctness import install
+    reference_correctness_finish=install(ep,reference_buffer,case)
 normal_plan=[('dispatch_fp8',32),('dispatch_bf16',32),('combine',12),('combine',16)]
 def measured_profile(fn,kernel_names,*args,**kwargs):
     global count
+    if count==0 and globals().get('reference_correctness_finish') is not None:reference_correctness_finish(True)
     index=count; count+=1
     label=(normal_plan[index][0]+'_chunk'+str(normal_plan[index][1])) if mode=='normal' else ('ll_no_hook' if index==0 else 'll_hook')
     if os.environ.get('PARITY_SAVE_TRACES')=='1': kwargs['trace_path']=str(case/f'gpu_trace_{index}.json')

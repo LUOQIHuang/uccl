@@ -22,6 +22,7 @@ timeline=os.environ.get('VB_TIMELINE')=='1'
 gpu_stages=os.environ.get('VB_GPU_STAGES')=='1'
 stage_suite=os.environ.get('VB_STAGE_SUITE')=='1'
 dispatch_focus=os.environ.get('VB_DISPATCH_FOCUS')=='1'
+reference_events=os.environ.get('VB_REFERENCE_EVENTS')=='1'
 stage_proxies=[]
 warmups, samples = int(os.environ['VB_WARMUPS']), int(os.environ['VB_SAMPLES'])
 ep, runtime = common.load_extension(Path(os.environ['VB_MODULE']))
@@ -83,6 +84,10 @@ def append(name, data):
 
 
 def measure(fn, label, post_fn=None):
+    if globals().get('reference_events',False) and label.startswith('dispatch_'):
+        sys.path.insert(0,str(common.HERE.parent/'reference_events'))
+        from event_runtime import measure as reference_measure
+        return reference_measure(torch,dist,ep,case,fn,label,warmups,samples,post_fn)
     torch.cuda.synchronize()
     dist.barrier()
     cache = torch.empty(int(256e6 // 4), dtype=torch.int, device=f'cuda:{torch.cuda.current_device()}')
@@ -147,10 +152,16 @@ utils.bench = measured_api
 exec(compile((bundle / 'profile_adapter.py').read_text(), str(bundle / 'profile_adapter.py'), 'exec'), utils.__dict__)
 original_profile = utils.bench_kineto
 profile_count = 0
+reference_correctness_finish=None
+if reference_events:
+    sys.path.insert(0,str(common.HERE.parent/'reference_events'))
+    from correctness import install
+    reference_correctness_finish=install(ep,buffer,case)
 
 
 def measured_profile(fn, kernel_names, *args, **kwargs):
     global profile_count
+    if profile_count==0 and globals().get('reference_correctness_finish') is not None:reference_correctness_finish(True)
     index = profile_count
     profile_count += 1
     label = f'{common.NORMAL_PLAN[index][0]}_chunk{common.NORMAL_PLAN[index][1]}' if mode == 'normal' else ('ll_no_hook' if index == 0 else 'll_immediate_hook')
