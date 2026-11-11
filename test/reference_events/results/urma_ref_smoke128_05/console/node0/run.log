@@ -1,0 +1,11 @@
+DIAG_ROOT=/home/h00918771
+DIAG_PYTHON=/home/h00918771/metax_dev/venv-maca-py312/bin/python
+Traceback (most recent call last):
+  File "/home/h00918771/uccl-ep-xpu-integration-new/test/urma_mode_parity/driver.py", line 399, in <module>
+    if __name__=='__main__': main()
+                             ^^^^^^
+  File "/home/h00918771/uccl-ep-xpu-integration-new/test/urma_mode_parity/driver.py", line 311, in main
+    legacy.pair(args,dict(stage='setup',meta=fingerprint,rc=1 if error else 0))
+  File "/home/h00918771/uccl-ep-xpu-integration-new/test/verbs_diag/driver.py", line 33, in pair
+    server.bind(('', args.port))
+OSError: [Errno 98] Address already in use
