@@ -13,11 +13,11 @@ while [ "$#" -gt 0 ];do
  esac
 done
 [[ "$BACKEND" == urma || "$BACKEND" == verbs ]] && [[ "$RANK" == 0 || "$RANK" == 1 ]] && [[ "$JOB" =~ ^[a-zA-Z0-9_-]+$ ]] && [ -n "$BUILD" ] || { echo 'backend/rank/job/build required' >&2;exit 2; }
-case "$STEP" in baseline|post|bypass|access|clock|trace);;*) echo 'invalid step' >&2;exit 2;;esac
+case "$STEP" in baseline|post|compiled-off|bypass|access|clock|trace);;*) echo 'invalid step' >&2;exit 2;;esac
 case "$ACTION" in build|check|run);;*) echo 'invalid action' >&2;exit 2;;esac
 [[ "$TOKENS" == 128 || "$TOKENS" == 4096 ]] || { echo 'tokens must be 128/4096' >&2;exit 2; }
 WARMUPS=5 SAMPLES=10
-if [ "$STEP" = baseline ] || [ "$STEP" = post ];then WARMUPS=50 SAMPLES=50;fi
+if [ "$STEP" = baseline ] || [ "$STEP" = post ] || [ "$STEP" = compiled-off ];then WARMUPS=50 SAMPLES=50;fi
 if [ "$TOKENS" = 128 ];then WARMUPS=1 SAMPLES=3;fi
 COMMON=(--node-rank "$RANK" --job "$JOB" --mode normal --build-dir "$BUILD" --master-addr "$MASTER" --port "$PORT" --output "$ROOT" --normal-tokens "$TOKENS" --warmups "$WARMUPS" --samples "$SAMPLES" --build-jobs 1)
 if [ "$BACKEND" = urma ];then
@@ -29,6 +29,7 @@ else
 fi
 if [ "$STEP" != baseline ] && [ "$STEP" != post ];then
  if [ "$ACTION" = build ];then COMMON+=(--gpu-stage-build)
+ elif [ "$STEP" = compiled-off ];then COMMON+=(--dispatch-compiled-off)
  else
   MODE=dispatch;case "$STEP" in bypass) MODE=bypass;;access) MODE=dispatch_access;;clock) MODE=dispatch_clock;;esac
   COMMON+=(--gpu-stages --gpu-stage-mode "$MODE")

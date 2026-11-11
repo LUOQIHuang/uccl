@@ -15,7 +15,7 @@ BUILD_FLAGS = dict(USE_METAX='1', USE_URMA='0', USE_URMA_METAX='0', USE_LIBFABRI
                    USE_DMABUF='1', MAX_NUM_GPUS='1', NUM_MAX_NVL_PEERS='1', PER_EXPERT_BATCHING='0')
 
 def build_flags(args):
-    return dict(BUILD_FLAGS, UCCL_GPU_STAGE_TRACE=str(int(bool(getattr(args,'gpu_stage_build',False) or getattr(args,'gpu_stages',False)))))
+    return dict(BUILD_FLAGS, UCCL_GPU_STAGE_TRACE=str(int(bool(getattr(args,'gpu_stage_build',False) or getattr(args,'gpu_stages',False) or getattr(args,'dispatch_compiled_off',False)))))
 
 
 def parser():
@@ -28,6 +28,7 @@ def parser():
     p.add_argument('--stage-suite',action='store_true')
     p.add_argument('--gpu-stages',action='store_true')
     p.add_argument('--dispatch-focus',action='store_true')
+    p.add_argument('--dispatch-compiled-off',action='store_true',help='Dispatch trace build with capture completely disabled; same API timing boundary as baseline')
     p.add_argument('--gpu-stage-mode',choices=('bypass','access','clock','kernels','waits','operators','all','dispatch_access','dispatch_clock','dispatch'),default='all')
     p.add_argument('--gpu-stage-build',action='store_true')
     p.add_argument('--notify-check',action='store_true')
@@ -79,6 +80,7 @@ def parser():
     if args.stage_suite and (args.variant!='current' or args.mode!='normal' or not args.no_profile or args.repeats!=1):p.error('--stage-suite requires current Normal --no-profile --repeats 1')
     if args.dispatch_focus and (args.variant!='current' or args.mode!='normal' or not args.no_profile or args.repeats!=1 or args.cpu_diagnostics or args.timeline or args.stage_suite):p.error('dispatch focus requires current Normal no-profile repeats=1, without CPU/timeline/stage-suite')
     if args.dispatch_focus and args.gpu_stages and args.gpu_stage_mode not in ('bypass','dispatch_access','dispatch_clock','dispatch'):p.error('invalid Dispatch focus GPU mode')
+    if args.dispatch_compiled_off and (not args.dispatch_focus or args.gpu_stages or args.gpu_stage_build or args.action not in ('check','run')):p.error('compiled-off requires Dispatch focus check/run without GPU capture/build switches')
     if args.gpu_stage_mode.startswith('dispatch') and not args.dispatch_focus:p.error('Dispatch GPU modes require --dispatch-focus')
     if args.gpu_stages and not args.dispatch_focus and (not args.stage_suite or not args.timeline):p.error('--gpu-stages requires --stage-suite --timeline --cpu-diagnostics')
     if args.gpu_stage_build and args.action!='build':p.error('--gpu-stage-build is only for build; use --gpu-stages for checks/runs')
@@ -183,6 +185,7 @@ def preflight(args):
     if getattr(args,'cpu_diagnostics',False) and info.get('verbs_diag_version')!=1:raise RuntimeError('VERBS_DIAGNOSTICS_REQUIRES_REBUILD')
     if getattr(args,'gpu_stages',False) and info.get('gpu_stage_version')!=2:raise RuntimeError('GPU_STAGE_REQUIRES_REBUILD')
     if getattr(args,'dispatch_focus',False) and info.get('dispatch_trace_version')!=1:raise RuntimeError('DISPATCH_FOCUS_REQUIRES_REBUILD')
+    if getattr(args,'dispatch_compiled_off',False) and info.get('gpu_stage_version')!=2:raise RuntimeError('COMPILED_OFF_REQUIRES_TRACE_BUILD_V2')
     if getattr(args,'gid_index',None) is not None:
         port=Path('/sys/class/infiniband')/args.hca/'ports/1'
         if not (port/'gids'/str(getattr(args,'gid_index',None))).read_text().strip().replace(':','').strip('0'):raise RuntimeError('selected GID is zero')
@@ -347,6 +350,7 @@ def run(args):
         meta.update(cpu_light=getattr(args,'cpu_light',False),cpu_diagnostics=getattr(args,'cpu_diagnostics',False),timeline=getattr(args,'timeline',False),gid_index=getattr(args,'gid_index',None))
         meta.update(normal_tokens=getattr(args,'normal_tokens',4096),stage_suite=getattr(args,'stage_suite',False),gpu_stages=getattr(args,'gpu_stages',False),gpu_stage_mode=getattr(args,'gpu_stage_mode','all'))
         meta['dispatch_focus']=getattr(args,'dispatch_focus',False)
+        meta['dispatch_compiled_off']=getattr(args,'dispatch_compiled_off',False)
     except Exception as exc:
         error = str(exc)
     (root / 'setup.json').write_text(json.dumps(dict(fingerprint=meta, error=error), indent=2))

@@ -21,7 +21,7 @@ def write(p,data):
         if data:
             w=csv.DictWriter(f,fieldnames=list(data[0]));w.writeheader();w.writerows(data)
 
-def case_data(root,rank,trace):
+def case_data(root,rank,trace,compiled_off=False):
     node=root/f'node{rank}';c=read(node/'setup.json')
     if c['error']:raise ValueError('failed setup '+str(node))
     c=c['fingerprint'];backend=c.get('backend','verbs')
@@ -30,7 +30,8 @@ def case_data(root,rank,trace):
     status=read(case/'status.json');runtime=read(case/'runtime.json')
     if status['rc'] or not REQUIRED_CHECKS.issubset(status['checks']) or not all(status['checks'].values()):raise ValueError('failed/incomplete case '+str(case))
     if not c.get('dispatch_focus') or c['mode']!='normal' or c.get('gpu_stages',False)!=trace or c.get('timeline') or c.get('stage_profile') or c.get('cpu_diagnostics') or c.get('capture_layout') or c.get('dispatch_trial') or c.get('save_traces'):raise ValueError('wrong focused configuration')
-    if runtime.get('dispatch_trace_version')!=1 or runtime['queue_backend']!='fifo' or runtime['gpu_stage_version']!=(2 if trace else 0):raise ValueError('wrong runtime capability')
+    if (trace and compiled_off) or bool(c.get('dispatch_compiled_off'))!=compiled_off:raise ValueError('wrong compiled-off configuration')
+    if runtime.get('dispatch_trace_version')!=1 or runtime['queue_backend']!='fifo' or runtime['gpu_stage_version']!=(2 if trace or compiled_off else 0):raise ValueError('wrong runtime capability')
     shape_ok=c['normal_tokens']==4096 if backend=='verbs' else c['shape']==[4096,128,7168,256,8]
     if not shape_ok:raise ValueError('formal comparison requires fixed 4096 shape')
     if (c['warmups'],c['samples'])!=((5,10) if trace else (50,50)):raise ValueError('wrong formal samples')
@@ -45,7 +46,7 @@ def case_data(root,rank,trace):
     if (case/'phases.jsonl').exists() and any(rec['metrics'] for w in rows(case/'phases.jsonl') for rec in w['records']):raise ValueError('CPU counters active')
     manifest=read(node/('build_manifest.json' if backend=='urma' else 'module_manifest.json'))
     flags=dict(manifest['flags']);compiled=flags.pop('UCCL_GPU_STAGE_TRACE','0')
-    if compiled!=('1' if trace else '0') or manifest['module_sha']!=runtime['module_sha']:raise ValueError('module/compile flag mismatch')
+    if compiled!=('1' if trace or compiled_off else '0') or manifest['module_sha']!=runtime['module_sha']:raise ValueError('module/compile flag mismatch')
     raw=rows(case/'api_samples.jsonl');saved=rows(case/'sample_summary.jsonl');means={}
     if len(raw)!=5*c['samples'] or {r['label'] for r in raw}!=ALL_LABELS or len(saved)!=5 or {r['label'] for r in saved}!=ALL_LABELS:raise ValueError('incomplete Normal samples')
     for label in ALL_LABELS:

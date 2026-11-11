@@ -1,9 +1,11 @@
 import ast
+import argparse
 from contextlib import redirect_stdout
 import importlib.util
 import io
 import json
 import os
+import re
 from pathlib import Path
 import sys
 import tempfile
@@ -15,6 +17,7 @@ HERE=Path(__file__).resolve().parent;REPO=HERE.parents[1]
 sys.path.insert(0,str(HERE));sys.path.append(str(HERE.parent/'urma_mode_parity'))
 from dispatch_checks import validate_gpu,REQUIRED,LABELS,SITES
 from summarize import summarize,compare,REQUIRED_CHECKS
+from summarize_compiled_off import summarize as summarize_off
 from phase_runtime import Measurements
 from phase_support import distribution
 
@@ -25,6 +28,57 @@ def windows(samples=10,mode='dispatch'):
         records=[] if mode=='bypass' else [dict(block=0,warp=0,sample_lane=0,stage=s,calls=1,sum_cycles=0 if mode=='dispatch_access' else 1000,max_cycles=0 if mode=='dispatch_access' else 1000) for s in ({46} if mode=='dispatch_clock' else REQUIRED)]) for l in sorted(LABELS) for i in range(samples)]
 
 class DispatchTests(unittest.TestCase):
+    def test_compiled_off_real_parsers_and_module_guards(self):
+        for backend in ('urma','verbs'):
+            folder=HERE.parent/('urma_mode_parity' if backend=='urma' else 'verbs_baseline')
+            source=ast.parse((folder/'driver.py').read_text())
+            names={'parser','preflight','build_flags'}
+            nodes=[n for n in source.body if isinstance(n,ast.FunctionDef) and n.name in names or isinstance(n,ast.Assign) and any(isinstance(t,ast.Name) and t.id=='BUILD_FLAGS' for t in n.targets)]
+            ns=dict(argparse=argparse,Path=Path,os=os,re=re,HERE=folder,sys=sys,json=json)
+            exec(compile(ast.Module(body=nodes,type_ignores=[]),'actual_'+backend+'_driver','exec'),ns)
+            argv=['driver','--job','off','--node-rank','0','--mode','normal','--dispatch-focus','--dispatch-compiled-off']
+            argv+=['--phase-suite','--api-only'] if backend=='urma' else ['--variant','current','--no-profile','--repeats','1']
+            with patch.object(sys,'argv',argv):args=ns['parser']()
+            self.assertFalse(args.gpu_stages)
+            for extra in (['--gpu-stages'],['--action','build']):
+                with patch.object(sys,'argv',argv+extra),patch('sys.stderr',io.StringIO()),self.assertRaises(SystemExit):ns['parser']()
+            metadata=dict(gpu_stage_version=2,dispatch_trace_version=1,phase_diagnostics=True,loaded_libraries=[])
+            flags={'UCCL_GPU_STAGE_TRACE':'1'} if backend=='urma' else ns['build_flags'](args)
+            manifest=dict(flags=flags,sources={'a':'same'},module='ep.so',module_sha='sha')
+            ns['environment']=lambda args:{}
+            ns['subprocess']=NS(run=lambda *a,**kw:NS(returncode=0,stdout=('MODE_PARITY_IMPORT_OK ' if backend=='urma' else 'VERBS_IMPORT_OK ')+json.dumps(metadata),stderr=''))
+            if backend=='urma':
+                ns['support']=NS(read_build=lambda p:(Path('ep.so'),manifest))
+                ns['urma_support']=NS(library_manifest=lambda p:{},hardware_check=lambda a:{})
+                ns['preflight'](args)
+                args.dispatch_compiled_off=False
+                with self.assertRaisesRegex(RuntimeError,'TRACE_OFF_BUILD'):ns['preflight'](args)
+                args.dispatch_compiled_off=True
+            else:
+                ns['common']=NS(sources=lambda:manifest['sources'],sha=lambda p:'sha',digest=lambda p:'hash')
+                with patch.object(Path,'read_text',return_value=json.dumps(manifest)):ns['preflight'](args)
+            metadata['gpu_stage_version']=0
+            with patch.object(Path,'read_text',return_value=json.dumps(manifest)),self.assertRaisesRegex(RuntimeError,'COMPILED_OFF_REQUIRES_TRACE_BUILD'):ns['preflight'](args)
+
+    def test_compiled_off_adapters_do_not_enter_capture_or_add_sample_barriers(self):
+        with tempfile.TemporaryDirectory() as tmp,redirect_stdout(io.StringIO()):
+            t,e=self.fake_gpu();dist=NS(barrier=Mock())
+            m=Measurements(t,dist,e,Path(tmp),'normal',False,1,50);m.dispatch_focus=True
+            m.api(Mock(),'dispatch_fp8_chunk32')
+            e.gpu_stage_begin.assert_not_called();e.gpu_stage_end.assert_not_called()
+            self.assertEqual(dist.barrier.call_count,2)
+            self.assertFalse((Path(tmp)/'gpu_stages.jsonl').exists())
+            source=ast.parse((HERE.parent/'verbs_baseline/worker.py').read_text())
+            fn=next(n for n in source.body if isinstance(n,ast.FunctionDef) and n.name=='measure')
+            dist.barrier.reset_mock();out=[]
+            ns=dict(torch=t,ep=e,dist=dist,warmups=1,samples=50,cpu_diag=False,dispatch_focus=True,gpu_stages=False,timeline=False,
+                os=os,time=__import__('time'),json=json,mode='normal',profile=False,common=NS(phase_support=NS(distribution=distribution)),append=lambda name,data:out.append((name,data)))
+            exec(compile(ast.Module(body=[fn],type_ignores=[]),'actual_worker','exec'),ns)
+            ns['measure'](Mock(),'dispatch_fp8_chunk32')
+            e.gpu_stage_begin.assert_not_called();e.gpu_stage_end.assert_not_called()
+            self.assertEqual(dist.barrier.call_count,3)
+            self.assertNotIn('gpu_stages.jsonl',{name for name,data in out})
+
     def test_coverage_rejects_layout_only_partial_duplicate_and_untimed(self):
         with tempfile.TemporaryDirectory() as tmp:
             p=Path(tmp)
@@ -93,5 +147,22 @@ class DispatchTests(unittest.TestCase):
             compare(root/'verbs/summary',root/'urma/summary',root/'comparison')
             p=root/'urma/post/node1/normal/runtime.json';d=json.loads(p.read_text());d['selected_runtime_hashes']={'libmcruntime.so':'changed'};dump(p,d)
             with self.assertRaisesRegex(ValueError,'changed between'):summarize(root/'urma/base',root/'urma/trace',root/'urma/post',root/'bad')
+
+    def test_compiled_off_summary_requires_disabled_capture_and_classifies_large_cost(self):
+        with tempfile.TemporaryDirectory() as tmp,redirect_stdout(io.StringIO()):
+            root=Path(tmp)
+            for backend in ('urma','verbs'):
+                b,t,p=self.fixture(root/backend,backend)
+                for rank in (0,1):
+                    node=t/f'node{rank}';case=node/('normal' if backend=='urma' else 'r01_baseline/normal')
+                    c=json.loads((node/'setup.json').read_text());c['fingerprint'].update(gpu_stages=False,dispatch_compiled_off=True,warmups=50,samples=50);dump(node/'setup.json',c)
+                    (case/'gpu_stages.jsonl').unlink()
+                    raw=[dict(label=l,index=i,used=i>0,us=2000,mode='normal') for l in {'layout','combine_chunk12','combine_chunk16'}|LABELS for i in range(50)]
+                    lines(case/'api_samples.jsonl',raw);lines(case/'sample_summary.jsonl',[dict(label=l,mean_us=2000) for l in {'layout','combine_chunk12','combine_chunk16'}|LABELS])
+                data=summarize_off(b,t,p,root/backend/'summary_off')
+                self.assertEqual(len(data),10);self.assertTrue(all(r['verdict']=='compiled_build_slower' for r in data))
+                self.assertTrue(all(r['compiled_off_change_pct']==100 for r in data))
+                lines(case/'gpu_stages.jsonl',windows(50,'bypass'))
+                with self.assertRaisesRegex(ValueError,'instrumented'):summarize_off(b,t,p,root/'bad')
 
 if __name__=='__main__':unittest.main()
