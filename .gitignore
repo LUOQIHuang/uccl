@@ -165,3 +165,8 @@ test/**/*.bin
 !test/dispatch_diag/results/**/*.json
 !test/dispatch_diag/results/**/*.jsonl
 !test/dispatch_diag/results/**/*.csv
+# The collector uses a selected build/ subtree; the generic build/ rule above
+# would otherwise hide its logs and manifests even with extension exceptions.
+!test/dispatch_diag/results/**/build/
+!test/dispatch_diag/results/**/build/**/*.log
+!test/dispatch_diag/results/**/build/**/*.json

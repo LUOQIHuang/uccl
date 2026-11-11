@@ -46,6 +46,8 @@ def case_data(root,rank,trace,compiled_off=False):
     if (case/'phases.jsonl').exists() and any(rec['metrics'] for w in rows(case/'phases.jsonl') for rec in w['records']):raise ValueError('CPU counters active')
     manifest=read(node/('build_manifest.json' if backend=='urma' else 'module_manifest.json'))
     flags=dict(manifest['flags']);compiled=flags.pop('UCCL_GPU_STAGE_TRACE','0')
+    roles=flags.pop('UCCL_GPU_STAGE_ROLES_ONLY','0')
+    if roles not in ('0','1') or roles!=str(int(bool(c.get('gpu_stage_roles_only')))) or (roles=='1' and not compiled_off):raise ValueError('wrong sparse probe build or unvalidated sparse capture')
     if compiled!=('1' if trace or compiled_off else '0') or manifest['module_sha']!=runtime['module_sha']:raise ValueError('module/compile flag mismatch')
     raw=rows(case/'api_samples.jsonl');saved=rows(case/'sample_summary.jsonl');means={}
     if len(raw)!=5*c['samples'] or {r['label'] for r in raw}!=ALL_LABELS or len(saved)!=5 or {r['label'] for r in saved}!=ALL_LABELS:raise ValueError('incomplete Normal samples')

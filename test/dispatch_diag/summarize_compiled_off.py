@@ -18,6 +18,7 @@ def summarize(baseline, compiled_off, post, output):
         if b['runtime']['module_sha'] != p['runtime']['module_sha']:
             raise ValueError('baseline/post module changed')
         contexts.append(dict(node=rank, **t['identity'],
+                             probe_set='roles' if t['c'].get('gpu_stage_roles_only') else 'full',
                              baseline_module_sha=b['runtime']['module_sha'],
                              compiled_off_module_sha=t['runtime']['module_sha']))
         for label in sorted(ALL_LABELS):

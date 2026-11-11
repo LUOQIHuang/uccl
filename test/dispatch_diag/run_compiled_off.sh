@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 HERE=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
-BACKEND=urma RANK= BASE= TRACE= JOB= MASTER=141.61.17.202 PORT=32880 GID=3
+BACKEND=urma RANK= BASE= TRACE= JOB= MASTER=141.61.17.202 PORT=32880 GID=3 PROBES=full
 ROOT="${URMA_DIAG_HOME:-${VERBS_DIAG_HOME:-${HOME:?}}}/metax_dev/dispatch_diag_results"
 DEST="$HERE/results"
 while [ "$#" -gt 0 ];do
@@ -11,6 +11,7 @@ while [ "$#" -gt 0 ];do
  --job) JOB=${2:?};shift 2;; --master-addr) MASTER=${2:?};shift 2;;
  --output) ROOT=${2:?};shift 2;; --destination) DEST=${2:?};shift 2;;
  --port) PORT=${2:?};shift 2;; --gid-index) GID=${2:?};shift 2;;
+ --probe-set) PROBES=${2:?};shift 2;;
  *) echo "unknown compiled-off argument: $1" >&2;exit 2;;
  esac
 done
@@ -21,7 +22,7 @@ if [ -z "$PY" ];then
  PY="${URMA_DIAG_HOME:-${VERBS_DIAG_HOME:-${HOME:?}}}/metax_dev/venv-maca-py312/bin/python"
  [ -x "$PY" ] || PY=$(command -v python3)
 fi
-COMMON=(--backend "$BACKEND" --node-rank "$RANK" --master-addr "$MASTER" --tokens 4096 --output "$ROOT" --port "$PORT" --gid-index "$GID")
+COMMON=(--backend "$BACKEND" --node-rank "$RANK" --master-addr "$MASTER" --tokens 4096 --output "$ROOT" --port "$PORT" --gid-index "$GID" --probe-set "$PROBES")
 # Check every target before starting the first GPU case. Reuse the exact two
 # modules from the preceding campaign; this script never builds a module.
 for SUFFIX in base off post;do

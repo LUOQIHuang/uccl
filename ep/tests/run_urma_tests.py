@@ -21,6 +21,9 @@ with tempfile.TemporaryDirectory(prefix='uccl-urma-test-') as tmp:
     gpu_stage_test=tmp/'gpu_stage_test'
     subprocess.run([os.environ.get('CXX','c++'),'-std=c++17','-Wall','-Wextra','-Werror','-I'+str(ep/'include'),str(ep/'tests/gpu_stage_trace_test.cpp'),'-o',str(gpu_stage_test)],check=True)
     subprocess.run([str(gpu_stage_test)],check=True)
+    roles_test=tmp/'gpu_stage_roles_test'
+    subprocess.run([os.environ.get('CXX','c++'),'-std=c++17','-O3','-Wall','-Wextra','-Werror','-I'+str(ep/'include'),str(ep/'tests/gpu_stage_roles_test.cpp'),'-o',str(roles_test)],check=True)
+    subprocess.run([str(roles_test)],check=True)
     runtime_test=tmp/'gpu_stage_runtime_test'
     subprocess.run([os.environ.get('CXX','c++'),'-std=c++17','-pthread','-Wall','-Wextra','-Werror','-I'+str(ep/'tests/gpu_stage_runtime_support'),'-I'+str(ep/'include'),str(ep/'tests/gpu_stage_runtime_test.cpp'),'-o',str(runtime_test)],check=True)
     subprocess.run([str(runtime_test)],check=True)

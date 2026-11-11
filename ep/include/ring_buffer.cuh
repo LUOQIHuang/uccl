@@ -435,7 +435,7 @@ struct alignas(128) RingBuffer {
   __host__ __device__ inline bool atomic_set_and_commit(
       T const& item, uint64_t* out_slot = nullptr) {
 #if defined(__CUDA_ARCH__) || defined(__HIP_DEVICE_COMPILE__)
-    uccl::gpu_stages::Span stage_span(uccl::gpu_stages::active_state(),40);
+    UCCL_GPU_STAGE_DETAIL(stage_span,uccl::gpu_stages::active_state(),40);
 #endif
     uint64_t slot;
     while (true) {

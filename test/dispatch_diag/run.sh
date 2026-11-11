@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 HERE=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
-BACKEND= STEP= RANK= BUILD= JOB= ACTION=run TOKENS=4096 MASTER=141.61.17.202 PORT=32880 GID=3
+BACKEND= STEP= RANK= BUILD= JOB= ACTION=run TOKENS=4096 MASTER=141.61.17.202 PORT=32880 GID=3 PROBES=full
 ROOT="${URMA_DIAG_HOME:-${VERBS_DIAG_HOME:-${HOME:?}}}/metax_dev/dispatch_diag_results"
 while [ "$#" -gt 0 ];do
  case "$1" in
@@ -9,12 +9,15 @@ while [ "$#" -gt 0 ];do
  --build-dir) BUILD=${2:?};shift 2;; --job) JOB=${2:?};shift 2;; --action) ACTION=${2:?};shift 2;;
  --tokens) TOKENS=${2:?};shift 2;; --output) ROOT=${2:?};shift 2;; --master-addr) MASTER=${2:?};shift 2;;
  --port) PORT=${2:?};shift 2;; --gid-index) GID=${2:?};shift 2;;
+ --probe-set) PROBES=${2:?};shift 2;;
  *) echo "unknown Dispatch diagnostic argument: $1" >&2;exit 2;;
  esac
 done
 [[ "$BACKEND" == urma || "$BACKEND" == verbs ]] && [[ "$RANK" == 0 || "$RANK" == 1 ]] && [[ "$JOB" =~ ^[a-zA-Z0-9_-]+$ ]] && [ -n "$BUILD" ] || { echo 'backend/rank/job/build required' >&2;exit 2; }
 case "$STEP" in baseline|post|compiled-off|bypass|access|clock|trace);;*) echo 'invalid step' >&2;exit 2;;esac
 case "$ACTION" in build|check|run);;*) echo 'invalid action' >&2;exit 2;;esac
+case "$PROBES" in full|roles);;*) echo 'probe-set must be full/roles' >&2;exit 2;;esac
+if [ "$PROBES" = roles ] && [ "$ACTION" != build ] && [[ "$STEP" != baseline && "$STEP" != post && "$STEP" != compiled-off ]];then echo 'roles capture is gated on compiled-off validation' >&2;exit 2;fi
 [[ "$TOKENS" == 128 || "$TOKENS" == 4096 ]] || { echo 'tokens must be 128/4096' >&2;exit 2; }
 WARMUPS=5 SAMPLES=10
 if [ "$STEP" = baseline ] || [ "$STEP" = post ] || [ "$STEP" = compiled-off ];then WARMUPS=50 SAMPLES=50;fi
@@ -28,6 +31,7 @@ else
  if [ "$ACTION" != build ];then COMMON+=(--no-profile --repeats 1 --dispatch-focus);fi
 fi
 if [ "$STEP" != baseline ] && [ "$STEP" != post ];then
+ if [ "$PROBES" = roles ];then COMMON+=(--gpu-stage-roles-only);fi
  if [ "$ACTION" = build ];then COMMON+=(--gpu-stage-build)
  elif [ "$STEP" = compiled-off ];then COMMON+=(--dispatch-compiled-off)
  else

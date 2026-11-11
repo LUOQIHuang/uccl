@@ -74,7 +74,7 @@ struct D2HHandle {
       TransferCmd const& item, uint64_t* out_slot = nullptr) {
 #ifdef USE_MSCCLPP_FIFO_BACKEND
 #ifdef MSCCLPP_DEVICE_COMPILE
-    uccl::gpu_stages::Span gpu_enqueue_stage(uccl::gpu_stages::active_state(),40);
+    UCCL_GPU_STAGE_DETAIL(gpu_enqueue_stage,uccl::gpu_stages::active_state(),40);
     mscclpp::ProxyTrigger trig;
     uint64_t fst, snd;
     pack_transfer_cmd(item, fst, snd);

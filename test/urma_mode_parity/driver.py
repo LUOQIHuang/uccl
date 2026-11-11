@@ -42,6 +42,9 @@ def build(args):
     env['UCCL_URMA_NORMAL_COMPLETION']='all'
     flags=dict(UCCL_GPU_STAGE_TRACE=str(int(getattr(args,'gpu_stage_build',False))),USE_METAX='1',USE_URMA='1',USE_URMA_METAX='0',USE_LIBFABRIC_CXI='0',USE_DMABUF='1',MAX_NUM_GPUS='1',NUM_MAX_NVL_PEERS='1',PER_EXPERT_BATCHING=str(args.per_expert_batching),MAX_JOBS=str(args.build_jobs),URMA_INCLUDE_DIR=str(include),URMA_LIBRARY_DIR=str(args.urma_lib_dir.resolve()))
     env.update(flags)
+    if getattr(args,'gpu_stage_roles_only',False):
+        flags['UCCL_GPU_STAGE_ROLES_ONLY']='1';env['UCCL_GPU_STAGE_ROLES_ONLY']='1'
+    else:env.pop('UCCL_GPU_STAGE_ROLES_ONLY',None)
     stable_flags={key:value for key,value in flags.items() if key not in ('URMA_INCLUDE_DIR','URMA_LIBRARY_DIR','MAX_JOBS')}
     if (args.build_dir/'manifest.json').exists():
         module,previous=support.read_build(args.build_dir)
@@ -86,6 +89,7 @@ def parser():
     p.add_argument('--gpu-stages',action='store_true')
     p.add_argument('--dispatch-focus',action='store_true')
     p.add_argument('--dispatch-compiled-off',action='store_true',help='Dispatch trace build with capture completely disabled; same API timing boundary as baseline')
+    p.add_argument('--gpu-stage-roles-only',action='store_true',help='sparse compile-time role probes; currently only build or compiled-off validation')
     p.add_argument('--gpu-stage-mode',choices=('bypass','access','clock','kernels','waits','operators','all','dispatch_access','dispatch_clock','dispatch'),default='all')
     p.add_argument('--gpu-stage-build',action='store_true')
     p.add_argument('--micro-repeat',type=int,choices=(1,2,3),default=1)
@@ -154,6 +158,7 @@ def parser():
     if args.dispatch_focus and (args.mode!='normal' or not args.api_only or args.stage_profile or args.timeline or args.capture_layout or args.dispatch_trial or args.normal_completion!='all' or args.normal_write_order!='default' or args.ll_write_order!='default'):p.error('dispatch focus requires Normal API-only default ordering/completion=all without CPU/timeline/layout/trial')
     if args.dispatch_focus and args.gpu_stages and args.gpu_stage_mode not in ('bypass','dispatch_access','dispatch_clock','dispatch'):p.error('invalid Dispatch focus GPU mode')
     if args.dispatch_compiled_off and (not args.dispatch_focus or args.gpu_stages or args.gpu_stage_build or args.action not in ('check','run')):p.error('compiled-off requires Dispatch focus check/run without GPU capture/build switches')
+    if args.gpu_stage_roles_only and not ((args.action=='build' and args.gpu_stage_build) or args.dispatch_compiled_off):p.error('roles-only currently requires trace build or compiled-off; active capture is gated on the disabled-cost result')
     if args.gpu_stage_mode.startswith('dispatch') and not args.dispatch_focus:p.error('Dispatch GPU modes require --dispatch-focus')
     if args.gpu_stages and not args.dispatch_focus and (not args.timeline or not args.capture_layout):p.error('--gpu-stages requires --timeline --capture-layout')
     if args.micro_suite=='notify' and args.micro_threads!=4:p.error('notification micro requires four threads')
@@ -211,6 +216,7 @@ def preflight(args):
     if getattr(args,'dispatch_compiled_off',False):
         if metadata.get('gpu_stage_version')!=2 or manifest['flags'].get('UCCL_GPU_STAGE_TRACE')!='1':raise RuntimeError('COMPILED_OFF_REQUIRES_TRACE_BUILD_V2')
     elif not getattr(args,'gpu_stages',False) and metadata.get('gpu_stage_version',0):raise RuntimeError('CPU_OR_BASELINE_REQUIRES_GPU_TRACE_OFF_BUILD')
+    if manifest.get('flags',{}).get('UCCL_GPU_STAGE_ROLES_ONLY','0')!=str(int(getattr(args,'gpu_stage_roles_only',False))):raise RuntimeError('GPU_STAGE_ROLE_BUILD_MISMATCH')
     return module,manifest,dict(libraries=libraries,hardware=hardware,import_log=probe.stdout+probe.stderr,runtime=metadata)
 
 def collect(args):
@@ -277,7 +283,7 @@ def main():
         phase_suite=args.phase_suite,stage_profile=args.stage_profile,save_traces=args.save_traces,
         warmups=args.warmups,samples=args.samples,ll_hook_workload=args.ll_hook_workload,
         api_only=args.api_only,ll_write_order=args.ll_write_order,normal_write_order=args.normal_write_order,normal_completion=args.normal_completion,capture_layout=args.capture_layout,
-        dispatch_trial=args.dispatch_trial,dispatch_delay_us=args.dispatch_delay_us,delay_node=1,timeline=getattr(args,'timeline',False),gpu_stages=getattr(args,'gpu_stages',False),gpu_stage_mode=args.gpu_stage_mode,device=args.urma_device,gpu=args.gpu,dispatch_focus=args.dispatch_focus,dispatch_compiled_off=args.dispatch_compiled_off)
+        dispatch_trial=args.dispatch_trial,dispatch_delay_us=args.dispatch_delay_us,delay_node=1,timeline=getattr(args,'timeline',False),gpu_stages=getattr(args,'gpu_stages',False),gpu_stage_mode=args.gpu_stage_mode,device=args.urma_device,gpu=args.gpu,dispatch_focus=args.dispatch_focus,dispatch_compiled_off=args.dispatch_compiled_off,gpu_stage_roles_only=args.gpu_stage_roles_only)
     try:
         module,manifest,info=preflight(args)
         fingerprint.update(build_hash=support.digest({key:manifest[key] for key in ('sources','sdk','flags')}),libraries=info['libraries'],runtime_libraries=info['runtime'].get('selected_runtime_hashes',{}),torch=info['runtime']['torch'])

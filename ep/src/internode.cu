@@ -11,7 +11,7 @@
 
 // GPU_STAGE_V2_LAUNCH_GUARD_BEGIN
 #include "gpu_stage_trace_host.hpp"
-#ifdef UCCL_GPU_STAGE_TRACE
+#if defined(UCCL_GPU_STAGE_TRACE) && !defined(UCCL_GPU_STAGE_ROLES_ONLY)
 #undef LAUNCH_KERNEL
 #define LAUNCH_KERNEL(config, kernel, ...) do { \
   auto* stage_cfg=(config); \
@@ -146,7 +146,7 @@ __global__ void notify_dispatch(
     void* rdma_buffer_ptr, void** buffer_ptrs, int** barrier_signal_ptrs,
     int rank, uint64_t const* d2h_channel_addrs, int num_d2h_channel_addrs,
     void* atomic_buffer_ptr) {
-  uccl::gpu_stages::Span gpu_kernel_stage(d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),45);
+  UCCL_GPU_STAGE_DETAIL(gpu_kernel_stage,d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),45);
   void* original_rdma_buffer_ptr = rdma_buffer_ptr;
   auto sm_id = static_cast<int>(blockIdx.x);
   auto thread_id = static_cast<int>(threadIdx.x),
@@ -322,7 +322,7 @@ __global__ void notify_dispatch(
       // know why. num_worst_tokens = 0, but somehow wrapping it with the
       // conditional will cause deadlock. Removing the ``if" is logically
       // redundant but harmless. if (num_worst_tokens == 0) {
-      { uccl::gpu_stages::Span gpu_stage_0(d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),0);
+      { UCCL_GPU_STAGE_DETAIL(gpu_stage_0,d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),0);
 while (ld_volatile_global(moe_recv_rdma_counter_mapped) != -1)
         ;
 }
@@ -356,7 +356,7 @@ while (ld_volatile_global(moe_recv_rdma_counter_mapped) != -1)
         recv_gbl_rank_prefix_sum[i] = sum;
       }
       // if (num_worst_tokens == 0) {
-      { uccl::gpu_stages::Span gpu_stage_1(d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),1);
+      { UCCL_GPU_STAGE_DETAIL(gpu_stage_1,d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),1);
 while (ld_volatile_global(moe_recv_counter_mapped) != -1)
         ;
 }
@@ -370,7 +370,7 @@ while (ld_volatile_global(moe_recv_counter_mapped) != -1)
         sum += nvl_recv_num_tokens_per_expert.buffer(i)[thread_id];
       sum = (sum + expert_alignment - 1) / expert_alignment * expert_alignment;
       // if (num_worst_tokens == 0) {
-      { uccl::gpu_stages::Span gpu_stage_2(d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),2);
+      { UCCL_GPU_STAGE_DETAIL(gpu_stage_2,d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),2);
 while (ld_volatile_global(moe_recv_expert_counter_mapped + thread_id) !=
              -1)
         ;
@@ -571,7 +571,7 @@ __global__ void __launch_bounds__(
              int num_max_nvl_chunked_recv_tokens, int rank, int num_ranks,
              uint64_t const* d2h_channel_addrs, int num_d2h_channel_addrs,
              void* atomic_buffer_ptr) {
-  uccl::gpu_stages::DispatchScope dispatch_operator_scope(d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs));
+  UCCL_GPU_STAGE_DISPATCH_SCOPE(dispatch_operator_scope,d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs));
   uccl::gpu_stages::Span gpu_kernel_stage(d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),46);
   enum class WarpRole {
     kRDMASender,
@@ -827,7 +827,7 @@ __global__ void __launch_bounds__(
       }
 
       // Acquire sequential lock
-      { uccl::gpu_stages::Span gpu_stage_3(d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),3);
+      { UCCL_GPU_STAGE_DETAIL(gpu_stage_3,d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),3);
 while (lane_id == 0 and rdma_send_next_token_idx != token_idx)
         ;
 }
@@ -839,7 +839,7 @@ while (lane_id == 0 and rdma_send_next_token_idx != token_idx)
       if (is_token_in_rank_uint64 != 0) {
         rdma_tail_idx = rdma_send_channel_next_tail[lane_id]++;
         // Wait the remote buffer to be released
-        { uccl::gpu_stages::Span gpu_stage_4(d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),4);
+        { UCCL_GPU_STAGE_DETAIL(gpu_stage_4,d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),4);
 while (rdma_tail_idx - cached_rdma_channel_head >=
                num_max_rdma_chunked_recv_tokens) {
           cached_rdma_channel_head =
@@ -891,7 +891,7 @@ while (rdma_tail_idx - cached_rdma_channel_head >=
 
       // Wait the remote buffer to be released
       auto start_time = clock64();
-      { uccl::gpu_stages::Span gpu_stage_5(d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),5);
+      { UCCL_GPU_STAGE_DETAIL(gpu_stage_5,d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),5);
 while (is_token_in_rank_uint64 != 0 and
              rdma_tail_idx - cached_rdma_channel_head >=
                  num_max_rdma_chunked_recv_tokens) {
@@ -916,7 +916,7 @@ while (is_token_in_rank_uint64 != 0 and
 #endif
       __syncwarp();
 
-      uccl::gpu_stages::Span dispatch_sender_pack(d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),50);
+      UCCL_GPU_STAGE_DETAIL(dispatch_sender_pack,d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),50);
       // Store RDMA head for combine
       if (lane_id < kNumRDMARanks and not kCachedMode)
         send_rdma_head[token_idx * kNumRDMARanks + lane_id] = rdma_tail_idx;
@@ -1013,7 +1013,7 @@ while (is_token_in_rank_uint64 != 0 and
         auto latest_tail = rdma_send_channel_tail[lane_id];
         auto offset = rdma_tail_idx - latest_tail;
         auto window_spin_start = clock64();
-        { uccl::gpu_stages::Span gpu_stage_6(d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),6);
+        { UCCL_GPU_STAGE_DETAIL(gpu_stage_6,d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),6);
 while (offset >= WARP_SIZE) {
           release_lock(rdma_send_channel_lock + lane_id);
           __nanosleep(
@@ -1055,7 +1055,7 @@ while (offset >= WARP_SIZE) {
     defined(__MC_PLATFORM_MXCC__) || defined(__MCC__) || defined(__MXCC__)
     // Epilogue
     // Acquire sequential lock
-    { uccl::gpu_stages::Span gpu_stage_7(d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),7);
+    { UCCL_GPU_STAGE_DETAIL(gpu_stage_7,d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),7);
 while (lane_id == 0 and rdma_send_next_token_idx != token_idx)
       ;
 }
@@ -1104,7 +1104,7 @@ while (lane_id == 0 and rdma_send_next_token_idx != token_idx)
     // Iterate all RDMA ranks
     int last_issued_tail = 0;
     auto start_time = clock64();
-    { uccl::gpu_stages::Span gpu_stage_8(d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),8);
+    { UCCL_GPU_STAGE_DETAIL(gpu_stage_8,d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),8);
 while (__any_sync(WARP_MASK, num_tokens_to_send > 0)) {
       // Timeout check with sender progress for diagnostics
       if (clock64() - start_time > NUM_TIMEOUT_CYCLES and
@@ -1142,7 +1142,7 @@ while (__any_sync(WARP_MASK, num_tokens_to_send > 0)) {
             num_tokens_processed < num_max_rdma_chunked_send_tokens)
           continue;
 
-        uccl::gpu_stages::Span dispatch_issue_chunk(d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),59);
+        UCCL_GPU_STAGE_DETAIL(dispatch_issue_chunk,d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),59);
         // Issue RDMA send
         auto num_tokens_to_issue =
             min(num_tokens_processed, num_max_rdma_chunked_send_tokens);
@@ -1223,7 +1223,7 @@ while (__any_sync(WARP_MASK, num_tokens_to_send > 0)) {
     EP_DEVICE_ASSERT(kNumRDMARanks <= WARP_SIZE);
     auto start_time = clock64();
     if (lane_id < kNumRDMARanks) {
-      { uccl::gpu_stages::Span gpu_stage_9(d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),9);
+      { UCCL_GPU_STAGE_DETAIL(gpu_stage_9,d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),9);
 while (true) {
         auto meta_0 = ld_volatile_global(
             rdma_channel_meta.recv_buffer(lane_id) + dst_nvl_rank);
@@ -1286,7 +1286,7 @@ while (true) {
     int cached_rdma_channel_head = 0, cached_rdma_channel_tail = 0;
     int cached_nvl_channel_head = 0, cached_nvl_channel_tail = 0,
         rdma_nvl_token_idx = 0;
-    { uccl::gpu_stages::Span gpu_stage_10(d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),10);
+    { UCCL_GPU_STAGE_DETAIL(gpu_stage_10,d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),10);
 while (__any_sync(WARP_MASK, num_tokens_to_recv_from_rdma > 0)) {
       // Non-blocking NVL check: flush tail and refresh head if full
       {
@@ -1308,7 +1308,7 @@ while (__any_sync(WARP_MASK, num_tokens_to_recv_from_rdma > 0)) {
 
       // Find next source RDMA rank (round-robin)
       start_time = clock64();
-      { uccl::gpu_stages::Span gpu_stage_11(d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),11);
+      { UCCL_GPU_STAGE_DETAIL(gpu_stage_11,d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),11);
 while (true) {
         src_rdma_rank = (src_rdma_rank + 1) % kNumRDMARanks;
         if (__shfl_sync(WARP_MASK, num_tokens_to_recv_from_rdma,
@@ -1364,7 +1364,7 @@ while (true) {
             seen_bits = raw & 0xFF;
           } else {
             auto spin_start = clock64();
-            { uccl::gpu_stages::Span gpu_stage_12(d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),12);
+            { UCCL_GPU_STAGE_DETAIL(gpu_stage_12,d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),12);
 while (true) {
               __nanosleep(100);
               raw = ld_volatile_global(ptr);
@@ -1398,7 +1398,7 @@ while (true) {
         // Per-token NVL slot wait: block until at least 1 slot free
         {
           auto nvl_wait_start = clock64();
-          { uccl::gpu_stages::Span gpu_stage_13(d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),13);
+          { UCCL_GPU_STAGE_DETAIL(gpu_stage_13,d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),13);
 while (true) {
             int nvl_used = cached_nvl_channel_tail - cached_nvl_channel_head;
             if (nvl_used < num_max_nvl_chunked_recv_tokens) break;
@@ -1426,7 +1426,7 @@ while (true) {
 }
         }
 
-        uccl::gpu_stages::Span dispatch_forward_copy(d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),51);
+        UCCL_GPU_STAGE_DETAIL(dispatch_forward_copy,d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),51);
         // Get an empty slot
         int dst_slot_idx =
             (cached_nvl_channel_tail++) % num_max_nvl_chunked_recv_tokens;
@@ -1503,7 +1503,7 @@ while (true) {
 
     int last_head = 0, target_rdma = lane_id < kNumRDMARanks ? lane_id : 0;
     auto coordinator_stall_start = clock64();
-    { uccl::gpu_stages::Span gpu_stage_14(d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),14);
+    { UCCL_GPU_STAGE_DETAIL(gpu_stage_14,d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),14);
 while (true) {
       // Find minimum head
       int min_head = std::numeric_limits<int>::max();
@@ -1521,7 +1521,7 @@ while (true) {
            clock64() - coordinator_stall_start > NUM_TIMEOUT_CYCLES / 100000);
       if (min_head != std::numeric_limits<int>::max() && should_advance &&
           lane_id < kNumRDMARanks) {
-        uccl::gpu_stages::Span dispatch_feedback_issue(d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),60);
+        UCCL_GPU_STAGE_DETAIL(dispatch_feedback_issue,d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),60);
         uccl::nvshmemi_ibgda_amo_nonfetch_add</*use_normal_mode=*/true>(
             reinterpret_cast<uint64_t>(rdma_channel_head.buffer(rdma_rank)),
             reinterpret_cast<uint64_t>(original_atomic_buffer_ptr),
@@ -1556,7 +1556,7 @@ while (true) {
     // Receive channel offsets
     int start_offset = 0, end_offset = 0, num_tokens_to_recv;
     auto start_time = clock64();
-    { uccl::gpu_stages::Span gpu_stage_15(d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),15);
+    { UCCL_GPU_STAGE_DETAIL(gpu_stage_15,d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),15);
 while (lane_id < kNumRDMARanks) {
       start_offset =
           ld_volatile_global(nvl_channel_prefix_start.buffer() + lane_id);
@@ -1591,11 +1591,11 @@ while (lane_id < kNumRDMARanks) {
 
     int cached_channel_head_idx = 0, cached_channel_tail_idx = 0;
     long long last_recv_token_idx = -1;
-    { uccl::gpu_stages::Span gpu_stage_16(d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),16);
+    { UCCL_GPU_STAGE_DETAIL(gpu_stage_16,d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),16);
 while (num_tokens_to_recv > 0) {
       // Check channel status by lane 0
       start_time = clock64();
-      { uccl::gpu_stages::Span gpu_stage_17(d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),17);
+      { UCCL_GPU_STAGE_DETAIL(gpu_stage_17,d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),17);
 while (true) {
         // Ready to copy
         if (cached_channel_head_idx != cached_channel_tail_idx) break;
@@ -1625,7 +1625,7 @@ while (true) {
       int num_recv_tokens = cached_channel_tail_idx - cached_channel_head_idx;
       for (int chunk_idx = 0; chunk_idx < num_recv_tokens;
            ++chunk_idx, --num_tokens_to_recv) {
-        uccl::gpu_stages::Span dispatch_output_copy(d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),52);
+        UCCL_GPU_STAGE_DETAIL(dispatch_output_copy,d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),52);
         int token_idx_in_buffer =
             (cached_channel_head_idx++) % num_max_nvl_chunked_recv_tokens;
         auto shifted =
@@ -1831,7 +1831,7 @@ __global__ void cached_notify(
     int** barrier_signal_ptrs, int rank, int num_ranks, bool is_cached_dispatch,
     uint64_t const* d2h_channel_addrs, int num_d2h_channel_addrs,
     void* atomic_buffer_ptr) {
-  uccl::gpu_stages::Span gpu_kernel_stage(d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),47);
+  UCCL_GPU_STAGE_DETAIL(gpu_kernel_stage,d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),47);
   auto sm_id = static_cast<int>(blockIdx.x);
   auto thread_id = static_cast<int>(threadIdx.x);
   auto num_threads = static_cast<int>(blockDim.x);
@@ -2337,7 +2337,7 @@ __global__ void __launch_bounds__((kNumForwarders + 1) * WARP_SIZE, 1)
             int num_max_nvl_chunked_recv_tokens, int rank, int num_ranks,
             uint64_t const* d2h_channel_addrs, int num_d2h_channel_addrs,
             void* atomic_buffer_ptr) {
-  uccl::gpu_stages::Span gpu_kernel_stage(d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),48);
+  UCCL_GPU_STAGE_DETAIL(gpu_kernel_stage,d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),48);
   enum class WarpRole {
     kNVLSender,
     kNVLAndRDMAForwarder,
@@ -2472,7 +2472,7 @@ __global__ void __launch_bounds__((kNumForwarders + 1) * WARP_SIZE, 1)
 
     // Iterate over all tokens and send by chunks
     int current_rdma_idx = channel_id % kNumRDMARanks;
-    { uccl::gpu_stages::Span gpu_stage_18(d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),18);
+    { UCCL_GPU_STAGE_DETAIL(gpu_stage_18,d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),18);
 while (true) {
       // Exit if possible
       if (__all_sync(WARP_MASK, token_start_idx >= token_end_idx)) break;
@@ -2480,7 +2480,7 @@ while (true) {
       // Decide the next RDMA buffer to send
       bool is_lane_ready = false;
       auto start_time = clock64();
-      { uccl::gpu_stages::Span gpu_stage_19(d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),19);
+      { UCCL_GPU_STAGE_DETAIL(gpu_stage_19,d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),19);
 while (true) {
         int num_used_slots = cached_channel_tail_idx - cached_channel_head_idx;
         is_lane_ready =
@@ -2780,7 +2780,7 @@ while (true) {
         auto num_chunked_tokens = token_end_idx - token_start_idx;
         auto start_time = clock64();
         unsigned long long rdma_wait_start = clock64();
-        { uccl::gpu_stages::Span gpu_stage_20(d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),20);
+        { UCCL_GPU_STAGE_DETAIL(gpu_stage_20,d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),20);
 while (sub_warp_id == 0 and lane_id == 0) {
           // Inequality: `num_max_rdma_chunked_recv_tokens - (tail - head) >=
           // num_chunked_tokens` Here, `token_start_idx` is the actual tail
@@ -2831,7 +2831,7 @@ while (sub_warp_id == 0 and lane_id == 0) {
 #endif
           // Wait lanes to be ready
           start_time = clock64();
-          { uccl::gpu_stages::Span gpu_stage_21(d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),21);
+          { UCCL_GPU_STAGE_DETAIL(gpu_stage_21,d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),21);
 while (cached_nvl_channel_tail_idx <= expected_head) {
             cached_nvl_channel_tail_idx =
                 ld_acquire_sys_global<kUseAggressiveAtomic>(
@@ -3032,7 +3032,7 @@ while (cached_nvl_channel_tail_idx <= expected_head) {
 
         // Wait lanes to be ready
         auto start_time = clock64();
-        { uccl::gpu_stages::Span gpu_stage_22(d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),22);
+        { UCCL_GPU_STAGE_DETAIL(gpu_stage_22,d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),22);
 while (cached_channel_tail_idx <= expected_head) {
           cached_channel_tail_idx =
               static_cast<int>(ld_acquire_sys_global<kUseAggressiveAtomic>(
@@ -3096,7 +3096,7 @@ while (cached_channel_tail_idx <= expected_head) {
       int dst_nvl_rank = lane_id < NUM_MAX_NVL_PEERS ? lane_id : 0;
       EP_STATIC_ASSERT(kNumCombineForwarderWarps <= WARP_SIZE,
                        "Invalid number of forwarder warps");
-      { uccl::gpu_stages::Span gpu_stage_23(d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),23);
+      { UCCL_GPU_STAGE_DETAIL(gpu_stage_23,d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),23);
 while (true) {
         // Retired
         if (not is_forwarder_sm and

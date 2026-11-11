@@ -15,7 +15,9 @@ BUILD_FLAGS = dict(USE_METAX='1', USE_URMA='0', USE_URMA_METAX='0', USE_LIBFABRI
                    USE_DMABUF='1', MAX_NUM_GPUS='1', NUM_MAX_NVL_PEERS='1', PER_EXPERT_BATCHING='0')
 
 def build_flags(args):
-    return dict(BUILD_FLAGS, UCCL_GPU_STAGE_TRACE=str(int(bool(getattr(args,'gpu_stage_build',False) or getattr(args,'gpu_stages',False) or getattr(args,'dispatch_compiled_off',False)))))
+    flags=dict(BUILD_FLAGS, UCCL_GPU_STAGE_TRACE=str(int(bool(getattr(args,'gpu_stage_build',False) or getattr(args,'gpu_stages',False) or getattr(args,'dispatch_compiled_off',False)))))
+    if getattr(args,'gpu_stage_roles_only',False):flags['UCCL_GPU_STAGE_ROLES_ONLY']='1'
+    return flags
 
 
 def parser():
@@ -29,6 +31,7 @@ def parser():
     p.add_argument('--gpu-stages',action='store_true')
     p.add_argument('--dispatch-focus',action='store_true')
     p.add_argument('--dispatch-compiled-off',action='store_true',help='Dispatch trace build with capture completely disabled; same API timing boundary as baseline')
+    p.add_argument('--gpu-stage-roles-only',action='store_true',help='sparse compile-time role probes; currently only build or compiled-off validation')
     p.add_argument('--gpu-stage-mode',choices=('bypass','access','clock','kernels','waits','operators','all','dispatch_access','dispatch_clock','dispatch'),default='all')
     p.add_argument('--gpu-stage-build',action='store_true')
     p.add_argument('--notify-check',action='store_true')
@@ -81,6 +84,7 @@ def parser():
     if args.dispatch_focus and (args.variant!='current' or args.mode!='normal' or not args.no_profile or args.repeats!=1 or args.cpu_diagnostics or args.timeline or args.stage_suite):p.error('dispatch focus requires current Normal no-profile repeats=1, without CPU/timeline/stage-suite')
     if args.dispatch_focus and args.gpu_stages and args.gpu_stage_mode not in ('bypass','dispatch_access','dispatch_clock','dispatch'):p.error('invalid Dispatch focus GPU mode')
     if args.dispatch_compiled_off and (not args.dispatch_focus or args.gpu_stages or args.gpu_stage_build or args.action not in ('check','run')):p.error('compiled-off requires Dispatch focus check/run without GPU capture/build switches')
+    if args.gpu_stage_roles_only and not ((args.action=='build' and args.gpu_stage_build) or args.dispatch_compiled_off):p.error('roles-only currently requires trace build or compiled-off; active capture is gated on the disabled-cost result')
     if args.gpu_stage_mode.startswith('dispatch') and not args.dispatch_focus:p.error('Dispatch GPU modes require --dispatch-focus')
     if args.gpu_stages and not args.dispatch_focus and (not args.stage_suite or not args.timeline):p.error('--gpu-stages requires --stage-suite --timeline --cpu-diagnostics')
     if args.gpu_stage_build and args.action!='build':p.error('--gpu-stage-build is only for build; use --gpu-stages for checks/runs')
@@ -351,6 +355,7 @@ def run(args):
         meta.update(normal_tokens=getattr(args,'normal_tokens',4096),stage_suite=getattr(args,'stage_suite',False),gpu_stages=getattr(args,'gpu_stages',False),gpu_stage_mode=getattr(args,'gpu_stage_mode','all'))
         meta['dispatch_focus']=getattr(args,'dispatch_focus',False)
         meta['dispatch_compiled_off']=getattr(args,'dispatch_compiled_off',False)
+        meta['gpu_stage_roles_only']=getattr(args,'gpu_stage_roles_only',False)
     except Exception as exc:
         error = str(exc)
     (root / 'setup.json').write_text(json.dumps(dict(fingerprint=meta, error=error), indent=2))

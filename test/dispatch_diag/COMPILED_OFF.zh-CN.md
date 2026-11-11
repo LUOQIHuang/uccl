@@ -1,5 +1,7 @@
 # 下一轮：4096-token Dispatch 打桩关闭对照
 
+**本轮已完成，结果见 [分析报告](results/urma_dispatch_disabled_01_summary/ANALYSIS.zh-CN.md)。完整打桩构建关闭采集仍有大幅回退；现在请按 [ROLES_ONLY.zh-CN.md](ROLES_ONLY.zh-CN.md) 验证新的编译期精简版，以下原步骤留作记录。**
+
 ## 本轮目的及范围
 
 上一轮正确性和覆盖通过，但详细打桩使 FP8 Dispatch 从约5.75 ms变为14.95 ms，BF16从7.97 ms变为16.22 ms，不能用这些内部时间解释原始性能差额。本轮只判断：**打桩构建在完全不启动采集时，是否仍改变性能。**

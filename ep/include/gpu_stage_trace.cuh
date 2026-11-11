@@ -1,6 +1,11 @@
 #pragma once
 #include <cstdint>
 namespace uccl { namespace gpu_stages {
+#ifdef UCCL_GPU_STAGE_ROLES_ONLY
+#define UCCL_STAGE_INLINE __forceinline__
+#else
+#define UCCL_STAGE_INLINE inline
+#endif
 constexpr unsigned kStages=64, kBlocks=128, kWarps=32;
 struct Metric {unsigned long long calls=0,cycles=0,max_cycles=0;};
 // A slot has exactly one writer: (CTA, warp, sampled lane). Normal kernels
@@ -16,7 +21,7 @@ struct Control {State* state=nullptr;uint64_t mask=0;unsigned mode=0;bool dispat
 #if defined(UCCL_GPU_STAGE_TRACE) && (defined(__CUDACC__) || defined(__HIPCC__))
 extern __device__ __constant__ Control control;
 #endif
-__device__ inline State* active_state(){
+__device__ UCCL_STAGE_INLINE State* active_state(){
 #if defined(UCCL_GPU_STAGE_TRACE) && (defined(__CUDA_ARCH__) || defined(__HIP_DEVICE_COMPILE__))
   return control.state;
 #else
@@ -25,7 +30,7 @@ __device__ inline State* active_state(){
 }
 struct Span {
   Metric* metric=nullptr;unsigned mode=0;unsigned long long begin=0;
-  __device__ Span(State* s,unsigned id) {
+  __device__ UCCL_STAGE_INLINE Span(State* s,unsigned id) {
 #if defined(UCCL_GPU_STAGE_TRACE) && (defined(__CUDA_ARCH__) || defined(__HIP_DEVICE_COMPILE__))
 #ifdef WARP_SIZE
     unsigned width=WARP_SIZE;
@@ -42,7 +47,7 @@ struct Span {
     (void)s;(void)id;
 #endif
   }
-  __device__ inline void finish(){
+  __device__ UCCL_STAGE_INLINE void finish(){
 #if defined(UCCL_GPU_STAGE_TRACE) && (defined(__CUDA_ARCH__) || defined(__HIP_DEVICE_COMPILE__))
     if(metric){
       // Private slot, no GPU atomics and no mapped-host-memory access.
@@ -53,7 +58,7 @@ struct Span {
     }
 #endif
   }
-  __device__ ~Span(){finish();}
+  __device__ UCCL_STAGE_INLINE ~Span(){finish();}
 };
 struct DispatchScope {
   unsigned char* flag=nullptr;
@@ -79,3 +84,13 @@ struct DispatchScope {
 };
 #endif
 } }
+
+// The sparse build removes detailed probes before compiling, including their
+// state argument evaluation. A runtime mask cannot remove their code footprint.
+#ifdef UCCL_GPU_STAGE_ROLES_ONLY
+#define UCCL_GPU_STAGE_DETAIL(...) ((void)0)
+#define UCCL_GPU_STAGE_DISPATCH_SCOPE(...) ((void)0)
+#else
+#define UCCL_GPU_STAGE_DETAIL(name, ...) uccl::gpu_stages::Span name(__VA_ARGS__)
+#define UCCL_GPU_STAGE_DISPATCH_SCOPE(name, ...) uccl::gpu_stages::DispatchScope name(__VA_ARGS__)
+#endif

@@ -1,6 +1,6 @@
 # Dispatch主kernel：URMA / RDMA同测点诊断
 
-**当前下一轮请使用 [COMPILED_OFF.zh-CN.md](COMPILED_OFF.zh-CN.md)。4096-token详细打桩已发现约2～2.6倍的Dispatch扰动，暂不重复本文第5节的全量trace，也不安排verbs同套trace。新增关闭采集对照复用原来的两份模块，先确认编入打桩代码的代价。以下保留原实验说明及结果格式。**
+**当前下一轮请使用 [ROLES_ONLY.zh-CN.md](ROLES_ONLY.zh-CN.md)。完整打桩构建已证实关闭采集后仍使FP8 Dispatch慢约92.7%、BF16慢约56.0%。新版本在编译期删除高频详细测点，先验证精简版的关闭代价。暂不重跑本文第5节全量trace，也不安排verbs同套trace。以下保留原实验说明及结果格式。**
 
 目标是把已知的Dispatch差额缩小到具体工作或等待范围：发送打包、命令入队、远端空间、接收通知、数据新鲜度、本地转发和消费反馈。两后端复用同一份internode.cu测点；不是再次确认Dispatch总耗时更长。本轮不修改CPU完成轮询实现、不切换强弱序、不运行LL，也不重复WRITE带宽扫描。
 

@@ -40,6 +40,8 @@ class DispatchTests(unittest.TestCase):
             argv+=['--phase-suite','--api-only'] if backend=='urma' else ['--variant','current','--no-profile','--repeats','1']
             with patch.object(sys,'argv',argv):args=ns['parser']()
             self.assertFalse(args.gpu_stages)
+            with patch.object(sys,'argv',argv+['--gpu-stage-roles-only']):
+                self.assertTrue(ns['parser']().gpu_stage_roles_only)
             for extra in (['--gpu-stages'],['--action','build']):
                 with patch.object(sys,'argv',argv+extra),patch('sys.stderr',io.StringIO()),self.assertRaises(SystemExit):ns['parser']()
             metadata=dict(gpu_stage_version=2,dispatch_trace_version=1,phase_diagnostics=True,loaded_libraries=[])
@@ -51,6 +53,10 @@ class DispatchTests(unittest.TestCase):
                 ns['support']=NS(read_build=lambda p:(Path('ep.so'),manifest))
                 ns['urma_support']=NS(library_manifest=lambda p:{},hardware_check=lambda a:{})
                 ns['preflight'](args)
+                manifest['flags']['UCCL_GPU_STAGE_ROLES_ONLY']='1'
+                with self.assertRaisesRegex(RuntimeError,'ROLE_BUILD_MISMATCH'):ns['preflight'](args)
+                args.gpu_stage_roles_only=True;ns['preflight'](args)
+                args.gpu_stage_roles_only=False;manifest['flags'].pop('UCCL_GPU_STAGE_ROLES_ONLY')
                 args.dispatch_compiled_off=False
                 with self.assertRaisesRegex(RuntimeError,'TRACE_OFF_BUILD'):ns['preflight'](args)
                 args.dispatch_compiled_off=True
@@ -162,7 +168,21 @@ class DispatchTests(unittest.TestCase):
                 data=summarize_off(b,t,p,root/backend/'summary_off')
                 self.assertEqual(len(data),10);self.assertTrue(all(r['verdict']=='compiled_build_slower' for r in data))
                 self.assertTrue(all(r['compiled_off_change_pct']==100 for r in data))
+                for rank in (0,1):
+                    node=t/f'node{rank}'
+                    c=json.loads((node/'setup.json').read_text());c['fingerprint']['gpu_stage_roles_only']=True;dump(node/'setup.json',c)
+                    manifest=node/('build_manifest.json' if backend=='urma' else 'module_manifest.json')
+                    d=json.loads(manifest.read_text());d['flags']['UCCL_GPU_STAGE_ROLES_ONLY']='1';dump(manifest,d)
+                self.assertEqual(len(summarize_off(b,t,p,root/backend/'summary_roles')),10)
                 lines(case/'gpu_stages.jsonl',windows(50,'bypass'))
                 with self.assertRaisesRegex(ValueError,'instrumented'):summarize_off(b,t,p,root/'bad')
+
+    def test_sparse_build_keeps_only_six_once_per_thread_scopes(self):
+        s=(REPO/'ep/src/internode.cu').read_text()
+        ids={int(x) for x in __import__('re').findall(r'uccl::gpu_stages::Span \w+\([^;]+,(\d+)\);',s)}
+        self.assertEqual(ids,{46,53,54,55,56,57})
+        for name in ('uccl_ibgda.cuh','d2h_queue_device.cuh','ring_buffer.cuh'):
+            self.assertNotIn('gpu_stages::Span ',(REPO/'ep/include'/name).read_text())
+        self.assertIn('!defined(UCCL_GPU_STAGE_ROLES_ONLY)',s)
 
 if __name__=='__main__':unittest.main()

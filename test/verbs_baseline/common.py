@@ -57,7 +57,7 @@ def diagnostics():
     paths += [HERE.parent/'urma_mode_parity'/n for n in ('split_support.py','micro_support.py','timeline_support.py','gpu_stage_sites.json')]
     paths += [REPO/'ep/tests/verbs_diag_test.cpp',REPO/'ep/tests/verbs_notify_test.cpp',REPO/'ep/tests/urma_support/ep_shim.hpp']
     paths += list((HERE.parent/'dispatch_diag').glob('*.py')) + list((HERE.parent/'dispatch_diag').glob('*.sh')) + [HERE.parent/'dispatch_diag/dispatch_sites.json']
-    paths += [REPO/'ep/tests/gpu_stage_trace_test.cpp',REPO/'ep/tests/fifo_stage_test.cpp',REPO/'ep/tests/gpu_stage_runtime_test.cpp',REPO/'ep/tests/gpu_stage_runtime_support/cuda_runtime.h']
+    paths += [REPO/'ep/tests/gpu_stage_trace_test.cpp',REPO/'ep/tests/gpu_stage_roles_test.cpp',REPO/'ep/tests/fifo_stage_test.cpp',REPO/'ep/tests/gpu_stage_runtime_test.cpp',REPO/'ep/tests/gpu_stage_runtime_support/cuda_runtime.h']
     return {p.relative_to(REPO).as_posix(): sha(p) for p in paths}
 
 

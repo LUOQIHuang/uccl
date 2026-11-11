@@ -34,7 +34,8 @@ __global__ void precision_compile_probe(float* out) {
     common=[str(compiler),'-std=c++17','-O3','-fPIC',*prefix,*precision_flags(),'-DUSE_METAX','-D__MC_PLATFORM_MXCC__','-DUSE_MACA','-DNV_ARCH_A100','-DDISABLE_SM90_FEATURES','--maca-path='+str(maca),'--gcc-install-dir='+str(gcc),'-Xdevice','-D__CUDA_ARCH__=800','-rdc=true','-I'+str(REPO/'ep/include')]
     commands=[common+['-c',str(source),'-o',str(output/'precision.o')]]
     for trace in ((False,True) if trace_build else (False,)):
-        commands.append(common+(['-DUCCL_GPU_STAGE_TRACE'] if trace else [])+['-c',str(REPO/'ep/src/gpu_stage_trace.cu'),'-o',str(output/('trace.o' if trace else 'base.o'))])
+        defines=(['-DUCCL_GPU_STAGE_TRACE'] if trace else [])+(['-DUCCL_GPU_STAGE_ROLES_ONLY'] if trace and os.environ.get('UCCL_GPU_STAGE_ROLES_ONLY')=='1' else [])
+        commands.append(common+defines+['-c',str(REPO/'ep/src/gpu_stage_trace.cu'),'-o',str(output/('trace.o' if trace else 'base.o'))])
     inputs=['ep/setup.py','ep/include/ep_configs.cuh','ep/include/gpu_stage_trace.cuh','ep/src/gpu_stage_trace.cu']
     (output/'request.json').write_text(json.dumps(dict(maca=str(maca),commands=commands,sources={p:hashlib.sha256((REPO/p).read_bytes()).hexdigest() for p in inputs}),indent=2))
     for index,command in enumerate(commands):
