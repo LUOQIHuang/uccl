@@ -1,16 +1,19 @@
 # URMA Normal：WRITE强序/弱序单变量对照
 
+当前参考事件实验实际为Normal WRITE=RELAX、FADD=STRONG、fence按原请求保留、completion=all；这轮还没有对应的Normal STRONG结果。先关闭采集比较两种策略，不重复整套GPU阶段验收。当前已构建的urma_base_v1具备排序开关，可直接复用，无需重编译。
+
 目的：直接判断真实Normal的Dispatch在WRITE使用STRONG或RELAX时，整体时延是否改变。不是比较Normal与LL，也不是把FADD改成弱序。FADD仍为STRONG，原请求fence保持，完成策略固定all；不改变GPU程序、FIFO、lane、批量提交策略、缓冲区、quiet/barrier。
 
 本轮仅在已支持URMA GPU路径的`6.6.0-gdr_f00955680_diag`内核及已协调好的设备环境运行。不在当前发行版内核上跳过检查运行，也不由脚本切内核、装驱动或修改PCI配置。
 
 ## 1. 测试内容与成功标准
 
-- 同一个新构建模块，通过运行时开关切换`--normal-write-order relax|strong`。默认生产行为仍是Normal WRITE弱序、LL WRITE强序。
+- 同一个已构建的普通模块，通过运行时开关切换`--normal-write-order relax|strong`。默认生产行为仍是Normal WRITE弱序、LL WRITE强序。
 - 三轮独立配对：r01弱→强，r02强→弱，r03弱→强，共6个双端进程任务。
 - 保留原有正确性检查及五个固定计时点：layout、FP8/BF16 Dispatch chunk32、Combine chunk12/16。重点比较两个Dispatch，其他点作为控制；不额外扫描参数。
 - tokens4096、hidden7168、experts256、topk8、SM24、NVL chunk4。每点预热50次、计时50次、丢弃首个，49个有效样本。
 - API-only，不启动Kineto、GPU打桩、CPU阶段统计、逐请求时间线或独立GPU observer微测。
+- 两种策略均采用原连续调用计时，不使用reference_events的逐样本同步。只回答排序对原Normal整体时延的影响，不与paced阶段窗口混为一种口径。
 - 两端所有任务必须正确性通过、运行时策略与请求一致；任何错误停止，不收集失败样本作为性能基线。
 
 强序可能因等待前序事务而增加耗时，也可能在特定实现/负载下改善执行节奏；本轮不预设哪种更快。即使性能改善，也只说明WRITE排序策略对真实程序有影响，不能独立证明具体哪个内部等待点是根因。
@@ -26,37 +29,33 @@ export URMA_DIAG_HOME=/home/h00918771
 export URMA_DIAG_PYTHON=/home/h00918771/metax_dev/venv-maca-py312/bin/python
 export URMA_DIAG_LIBRARY_DIR=/home/h00918771/metax_dev/urma_after_kernel_20261029/diag/umdk_private_618957c3/lib
 export URMA_DIAG_INCLUDE_DIR=/home/h00918771/metax_dev/urma_sdk_private_include
-export MACA_PATH=/opt/maca-3.7.0
+export MACA_PATH=/opt/maca-3.9.0
 # 沿用此前已通过检查的URMA_DIAG_EXTRA_LIBRARY_DIRS（若有）。
 RANK=0  # 204改为1
-JOB=urma_normal_order_01
-BUILD=/home/h00918771/metax_dev/urma_mode_parity_build/normal_order_v1
+JOB=urma_normal_order_current_01
+BUILD=/home/h00918771/metax_dev/reference_event_build/urma_base_v1
 ROOT=/home/h00918771/metax_dev/urma_normal_order_results/$JOB
 CONSOLE="$ROOT/${JOB}_console/node$RANK"
 PY="$URMA_DIAG_PYTHON"
 mkdir -p "$CONSOLE"
 test "$(uname -r)" = 6.6.0-gdr_f00955680_diag
 test -x "$PY"
-test -s "$URMA_DIAG_INCLUDE_DIR/urma_api.h"
 test -d "$URMA_DIAG_LIBRARY_DIR"
 mx-smi
 df -h / "$URMA_DIAG_HOME"
 ```
 
-上述SDK/库目录若与本机实际不同，修改为此前成功使用的真实目录，两端对应一致。MACA3.7为历史URMA通过的配方；如果服务器只能使用其他MACA版本，先固定两端实际可用版本、完成下方检查，不在A/B中混用版本，不把其结果直接并入历史3.7基线。本轮保存实际加载的MACA运行库哈希，不能只凭MACA_PATH声明判断。
+上述目录以本机真实路径为准，两端对应一致。保持刚刚成功的MACA3.9环境，不在A/B中切换，不并入历史3.7数据。记录实际加载运行库哈希，不能只凭MACA_PATH声明判断。复用模块时不重新使用SDK include编译，保留原manifest及运行库。
 
-## 3. 两端各构建一次；不需要双端同时开始
+## 3. 当前复用普通模块，不构建
 
-旧模块没有Normal顺序开关，需要一次新构建，两种策略共用这一个模块。使用新的BUILD目录；不修改旧manifest，不复用缺少能力的旧.so。下面设置单编译任务，不自动进行重试或完整重建。
+使用本轮已成功运行base/post的urma_base_v1，两种策略共用它。不要换成urma_events_v1，本入口要求reference_events_version=0；也不使用历史缺少开关的私有模块。
 
 ```bash
-bash test/urma_mode_parity/run.sh --action build \
-  --node-rank "$RANK" --job "${JOB}_build" --build-dir "$BUILD" \
-  --build-jobs 1 \
-  2>&1 | tee "$CONSOLE/build.log"
+test -s "$BUILD/manifest.json"
 ```
 
-先运行precision probe和CPU模拟检查，再进行扩展编译；成功标志`BUILD_PASSED`。同输入构建已完成时显示`BUILD_ALREADY_PASSED`。之前完整编译曾发生中断：若再次失败，停止并保留console、BUILD中的build.log、host_tests.log、build_request.json、precision_probe相关日志，不反复重编译。开发端未验证服务器GPU编译和真实私有SDK ABI。
+下一步check会验证模块SHA、源文件身份及两种运行时排序能力。若模块不满足条件，先保留错误，不修改manifest或跳过检查，也不自动重建。
 
 ## 4. 两端各自检查两种策略
 
@@ -97,9 +96,9 @@ bash test/urma_mode_parity/run.sh --action collect --collect-suite \
 
 - setup、preflight、build_manifest、host、runtime、冻结的normal.py/low_latency.py。
 - normal/下的bench.log、status.json、api_samples.jsonl、sample_summary.jsonl、metrics.jsonl、phases.jsonl、GPU/内核/端口快照、measurement_boundary.json。
-- console中的build.log、check_relax.log、check_strong.log和六个任务日志。
+- console中的check_relax.log、check_strong.log和六个任务日志。
 
-不需要.so、objects和cache。若构建失败还没有manifest，提供第3节列出的构建诊断文件即可，不为补结果反复运行。
+不需要.so、objects和cache。check失败也可用同一collect命令收集已有console，不为补结果反复运行。旧base/post/on/阶段数据不必重传。
 
 ## 7. 两端数据齐全后汇总
 
