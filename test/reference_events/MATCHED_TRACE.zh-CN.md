@@ -1,5 +1,7 @@
 # 只补一次on：与已完成的paced使用同一采样方式
 
+本项已完成，四个Dispatch测点变化均小于1%、usable=True，见[最新结果](results/MATCHED_TRACE_ANALYSIS.zh-CN.md)。不要重跑；下一步只在verbs窗口按[同口径文档](VERBS_MATCHED.zh-CN.md)执行。以下保留原运行记录。
+
 batch/paced已完成，参见[分析](results/CADENCE_CONTROL_ANALYSIS.zh-CN.md)。逐样本同步已在关闭采集时复现204 BF16下降约16%。现在只补一次当前脚本版本的on，以已有paced为控制，完成采集自身影响的匹配检查；不重复smoke、base/post/off或batch/paced。
 
 原on与新paced的诊断脚本版本不同，不能拿它们直接通过严格身份检查。本次仅增加tools/reference_events下的离线分析器与Markdown，不修改测量代码；这两个类型不在diagnostic_manifest的采集范围中。因此可与已有paced保持同一诊断脚本身份，GPU模块也不需重编译。分析器自身SHA会写入输出，原有来源/模块校验不放宽。

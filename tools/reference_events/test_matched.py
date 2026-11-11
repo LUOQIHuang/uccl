@@ -40,6 +40,19 @@ class MatchedTests(unittest.TestCase):
                         fixtures.dump(case/'status.json',status)
                 result=matched.summarize(root/'paced',root/'on',root/'summary')
                 self.assertEqual(len(result),10);self.assertTrue(all(r['representative'] for r in result))
+                import csv
+                with (root/'summary/cpu_stage_medians.csv').open() as stream:
+                    medians=list(csv.DictReader(stream))
+                self.assertEqual(len(medians),4)
+                self.assertTrue(all(int(r['requests'])==9 and int(r['windows'])==9 for r in medians))
+                self.assertTrue(all(abs(float(r['post_end_to_cqe_us'])-0.1)<1e-9 for r in medians))
+                raw=case/'event_trace.jsonl';original=raw.read_text()
+                windows=[json.loads(line) for line in original.splitlines()]
+                next(e for e in windows[1]['cpu']['events'] if e['stage']=='cqe')['ns']=150
+                fixtures.lines(raw,windows)
+                with self.assertRaisesRegex(ValueError,'non-monotonic complete CPU request'):
+                    matched.summarize(root/'paced',root/'on',root/'nonmonotonic')
+                raw.write_text(original)
                 host=root/'on/node1/host.json';data=json.loads(host.read_text());data['boot_id']='different';fixtures.dump(host,data)
                 with self.assertRaisesRegex(ValueError,'boot or module changed'):matched.summarize(root/'paced',root/'on',root/'invalid')
 
