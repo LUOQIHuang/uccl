@@ -1,0 +1,13 @@
+DIAG_ROOT=/home/h00918771
+DIAG_PYTHON=/home/h00918771/metax_dev/venv-maca-py312/bin/python
+CASE_BEGIN normal
+CASE_END normal rc=1 checks={'mode': True, 'done': False, 'exit_ack': False, 'no_errors': False, 'correctness': False, 'profiles': False, 'tuning': False, 'no_gpu_profiler': False, 'measurement_boundary': False, 'reference_correctness': False, 'reference_events': False, 'native_mode': True, 'device': True, 'normal_completion': True, 'phase_files': True, 'samples': False}
+Traceback (most recent call last):
+  File "/home/h00918771/uccl-ep-xpu-integration-new/test/urma_mode_parity/driver.py", line 399, in <module>
+    if __name__=='__main__': main()
+                             ^^^^^^
+  File "/home/h00918771/uccl-ep-xpu-integration-new/test/urma_mode_parity/driver.py", line 396, in main
+    legacy.pair(args,dict(stage='done',job=args.job,mode=mode,rc=rc))
+  File "/home/h00918771/uccl-ep-xpu-integration-new/test/verbs_diag/driver.py", line 53, in pair
+    raise RuntimeError(f'PAIR_STOP local={payload!r} peer={peer!r}')
+RuntimeError: PAIR_STOP local={'stage': 'done', 'job': 'urma_ref_smoke128_11', 'mode': 'normal', 'rc': 1} peer={'stage': 'done', 'job': 'urma_ref_smoke128_11', 'mode': 'normal', 'rc': 1}
