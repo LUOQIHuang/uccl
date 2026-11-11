@@ -1,0 +1,7 @@
+/home/h00918771/uccl-ep-xpu-integration-new/ep/src/gpu_stage_trace.cu:56:30: warning: reference to __device__ variable 'control' in __host__ function [-Wmaca-compat]
+   56 |     check(cudaMemcpyToSymbol(control,&next,sizeof(next)));
+      |                              ^
+/home/h00918771/uccl-ep-xpu-integration-new/ep/src/gpu_stage_trace.cu:85:42: warning: reference to __device__ variable 'control' in __host__ function [-Wmaca-compat]
+   85 |   Control off{};check(cudaMemcpyToSymbol(control,&off,sizeof(off)));
+      |                                          ^
+2 warnings generated when compiling for host.
