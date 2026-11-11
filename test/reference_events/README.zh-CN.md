@@ -1,5 +1,7 @@
 # 参考版本移植：Normal Dispatch 事件打点
 
+本次smoke128若出现`urma_bind_jetty rc=4096`，先按[建连失败排查流程](RECOVERY.zh-CN.md)处理；保留现有模块，先做一次关闭所有新打桩的128-token对照，不直接重跑4096或重新编译。
+
 ## 1. 本轮内容
 
 参考提交 `940f7c7b`，目录 `reference/f00955680_ll28_maca39_build_a3/tree/`。复用其独立事件、设备显存计数/记录、GPU读取周期性更新主机时钟、epoch分窗的设计。提供的test.py/test_eager.py是LL正确性入口，未驱动trace接口；本入口补上Normal控制、采集和解析，使用当前通信实现。

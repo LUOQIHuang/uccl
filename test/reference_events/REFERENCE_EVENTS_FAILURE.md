@@ -1,5 +1,7 @@
 # REFERENCE_EVENTS smoke128 失败：URMA jetty 绑定失败 (urma_bind_jetty rc=4096)
 
+> 开发侧复核：下面“重启后未稳定/固件初始化”的根因判断尚未证实；日志能确定的是RC绑定阶段TP交换失败。模块重载后的设备激活超时也需单独处理。保留原始报告，下一步按[RECOVERY.zh-CN.md](RECOVERY.zh-CN.md)做无需重编译的普通模块对照及连接状态采集。
+
 **测试**: 参考版本移植 Normal Dispatch 事件打点 (README.zh-CN.md §4 128-token 验证)
 **模块**: urma_events_v1 (reference_events_version=1, gpu_stage_version=0)
 **节点**: 202 (141.61.17.202, RANK=0) + 204 (141.61.17.204, RANK=1)
