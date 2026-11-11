@@ -1,0 +1,53 @@
+There are 44 section headers, starting at offset 0x1ea7d48:
+
+Section Headers:
+  [Nr] Name              Type            Address          Off    Size   ES Flg Lk Inf Al
+  [ 0]                   NULL            0000000000000000 000000 000000 00      0   0  0
+  [ 1] .note.gnu.build-id NOTE           0000000000000200 000200 000024 00   A  0   0  4
+  [ 2] .gnu.hash         GNU_HASH        0000000000000228 000228 0025a4 00   A  3   0  8
+  [ 3] .dynsym           DYNSYM          00000000000027d0 0027d0 009f90 18   A  4   3  8
+  [ 4] .dynstr           STRTAB          000000000000c760 00c760 01a40d 00   A  0   0  1
+  [ 5] .gnu.version      VERSYM          0000000000026b6e 026b6e 000d4c 02   A  3   0  2
+  [ 6] .gnu.version_r    VERNEED         00000000000278c0 0278c0 000260 00   A  4   6  8
+  [ 7] .rela.dyn         RELA            0000000000027b20 027b20 006600 18   A  3   0  8
+  [ 8] .rela.plt         RELA            000000000002e120 02e120 005cd0 18  AI  3  26  8
+  [ 9] .init             PROGBITS        0000000000033df0 033df0 000018 00  AX  0   0  4
+  [10] .plt              PROGBITS        0000000000033e10 033e10 003c90 00  AX  0   0 16
+  [11] .text             PROGBITS        0000000000037aa0 037aa0 0bf820 00  AX  0   0 16
+  [12] .fini             PROGBITS        00000000000f72c0 0f72c0 000014 00  AX  0   0  4
+  [13] .rodata           PROGBITS        00000000000f72e0 0f72e0 014e9b 00   A  0   0 16
+  [14] .__mc_module_uuid PROGBITS        000000000010c180 10c180 0000f1 00   A  0   0 32
+  [15] .__mc_module_uuid_def PROGBITS    000000000010c271 10c271 000088 00   A  0   0  1
+  [16] .mc_fatbin        PROGBITS        000000000010d000 10d000 7972dc 00   A  0   0 4096
+  [17] .eh_frame_hdr     PROGBITS        00000000008a42dc 8a42dc 002f64 00   A  0   0  4
+  [18] .eh_frame         PROGBITS        00000000008a7240 8a7240 015fa0 00   A  0   0  8
+  [19] .gcc_except_table PROGBITS        00000000008bd1e0 8bd1e0 007d49 00   A  0   0  4
+  [20] .tdata            PROGBITS        00000000008dc148 8cc148 000014 00 WAT  0   0  8
+  [21] .tbss             NOBITS          00000000008dc160 8cc15c 000198 00 WAT  0   0  8
+  [22] .init_array       INIT_ARRAY      00000000008dc160 8cc160 000218 08  WA  0   0  8
+  [23] .fini_array       FINI_ARRAY      00000000008dc378 8cc378 000008 08  WA  0   0  8
+  [24] .data.rel.ro      PROGBITS        00000000008dc380 8cc380 0009c8 00  WA  0   0  8
+  [25] .dynamic          DYNAMIC         00000000008dcd48 8ccd48 000340 10  WA  4   0  8
+  [26] .got              PROGBITS        00000000008dd088 8cd088 002f78 08  WA  0   0  8
+  [27] .data             PROGBITS        00000000008e0000 8d0000 000c58 00  WA  0   0  8
+  [28] .mcFatBinSegment  PROGBITS        00000000008e0c58 8d0c58 0000c0 00  WA  0   0  8
+  [29] .__mc_module_uuid_ptr PROGBITS    00000000008e0d18 8d0d18 000040 00  WA  0   0  8
+  [30] .bss              NOBITS          00000000008e0d60 8d0d58 001370 00  WA  0   0 16
+  [31] .comment          PROGBITS        0000000000000000 8d0d58 0000a8 01  MS  0   0  1
+  [32] .gnu.build.attributes NOTE        00000000008e20d0 8d0e00 0000d8 00      0   0  4
+  [33] .debug_aranges    PROGBITS        0000000000000000 8d0ed8 0039f0 00      0   0  1
+  [34] .debug_info       PROGBITS        0000000000000000 8d48c8 ac2e9a 00      0   0  1
+  [35] .debug_abbrev     PROGBITS        0000000000000000 1397762 01a6e8 00      0   0  1
+  [36] .debug_line       PROGBITS        0000000000000000 13b1e4a 1808aa 00      0   0  1
+  [37] .debug_str        PROGBITS        0000000000000000 15326f4 4f059f 01  MS  0   0  1
+  [38] .debug_line_str   PROGBITS        0000000000000000 1a22c93 001a8e 01  MS  0   0  1
+  [39] .debug_loclists   PROGBITS        0000000000000000 1a24721 393aeb 00      0   0  1
+  [40] .debug_rnglists   PROGBITS        0000000000000000 1db820c 09a6db 00      0   0  1
+  [41] .symtab           SYMTAB          0000000000000000 1e528e8 018cd8 18     42 2534  8
+  [42] .strtab           STRTAB          0000000000000000 1e6b5c0 03c598 00      0   0  1
+  [43] .shstrtab         STRTAB          0000000000000000 1ea7b58 0001f0 00      0   0  1
+Key to Flags:
+  W (write), A (alloc), X (execute), M (merge), S (strings), I (info),
+  L (link order), O (extra OS processing required), G (group), T (TLS),
+  C (compressed), x (unknown), o (OS specific), E (exclude),
+  R (retain), p (processor specific)
