@@ -2,6 +2,8 @@
 
 讲定位过程时，请先使用[八步证据递进版](../normal_evidence_steps_20261112/README.zh-CN.md)，逐步说明数据、判断和下一步理由。本页一页总览放在最后作结论页，不替代中间的验证过程。
 
+排序与通知的详细解释、强弱序A/B结果及当前结论边界，见[排序/通知专题报告](../normal_order_notify_review_20261112/README.zh-CN.md)。
+
 ## 可直接使用的图
 
 - [一页汇报总览 PNG](01-report-overview.png) / [矢量SVG](01-report-overview.svg)：整体回退、通知完成间隔、FIFO阻塞机制及窗口干预结果。

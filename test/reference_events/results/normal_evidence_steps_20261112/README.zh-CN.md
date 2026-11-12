@@ -1,5 +1,7 @@
 # Normal回退定位：按证据递进展开的八步汇报
 
+补充专题：[WRITE排序、通知FADD与FIFO阻塞的数据及分析](../normal_order_notify_review_20261112/README.zh-CN.md)，集中说明两种请求的路径、顺序约束、完成回执及历史WRITE强弱序A/B结果。
+
 本版用于讲清调查过程，每一步先给数据，再给当时能支持的判断和下一步理由。第一步不先宣布最终根因。原一页总览适合在本版之后作为结论页。
 
 范围是Normal BF16、4096 tokens、hidden7168、experts256、topk8，SM24、Dispatch chunk32、NVL chunk4，两端各一张C500。历史verbs/URMA的内核、设备及SDK不同；图中保留历史匹配对照与本轮URMA观测的区别。每组通常9个有效API样本；132大WRITE/窗×9窗=1188条请求，12通道×9窗=108条特定位置观测，不当成1188轮独立实验。

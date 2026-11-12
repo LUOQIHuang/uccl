@@ -1,0 +1,35 @@
+{
+  "source": "test\\urma_mode_parity\\results\\urma_normal_order_current_02\\summary\\order_comparison.csv",
+  "sha256": "c8800f04eb4f8699d5a30f46f88f56efac831ba72dd8b521c9ba60018507d325",
+  "metrics": [
+    {
+      "node": 0,
+      "label": "dispatch_fp8_chunk32",
+      "relax_ms": 5.744551172061842,
+      "strong_ms": 52.72574685544384,
+      "strong_over_relax": 9.178392754489025
+    },
+    {
+      "node": 1,
+      "label": "dispatch_fp8_chunk32",
+      "relax_ms": 5.743571583105593,
+      "strong_ms": 52.72763018705407,
+      "strong_over_relax": 9.18028606836721
+    },
+    {
+      "node": 0,
+      "label": "dispatch_bf16_chunk32",
+      "relax_ms": 7.963634928878474,
+      "strong_ms": 99.96776775437958,
+      "strong_over_relax": 12.553032459068053
+    },
+    {
+      "node": 1,
+      "label": "dispatch_bf16_chunk32",
+      "relax_ms": 7.962266104561943,
+      "strong_ms": 99.96674090015644,
+      "strong_over_relax": 12.55506153491667
+    }
+  ],
+  "notes": "Historical WRITE-only ordering intervention, two reversed pairs, FADD ordering/fence unchanged. Do not mix its 49-sample API timing with nine-sample paced captures or infer FADD relaxation correctness."
+}
