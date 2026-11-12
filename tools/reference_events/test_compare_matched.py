@@ -32,6 +32,10 @@ class BackendComparisonTests(unittest.TestCase):
         u = copy.deepcopy(v)
         u.update(backend='urma', flags={'USE_URMA': '1', 'USE_DMABUF': '1'}, kernel='urma-kernel')
         compare.compatible(v, u)
+        ablation=copy.deepcopy(u)
+        ablation['normal_submit_schedule']='writes-first'
+        with self.assertRaisesRegex(ValueError,'analyze submission A/B separately'):
+            compare.compatible(v, ablation)
         for field in ('sources', 'benchmark_sha', 'maca', 'host', 'gpu_versions'):
             changed = copy.deepcopy(u)
             changed[field] = 'different'

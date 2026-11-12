@@ -322,6 +322,21 @@ int main() {
   unsetenv("UCCL_URMA_NORMAL_COMPLETION");
   unsetenv("UCCL_URMA_NORMAL_WRITE_ORDER");
   unsetenv("UCCL_URMA_LL_WRITE_ORDER");
+  unsetenv("UCCL_URMA_NORMAL_SUBMIT_SCHEDULE");
+  {
+    UrmaTransport original; original.configure(true,8);
+    assert(!original.normal_writes_first());
+    setenv("UCCL_URMA_NORMAL_SUBMIT_SCHEDULE","writes-first",1);
+    UrmaTransport experiment; experiment.configure(true,8);
+    assert(experiment.normal_writes_first());
+    UrmaTransport ll; rejects([&] {ll.configure(false,1);});
+    setenv("UCCL_URMA_NORMAL_COMPLETION","paired",1);
+    UrmaTransport paired; rejects([&] {paired.configure(true,8);});
+    unsetenv("UCCL_URMA_NORMAL_COMPLETION");
+    setenv("UCCL_URMA_NORMAL_SUBMIT_SCHEDULE","invalid",1);
+    UrmaTransport bad; rejects([&] {bad.configure(true,8);});
+    unsetenv("UCCL_URMA_NORMAL_SUBMIT_SCHEDULE");
+  }
   ProxyCtx ctx;
   // Failure before a context exists must release global initialization
   // ownership.

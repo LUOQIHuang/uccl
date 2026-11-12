@@ -26,6 +26,9 @@ void UrmaTransport::configure(bool normal, size_t channels) {
   ll_relaxed_write_ = urma_ll_relaxed_write_from_env();
   normal_relaxed_write_ = urma_normal_relaxed_write_from_env();
   normal_completion_ = urma_normal_completion_from_env();
+  normal_writes_first_ = urma_normal_writes_first_from_env();
+  if (normal_writes_first_ && (!normal || normal_completion_ != UrmaNormalCompletion::All))
+    throw std::invalid_argument("writes-first requires Normal completion=all");
   mode_ = requested;
 }
 #ifndef USE_URMA
@@ -315,11 +318,12 @@ void UrmaTransport::init(ProxyCtx& ctx) {
         register_segment(barrier_words_.data(),
                          barrier_words_.size() * sizeof(uint64_t), false, true);
     std::fprintf(stderr,
-        "[URMA] mode=%s channels=%zu endpoints=%zu batch=linked capacity=%zu wire=%u write_order=%s atomic_fence=per_request normal_completion=%s\n",
+        "[URMA] mode=%s channels=%zu endpoints=%zu batch=linked capacity=%zu wire=%u write_order=%s atomic_fence=per_request normal_completion=%s normal_submit_schedule=%s\n",
         mode_.normal ? "normal" : "low_latency", mode_.channels,
         jetties_.size(), capacity(), UrmaMode::kWireVersion,
         (mode_.normal ? normal_relaxed_write_ : ll_relaxed_write_) ? "relax" : "strong",
-        urma_normal_completion_name(normal_completion_));
+        urma_normal_completion_name(normal_completion_),
+        urma_normal_submit_schedule_name(normal_writes_first_));
   } catch (...) {
     destroy();
     throw;

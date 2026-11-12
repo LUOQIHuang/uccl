@@ -26,6 +26,16 @@ inline bool urma_normal_relaxed_write_from_env() {
 }
 
 enum class UrmaNormalCompletion { All, Ordered, Paired };
+// Diagnostic submission scheduling only; no placement/fence/CQE changes.
+inline bool urma_normal_writes_first_from_env() {
+  auto const* value=std::getenv("UCCL_URMA_NORMAL_SUBMIT_SCHEDULE");
+  if (!value || !*value || !std::strcmp(value,"lane-mixed")) return false;
+  if (!std::strcmp(value,"writes-first")) return true;
+  throw std::invalid_argument("UCCL_URMA_NORMAL_SUBMIT_SCHEDULE must be lane-mixed|writes-first");
+}
+inline char const* urma_normal_submit_schedule_name(bool writes_first) {
+  return writes_first ? "writes-first" : "lane-mixed";
+}
 inline UrmaNormalCompletion urma_normal_completion_from_env() {
   auto const* value=std::getenv("UCCL_URMA_NORMAL_COMPLETION");
   if (!value || !*value || !std::strcmp(value,"all")) return UrmaNormalCompletion::All;

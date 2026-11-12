@@ -19,6 +19,8 @@ constexpr uint64_t kUrmaInternalWrId=UINT64_MAX;
 struct ProxyCtx { static constexpr size_t kMaxAtomicOps=16; };
 struct UrmaTransport {
   std::vector<std::vector<UrmaWorkRequest>> batches;
+  bool writes_first=false;
+  bool normal_writes_first() const { return writes_first; }
   void post_batch(int,std::vector<UrmaWorkRequest> const& requests) {
     batches.push_back(requests);
   }
@@ -64,7 +66,34 @@ int main() {
     assert(p.drains==1);
   }
   {
+    // Compile/run the actual production batching body in both schedules.
+    // A single Proxy iteration contains commands from two rings; writes-first
+    // must submit both writes before either standalone FADD, with identical
+    // per-ring IDs, fences, bytes and no early quiet/barrier acknowledgement.
+    for (bool first : {false,true}) {
+      Proxy p; p.cfg_.use_normal_mode=true; p.transport.writes_first=first;
+      TransferCmd write{},atomic{},quiet{};
+      write.cmd_type=CmdType::WRITE;write.dst_rank=1;write.bytes=64;
+      atomic.cmd_type=CmdType::ATOMIC;atomic.dst_rank=1;atomic.req_rptr=8;atomic.value=7;
+      quiet.cmd_type=CmdType::QUIET;
+      p.post_urma_commands({1,(1ULL<<32)|1,2,(1ULL<<32)|2,3},{write,write,atomic,atomic,quiet});
+      assert(p.transport.batches.size()==(first ? 2U : 1U));
+      std::vector<UrmaWorkRequest> flattened;
+      for(auto const& batch:p.transport.batches)flattened.insert(flattened.end(),batch.begin(),batch.end());
+      assert(flattened.size()==4);
+      for(size_t i=0;i<4;++i){
+        assert(flattened[i].kind==(i<2 ? UrmaWorkRequest::Kind::Write : UrmaWorkRequest::Kind::Atomic));
+        assert(flattened[i].fence);
+      }
+      assert(flattened[0].wr_id==1 && flattened[1].wr_id==((1ULL<<32)|1));
+      assert(flattened[2].wr_id==2 && flattened[3].wr_id==((1ULL<<32)|2));
+      if(first)assert(p.transport.batches[0].size()==2 && p.transport.batches[1].size()==2);
+      assert(p.drains==1 && p.acked_wrs_.count(3));
+    }
+  }
+  {
     Proxy p; p.cfg_.use_normal_mode=true;
+    p.transport.writes_first=true;
     TransferCmd write{}; write.cmd_type=CmdType::WRITE; write.dst_rank=1;
     write.bytes=8; write.atomic_offset=8; write.atomic_val=3;
     p.post_urma_commands({(2ULL<<32)|9},{write});

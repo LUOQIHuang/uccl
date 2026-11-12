@@ -18,6 +18,8 @@ def csv_rows(path):
 def compatible(verbs, urma):
     if verbs['backend'] != 'verbs' or urma['backend'] != 'urma':
         raise ValueError('wrong backend order')
+    if urma.get('normal_submit_schedule','lane-mixed') != 'lane-mixed':
+        raise ValueError('default backend comparison requires lane-mixed URMA; analyze submission A/B separately')
     for key in ('node', 'host', 'torch', 'maca', 'gpu_versions', 'sources', 'benchmark_sha', 'ifname', 'gpu'):
         if verbs[key] != urma[key]:
             raise ValueError('cross-backend mismatch: ' + key)

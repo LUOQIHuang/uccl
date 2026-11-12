@@ -40,6 +40,7 @@ def build(args):
     env['UCCL_URMA_LL_WRITE_ORDER']='default'
     env['UCCL_URMA_NORMAL_WRITE_ORDER']='default'
     env['UCCL_URMA_NORMAL_COMPLETION']='all'
+    env['UCCL_URMA_NORMAL_SUBMIT_SCHEDULE']='lane-mixed'
     flags=dict(UCCL_GPU_STAGE_TRACE=str(int(getattr(args,'gpu_stage_build',False))),USE_METAX='1',USE_URMA='1',USE_URMA_METAX='0',USE_LIBFABRIC_CXI='0',USE_DMABUF='1',MAX_NUM_GPUS='1',NUM_MAX_NVL_PEERS='1',PER_EXPERT_BATCHING=str(args.per_expert_batching),MAX_JOBS=str(args.build_jobs),URMA_INCLUDE_DIR=str(include),URMA_LIBRARY_DIR=str(args.urma_lib_dir.resolve()))
     env.update(flags)
     if getattr(args,'reference_events',None):flags['UCCL_REFERENCE_EVENTS']='1';env['UCCL_REFERENCE_EVENTS']='1'
@@ -110,6 +111,7 @@ def parser():
     p.add_argument('--api-only',action='store_true',help='phase suite: skip Kineto and retain whole-call samples only')
     p.add_argument('--ll-write-order',choices=('default','strong','relax'),default='default',help='diagnostic LL WRITE ordering; FADD fences unchanged')
     p.add_argument('--normal-write-order',choices=('default','strong','relax'),default='default',help='diagnostic Normal WRITE placement; FADD, fence and completion unchanged')
+    p.add_argument('--normal-submit-schedule',choices=('lane-mixed','writes-first'),default='lane-mixed',help='Normal-only causal A/B: flush WRITE stage before standalone FADD; retains explicit notifying pairs')
     p.add_argument('--normal-completion',choices=('all','ordered','paired'),default='all',help='Normal-only completion A/B; paired suppresses eligible WRITE CQEs')
     p.add_argument('--stage-profile',action='store_true')
     p.add_argument('--save-traces',action='store_true')
@@ -152,6 +154,8 @@ def parser():
         p.error('Normal WRITE order A/B requires URMA Normal API-only completion=all; excludes micro/probe')
     if args.normal_completion!='all' and (args.backend!='urma' or args.mode!='normal'):
         p.error('normal completion diagnostics require --backend urma --mode normal')
+    if args.normal_submit_schedule!='lane-mixed' and (args.backend!='urma' or args.mode!='normal' or args.normal_completion!='all' or not args.api_only or not args.dispatch_focus or args.reference_events not in ('paced','on') or args.action not in ('check','run')):
+        p.error('writes-first requires URMA Normal Dispatch focus API-only completion=all and reference-events paced/on check/run')
     if args.collect_suite and args.action!='collect': p.error('--collect-suite requires --action collect')
     if args.capture_layout and (args.mode!='normal' or not args.api_only or args.backend!='urma'):
         p.error('--capture-layout requires URMA Normal API-only')
@@ -193,6 +197,7 @@ def environment(args):
         env.pop('UCCL_EP_VERBS_REG',None); env.pop('UCCL_IB_HCA',None)
     env['UCCL_URMA_LL_WRITE_ORDER']=args.ll_write_order
     env['UCCL_URMA_NORMAL_WRITE_ORDER']=getattr(args,'normal_write_order','default')
+    env['UCCL_URMA_NORMAL_SUBMIT_SCHEDULE']=getattr(args,'normal_submit_schedule','lane-mixed')
     env['UCCL_URMA_NORMAL_COMPLETION']=args.normal_completion
     env['LD_LIBRARY_PATH']=str(args.urma_lib_dir)+':'+env.get('LD_LIBRARY_PATH','')
     return env
@@ -211,6 +216,8 @@ def preflight(args):
         raise RuntimeError('LL_WRITE_ORDER_DIAGNOSTICS_REQUIRES_REBUILD')
     if getattr(args,'normal_write_order','default')!='default' and metadata.get('normal_write_order')!=args.normal_write_order:
         raise RuntimeError('NORMAL_WRITE_ORDER_DIAGNOSTICS_REQUIRES_REBUILD')
+    if getattr(args,'normal_submit_schedule','lane-mixed')!='lane-mixed' and metadata.get('normal_submit_schedule')!=args.normal_submit_schedule:
+        raise RuntimeError('NORMAL_SUBMIT_SCHEDULE_REQUIRES_REBUILD')
     if args.normal_completion!='all' and metadata.get('normal_completion')!=args.normal_completion:
         raise RuntimeError('NORMAL_COMPLETION_DIAGNOSTICS_REQUIRES_REBUILD')
     if args.capture_layout and not metadata.get('layout_diagnostics'):raise RuntimeError('LAYOUT_DIAGNOSTICS_REQUIRES_REBUILD')
@@ -290,7 +297,7 @@ def main():
     error=None; fingerprint=dict(job=args.job,backend=args.backend,mode=args.mode,shape=[args.normal_tokens,args.ll_tokens,args.hidden,args.experts,args.topk],sources_hash=support.digest(support.source_manifest()),diagnostics_hash=support.digest(support.diagnostic_manifest()),ifname=args.ifname,kernel=os.uname().release,
         phase_suite=args.phase_suite,stage_profile=args.stage_profile,save_traces=args.save_traces,
         warmups=args.warmups,samples=args.samples,ll_hook_workload=args.ll_hook_workload,
-        api_only=args.api_only,ll_write_order=args.ll_write_order,normal_write_order=args.normal_write_order,normal_completion=args.normal_completion,capture_layout=args.capture_layout,
+        api_only=args.api_only,ll_write_order=args.ll_write_order,normal_write_order=args.normal_write_order,normal_submit_schedule=args.normal_submit_schedule,normal_completion=args.normal_completion,capture_layout=args.capture_layout,
         dispatch_trial=args.dispatch_trial,dispatch_delay_us=args.dispatch_delay_us,delay_node=1,timeline=getattr(args,'timeline',False),gpu_stages=getattr(args,'gpu_stages',False),gpu_stage_mode=args.gpu_stage_mode,device=args.urma_device,gpu=args.gpu,dispatch_focus=args.dispatch_focus,dispatch_compiled_off=args.dispatch_compiled_off,gpu_stage_roles_only=args.gpu_stage_roles_only)
     try:
         module,manifest,info=preflight(args)
@@ -384,6 +391,8 @@ def main():
                 checks['write_order']=text.count('write_order='+expected_order+' atomic_fence=per_request')>=1
             if mode=='normal' and info['runtime'].get('normal_completion') is not None:
                 checks['normal_completion']=text.count('normal_completion='+args.normal_completion)>=1
+            if mode=='normal' and info['runtime'].get('normal_submit_schedule') is not None:
+                checks['normal_submit_schedule']=('normal_submit_schedule='+args.normal_submit_schedule) in text
         if args.phase_suite:
             checks.update(phase_files=(case/'phases.jsonl').is_file() and (case/'api_samples.jsonl').is_file(),
                           samples=text.count('MODE_PARITY_SAMPLES ')==(5 if mode=='normal' else (2 if args.ll_hook_workload=='immediate' else 1)))

@@ -43,6 +43,7 @@ class UrmaTransport final : public EpTransport {
   void init(ProxyCtx& ctx) override;
   void configure(bool normal, size_t channels);
   UrmaMode mode() const { return mode_; }
+  bool normal_writes_first() const { return normal_writes_first_; }
   size_t capacity() const;
   // Input order is retained within each lane. All WRITE/FADD operations from
   // one ring use its data lane; barrier messages use the control lane.
@@ -78,6 +79,7 @@ class UrmaTransport final : public EpTransport {
   UrmaMode mode_;
   bool ll_relaxed_write_ = false;
   bool normal_relaxed_write_ = true;
+  bool normal_writes_first_ = false;
   uint64_t dispatch_trial_epoch_ = 0;
   UrmaNormalCompletion normal_completion_ = UrmaNormalCompletion::All;
 #ifdef USE_URMA

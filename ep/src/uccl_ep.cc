@@ -2593,6 +2593,9 @@ NB_MODULE(ep, m) {
   m.def("get_urma_normal_write_order", []() {
     return std::string(urma_normal_relaxed_write_from_env() ? "relax" : "strong");
   });
+  m.def("get_urma_normal_submit_schedule", []() {
+    return std::string(urma_normal_submit_schedule_name(urma_normal_writes_first_from_env()));
+  });
   m.def("get_urma_normal_completion", []() {
     return std::string(urma_normal_completion_name(urma_normal_completion_from_env()));
   });

@@ -1398,6 +1398,16 @@ void Proxy::post_urma_commands(std::vector<uint64_t> const& wrs_to_post,
       enqueue(peer,request);
     }
   }
+  // Causal A/B: verbs submits all WRITE groups before standalone FADD groups.
+  // The default coalesces these into per-lane SDK chains. A writes-first
+  // transport flushes the WRITE stage here, preserving explicit WRITE/FADD
+  // notifying pairs, per-lane order, all CQEs and the later control drain.
+  if (cfg_.use_normal_mode) {
+    for (size_t peer=0; peer<urma_batches_by_rank_.size(); ++peer) {
+      auto* transport=urma_transport_for_rank(static_cast<int>(peer));
+      if (transport && transport->normal_writes_first()) flush(static_cast<int>(peer));
+    }
+  }
   UrmaMode mode{cfg_.use_normal_mode,1};
   for (size_t i = 0; i < cmds_to_post.size(); ++i) {
     auto const& cmd = cmds_to_post[i];

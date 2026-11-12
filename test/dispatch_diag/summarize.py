@@ -78,6 +78,10 @@ def case_data(root,rank,trace,compiled_off=False,reference_events=None):
     if not libraries:raise ValueError('actual MACA runtime unrecorded')
     bench=node/('normal.py' if backend=='urma' else 'benchmark/test_internode.py')
     identity=dict(backend=backend,host=host['host'],boot=host['boot_id'],kernel=c['kernel'],torch=runtime['torch'],sources=manifest['sources'],flags=flags,sdk=manifest.get('sdk',{}),libraries=c['libraries'],maca=libraries,gpu_versions=[v.strip() for v in versions],benchmark_sha=sha(bench),diagnostics=c.get('diagnostics_hash',c.get('diagnostics')))
+    if backend=='urma':
+        schedule=c.get('normal_submit_schedule','lane-mixed')
+        if runtime.get('normal_submit_schedule') not in (None,schedule) or (schedule!='lane-mixed' and runtime.get('normal_submit_schedule')!=schedule):raise ValueError('Normal submission schedule runtime mismatch')
+        identity['normal_submit_schedule']=schedule
     for k in ('ifname','gpu','gid_index','hca','device'):identity[k]=c.get(k)
     return dict(node=node,case=case,c=c,identity=identity,runtime=runtime,means=means)
 
