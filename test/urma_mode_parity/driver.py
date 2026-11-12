@@ -91,6 +91,7 @@ def parser():
     p.add_argument('--timeline',action='store_true')
     p.add_argument('--gpu-stages',action='store_true')
     p.add_argument('--reference-events',choices=('build','off','on','batch','paced'),help='reference events or inactive batch/paced controls')
+    p.add_argument('--reference-profile',choices=('legacy','boundaries'),default='legacy')
     p.add_argument('--dispatch-focus',action='store_true')
     p.add_argument('--dispatch-compiled-off',action='store_true',help='Dispatch trace build with capture completely disabled; same API timing boundary as baseline')
     p.add_argument('--gpu-stage-roles-only',action='store_true',help='sparse compile-time role probes; currently only build or compiled-off validation')
@@ -171,6 +172,8 @@ def parser():
         if args.gpu_stages or args.gpu_stage_build or args.gpu_stage_roles_only or args.dispatch_compiled_off:p.error('reference events exclude old GPU tracing')
         if (args.reference_events=='build')!=(args.action=='build'):p.error('reference-events build is for build only; off/on require check/run')
         if args.action!='build' and (args.action not in ('check','run') or not args.dispatch_focus):p.error('reference events require Normal Dispatch focus check/run')
+    if args.reference_profile=='boundaries' and (args.reference_events not in ('build','paced','on') or args.normal_window_plan!='default' or args.normal_submit_schedule!='lane-mixed'):
+        p.error('boundary profile requires reference build/paced/on and default window/submission')
     if args.dispatch_compiled_off and (not args.dispatch_focus or args.gpu_stages or args.gpu_stage_build or args.action not in ('check','run')):p.error('compiled-off requires Dispatch focus check/run without GPU capture/build switches')
     if args.gpu_stage_roles_only and not ((args.action=='build' and args.gpu_stage_build) or args.dispatch_compiled_off):p.error('roles-only currently requires trace build or compiled-off; active capture is gated on the disabled-cost result')
     if args.gpu_stage_mode.startswith('dispatch') and not args.dispatch_focus:p.error('Dispatch GPU modes require --dispatch-focus')
@@ -203,6 +206,7 @@ def environment(args):
     env['UCCL_URMA_NORMAL_SUBMIT_SCHEDULE']=getattr(args,'normal_submit_schedule','lane-mixed')
     env['UCCL_URMA_NORMAL_COMPLETION']=args.normal_completion
     env['UCCL_IB_MAX_INFLIGHT_NORMAL']=str(4 if getattr(args,'normal_window_plan','default')=='peer4' and args.node_rank==1 else 8)
+    env['UCCL_REFERENCE_PROFILE']=getattr(args,'reference_profile','legacy')
     env['LD_LIBRARY_PATH']=str(args.urma_lib_dir)+':'+env.get('LD_LIBRARY_PATH','')
     return env
 
@@ -214,6 +218,8 @@ def preflight(args):
     probe=subprocess.run([sys.executable,str(HERE/'support.py'),str(module)],env=env,capture_output=True,text=True,timeout=90)
     if probe.returncode: raise RuntimeError(probe.stdout+probe.stderr)
     metadata=next(json.loads(line.split(' ',1)[1]) for line in probe.stdout.splitlines() if line.startswith('MODE_PARITY_IMPORT_OK '))
+    if getattr(args,'reference_profile','legacy')=='boundaries' and (metadata.get('reference_boundary_version')!=1 or metadata.get('reference_profile')!='boundaries'):
+        raise RuntimeError('REFERENCE_BOUNDARY_PROFILE_REQUIRES_REBUILD')
     if args.phase_suite and not metadata.get('phase_diagnostics'):
         raise RuntimeError('PHASE_DIAGNOSTICS_REQUIRES_REBUILD')
     if args.ll_write_order!='default' and metadata.get('ll_write_order')!=args.ll_write_order:
@@ -309,6 +315,7 @@ def main():
     try:
         module,manifest,info=preflight(args)
         fingerprint['reference_events']=args.reference_events
+        fingerprint['reference_profile']=args.reference_profile
         fingerprint.update(build_hash=support.digest({key:manifest[key] for key in ('sources','sdk','flags')}),libraries=info['libraries'],runtime_libraries=info['runtime'].get('selected_runtime_hashes',{}),torch=info['runtime']['torch'])
         (root/'preflight.json').write_text(json.dumps(info,indent=2))
         (root/'build_manifest.json').write_text(json.dumps(manifest,indent=2))
@@ -369,15 +376,15 @@ def main():
         if args.reference_events=='on':
             sys.path.insert(0,str(HERE.parent/'reference_events'))
             from event_runtime import validate,correctness_passed
-            checks['reference_correctness']='REFERENCE_CORRECTNESS_EVENTS_PASSED' in text and correctness_passed(case)
-            try:checks['reference_events']=validate(case,args.samples)
+            checks['reference_correctness']='REFERENCE_CORRECTNESS_EVENTS_PASSED' in text and correctness_passed(case,args.reference_profile,args.normal_tokens)
+            try:checks['reference_events']=validate(case,args.samples,args.reference_profile,args.normal_tokens)
             except Exception as exc:
                 checks['reference_events']=False
                 (case/'reference_validation_error.txt').write_text(str(exc))
         if args.reference_events in ('batch','paced'):
             sys.path.insert(0,str(HERE.parent/'reference_events'))
             from event_runtime import validate_control
-            try:checks['reference_control']=validate_control(case,args.reference_events,args.warmups,args.samples)
+            try:checks['reference_control']=validate_control(case,args.reference_events,args.warmups,args.samples,args.reference_profile)
             except Exception as exc:
                 checks['reference_control']=False
                 (case/'reference_validation_error.txt').write_text(str(exc))

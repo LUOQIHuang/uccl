@@ -55,13 +55,14 @@ def case_data(root,rank,trace,compiled_off=False,reference_events=None):
         import sys
         sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'reference_events'))
         from event_runtime import validate,correctness_passed
-        if not status['checks'].get('reference_events') or not status['checks'].get('reference_correctness') or not correctness_passed(case) or not validate(case,10):raise ValueError('unvalidated reference events/correctness')
+        profile=c.get('reference_profile','legacy')
+        if not status['checks'].get('reference_events') or not status['checks'].get('reference_correctness') or not correctness_passed(case,profile) or not validate(case,10,profile):raise ValueError('unvalidated reference events/correctness')
     elif (case/'event_trace.jsonl').exists():raise ValueError('unexpected reference events')
     if reference_events in ('batch','paced'):
         import sys
         sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'reference_events'))
         from event_runtime import validate_control
-        if not status['checks'].get('reference_control') or not validate_control(case,reference_events,5,10):raise ValueError('unvalidated sampling control')
+        if not status['checks'].get('reference_control') or not validate_control(case,reference_events,5,10,c.get('reference_profile','legacy')):raise ValueError('unvalidated sampling control')
     raw=rows(case/'api_samples.jsonl');saved=rows(case/'sample_summary.jsonl');means={}
     if len(raw)!=5*c['samples'] or {r['label'] for r in raw}!=ALL_LABELS or len(saved)!=5 or {r['label'] for r in saved}!=ALL_LABELS:raise ValueError('incomplete Normal samples')
     for label in ALL_LABELS:
@@ -78,6 +79,10 @@ def case_data(root,rank,trace,compiled_off=False,reference_events=None):
     if not libraries:raise ValueError('actual MACA runtime unrecorded')
     bench=node/('normal.py' if backend=='urma' else 'benchmark/test_internode.py')
     identity=dict(backend=backend,host=host['host'],boot=host['boot_id'],kernel=c['kernel'],torch=runtime['torch'],sources=manifest['sources'],flags=flags,sdk=manifest.get('sdk',{}),libraries=c['libraries'],maca=libraries,gpu_versions=[v.strip() for v in versions],benchmark_sha=sha(bench),diagnostics=c.get('diagnostics_hash',c.get('diagnostics')))
+    profile=c.get('reference_profile','legacy')
+    if profile not in ('legacy','boundaries'):raise ValueError('unknown reference profile')
+    if profile=='boundaries' and (runtime.get('reference_boundary_version')!=1 or runtime.get('reference_profile')!=profile):raise ValueError('boundary runtime capability mismatch')
+    identity['reference_profile']=profile
     window_plan=c.get('normal_window_plan','default')
     if window_plan not in ('default','peer4'):raise ValueError('unknown Normal window plan')
     expected_window=4 if window_plan=='peer4' and rank==1 else 8

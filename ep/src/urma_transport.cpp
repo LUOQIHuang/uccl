@@ -861,6 +861,7 @@ int UrmaTransport::poll(TransportCompletion* out, int max) {
   while (total < max) {
     int wanted = std::min(16,max-total);
     urma_cr_t crs[16]{};
+    uccl::transport_timeline::poll_heartbeat();
     int n = urma_poll_jfc(jfc_,wanted,crs);
     if (n < 0) throw std::runtime_error("urma_poll_jfc failed");
     for (int i = 0; i < n; ++i) {

@@ -20,4 +20,10 @@ int main(){
   }
   stop=true;for(auto& thread:threads)thread.join();
   t::begin();assert(t::end().find("\"events\":[]")!=std::string::npos);
+  uccl::urma_diag::identity(0,0);
+  t::begin(true);
+  for(int i=0;i<129;++i)t::poll_heartbeat();
+  auto sampled=t::end();assert(sampled.find("\"heartbeat_stride\":128")!=std::string::npos);
+  assert(t::events.size()==2 && std::string(t::events[0].stage)=="poll_heartbeat");
+  t::begin();t::poll_heartbeat();assert(t::end().find("\"events\":[]")!=std::string::npos);
 }

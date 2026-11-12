@@ -1178,6 +1178,8 @@ while (__any_sync(WARP_MASK, num_tokens_to_send > 0)) {
 // REFERENCE_EVENT_BEGIN
 #ifdef UCCL_REFERENCE_EVENTS
           if(lane_id==0 && synced_last_issued_tail==0) uccl::reference_events::tick(1);
+          if(lane_id==0 && synced_num_tokens_to_send==num_tokens_to_issue) uccl::reference_events::boundary(3);
+          if(lane_id==0 && synced_last_issued_tail==5*num_max_rdma_chunked_send_tokens) uccl::reference_events::boundary(10);
 #endif
 // REFERENCE_EVENT_END
           uccl::nvshmemi_ibgda_put_nbi_warp</*use_normal_mode=*/true>(
@@ -1225,6 +1227,14 @@ while (__any_sync(WARP_MASK, num_tokens_to_send > 0)) {
           );
         }
         __syncwarp();
+// REFERENCE_EVENT_BEGIN
+#ifdef UCCL_REFERENCE_EVENTS
+        if(lane_id==0 && dst_rdma_rank!=rdma_rank){
+          if(synced_num_tokens_to_send==num_tokens_to_issue) uccl::reference_events::boundary(4);
+          if(synced_last_issued_tail==5*num_max_rdma_chunked_send_tokens) uccl::reference_events::boundary(11);
+        }
+#endif
+// REFERENCE_EVENT_END
       }
     }
 }
@@ -1323,11 +1333,25 @@ while (__any_sync(WARP_MASK, num_tokens_to_recv_from_rdma > 0)) {
 
       // Find next source RDMA rank (round-robin)
       start_time = clock64();
+// REFERENCE_EVENT_BEGIN
+#ifdef UCCL_REFERENCE_EVENTS
+      bool boundary_final_check_recorded=false;
+#endif
+// REFERENCE_EVENT_END
       { UCCL_GPU_STAGE_DETAIL(gpu_stage_11,d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),11);
 while (true) {
         src_rdma_rank = (src_rdma_rank + 1) % kNumRDMARanks;
         if (__shfl_sync(WARP_MASK, num_tokens_to_recv_from_rdma,
                         src_rdma_rank) > 0) {
+// REFERENCE_EVENT_BEGIN
+#ifdef UCCL_REFERENCE_EVENTS
+          if(uccl::reference_events::boundaries_active() && !boundary_final_check_recorded && src_rdma_rank!=rdma_rank &&
+              __shfl_sync(WARP_MASK,num_tokens_to_recv_from_rdma,src_rdma_rank)<=num_max_rdma_chunked_send_tokens){
+            if(lane_id==0) uccl::reference_events::boundary(5);
+            boundary_final_check_recorded=true;
+          }
+#endif
+// REFERENCE_EVENT_END
           if (lane_id == src_rdma_rank)
             cached_rdma_channel_tail =
                 static_cast<int>(ld_acquire_sys_global<kUseAggressiveAtomic>(
@@ -1353,6 +1377,13 @@ while (true) {
         }
       }
 }
+// REFERENCE_EVENT_BEGIN
+#ifdef UCCL_REFERENCE_EVENTS
+      if(uccl::reference_events::boundaries_active() && src_rdma_rank!=rdma_rank &&
+          __shfl_sync(WARP_MASK,num_tokens_to_recv_from_rdma,src_rdma_rank)<=num_max_rdma_chunked_send_tokens)
+        if(lane_id==0) uccl::reference_events::boundary(6);
+#endif
+// REFERENCE_EVENT_END
       auto src_rdma_head =
           __shfl_sync(WARP_MASK, cached_rdma_channel_head, src_rdma_rank);
       auto src_rdma_tail =
@@ -1370,6 +1401,13 @@ while (true) {
         // Epoch tag spin-wait: detect stale data from prior iteration
         int expected_tag = ((i + 1) & 0xFFFFFF) << 8;
         int seen_bits;
+// REFERENCE_EVENT_BEGIN
+#ifdef UCCL_REFERENCE_EVENTS
+        if(uccl::reference_events::boundaries_active() && src_rdma_rank!=rdma_rank &&
+            __shfl_sync(WARP_MASK,num_tokens_to_recv_from_rdma,src_rdma_rank)==1)
+          if(lane_id==0) uccl::reference_events::boundary(7);
+#endif
+// REFERENCE_EVENT_END
         {
           auto ptr = reinterpret_cast<int const*>(shifted + hidden_bytes +
                                                   scale_bytes) +
@@ -1504,6 +1542,11 @@ while (true) {
     // Retired
     __syncwarp();
     if (lane_id == 0) forward_channel_retired[dst_nvl_rank] = true;
+// REFERENCE_EVENT_BEGIN
+#ifdef UCCL_REFERENCE_EVENTS
+    if(lane_id==0) uccl::reference_events::boundary(8);
+#endif
+// REFERENCE_EVENT_END
   } else if (warp_role == WarpRole::kForwarderCoordinator) {
     // Extra warps for forwarder coordinator should exit directly
     if (target_rank > 0) return;
@@ -1764,6 +1807,11 @@ while (true) {
     for (int i = clean_start + thread_id; i < clean_end; i += clean_stride)
       recv_topk_idx[i] = -1;
   }
+// REFERENCE_EVENT_BEGIN
+#ifdef UCCL_REFERENCE_EVENTS
+  if(warp_role==WarpRole::kNVLReceivers && lane_id==0) uccl::reference_events::boundary(9);
+#endif
+// REFERENCE_EVENT_END
 }
 
 void dispatch(

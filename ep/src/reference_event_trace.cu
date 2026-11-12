@@ -12,6 +12,8 @@
 namespace uccl::reference_events {
 #ifdef UCCL_REFERENCE_EVENTS
 __device__ Trace trace;
+__device__ BoundaryTrace boundary_trace;
+__device__ int boundary_profile;
 __device__ int enabled;
 __device__ unsigned epoch;
 __device__ volatile unsigned long long* host_clock;
@@ -22,6 +24,7 @@ std::thread updater;
 unsigned long long* page=nullptr;
 void* mapped=nullptr;
 ClockStats stats{};
+bool capture_boundaries=false;
 unsigned long long now(){timespec ts{};clock_gettime(CLOCK_MONOTONIC_RAW,&ts);return ts.tv_sec*1000000000ULL+ts.tv_nsec;}
 void update(){
   sched_param param{};
@@ -43,16 +46,25 @@ extern "C" __attribute__((visibility("default"))) int uccl_reference_events_vers
   return 0;
 #endif
 }
-extern "C" __attribute__((visibility("default"))) int uccl_reference_events_begin(unsigned value){
+static int reference_begin(unsigned value,bool boundaries){
 #ifdef UCCL_REFERENCE_EVENTS
   using namespace uccl::reference_events;std::lock_guard<std::mutex> lock(mutex);
   if(page || running.load())return -1;
   int rc=cudaDeviceSynchronize();if(rc)return rc;
   rc=cudaHostAlloc(reinterpret_cast<void**>(&page),4096,cudaHostAllocMapped);if(rc)return rc;
   rc=cudaHostGetDevicePointer(&mapped,page,0);
-  std::unique_ptr<Trace> zero(new(std::nothrow) Trace{});
-  if(!zero){cudaFreeHost(page);page=nullptr;mapped=nullptr;return -3;}
-  if(!rc)rc=cudaMemcpyToSymbol(trace,zero.get(),sizeof(Trace));
+  if(boundaries){
+    std::unique_ptr<BoundaryTrace> zero(new(std::nothrow) BoundaryTrace{});
+    if(!zero){cudaFreeHost(page);page=nullptr;mapped=nullptr;return -3;}
+    if(!rc)rc=cudaMemcpyToSymbol(boundary_trace,zero.get(),sizeof(BoundaryTrace));
+  }else{
+    std::unique_ptr<Trace> zero(new(std::nothrow) Trace{});
+    if(!zero){cudaFreeHost(page);page=nullptr;mapped=nullptr;return -3;}
+    if(!rc)rc=cudaMemcpyToSymbol(trace,zero.get(),sizeof(Trace));
+  }
+  int profile=boundaries ? 1 : 0;
+  if(!rc)rc=cudaMemcpyToSymbol(boundary_profile,&profile,sizeof(profile));
+  capture_boundaries=boundaries;
   if(!rc)rc=cudaMemcpyToSymbol(epoch,&value,sizeof(value));
   __atomic_store_n(page,now(),__ATOMIC_RELEASE);stats={};
   if(!rc)rc=cudaMemcpyToSymbol(host_clock,&mapped,sizeof(mapped));
@@ -67,13 +79,13 @@ extern "C" __attribute__((visibility("default"))) int uccl_reference_events_begi
   }
   return rc;
 #else
-  (void)value;return -1;
+  (void)value;(void)boundaries;return -1;
 #endif
 }
-extern "C" __attribute__((visibility("default"))) int uccl_reference_events_end(void* output,void* clock_output){
+static int reference_end(void* output,void* clock_output,bool boundaries){
 #ifdef UCCL_REFERENCE_EVENTS
   using namespace uccl::reference_events;std::lock_guard<std::mutex> lock(mutex);
-  if(!page || !output || !clock_output)return -1;
+  if(!page || !output || !clock_output || boundaries!=capture_boundaries)return -1;
   int rc=cudaDeviceSynchronize();
   running=false;if(updater.joinable())updater.join();
   auto tail_gap=now()-__atomic_load_n(page,__ATOMIC_ACQUIRE);
@@ -81,13 +93,24 @@ extern "C" __attribute__((visibility("default"))) int uccl_reference_events_end(
   *static_cast<ClockStats*>(clock_output)=stats;
   // On CUDA failure retain the mapped allocation; never free an in-flight page.
   if(rc)return rc;
-  rc=cudaMemcpyFromSymbol(output,trace,sizeof(Trace));
+  rc=boundaries ? cudaMemcpyFromSymbol(output,boundary_trace,sizeof(BoundaryTrace)) : cudaMemcpyFromSymbol(output,trace,sizeof(Trace));
   int off=0;void* nil=nullptr;
   int a=cudaMemcpyToSymbol(enabled,&off,sizeof(off));
   int b=cudaMemcpyToSymbol(host_clock,&nil,sizeof(nil));
   if(!a && !b){int freed=cudaFreeHost(page);if(!rc)rc=freed;page=nullptr;mapped=nullptr;}
   return rc?rc:a?a:b;
 #else
-  (void)output;(void)clock_output;return -1;
+  (void)output;(void)clock_output;(void)boundaries;return -1;
 #endif
 }
+extern "C" __attribute__((visibility("default"))) int uccl_reference_events_begin(unsigned epoch){return reference_begin(epoch,false);}
+extern "C" __attribute__((visibility("default"))) int uccl_reference_events_end(void* trace,void* stats){return reference_end(trace,stats,false);}
+extern "C" __attribute__((visibility("default"))) int uccl_reference_boundaries_version(){
+#ifdef UCCL_REFERENCE_EVENTS
+  return 1;
+#else
+  return 0;
+#endif
+}
+extern "C" __attribute__((visibility("default"))) int uccl_reference_boundaries_begin(unsigned epoch){return reference_begin(epoch,true);}
+extern "C" __attribute__((visibility("default"))) int uccl_reference_boundaries_end(void* trace,void* stats){return reference_end(trace,stats,true);}

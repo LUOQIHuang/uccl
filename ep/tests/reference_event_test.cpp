@@ -29,5 +29,20 @@ int main(){
   tick(0);assert(trace.count[0]==0);
   assert(uccl_reference_events_begin(11)==0);assert(uccl_reference_events_end(out,&clock)==0);
   assert(!out->dropped && !out->count[1] && fixture_allocations==0);
+  BoundaryTrace* detail=new BoundaryTrace{};
+  static_assert(sizeof(BoundaryTrace)==3539000,"boundary ABI size changed");
+  assert(uccl_reference_boundaries_version()==1);
+  assert(uccl_reference_boundaries_begin(12)==0);
+  running=false;updater.join();
+  tick(1);boundary(11);
+  assert(boundary_trace.count[1]==1 && boundary_trace.count[11]==1);
+  assert(uccl_reference_events_end(out,&clock)==-1); // wrong-size ABI rejected
+  assert(uccl_reference_boundaries_end(detail,&clock)==0);
+  assert(detail->count[11]==1 && detail->epoch[11][0]==12 && fixture_allocations==0);
+  assert(uccl_reference_events_begin(13)==0);
+  boundary(11);assert(trace.count[1]==0);
+  assert(uccl_reference_boundaries_end(detail,&clock)==-1);
+  assert(uccl_reference_events_end(out,&clock)==0);
+  delete detail;
   delete out;
 }

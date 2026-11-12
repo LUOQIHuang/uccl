@@ -60,6 +60,7 @@ inline int post(ibv_qp* qp,ibv_send_wr* wr,ibv_send_wr** bad) {
 }
 inline int poll(ibv_cq* cq,int max,ibv_wc* wc) {
   namespace d=uccl::urma_diag;
+  uccl::transport_timeline::poll_heartbeat();
   int n=ibv_poll_cq(cq,max,wc);
   if(!d::enabled.load(std::memory_order_relaxed)){
 #ifdef UCCL_REFERENCE_EVENTS

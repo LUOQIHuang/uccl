@@ -31,6 +31,7 @@ def parser():
     p.add_argument('--stage-suite',action='store_true')
     p.add_argument('--gpu-stages',action='store_true')
     p.add_argument('--reference-events',choices=('build','off','on','batch','paced'),help='reference events or inactive batch/paced controls')
+    p.add_argument('--reference-profile',choices=('legacy','boundaries'),default='legacy')
     p.add_argument('--dispatch-focus',action='store_true')
     p.add_argument('--dispatch-compiled-off',action='store_true',help='Dispatch trace build with capture completely disabled; same API timing boundary as baseline')
     p.add_argument('--gpu-stage-roles-only',action='store_true',help='sparse compile-time role probes; currently only build or compiled-off validation')
@@ -91,6 +92,7 @@ def parser():
         if args.gpu_stages or args.gpu_stage_build or args.gpu_stage_roles_only or args.dispatch_compiled_off:p.error('reference events exclude old GPU tracing')
         if (args.reference_events=='build')!=(args.action=='build'):p.error('reference-events build is for build only; off/on require check/run')
         if args.action!='build' and (args.action not in ('check','run') or not args.dispatch_focus):p.error('reference events require Normal Dispatch focus check/run')
+    if args.reference_profile=='boundaries' and (args.reference_events not in ('build','paced','on') or args.normal_window_plan!='default'):p.error('boundary profile requires reference build/paced/on with default window')
     if args.dispatch_compiled_off and (not args.dispatch_focus or args.gpu_stages or args.gpu_stage_build or args.action not in ('check','run')):p.error('compiled-off requires Dispatch focus check/run without GPU capture/build switches')
     if args.gpu_stage_roles_only and not ((args.action=='build' and args.gpu_stage_build) or args.dispatch_compiled_off):p.error('roles-only currently requires trace build or compiled-off; active capture is gated on the disabled-cost result')
     if args.gpu_stage_mode.startswith('dispatch') and not args.dispatch_focus:p.error('Dispatch GPU modes require --dispatch-focus')
@@ -120,6 +122,7 @@ def environment(args):
         env['UCCL_METAX_URMA_HOST_ATOMICS'] = '1'
     if getattr(args,'gid_index',None) is not None:env['UCCL_IB_GID_INDEX']=str(getattr(args,'gid_index',None))
     env['UCCL_IB_MAX_INFLIGHT_NORMAL']=str(4 if getattr(args,'normal_window_plan','default')=='peer4' and args.node_rank==1 else 8)
+    env['UCCL_REFERENCE_PROFILE']=getattr(args,'reference_profile','legacy')
     return env
 
 
@@ -193,6 +196,7 @@ def preflight(args):
     if probe.returncode:
         raise RuntimeError('IMPORT_FAILED:\n' + probe.stdout + probe.stderr)
     info = next(json.loads(line.split(' ', 1)[1]) for line in probe.stdout.splitlines() if line.startswith('VERBS_IMPORT_OK '))
+    if getattr(args,'reference_profile','legacy')=='boundaries' and (info.get('reference_boundary_version')!=1 or info.get('reference_profile')!='boundaries'):raise RuntimeError('REFERENCE_BOUNDARY_PROFILE_REQUIRES_REBUILD')
     expected_window=4 if getattr(args,'normal_window_plan','default')=='peer4' and args.node_rank==1 else 8
     if (getattr(args,'normal_window_plan','default')!='default' or info.get('normal_max_inflight') is not None) and info.get('normal_max_inflight')!=expected_window:raise RuntimeError('NORMAL_WINDOW_RUNTIME_MISMATCH_OR_REBUILD_REQUIRED')
     if (getattr(args,'notify_check',False) or getattr(args,'timeline',False) or getattr(args,'micro_suite','write')=='notify') and info.get('verbs_notify_version')!=1:raise RuntimeError('NOTIFICATION_SUITE_REQUIRES_REBUILD')
@@ -314,12 +318,15 @@ def run_case(args, root, tag, mode, profile, module, module_sha):
         if getattr(args,'reference_events',None)=='on':
             sys.path.insert(0,str(HERE.parent/'reference_events'))
             from event_runtime import validate,correctness_passed
-            checks['reference_correctness']='REFERENCE_CORRECTNESS_EVENTS_PASSED' in text and correctness_passed(case)
-            checks['reference_events']=validate(case,args.samples)
+            checks['reference_correctness']='REFERENCE_CORRECTNESS_EVENTS_PASSED' in text and correctness_passed(case,args.reference_profile,args.normal_tokens)
+            try:checks['reference_events']=validate(case,args.samples,args.reference_profile,args.normal_tokens)
+            except Exception as exc:
+                checks['reference_events']=False
+                (case/'reference_validation_error.txt').write_text(str(exc))
         if getattr(args,'reference_events',None) in ('batch','paced'):
             sys.path.insert(0,str(HERE.parent/'reference_events'))
             from event_runtime import validate_control
-            checks['reference_control']=validate_control(case,args.reference_events,args.warmups,args.samples)
+            checks['reference_control']=validate_control(case,args.reference_events,args.warmups,args.samples,args.reference_profile)
         if getattr(args,'dispatch_focus',False) and getattr(args,'gpu_stages',False):
             sys.path.insert(0,str(HERE.parent/'dispatch_diag'))
             from dispatch_checks import validate_gpu
@@ -378,6 +385,7 @@ def run(args):
         meta.update(normal_tokens=getattr(args,'normal_tokens',4096),stage_suite=getattr(args,'stage_suite',False),gpu_stages=getattr(args,'gpu_stages',False),gpu_stage_mode=getattr(args,'gpu_stage_mode','all'))
         meta['dispatch_focus']=getattr(args,'dispatch_focus',False)
         meta['reference_events']=getattr(args,'reference_events',None)
+        meta['reference_profile']=getattr(args,'reference_profile','legacy')
         meta['normal_window_plan']=getattr(args,'normal_window_plan','default')
         meta['dispatch_compiled_off']=getattr(args,'dispatch_compiled_off',False)
         meta['gpu_stage_roles_only']=getattr(args,'gpu_stage_roles_only',False)

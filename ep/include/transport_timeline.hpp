@@ -7,6 +7,7 @@
 #include <algorithm>
 namespace uccl::transport_timeline {
 inline std::atomic<bool> active{false};
+inline std::atomic<bool> heartbeats{false};
 inline std::mutex mutex;
 struct Event {uint64_t ns,id,value;uint32_t qp;int proxy;char const* stage;};
 inline std::vector<Event> events;
@@ -51,17 +52,28 @@ inline void record(char const* stage,uint64_t id,uint32_t qp=0,uint64_t value=0)
   if(!active.load(std::memory_order_relaxed))return;
   record_at(stage,id,now(),qp,value);
 }
-inline void begin(){
+// Sparse service evidence, only for the boundary profile. Never log each
+// empty poll; a heartbeat bounds an interval containing 128 SDK poll calls.
+inline void poll_heartbeat(){
+#ifdef UCCL_REFERENCE_EVENTS
+  if(!active.load(std::memory_order_relaxed) || !heartbeats.load(std::memory_order_relaxed))return;
+  static thread_local uint64_t frame=0,calls=0;
+  auto current=capture_epoch.load(std::memory_order_relaxed);
+  if(current!=frame){frame=current;calls=0;}
+  if((calls++ & 127u)==0)record("poll_heartbeat",UINT64_MAX,0,calls);
+#endif
+}
+inline void begin(bool with_heartbeats=false){
   std::lock_guard<std::mutex> lock(mutex);
   if(active.load())throw std::runtime_error("overlapping transport timeline");
 #ifdef UCCL_REFERENCE_EVENTS
   ++capture_epoch;
   for(auto const& s:streams){s->records.clear();s->dropped=0;}
 #endif
-  events.clear();events.reserve(32768);dropped=0;origin=now();active=true;
+  events.clear();events.reserve(32768);dropped=0;origin=now();heartbeats=with_heartbeats;active=true;
 }
 inline std::string end(){
-  std::lock_guard<std::mutex> lock(mutex);active=false;std::ostringstream out;
+  std::lock_guard<std::mutex> lock(mutex);active=false;bool sampled=heartbeats.exchange(false);std::ostringstream out;
 #ifdef UCCL_REFERENCE_EVENTS
   for(auto const& s:streams){
     while(s->writing.load())std::this_thread::yield();
@@ -70,7 +82,7 @@ inline std::string end(){
     dropped+=s->dropped+s->records.size()-take;
   }
 #endif
-  out<<"{\"version\":1,";
+  out<<"{\"version\":1,\"heartbeat_stride\":"<<(sampled ? 128 : 0)<<",";
 #ifdef UCCL_REFERENCE_EVENTS
   out<<"\"clock\":\"CLOCK_MONOTONIC_RAW\",";
 #endif
