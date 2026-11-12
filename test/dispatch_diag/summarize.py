@@ -93,6 +93,13 @@ def case_data(root,rank,trace,compiled_off=False,reference_events=None):
         schedule=c.get('normal_submit_schedule','lane-mixed')
         if runtime.get('normal_submit_schedule') not in (None,schedule) or (schedule!='lane-mixed' and runtime.get('normal_submit_schedule')!=schedule):raise ValueError('Normal submission schedule runtime mismatch')
         identity['normal_submit_schedule']=schedule
+        fence_plan=c.get('normal_fadd_fence_plan','default')
+        if fence_plan not in ('default','all-on','peer-off'):raise ValueError('unknown Normal FADD fence plan')
+        expected_fence='off' if fence_plan=='peer-off' and rank==1 else 'on'
+        if fence_plan!='default' and (runtime.get('normal_fadd_fence_version')!=1 or runtime.get('normal_fadd_fence')!=expected_fence or not status['checks'].get('normal_fadd_fence')):
+            raise ValueError('unverified Normal FADD fence capability/effective transport setting')
+        if runtime.get('normal_fadd_fence') not in (None,expected_fence):raise ValueError('Normal FADD fence runtime mismatch')
+        identity.update(normal_fadd_fence_plan=fence_plan,normal_fadd_fence=expected_fence)
     for k in ('ifname','gpu','gid_index','hca','device'):identity[k]=c.get(k)
     return dict(node=node,case=case,c=c,identity=identity,runtime=runtime,means=means)
 

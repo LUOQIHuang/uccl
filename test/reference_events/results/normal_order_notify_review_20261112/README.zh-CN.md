@@ -180,6 +180,8 @@ WRITE CQE→FADD CQE，中位数，单位μs：
 
 本报告未提出重复运行已完成的WRITE排序、smoke、边界三项或窗口ABBA。现有结果及阴性结果均保留。
 
+下一项因果验证已准备：[204端Normal数据FADD fence单变量实验与运行步骤](../../FADD_FENCE.zh-CN.md)。保留FADD STRONG，只切换204数据通道fence，先验证正确性，再关闭采集做ABBA；这是一项待执行实验，不是本报告已经取得的结论。
+
 ## 10. 图表与来源核查
 
 - WRITE排序新图：[PNG](write-order-impact.png)、[矢量SVG](write-order-impact.svg)，figure_source.json记录原始CSV摘要及计算值。

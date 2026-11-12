@@ -114,6 +114,7 @@ def parser():
     p.add_argument('--normal-write-order',choices=('default','strong','relax'),default='default',help='diagnostic Normal WRITE placement; FADD, fence and completion unchanged')
     p.add_argument('--normal-submit-schedule',choices=('lane-mixed','writes-first'),default='lane-mixed',help='Normal-only causal A/B: flush WRITE stage before standalone FADD; retains explicit notifying pairs')
     p.add_argument('--normal-window-plan',choices=('default','peer4'),default='default',help='Normal pending-command limit: default=8 on both; peer4=8 on node0 and 4 on node1')
+    p.add_argument('--normal-fadd-fence-plan',choices=('default','all-on','peer-off'),default='default',help='diagnostic: keep FADD STRONG; peer-off disables Normal data FADD fence on node1 only')
     p.add_argument('--normal-completion',choices=('all','ordered','paired'),default='all',help='Normal-only completion A/B; paired suppresses eligible WRITE CQEs')
     p.add_argument('--stage-profile',action='store_true')
     p.add_argument('--save-traces',action='store_true')
@@ -160,6 +161,8 @@ def parser():
         p.error('writes-first requires URMA Normal Dispatch focus API-only completion=all and reference-events paced/on check/run')
     if args.normal_window_plan!='default' and (args.backend!='urma' or args.mode!='normal' or not args.dispatch_focus or args.reference_events not in ('paced','on') or args.normal_submit_schedule!='lane-mixed' or args.action not in ('check','run')):
         p.error('peer4 requires Normal Dispatch focus paced/on check/run with default submission schedule')
+    if args.normal_fadd_fence_plan!='default' and (args.backend!='urma' or args.mode!='normal' or not args.dispatch_focus or args.reference_events not in ('paced','on') or args.normal_submit_schedule!='lane-mixed' or args.normal_window_plan!='default' or args.normal_completion!='all' or args.reference_profile!='legacy' or args.action not in ('check','run')):
+        p.error('FADD fence experiment requires URMA Normal Dispatch focus legacy paced/on check/run with default window/submission/completion')
     if args.collect_suite and args.action!='collect': p.error('--collect-suite requires --action collect')
     if args.capture_layout and (args.mode!='normal' or not args.api_only or args.backend!='urma'):
         p.error('--capture-layout requires URMA Normal API-only')
@@ -207,6 +210,7 @@ def environment(args):
     env['UCCL_URMA_NORMAL_COMPLETION']=args.normal_completion
     env['UCCL_IB_MAX_INFLIGHT_NORMAL']=str(4 if getattr(args,'normal_window_plan','default')=='peer4' and args.node_rank==1 else 8)
     env['UCCL_REFERENCE_PROFILE']=getattr(args,'reference_profile','legacy')
+    env['UCCL_URMA_NORMAL_FADD_FENCE']='off' if getattr(args,'normal_fadd_fence_plan','default')=='peer-off' and args.node_rank==1 else 'on'
     env['LD_LIBRARY_PATH']=str(args.urma_lib_dir)+':'+env.get('LD_LIBRARY_PATH','')
     return env
 
@@ -231,6 +235,11 @@ def preflight(args):
     expected_window=4 if getattr(args,'normal_window_plan','default')=='peer4' and args.node_rank==1 else 8
     if (getattr(args,'normal_window_plan','default')!='default' or metadata.get('normal_max_inflight') is not None) and metadata.get('normal_max_inflight')!=expected_window:
         raise RuntimeError('NORMAL_WINDOW_RUNTIME_MISMATCH_OR_REBUILD_REQUIRED')
+    expected_fence='off' if getattr(args,'normal_fadd_fence_plan','default')=='peer-off' and args.node_rank==1 else 'on'
+    if getattr(args,'normal_fadd_fence_plan','default')!='default' and (metadata.get('normal_fadd_fence_version')!=1 or metadata.get('normal_fadd_fence')!=expected_fence):
+        raise RuntimeError('NORMAL_FADD_FENCE_RUNTIME_MISMATCH_OR_REBUILD_REQUIRED')
+    if metadata.get('normal_fadd_fence') not in (None,expected_fence):
+        raise RuntimeError('NORMAL_FADD_FENCE_ENVIRONMENT_LEAK')
     if args.normal_completion!='all' and metadata.get('normal_completion')!=args.normal_completion:
         raise RuntimeError('NORMAL_COMPLETION_DIAGNOSTICS_REQUIRES_REBUILD')
     if args.capture_layout and not metadata.get('layout_diagnostics'):raise RuntimeError('LAYOUT_DIAGNOSTICS_REQUIRES_REBUILD')
@@ -316,6 +325,7 @@ def main():
         module,manifest,info=preflight(args)
         fingerprint['reference_events']=args.reference_events
         fingerprint['reference_profile']=args.reference_profile
+        fingerprint['normal_fadd_fence_plan']=args.normal_fadd_fence_plan
         fingerprint.update(build_hash=support.digest({key:manifest[key] for key in ('sources','sdk','flags')}),libraries=info['libraries'],runtime_libraries=info['runtime'].get('selected_runtime_hashes',{}),torch=info['runtime']['torch'])
         (root/'preflight.json').write_text(json.dumps(info,indent=2))
         (root/'build_manifest.json').write_text(json.dumps(manifest,indent=2))
@@ -407,6 +417,10 @@ def main():
                 checks['normal_completion']=text.count('normal_completion='+args.normal_completion)>=1
             if mode=='normal' and info['runtime'].get('normal_submit_schedule') is not None:
                 checks['normal_submit_schedule']=('normal_submit_schedule='+args.normal_submit_schedule) in text
+            if mode=='normal' and info['runtime'].get('normal_fadd_fence_version')==1:
+                expected_fence='off' if args.normal_fadd_fence_plan=='peer-off' and args.node_rank==1 else 'on'
+                observed=re.findall(r'\[URMA\] mode=normal [^\n]*normal_fadd_fence=(on|off)\b',text)
+                checks['normal_fadd_fence']=bool(observed) and set(observed)=={expected_fence}
         if args.phase_suite:
             checks.update(phase_files=(case/'phases.jsonl').is_file() and (case/'api_samples.jsonl').is_file(),
                           samples=text.count('MODE_PARITY_SAMPLES ')==(5 if mode=='normal' else (2 if args.ll_hook_workload=='immediate' else 1)))

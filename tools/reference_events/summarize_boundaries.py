@@ -83,7 +83,7 @@ def summarize(control,trace,post,output):
         b=matched.base.case_data(control,rank,False,reference_events='paced')
         t=matched.base.case_data(trace,rank,False,reference_events='on')
         p=matched.base.case_data(post,rank,False,reference_events='paced')
-        if any(x['identity'].get('reference_profile')!='boundaries' or x['identity'].get('normal_window_plan')!='default' or x['identity'].get('normal_submit_schedule','lane-mixed')!='lane-mixed' for x in (b,t,p)):
+        if any(x['identity'].get('reference_profile')!='boundaries' or x['identity'].get('normal_window_plan')!='default' or x['identity'].get('normal_submit_schedule','lane-mixed')!='lane-mixed' or x['identity'].get('normal_fadd_fence','on')!='on' for x in (b,t,p)):
             raise ValueError('wrong boundary/default transport profile')
         if not matched.base.sig(b['identity'])==matched.base.sig(t['identity'])==matched.base.sig(p['identity']) or len({x['runtime']['module_sha'] for x in (b,t,p)})!=1:
             raise ValueError('boundary controls changed source/module/boot/runtime/workload')

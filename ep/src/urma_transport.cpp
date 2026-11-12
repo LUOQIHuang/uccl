@@ -27,8 +27,11 @@ void UrmaTransport::configure(bool normal, size_t channels) {
   normal_relaxed_write_ = urma_normal_relaxed_write_from_env();
   normal_completion_ = urma_normal_completion_from_env();
   normal_writes_first_ = urma_normal_writes_first_from_env();
+  normal_fadd_fence_ = urma_normal_fadd_fence_from_env();
   if (normal_writes_first_ && (!normal || normal_completion_ != UrmaNormalCompletion::All))
     throw std::invalid_argument("writes-first requires Normal completion=all");
+  if (normal && !normal_fadd_fence_ && (normal_completion_!=UrmaNormalCompletion::All || normal_writes_first_))
+    throw std::invalid_argument("Normal FADD fence experiment requires completion=all and lane-mixed");
   mode_ = requested;
 }
 #ifndef USE_URMA
@@ -318,12 +321,13 @@ void UrmaTransport::init(ProxyCtx& ctx) {
         register_segment(barrier_words_.data(),
                          barrier_words_.size() * sizeof(uint64_t), false, true);
     std::fprintf(stderr,
-        "[URMA] mode=%s channels=%zu endpoints=%zu batch=linked capacity=%zu wire=%u write_order=%s atomic_fence=per_request normal_completion=%s normal_submit_schedule=%s\n",
+        "[URMA] mode=%s channels=%zu endpoints=%zu batch=linked capacity=%zu wire=%u write_order=%s atomic_fence=%s normal_completion=%s normal_submit_schedule=%s normal_fadd_fence=%s fadd_order=strong barrier_fence=per_request\n",
         mode_.normal ? "normal" : "low_latency", mode_.channels,
         jetties_.size(), capacity(), UrmaMode::kWireVersion,
         (mode_.normal ? normal_relaxed_write_ : ll_relaxed_write_) ? "relax" : "strong",
+        mode_.normal && !normal_fadd_fence_ ? "diagnostic_data_off" : "per_request",
         urma_normal_completion_name(normal_completion_),
-        urma_normal_submit_schedule_name(normal_writes_first_));
+        urma_normal_submit_schedule_name(normal_writes_first_),normal_fadd_fence_ ? "on" : "off");
   } catch (...) {
     destroy();
     throw;
@@ -674,7 +678,10 @@ void UrmaTransport::prepare(PreparedWr& out, Peer& peer, size_t lane,
     out.src.tseg = operand_tseg_;
     out.wr.opcode = URMA_OPC_FADD;
     out.wr.flag.bs.place_order = URMA_STRONG_ORDER;
-    out.wr.flag.bs.fence = request.fence ? URMA_FENCE_ENABLE : URMA_FENCE_DISABLE;
+    bool fence=request.fence && !(mode_.normal && request.kind==UrmaWorkRequest::Kind::Atomic && !normal_fadd_fence_);
+    out.wr.flag.bs.fence = fence ? URMA_FENCE_ENABLE : URMA_FENCE_DISABLE;
+    if(mode_.normal && request.kind==UrmaWorkRequest::Kind::Atomic)
+      uccl::transport_timeline::record("atomic_fence",request.wr_id,lane,fence);
     out.wr.faa.src = &out.src;
     out.wr.faa.dst = &out.dst;
     out.wr.faa.operand = static_cast<uint64_t>(request.value);

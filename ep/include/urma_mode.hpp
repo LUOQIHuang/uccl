@@ -25,6 +25,15 @@ inline bool urma_normal_relaxed_write_from_env() {
   throw std::invalid_argument("UCCL_URMA_NORMAL_WRITE_ORDER must be default|strong|relax");
 }
 
+// Diagnostic only: keep STRONG placement, vary only Normal data FADD fence.
+// Barrier requests and LL retain their original per-request fence.
+inline bool urma_normal_fadd_fence_from_env() {
+  auto const* value=std::getenv("UCCL_URMA_NORMAL_FADD_FENCE");
+  if (!value || !*value || !std::strcmp(value,"default") || !std::strcmp(value,"on")) return true;
+  if (!std::strcmp(value,"off")) return false;
+  throw std::invalid_argument("UCCL_URMA_NORMAL_FADD_FENCE must be default|on|off");
+}
+
 enum class UrmaNormalCompletion { All, Ordered, Paired };
 // Diagnostic submission scheduling only; no placement/fence/CQE changes.
 inline bool urma_normal_writes_first_from_env() {

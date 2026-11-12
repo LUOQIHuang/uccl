@@ -323,6 +323,7 @@ int main() {
   unsetenv("UCCL_URMA_NORMAL_WRITE_ORDER");
   unsetenv("UCCL_URMA_LL_WRITE_ORDER");
   unsetenv("UCCL_URMA_NORMAL_SUBMIT_SCHEDULE");
+  unsetenv("UCCL_URMA_NORMAL_FADD_FENCE");
   {
     UrmaTransport original; original.configure(true,8);
     assert(!original.normal_writes_first());
@@ -779,6 +780,42 @@ int main() {
     left.destroy(); right.destroy();
     assert(resources==0 && init_count==0 && gpu_regs==0);
   }
+  // Inspect real SDK WRs: only Normal data FADD changes; placement, LL,
+  // barrier and CQE policy are retained. The environment freezes at configure.
+  for (bool normal : {true,false}) for (auto const* setting : {"on","off"}) {
+    setenv("UCCL_URMA_NORMAL_FADD_FENCE",setting,1);
+    UrmaTransport left,right;
+    left.configure(normal,8);right.configure(normal,8);
+    unsetenv("UCCL_URMA_NORMAL_FADD_FENCE");
+    assert(left.normal_fadd_fence()==(std::string(setting)=="on"));
+    left.init(ctx);right.init(ctx);
+    left.register_main_buffer(a,sizeof(a),2);right.register_main_buffer(b,sizeof(b),2);
+    left.register_atomic_buffer(ac,sizeof(ac),2);right.register_atomic_buffer(bc,sizeof(bc),2);
+    left.connect_peer(1,right.local_info());right.connect_peer(0,left.local_info());
+    UrmaWorkRequest write,atomic;
+    write.wr_id=100;write.bytes=8;
+    atomic.kind=UrmaWorkRequest::Kind::Atomic;atomic.wr_id=101;atomic.value=1;
+    size_t seen=posted_ops.size();left.post_batch(1,{write,atomic});
+    assert(posted_ops.size()==seen+2);
+    assert(posted_ops[seen].order==unsigned(normal ? URMA_RELAX_ORDER : URMA_STRONG_ORDER));
+    assert(posted_ops[seen+1].order==URMA_STRONG_ORDER);
+    assert(posted_ops[seen+1].fence==unsigned(normal && std::string(setting)=="off" ? URMA_FENCE_DISABLE : URMA_FENCE_ENABLE));
+    assert(posted_ops[seen].complete==1 && posted_ops[seen+1].complete==1);
+    assert(!posted_ops[seen].comp_order && !posted_ops[seen+1].comp_order);
+    assert(posted_ops[seen].jetty==posted_ops[seen+1].jetty);
+    TransportCompletion out[4];assert(left.poll(out,4)==2);
+    left.post_barrier_atomic_add(1,102,0,1);
+    assert(posted_ops.back().order==URMA_STRONG_ORDER && posted_ops.back().fence==URMA_FENCE_ENABLE);
+    assert(left.poll(out,4)==1);
+    left.destroy();right.destroy();assert(resources==0 && init_count==0 && gpu_regs==0);
+  }
+  setenv("UCCL_URMA_NORMAL_FADD_FENCE","off",1);
+  setenv("UCCL_URMA_NORMAL_COMPLETION","paired",1);
+  { UrmaTransport t;rejects([&] {t.configure(true,8);}); }
+  unsetenv("UCCL_URMA_NORMAL_COMPLETION");
+  setenv("UCCL_URMA_NORMAL_FADD_FENCE","invalid",1);
+  { UrmaTransport t;rejects([&] {t.configure(true,8);}); }
+  unsetenv("UCCL_URMA_NORMAL_FADD_FENCE");
   setenv("UCCL_URMA_LL_WRITE_ORDER","invalid",1);
   { UrmaTransport t; rejects([&] {t.configure(false,1);}); }
   unsetenv("UCCL_URMA_LL_WRITE_ORDER");

@@ -55,6 +55,8 @@ def load_extension(module):
                           normal_submit_schedule=extension.get_urma_normal_submit_schedule() if hasattr(extension,'get_urma_normal_submit_schedule') else None,
                           normal_max_inflight=extension.get_normal_max_inflight() if hasattr(extension,'get_normal_max_inflight') else None,
                           normal_completion=extension.get_urma_normal_completion() if hasattr(extension,'get_urma_normal_completion') else None,
+                          normal_fadd_fence_version=extension.get_urma_normal_fadd_fence_version() if hasattr(extension,'get_urma_normal_fadd_fence_version') else 0,
+                          normal_fadd_fence=extension.get_urma_normal_fadd_fence() if hasattr(extension,'get_urma_normal_fadd_fence') else None,
                           micro_diagnostics=hasattr(extension,'UrmaMicroSession'),
                           queue_backend=extension.get_d2h_backend() if hasattr(extension,'get_d2h_backend') else None,
                           gpu_stage_version=extension.get_gpu_stage_version() if hasattr(extension,'get_gpu_stage_version') else 0,

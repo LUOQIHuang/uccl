@@ -20,6 +20,8 @@ def compatible(verbs, urma):
         raise ValueError('wrong backend order')
     if urma.get('normal_submit_schedule','lane-mixed') != 'lane-mixed':
         raise ValueError('default backend comparison requires lane-mixed URMA; analyze submission A/B separately')
+    if urma.get('normal_fadd_fence','on')!='on' or urma.get('normal_fadd_fence_plan','default') not in ('default','all-on'):
+        raise ValueError('analyze FADD fence A/B separately from default backend comparison')
     if any(c.get('normal_window_plan','default')!='default' for c in (verbs,urma)):
         raise ValueError('analyze window A/B separately from default backend comparison')
     if any(c.get('reference_profile','legacy')!='legacy' for c in (verbs,urma)):

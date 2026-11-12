@@ -2589,6 +2589,10 @@ NB_MODULE(ep, m) {
   });
   m.def("get_dispatch_trace_version", []() { return 1; });
   m.def("get_normal_max_inflight", []() { return get_max_inflight_normal(); });
+  m.def("get_urma_normal_fadd_fence_version", []() { return 1; });
+  m.def("get_urma_normal_fadd_fence", []() {
+    return std::string(urma_normal_fadd_fence_from_env() ? "on" : "off");
+  });
   m.def("get_reference_events_version", []() { return uccl_reference_events_version(); });
   m.def("get_reference_boundary_version", []() { return uccl_reference_boundaries_version(); });
   m.def("get_urma_ll_write_order", []() {
