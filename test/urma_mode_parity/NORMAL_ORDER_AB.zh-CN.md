@@ -1,6 +1,8 @@
 # URMA Normal：WRITE强序/弱序单变量对照
 
-当前参考事件实验实际为Normal WRITE=RELAX、FADD=STRONG、fence按原请求保留、completion=all；这轮还没有对应的Normal STRONG结果。先关闭采集比较两种策略，不重复整套GPU阶段验收。当前已构建的urma_base_v1具备排序开关，可直接复用，无需重编译。
+本轮已收到两轮完整配对，STRONG下FP8 Dispatch时延约为RELAX的9.18倍，BF16约为12.55倍。见[复核报告](results/NORMAL_ORDER_REVIEW.zh-CN.md)。第三轮预检查失败不计入结果，无需为补齐数字重复运行；以下保留原操作流程。已有两轮结果离线汇总使用--repeats 2。
+
+当前参考事件实验实际为Normal WRITE=RELAX、FADD=STRONG、fence按原请求保留、completion=all。本对照关闭采集比较两种策略，不重复整套GPU阶段验收。当前已构建的urma_base_v1具备排序开关，可直接复用，无需重编译。
 
 目的：直接判断真实Normal的Dispatch在WRITE使用STRONG或RELAX时，整体时延是否改变。不是比较Normal与LL，也不是把FADD改成弱序。FADD仍为STRONG，原请求fence保持，完成策略固定all；不改变GPU程序、FIFO、lane、批量提交策略、缓冲区、quiet/barrier。
 

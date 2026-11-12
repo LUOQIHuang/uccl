@@ -85,4 +85,19 @@ class NormalOrderTests(unittest.TestCase):
             (root/'ab_r03_strong/node1/setup.json').unlink()
             with self.assertRaises(FileNotFoundError):summarize(root,'ab',root/'bad')
 
+    def test_dynamic_power_state_is_retained_but_other_hardware_changes_rejected(self):
+        with tempfile.TemporaryDirectory() as tmp,redirect_stdout(io.StringIO()):
+            root=Path(tmp);self.fixture(root)
+            for p in root.glob('ab_r*/node*/preflight.json'):
+                data=json.loads(p.read_text());data['hardware']['runtime_status']='suspended' if 'r01_relax' in str(p) else 'active';p.write_text(json.dumps(data))
+            summarize(root,'ab',root/'summary')
+            context=json.loads((root/'summary/context.json').read_text())
+            self.assertEqual(len(context['preflight_power_states']),12)
+            self.assertEqual({r['preflight_runtime_status'] for r in context['preflight_power_states']},{'active','suspended'})
+            path=root/'ab_r03_strong/node1/preflight.json';original=path.read_text()
+            for key,value in [('runtime_status','error'),('atomic_control','0020'),('device','different')]:
+                data=json.loads(original);data['hardware'][key]=value;path.write_text(json.dumps(data))
+                with self.assertRaises(ValueError):summarize(root,'ab',root/'bad')
+                path.write_text(original)
+
 if __name__=='__main__':unittest.main()

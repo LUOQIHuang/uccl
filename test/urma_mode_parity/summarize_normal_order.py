@@ -22,7 +22,7 @@ def write(p,data):
 
 def summarize(root,job,output,repeats=3):
     if not 1<=repeats<=10:raise ValueError('repeats must be 1..10')
-    groups=collections.defaultdict(dict);identities=collections.defaultdict(set);runs=[];contexts=[]
+    groups=collections.defaultdict(dict);identities=collections.defaultdict(set);runs=[];contexts=[];power_states=[]
     expected={f'{job}_r{r:02d}_{order}' for r in range(1,repeats+1) for order in ('relax','strong')}
     observed={p.parent.parent.name for p in root.glob(job+'_r*/node*/setup.json')}
     if observed!=expected:raise ValueError('missing or unexpected A/B jobs')
@@ -46,7 +46,11 @@ def summarize(root,job,output,repeats=3):
                 gpu=(case/'gpu_before.txt').read_text()
                 versions=re.findall(r'(?:Kernel Mode Driver Version|MACA Version)\s*:\s*([^|\n]+)',gpu)
                 if len(versions)!=2:raise ValueError('missing GPU driver/runtime version snapshot')
-                identity.update(manifest=manifest,boot=host['boot_id'],host=host['host'],hardware=pre['hardware'],queue_backend=runtime['queue_backend'],gpu_versions=[v.strip() for v in versions])
+                hardware=dict(pre['hardware'])
+                power=hardware.pop('runtime_status',None)
+                if power is not None and power not in ('active','suspended'):raise ValueError('unexpected preflight GPU runtime_status')
+                power_states.append(dict(node=rank,repeat=r,order=order,preflight_runtime_status=power))
+                identity.update(manifest=manifest,boot=host['boot_id'],host=host['host'],hardware=hardware,queue_backend=runtime['queue_backend'],gpu_versions=[v.strip() for v in versions])
                 identities[rank].add(signature(identity))
                 if len(identities[rank])!=1:raise ValueError('A/B changed build, libraries, boot, hardware or workload')
                 if runtime['queue_backend']!='fifo':raise ValueError('expected FIFO backend')
@@ -69,7 +73,7 @@ def summarize(root,job,output,repeats=3):
             paired_delta_median_pct=statistics.median(deltas),paired_delta_min_pct=min(deltas),paired_delta_max_pct=max(deltas),
             paired_direction_consistent=all(x>0 for x in deltas) or all(x<0 for x in deltas),run_ranges_overlap=max(min(a),min(b))<=min(max(a),max(b))))
     output.mkdir(parents=True,exist_ok=True);write(output/'order_runs.csv',runs);write(output/'order_comparison.csv',comparison)
-    (output/'context.json').write_text(json.dumps(dict(contexts=contexts,note='Only Normal WRITE placement differs. Negative strong_change_pct means STRONG faster. Run ranges and paired signs are descriptive, not a significance test. One repeat is a smoke test; no GPU-internal root-cause claim.'),indent=2))
+    (output/'context.json').write_text(json.dumps(dict(contexts=contexts,preflight_power_states=power_states,note='Only Normal WRITE placement differs. Preflight active/suspended is a dynamic snapshot, retained separately rather than treated as an immutable identity; this does not prove power state cannot affect timings. Negative strong_change_pct means STRONG faster. Run ranges and paired signs are descriptive, not a significance test. One repeat is a smoke test; no GPU-internal root-cause claim.'),indent=2))
     print('NORMAL_ORDER_SUMMARY_PASSED '+str(output));return runs,comparison
 
 if __name__=='__main__':
