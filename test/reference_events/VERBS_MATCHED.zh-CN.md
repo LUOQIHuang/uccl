@@ -1,5 +1,7 @@
 # 下一后端：verbs同口径Normal阶段采集
 
+2026-11-12：本流程已完成，smoke128_02、4096 paced/on两端均通过，已有[后端对照报告](results/BACKEND_MATCHED_ANALYSIS.zh-CN.md)。无需重复本套实验；以下保留完整操作步骤供复现。verbs GPU采集入口已在这轮服务器结果中验证。
+
 URMA匹配paced/on已通过，见[结果报告](results/MATCHED_TRACE_ANALYSIS.zh-CN.md)。不再追加URMA开关扫描。以下只在已协调好的verbs内核窗口执行，不要求现在主动切核。
 
 ## 固定口径
@@ -66,7 +68,7 @@ run_verbs_case() {
 run_verbs_case trace verbs_ref_smoke128_01 128
 ```
 
-成功需reference_correctness=True、reference_events=True及CASE_END normal rc=0；这套verbs GPU采集尚未在服务器验证，失败先收集停止，不自动继续4096。
+成功需reference_correctness=True、reference_events=True及CASE_END normal rc=0；失败先收集停止，不自动继续4096。
 
 随后只做两项正式任务：
 
