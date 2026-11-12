@@ -1,5 +1,7 @@
 # 本轮优先：拆解Dispatch持续发送、通知等待、epoch可见性及输出收尾
 
+本轮4096-token结果已接收，见[BF16分析与FIFO重建证据](results/urma_boundaries_01_fifo_audit/ANALYSIS.zh-CN.md)。已完成的smoke及三项不必重跑；当前下一步为[单变量窗口因果测试](WINDOW_CAUSAL.zh-CN.md)。下文保留本轮原始测试协议。
+
 ## 本轮只回答什么
 
 已知202 BF16的首次WRITE→最后远端token可见区间，verbs约6.428ms、URMA约7.110ms；204 URMA的完成长尾集中在每通道第6块大WRITE。本轮沿这个已观测到的区间补边界，判断延迟落在后续数据准备/发布、CPU请求推进、末块通知等待、末token epoch可见性，还是输出收尾。

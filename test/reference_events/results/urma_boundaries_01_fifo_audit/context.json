@@ -1,0 +1,7 @@
+{
+  "accepted_labels": [
+    "dispatch_bf16_chunk32"
+  ],
+  "limit": 8,
+  "notes": "All collect/ack_slot events are replayed, including local commands, not just completed network business chains. Reject missing, duplicate, out-of-order, over-limit or unretired ownership. Publication is GPU event4 after final payload/tail publication; correspondence uses one remote peer, channel and issue ordinal. Percentages describe software pending ownership, not hardware occupancy or a counterfactual speedup. Boundary timestamps include observer overhead. Per-workload controls are required on both nodes; global usable=False does not discard a different workload that passed."
+}
