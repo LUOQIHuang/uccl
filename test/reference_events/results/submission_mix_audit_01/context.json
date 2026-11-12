@@ -1,0 +1,9 @@
+{
+  "inputs": {
+    "verbs_control": "test\\reference_events\\results\\verbs_ref_4096_paced_01",
+    "verbs_trace": "test\\reference_events\\results\\verbs_ref_4096_matched_on_01",
+    "urma_control": "test\\reference_events\\results\\urma_ref_4096_paced_01",
+    "urma_trace": "test\\reference_events\\results\\urma_ref_4096_matched_on_01"
+  },
+  "note": "Original paced/on validation repeated. SDK calls reconstructed per Proxy from consecutive post_begin records followed by matching post_end records. Mixing requires WRITE and FADD opcodes, mapped from validated complete business requests. Subset observations are NOT randomized treatment groups: lane, position, submission time and previous traffic differ even at equal size. No causal benefit or harm of coalescing follows from these tables."
+}
