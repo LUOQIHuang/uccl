@@ -20,6 +20,8 @@ def compatible(verbs, urma):
         raise ValueError('wrong backend order')
     if urma.get('normal_submit_schedule','lane-mixed') != 'lane-mixed':
         raise ValueError('default backend comparison requires lane-mixed URMA; analyze submission A/B separately')
+    if any(c.get('normal_window_plan','default')!='default' for c in (verbs,urma)):
+        raise ValueError('analyze window A/B separately from default backend comparison')
     for key in ('node', 'host', 'torch', 'maca', 'gpu_versions', 'sources', 'benchmark_sha', 'ifname', 'gpu'):
         if verbs[key] != urma[key]:
             raise ValueError('cross-backend mismatch: ' + key)

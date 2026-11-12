@@ -60,6 +60,7 @@ def parser():
     p.add_argument('--gid-index',type=int)
     p.add_argument('--samples', type=int, default=50)
     p.add_argument('--normal-tokens',type=int,choices=(128,4096),default=4096)
+    p.add_argument('--normal-window-plan',choices=('default','peer4'),default='default',help='Normal pending-command limit: default=8 on both; peer4=8 on node0 and 4 on node1')
     profile = p.add_mutually_exclusive_group()
     profile.add_argument('--no-profile', action='store_true')
     profile.add_argument('--profile-only', action='store_true')
@@ -85,6 +86,7 @@ def parser():
     if args.stage_suite and (args.variant!='current' or args.mode!='normal' or not args.no_profile or args.repeats!=1):p.error('--stage-suite requires current Normal --no-profile --repeats 1')
     if args.dispatch_focus and (args.variant!='current' or args.mode!='normal' or not args.no_profile or args.repeats!=1 or args.cpu_diagnostics or args.timeline or args.stage_suite):p.error('dispatch focus requires current Normal no-profile repeats=1, without CPU/timeline/stage-suite')
     if args.dispatch_focus and args.gpu_stages and args.gpu_stage_mode not in ('bypass','dispatch_access','dispatch_clock','dispatch'):p.error('invalid Dispatch focus GPU mode')
+    if args.normal_window_plan!='default' and (not args.dispatch_focus or args.reference_events not in ('paced','on') or args.action not in ('check','run')):p.error('peer4 requires current Normal Dispatch focus paced/on check/run')
     if args.reference_events:
         if args.gpu_stages or args.gpu_stage_build or args.gpu_stage_roles_only or args.dispatch_compiled_off:p.error('reference events exclude old GPU tracing')
         if (args.reference_events=='build')!=(args.action=='build'):p.error('reference-events build is for build only; off/on require check/run')
@@ -117,6 +119,7 @@ def environment(args):
         # control-atomic registration path; preserve the earlier baseline.
         env['UCCL_METAX_URMA_HOST_ATOMICS'] = '1'
     if getattr(args,'gid_index',None) is not None:env['UCCL_IB_GID_INDEX']=str(getattr(args,'gid_index',None))
+    env['UCCL_IB_MAX_INFLIGHT_NORMAL']=str(4 if getattr(args,'normal_window_plan','default')=='peer4' and args.node_rank==1 else 8)
     return env
 
 
@@ -190,6 +193,8 @@ def preflight(args):
     if probe.returncode:
         raise RuntimeError('IMPORT_FAILED:\n' + probe.stdout + probe.stderr)
     info = next(json.loads(line.split(' ', 1)[1]) for line in probe.stdout.splitlines() if line.startswith('VERBS_IMPORT_OK '))
+    expected_window=4 if getattr(args,'normal_window_plan','default')=='peer4' and args.node_rank==1 else 8
+    if (getattr(args,'normal_window_plan','default')!='default' or info.get('normal_max_inflight') is not None) and info.get('normal_max_inflight')!=expected_window:raise RuntimeError('NORMAL_WINDOW_RUNTIME_MISMATCH_OR_REBUILD_REQUIRED')
     if (getattr(args,'notify_check',False) or getattr(args,'timeline',False) or getattr(args,'micro_suite','write')=='notify') and info.get('verbs_notify_version')!=1:raise RuntimeError('NOTIFICATION_SUITE_REQUIRES_REBUILD')
     if getattr(args,'campaign_check',False) and (info.get('verbs_diag_version')!=1 or not info.get('verbs_micro')):raise RuntimeError('CAMPAIGN_REQUIRES_REBUILD')
     if getattr(args,'cpu_diagnostics',False) and info.get('verbs_diag_version')!=1:raise RuntimeError('VERBS_DIAGNOSTICS_REQUIRES_REBUILD')
@@ -373,6 +378,7 @@ def run(args):
         meta.update(normal_tokens=getattr(args,'normal_tokens',4096),stage_suite=getattr(args,'stage_suite',False),gpu_stages=getattr(args,'gpu_stages',False),gpu_stage_mode=getattr(args,'gpu_stage_mode','all'))
         meta['dispatch_focus']=getattr(args,'dispatch_focus',False)
         meta['reference_events']=getattr(args,'reference_events',None)
+        meta['normal_window_plan']=getattr(args,'normal_window_plan','default')
         meta['dispatch_compiled_off']=getattr(args,'dispatch_compiled_off',False)
         meta['gpu_stage_roles_only']=getattr(args,'gpu_stage_roles_only',False)
     except Exception as exc:

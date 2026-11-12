@@ -78,6 +78,12 @@ def case_data(root,rank,trace,compiled_off=False,reference_events=None):
     if not libraries:raise ValueError('actual MACA runtime unrecorded')
     bench=node/('normal.py' if backend=='urma' else 'benchmark/test_internode.py')
     identity=dict(backend=backend,host=host['host'],boot=host['boot_id'],kernel=c['kernel'],torch=runtime['torch'],sources=manifest['sources'],flags=flags,sdk=manifest.get('sdk',{}),libraries=c['libraries'],maca=libraries,gpu_versions=[v.strip() for v in versions],benchmark_sha=sha(bench),diagnostics=c.get('diagnostics_hash',c.get('diagnostics')))
+    window_plan=c.get('normal_window_plan','default')
+    if window_plan not in ('default','peer4'):raise ValueError('unknown Normal window plan')
+    expected_window=4 if window_plan=='peer4' and rank==1 else 8
+    actual_window=runtime.get('normal_max_inflight')
+    if (window_plan!='default' or actual_window is not None) and actual_window!=expected_window:raise ValueError('Normal window runtime mismatch')
+    identity.update(normal_window_plan=window_plan,normal_max_inflight=expected_window)
     if backend=='urma':
         schedule=c.get('normal_submit_schedule','lane-mixed')
         if runtime.get('normal_submit_schedule') not in (None,schedule) or (schedule!='lane-mixed' and runtime.get('normal_submit_schedule')!=schedule):raise ValueError('Normal submission schedule runtime mismatch')

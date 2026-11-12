@@ -118,6 +118,7 @@ def load_extension(module):
                           gpu_stage_version=extension.get_gpu_stage_version() if hasattr(extension,'get_gpu_stage_version') else 0,
                           dispatch_trace_version=extension.get_dispatch_trace_version() if hasattr(extension,'get_dispatch_trace_version') else 0,
                           reference_events_version=extension.get_reference_events_version() if hasattr(extension,'get_reference_events_version') else 0,
+                          normal_max_inflight=extension.get_normal_max_inflight() if hasattr(extension,'get_normal_max_inflight') else None,
                           verbs_diag_version=extension.get_verbs_diag_version() if hasattr(extension,'get_verbs_diag_version') else 0,
                           verbs_micro=hasattr(extension,'VerbsWriteSession'),
                           verbs_notify_version=extension.get_verbs_notify_version() if hasattr(extension,'get_verbs_notify_version') else 0)

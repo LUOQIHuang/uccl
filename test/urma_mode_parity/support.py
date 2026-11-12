@@ -53,6 +53,7 @@ def load_extension(module):
                           ll_write_order=extension.get_urma_ll_write_order() if hasattr(extension,'get_urma_ll_write_order') else None,
                           normal_write_order=extension.get_urma_normal_write_order() if hasattr(extension,'get_urma_normal_write_order') else None,
                           normal_submit_schedule=extension.get_urma_normal_submit_schedule() if hasattr(extension,'get_urma_normal_submit_schedule') else None,
+                          normal_max_inflight=extension.get_normal_max_inflight() if hasattr(extension,'get_normal_max_inflight') else None,
                           normal_completion=extension.get_urma_normal_completion() if hasattr(extension,'get_urma_normal_completion') else None,
                           micro_diagnostics=hasattr(extension,'UrmaMicroSession'),
                           queue_backend=extension.get_d2h_backend() if hasattr(extension,'get_d2h_backend') else None,

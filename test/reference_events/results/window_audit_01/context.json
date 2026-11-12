@@ -1,0 +1,86 @@
+{
+  "summaries": [
+    {
+      "backend": "verbs",
+      "node": 0,
+      "requests": 1188,
+      "tail_requests": 60,
+      "p95_us": 2198.9069999999997,
+      "tail_positions": {
+        "7": 10,
+        "8": 13,
+        "9": 24,
+        "10": 13
+      },
+      "observed_pending_counts": {
+        "0": 108,
+        "2": 111,
+        "4": 149,
+        "6": 313,
+        "7": 504,
+        "5": 3
+      }
+    },
+    {
+      "backend": "verbs",
+      "node": 1,
+      "requests": 1188,
+      "tail_requests": 60,
+      "p95_us": 2289.9230000000002,
+      "tail_positions": {
+        "7": 17,
+        "8": 22,
+        "9": 9,
+        "6": 12
+      },
+      "observed_pending_counts": {
+        "0": 108,
+        "2": 108,
+        "4": 155,
+        "6": 308,
+        "7": 507,
+        "5": 2
+      }
+    },
+    {
+      "backend": "urma",
+      "node": 0,
+      "requests": 1188,
+      "tail_requests": 60,
+      "p95_us": 2227.6935,
+      "tail_positions": {
+        "7": 19,
+        "6": 38,
+        "8": 3
+      },
+      "observed_pending_counts": {
+        "0": 108,
+        "2": 108,
+        "4": 108,
+        "6": 147,
+        "5": 78,
+        "7": 639
+      }
+    },
+    {
+      "backend": "urma",
+      "node": 1,
+      "requests": 1188,
+      "tail_requests": 60,
+      "p95_us": 3449.8869999999974,
+      "tail_positions": {
+        "6": 59,
+        "7": 1
+      },
+      "observed_pending_counts": {
+        "0": 109,
+        "2": 108,
+        "4": 108,
+        "6": 207,
+        "7": 643,
+        "5": 13
+      }
+    }
+  ],
+  "note": "BF16, 4096 tokens, nine valid windows per node. Position means issue order among payload WRs within each (Proxy, GPU ring, window), not a global WR number. Pending is reconstructed only from complete observed business chains and is a lower bound, not hardware queue occupancy. Earlier CQE timestamps are software observations. A concentration at one position motivates an intervention; it does not prove queue or fence causality."
+}

@@ -2586,6 +2586,7 @@ NB_MODULE(ep, m) {
 #endif
   });
   m.def("get_dispatch_trace_version", []() { return 1; });
+  m.def("get_normal_max_inflight", []() { return get_max_inflight_normal(); });
   m.def("get_reference_events_version", []() { return uccl_reference_events_version(); });
   m.def("get_urma_ll_write_order", []() {
     return std::string(urma_ll_relaxed_write_from_env() ? "relax" : "strong");
