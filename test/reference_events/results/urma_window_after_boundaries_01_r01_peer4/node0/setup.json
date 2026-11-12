@@ -1,0 +1,60 @@
+{
+  "fingerprint": {
+    "job": "urma_window_after_boundaries_01_r01_peer4",
+    "backend": "urma",
+    "mode": "normal",
+    "shape": [
+      4096,
+      128,
+      7168,
+      256,
+      8
+    ],
+    "sources_hash": "fb593b9a8c5d0610561b33e2e843426d96687742fedf991bbc585bc30458907c",
+    "diagnostics_hash": "6585633e7f064db48daa1b461c432b5dd8afbfa8fa30522dd9a5233494397e0c",
+    "ifname": "enp33s0",
+    "kernel": "6.6.0-gdr_f00955680_diag",
+    "phase_suite": true,
+    "stage_profile": false,
+    "save_traces": false,
+    "warmups": 5,
+    "samples": 10,
+    "ll_hook_workload": "gemm",
+    "api_only": true,
+    "ll_write_order": "default",
+    "normal_write_order": "default",
+    "normal_submit_schedule": "lane-mixed",
+    "normal_window_plan": "peer4",
+    "normal_completion": "all",
+    "capture_layout": false,
+    "dispatch_trial": false,
+    "dispatch_delay_us": 0,
+    "delay_node": 1,
+    "timeline": false,
+    "gpu_stages": false,
+    "gpu_stage_mode": "all",
+    "device": "udmac0d1e2",
+    "gpu": "0",
+    "dispatch_focus": true,
+    "dispatch_compiled_off": false,
+    "gpu_stage_roles_only": false,
+    "reference_events": "paced",
+    "reference_profile": "legacy",
+    "build_hash": "54460d4934d1217e07e4c003506938d508f2550be45a484be77aed1b69868803",
+    "libraries": {
+      "libummu.so.1": "ad8bb0e5153549f4b76f1a8eeffcab62f503a1114e2373ceed8784c45e88105a",
+      "liburma.so": "56d6374553c2843c13eb7f7bc98a5bb65fa2fa4eb5f3b4a331f56cf126fb1f22",
+      "liburma.so.0": "56d6374553c2843c13eb7f7bc98a5bb65fa2fa4eb5f3b4a331f56cf126fb1f22",
+      "liburma.so.0.0.3": "56d6374553c2843c13eb7f7bc98a5bb65fa2fa4eb5f3b4a331f56cf126fb1f22",
+      "liburma_common.so": "c159fffbce1c82944ceccc98555d8e181fe405414384ed671e9ce3fb0b437fad",
+      "liburma_common.so.0": "c159fffbce1c82944ceccc98555d8e181fe405414384ed671e9ce3fb0b437fad",
+      "liburma_common.so.0.0.1": "c159fffbce1c82944ceccc98555d8e181fe405414384ed671e9ce3fb0b437fad"
+    },
+    "runtime_libraries": {
+      "libmcruntime.so": "bef5663d8c72272bccd8e2f23acc33345876a67c6325644285dff27737938807",
+      "libruntime_cu.so": "65a7974316536e3125bfd8e5bd6595ff71bdb7ac8e2b911c226bc3b2ba455f80"
+    },
+    "torch": "2.6.0+metax3.7.0.7"
+  },
+  "error": null
+}
