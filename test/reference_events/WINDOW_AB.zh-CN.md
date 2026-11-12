@@ -1,6 +1,6 @@
 # 下一轮：只改变204发送端的Normal未回收命令窗口
 
-**4096-token边界测试已完成，现有数据支持恢复单变量窗口干预。**新一轮直接按[URMA窗口因果测试操作文档](WINDOW_CAUSAL.zh-CN.md)执行：复用已成功的boundaries模块，只跑关闭采集的ABBA四项，无需重编译。下文保留原双后端完整协议；暂不执行可选trace或新增verbs任务。
+**URMA窗口ABBA已完成，未得到BF16净收益，保留8。**见[结果分析](results/urma_window_after_boundaries_01_summary/ANALYSIS.zh-CN.md)。不重复本轮、不追加窗口扫描/可选trace或新增verbs任务。下文保留原双后端完整协议。
 
 ## 要回答什么，以及为什么测
 

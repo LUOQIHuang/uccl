@@ -1,6 +1,6 @@
 # 本轮优先：拆解Dispatch持续发送、通知等待、epoch可见性及输出收尾
 
-本轮4096-token结果已接收，见[BF16分析与FIFO重建证据](results/urma_boundaries_01_fifo_audit/ANALYSIS.zh-CN.md)。已完成的smoke及三项不必重跑；当前下一步为[单变量窗口因果测试](WINDOW_CAUSAL.zh-CN.md)。下文保留本轮原始测试协议。
+本轮4096-token结果已接收，见[BF16分析与FIFO重建证据](results/urma_boundaries_01_fifo_audit/ANALYSIS.zh-CN.md)。后续[窗口ABBA已完成且未获净收益](results/urma_window_after_boundaries_01_summary/ANALYSIS.zh-CN.md)，保留8；smoke、三项和窗口任务均不必重跑。现有日志已进一步定位到[通知FADD完成推进间隔](results/notify_completion_audit_01/ANALYSIS.zh-CN.md)。下文保留本轮原始测试协议。
 
 ## 本轮只回答什么
 

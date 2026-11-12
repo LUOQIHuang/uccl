@@ -177,6 +177,8 @@ flowchart LR
 
 ## 下一步只验证一个因果问题
 
+**后续进展：该窗口ABBA已经完成。**BF16 r01 B相对A +4.236%但CV超限，r02稳定但+0.719%，未获净收益，保留8、不追加窗口扫描。详见[窗口结果](../urma_window_after_boundaries_01_summary/ANALYSIS.zh-CN.md)。新增纯离线配对审查还发现：WRITE完成观测后，对应FADD完成观测的中位间隔verbs约4μs、URMA约0.55～0.66ms；所有FADD都已在WRITE完成前提交，见[通知完成审查](../notify_completion_audit_01/ANALYSIS.zh-CN.md)。以下保留当时的预定计划，不要求重复执行。
+
 已准备202保持8、204窗口8→4的关闭采集ABBA实验：A→B→B→A。复用当前模块、不重编译、不新增GPU打点、不重跑smoke。操作见[窗口因果测试文档](../../WINDOW_CAUSAL.zh-CN.md)。
 
 目的不是重复确认队列曾满，而是测试：**降低并发是否缩短提交后等待，并带来真实Dispatch净改善？** 减窗也可能让等待前移、降低并行度，因此只有两轮净改善及正确性/CV同时通过才采用。没有结果前不声称它能解决回退，也不将8→4阴性结果等同于否定FIFO满额事实。

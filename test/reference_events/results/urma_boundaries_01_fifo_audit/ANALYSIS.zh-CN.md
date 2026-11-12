@@ -1,5 +1,7 @@
 # URMA Normal BF16：已观察到ATOMIC完成推进拖住FIFO读取
 
+后续[窗口ABBA结果](../urma_window_after_boundaries_01_summary/ANALYSIS.zh-CN.md)未支持8→4带来净收益，保留8；不因此否定下述满额等待事实。新增[通知完成配对审查](../notify_completion_audit_01/ANALYSIS.zh-CN.md)进一步将注意力收窄到WRITE完成观测后仍迟到的通知FADD。下文保留本阶段观察及当时提出的干预计划。
+
 输入提交 `08adc33d`，打点实现 `de66ec0f`。4096-token paced、trace、post两端齐全，六个status均rc=0、全部checks=true。独立运行 `summarize_boundaries.py` 复核原始结果，并新增纯离线FIFO所有权重放，无需服务器再测。
 
 **本轮最具体的发现：末payload已经在GPU侧准备并发布，但CPU很晚才读出；这段间隔超过99%的时间，对应FIFO的8个未回收名额被占满，队首主要是尚未观察到完成的ATOMIC。** 不再只是“Dispatch kernel慢”或笼统猜测“CPU Proxy慢”。

@@ -1,5 +1,7 @@
 # 下一步：验证204并发窗口是否放大ATOMIC完成等待
 
+**本轮已完成，请勿按下文重复运行。**结果未获得BF16净收益，保留8，不追加窗口扫描或可选trace；见[窗口结果分析](results/urma_window_after_boundaries_01_summary/ANALYSIS.zh-CN.md)。下文保留当时预先制定的实验协议。
+
 ## 为什么现在做
 
 4096-token BF16已通过打点代表性检查。末块命令发布后，202/204分别等1.922/3.578ms才被CPU读出；这段间隔超过99%的时间，软件pending=8、队首主要是尚未观察到CQE的ATOMIC。依据见[完整分析](results/urma_boundaries_01_fifo_audit/ANALYSIS.zh-CN.md)。
