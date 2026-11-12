@@ -1,0 +1,24 @@
+{
+  "shape": {
+    "tokens": 4096,
+    "hidden": 7168,
+    "experts": 256,
+    "topk": 8,
+    "sm": 24,
+    "dispatch_chunk": 32,
+    "nvl_chunk": 4
+  },
+  "input_sha256": {
+    "test\\reference_events\\results\\backend_matched_comparison_01\\api_comparison.csv": "b76bde243555d294d98fbfad725b831838bb09bb7feaa88564b2b2d4197c7bfd",
+    "test\\reference_events\\results\\backend_matched_comparison_01\\gpu_span_comparison.csv": "037f097c0018ab78c1c81407006ca74cc1b6bbeb7673b8e63dc0dbaea3da6a35",
+    "test\\reference_events\\results\\backend_matched_comparison_01\\cpu_completion_tails.csv": "fc08b2fcc2609cf5f9e9938a10928f9630026607ac0fb747459472f186f96f5e",
+    "test\\reference_events\\results\\window_audit_01\\payload_positions.csv": "84d0e8f637847f886830fa464977ddc6a600b8d39643cc991f5dab735a283753",
+    "test\\reference_events\\results\\window_audit_01\\context.json": "bd90ece967e3533d57938032bee163828267217aaaeec88e9410af1d9e517c03",
+    "test\\reference_events\\results\\urma_boundaries_01_summary\\boundary_medians.csv": "d443f4e6ee27ecbccbd4a4ba172e0d0f77d834bd68817ea1e2aa2d60968b9ff9",
+    "test\\reference_events\\results\\urma_boundaries_01_summary\\cpu_chunk6_and_last.csv": "089f7257a94e96b8852fe85954e7657ee0c7642e40825d0e0f701d7216accaa3",
+    "test\\reference_events\\results\\urma_boundaries_01_summary\\api_controls.csv": "72efed0e420c85c0925413ac9a3ecd2fcc74d20e9b256686cc6c7a9c5438aec8",
+    "test\\reference_events\\results\\urma_boundaries_01_fifo_audit\\last_write_fifo.csv": "09e4ae3bbce2679937c0231fbbbd6b325a1d1c029593bd49e61e972beb14d3b3",
+    "test\\reference_events\\results\\urma_boundaries_01_fifo_audit\\fifo_medians.csv": "e06f461ebcb04f368b16749b1490c67ef82eabaa9cf1f6233513e0069dc16e2c"
+  },
+  "notes": "Figures 1-3 contain historical backend comparison; figure3 separately labels the latest URMA trace. Figures4-5 use current accepted BF16 only. Request medians are across nine windows and twelve channels, not independent repeated experiments. All CQEs are software observations. No additive critical-path claim."
+}
