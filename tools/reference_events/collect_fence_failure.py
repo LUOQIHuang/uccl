@@ -28,27 +28,57 @@ def snapshot(command):
         return dict(command=command,error=str(exc))
 
 
+def crash_matches(root,job,rank):
+    matches=set()
+    for _,source in existing_cases(root,job,rank):
+        node=source/('node%d'%rank);host=node/'host.json';log=node/'normal/bench.log'
+        if not host.is_file() or not log.is_file():continue
+        boot=json.loads(host.read_text()).get('boot_id','').replace('-','')
+        if not re.fullmatch('[0-9a-fA-F]{32}',boot):continue
+        text=log.read_text(errors='replace')
+        for pid in re.findall(r'\bpid:\s*(\d+)',text):matches.add((boot,pid))
+    return sorted(matches)
+
+
 def collect(root,job,rank,build,destination,since,until):
     if not re.fullmatch('[a-zA-Z0-9_-]+',job):raise ValueError('invalid job')
     spec=importlib.util.spec_from_file_location('failure_collector',REPO/'test/gpu_stage_recovery/collect.py')
     module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
-    collected=[];collection_errors=[]
+    stamp=datetime.datetime.now(datetime.timezone.utc).strftime('%Y%m%dT%H%M%S%fZ')
+    target=destination/(job+'_failure_capture')/('node%d'%rank)/stamp
+    target.mkdir(parents=True,exist_ok=False)
+    collected=[];collection_errors=[];archived=[]
     for suffix,source in existing_cases(root,job,rank):
         try:
             module.collect(source,rank,dict(trace=build),destination/source.name)
             collected.append(suffix)
         except (ValueError,OSError) as exc:
             collection_errors.append(dict(suffix=suffix,error=str(exc)))
+            # Keep changed source evidence without overwriting published data.
+            alternative=target/'conflicting_source'/source.name
+            try:
+                module.collect(source,rank,dict(trace=build),alternative)
+                archived.append(str(alternative.relative_to(target)))
+            except (ValueError,OSError) as err:
+                collection_errors.append(dict(suffix=suffix,archive_error=str(err)))
     # A separate directory retains read-only diagnostics, even when trace
     # never reached the driver's normal result/status writer.
-    stamp=datetime.datetime.now(datetime.timezone.utc).strftime('%Y%m%dT%H%M%S%fZ')
-    target=destination/(job+'_failure_capture')/('node%d'%rank)/stamp
-    target.mkdir(parents=True,exist_ok=False)
+    # A trace may remain in the repository collection after raw output was
+    # removed. Preserve that existing evidence too, never synthesize a case.
+    present={s for s,_ in existing_cases(root,job,rank)}
+    for suffix,source in existing_cases(destination,job,rank):
+        if suffix not in present:
+            alternative=target/'destination_only'/source.name
+            module.collect(source,rank,dict(),alternative)
+            archived.append(str(alternative.relative_to(target)))
     commands=[['uname','-a'],['mx-smi'],['ps','-eo','pid,ppid,user,etime,comm'],
               ['fuser','-v','/dev/mxcd','/dev/uburma/udmac0d1e2'],
-              ['journalctl','-k','--since',since,'--until',until,'--no-pager','-o','short-iso'],
-              ['coredumpctl','--since',since,'--until',until,'--no-pager','list'],
-              ['coredumpctl','--since',since,'--until',until,'--no-pager','info']]
+              ['journalctl','--list-boots','--no-pager'],
+              ['journalctl','_TRANSPORT=kernel','--since',since,'--until',until,'--no-pager','-o','short-iso'],
+              ['coredumpctl','--since',since,'--until',until,'--no-pager','list']]
+    matches=sorted(set(crash_matches(root,job,rank)+crash_matches(destination,job,rank)))
+    for boot,pid in matches:
+        commands.append(['coredumpctl','--no-pager','info','COREDUMP_PID='+pid,'_BOOT_ID='+boot])
     snapshots=[snapshot(command) for command in commands]
     barriers=[]
     for path in sorted(Path('/dev/shm').glob('uccl_barrier_*')):
@@ -57,8 +87,7 @@ def collect(root,job,rank,build,destination,since,until):
         except OSError as exc:barriers.append(dict(path=str(path),error=str(exc)))
     console=root.parent/'fadd_fence_console'/job/('node%d'%rank)
     if console.is_dir():shutil.copytree(console,target/'external_console')
-    present={s for s,_ in existing_cases(root,job,rank)}
-    (target/'capture.json').write_text(json.dumps(dict(collected=collected,collection_errors=collection_errors,missing=[s for s in SUFFIXES if s not in present],
+    (target/'capture.json').write_text(json.dumps(dict(collected=collected,collection_errors=collection_errors,archived=archived,crash_matches=matches,missing=[s for s in SUFFIXES if s not in present],
         root=str(root),job=job,rank=rank,since=since,until=until,barriers=barriers,snapshots=snapshots,
         note='Read-only collection. Missing trace is recorded, never synthesized. No benchmark, process kill, shared-memory unlink, device reset, module reload or boot. Core metadata/backtrace only; no core memory dump.'),indent=2))
     print('FENCE_FAILURE_COLLECTED '+str(target))
