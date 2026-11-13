@@ -1,5 +1,7 @@
 # 下一步：只验证204端Normal数据FADD的fence是否增加等待
 
+本轮已完成：[结果分析](results/urma_fadd_fence_01_summary/ANALYSIS.zh-CN.md)。BF16两配对分别改善3.35%/3.52%，保留为部分候选收益，默认仍on；不需要重复下文已完成任务。
+
 ## 本轮目的与现有数据依据
 
 当前主目标仍是解释并减少Normal BF16的URMA-vs-verbs回退，不继续窗口扫描或增加密集GPU打点。
