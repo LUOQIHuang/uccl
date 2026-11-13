@@ -71,9 +71,9 @@ def occupancy(segments,groups,proxy,start,end,limit=8):
         atomic_head_no_observed_cqe_pct=100*atomic_no_cqe/covered)
 
 
-def audit(control,trace,post,output):
+def audit(control,trace,post,output,fence_plan='default'):
     with tempfile.TemporaryDirectory() as temporary:
-        accepted=boundaries.summarize(control,trace,post,Path(temporary)/'summary')
+        accepted=boundaries.summarize(control,trace,post,Path(temporary)/'summary',fence_plan=fence_plan)
         with (Path(temporary)/'summary/capture_quality.csv').open(newline='') as stream:
             quality=list(csv.DictReader(stream))
     labels=[]
@@ -107,7 +107,7 @@ def audit(control,trace,post,output):
             metrics={k:statistics.median(r[k] for r in rr) for k in ('published_to_poll_us','full_pct','atomic_head_full_pct','payload_head_full_pct','atomic_head_no_observed_cqe_pct')}
             medians.append(dict(node=rank,label=label,observations=len(rr),min_full_pct=min(r['full_pct'] for r in rr),**metrics))
     boundaries.matched.base.write(output/'fifo_medians.csv',medians)
-    (output/'context.json').write_text(json.dumps(dict(accepted_labels=labels,limit=8,
+    (output/'context.json').write_text(json.dumps(dict(accepted_labels=labels,limit=8,fence_plan=fence_plan,
         notes='All collect/ack_slot events are replayed, including local commands, not just completed network business chains. Reject missing, duplicate, out-of-order, over-limit or unretired ownership. Publication is GPU event4 after final payload/tail publication; correspondence uses one remote peer, channel and issue ordinal. Percentages describe software pending ownership, not hardware occupancy or a counterfactual speedup. Boundary timestamps include observer overhead. Per-workload controls are required on both nodes; global usable=False does not discard a different workload that passed.'),indent=2))
     print('BOUNDARY_FIFO_AUDIT_PASSED labels='+','.join(labels)+' '+str(output))
     return medians

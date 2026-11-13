@@ -161,8 +161,8 @@ def parser():
         p.error('writes-first requires URMA Normal Dispatch focus API-only completion=all and reference-events paced/on check/run')
     if args.normal_window_plan!='default' and (args.backend!='urma' or args.mode!='normal' or not args.dispatch_focus or args.reference_events not in ('paced','on') or args.normal_submit_schedule!='lane-mixed' or args.action not in ('check','run')):
         p.error('peer4 requires Normal Dispatch focus paced/on check/run with default submission schedule')
-    if args.normal_fadd_fence_plan!='default' and (args.backend!='urma' or args.mode!='normal' or not args.dispatch_focus or args.reference_events not in ('paced','on') or args.normal_submit_schedule!='lane-mixed' or args.normal_window_plan!='default' or args.normal_completion!='all' or args.reference_profile!='legacy' or args.action not in ('check','run')):
-        p.error('FADD fence experiment requires URMA Normal Dispatch focus legacy paced/on check/run with default window/submission/completion')
+    if args.normal_fadd_fence_plan!='default' and (args.backend!='urma' or args.mode!='normal' or not args.dispatch_focus or args.reference_events not in ('paced','on') or args.normal_submit_schedule!='lane-mixed' or args.normal_window_plan!='default' or args.normal_completion!='all' or args.action not in ('check','run')):
+        p.error('FADD fence experiment requires URMA Normal Dispatch focus paced/on check/run with default window/submission/completion')
     if args.collect_suite and args.action!='collect': p.error('--collect-suite requires --action collect')
     if args.capture_layout and (args.mode!='normal' or not args.api_only or args.backend!='urma'):
         p.error('--capture-layout requires URMA Normal API-only')

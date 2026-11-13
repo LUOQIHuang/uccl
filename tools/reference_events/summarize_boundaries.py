@@ -77,13 +77,14 @@ def cpu_focus(window):
     return rows
 
 
-def summarize(control,trace,post,output):
+def summarize(control,trace,post,output,fence_plan='default'):
+    if fence_plan not in ('default','all-on','peer-off'):raise ValueError('unknown fence observation plan')
     controls=[];cases=[];contexts=[]
     for rank in (0,1):
         b=matched.base.case_data(control,rank,False,reference_events='paced')
         t=matched.base.case_data(trace,rank,False,reference_events='on')
         p=matched.base.case_data(post,rank,False,reference_events='paced')
-        if any(x['identity'].get('reference_profile')!='boundaries' or x['identity'].get('normal_window_plan')!='default' or x['identity'].get('normal_submit_schedule','lane-mixed')!='lane-mixed' or x['identity'].get('normal_fadd_fence','on')!='on' for x in (b,t,p)):
+        if any(x['identity'].get('reference_profile')!='boundaries' or x['identity'].get('normal_window_plan')!='default' or x['identity'].get('normal_submit_schedule','lane-mixed')!='lane-mixed' or x['identity'].get('normal_fadd_fence_plan','default')!=fence_plan or x['identity'].get('normal_fadd_fence','on')!=('off' if fence_plan=='peer-off' and rank==1 else 'on') for x in (b,t,p)):
             raise ValueError('wrong boundary/default transport profile')
         if not matched.base.sig(b['identity'])==matched.base.sig(t['identity'])==matched.base.sig(p['identity']) or len({x['runtime']['module_sha'] for x in (b,t,p)})!=1:
             raise ValueError('boundary controls changed source/module/boot/runtime/workload')
@@ -114,8 +115,8 @@ def summarize(control,trace,post,output):
     with (output/'capture_quality.csv').open(newline='') as stream:quality=list(csv.DictReader(stream))
     clock_offsets_ok=all(int(r['gpu_before_origin'])==0 and int(r['scheduler_error'])==0 for r in quality)
     usable=representative and clock_offsets_ok
-    (output/'context.json').write_text(json.dumps(dict(nodes=contexts,usable=usable,performance_representative=representative,clock_offsets_ok=clock_offsets_ok,
-        note='Default Normal, sparse dispatch_boundaries_v1 profile. GPU times are sampled RAW clock estimates; same-role clock64 deltas are cycles without frequency conversion. Tail first/last attempt spans differ: first includes intervening round-robin work, last covers the successful check attempt. Finishing gaps can be signed because roles overlap. CPU focus matches one remote peer by channel and payload issue ordinal, not protocol-carried WR identity. Heartbeats sample every 128 SDK polls; only a fully bracketed small maximum gap can exclude a long unserviced interval, a large gap alone does not prove Proxy inactivity. No cross-host timestamp subtraction or additive critical-path claim. If usable=false, keep raw observations but do not treat them as representative performance.'),indent=2))
+    (output/'context.json').write_text(json.dumps(dict(nodes=contexts,fence_plan=fence_plan,usable=usable,performance_representative=representative,clock_offsets_ok=clock_offsets_ok,
+        note='Fixed Normal, sparse dispatch_boundaries_v1 profile; fence_plan records the explicit default or diagnostic intervention. GPU times are sampled RAW clock estimates; same-role clock64 deltas are cycles without frequency conversion. Tail first/last attempt spans differ: first includes intervening round-robin work, last covers the successful check attempt. Finishing gaps can be signed because roles overlap. CPU focus matches one remote peer by channel and payload issue ordinal, not protocol-carried WR identity. Heartbeats sample every 128 SDK polls; only a fully bracketed small maximum gap can exclude a long unserviced interval, a large gap alone does not prove Proxy inactivity. No cross-host timestamp subtraction or additive critical-path claim. If usable=false, keep raw observations but do not treat them as representative performance.'),indent=2))
     print('BOUNDARY_SUMMARY_PASSED usable='+str(usable)+' '+str(output))
     return controls
 

@@ -23,7 +23,9 @@ class FaddFencePlanTests(unittest.TestCase):
         args.node_rank=1;args.normal_fadd_fence_plan='default'
         with patch.dict(os.environ,{'UCCL_URMA_NORMAL_FADD_FENCE':'off'}):
             self.assertEqual(ns['environment'](args)['UCCL_URMA_NORMAL_FADD_FENCE'],'on')
-        for extra in (['--mode','low_latency'],['--normal-window-plan','peer4'],['--normal-submit-schedule','writes-first'],['--normal-completion','paired'],['--reference-profile','boundaries'],['--action','build']):
+        with patch.object(sys,'argv',self.arguments()+['--reference-profile','boundaries']):
+            self.assertEqual(ns['parser']().reference_profile,'boundaries')
+        for extra in (['--mode','low_latency'],['--normal-window-plan','peer4'],['--normal-submit-schedule','writes-first'],['--normal-completion','paired'],['--action','build']):
             with patch.object(sys,'argv',self.arguments()+extra),patch('sys.stderr',io.StringIO()),self.assertRaises(SystemExit):ns['parser']()
 
     def test_preflight_requires_new_module_and_effective_setting(self):

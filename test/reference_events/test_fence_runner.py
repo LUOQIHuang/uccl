@@ -33,8 +33,8 @@ rank=int(a['--node-rank']);node=root/a['--job']/('node%d'%rank);case=node/'norma
 failed=os.environ.get('FAIL_SUFFIX') and a['--job'].endswith(os.environ['FAIL_SUFFIX'])
 def save(path,value):path.write_text(json.dumps(value))
 save(case/'status.json',dict(rc=7 if failed else 0,checks=dict(correctness=not failed)))
-save(case/'runtime.json',dict(module_sha='same',normal_fadd_fence_version=1,normal_fadd_fence='off' if rank and a['--normal-fadd-fence-plan']=='peer-off' else 'on'))
-save(node/'setup.json',dict(error=None,fingerprint=dict(normal_fadd_fence_plan=a['--normal-fadd-fence-plan'],shape=[int(a['--normal-tokens']),128,7168,256,8])))
+save(case/'runtime.json',dict(module_sha='same',normal_fadd_fence_version=1,normal_fadd_fence='off' if rank and a['--normal-fadd-fence-plan']=='peer-off' else 'on',reference_boundary_version=1,reference_profile=a['--reference-profile']))
+save(node/'setup.json',dict(error=None,fingerprint=dict(normal_fadd_fence_plan=a['--normal-fadd-fence-plan'],shape=[int(a['--normal-tokens']),128,7168,256,8],reference_profile=a['--reference-profile'],reference_events=a['--reference-events'])))
 save(node/'host.json',dict(boot_id=Path('/proc/sys/kernel/random/boot_id').read_text().strip()))
 sys.exit(7 if failed else 0)
 ''')
@@ -79,6 +79,16 @@ with (root/'collected.jsonl').open('a') as f:f.write(json.dumps(sys.argv[1:])+'\
             result=self.run_part('performance');self.assertNotEqual(result.returncode,0,result.stdout)
             self.assertEqual(len(self.calls()),2)
             path.write_text(original)
+
+    def test_observation_requires_its_own_active_boundary_smoke_and_six_cases(self):
+        result=self.run_part('smoke');self.assertEqual(result.returncode,0,result.stdout)
+        self.assertNotEqual(self.run_part('observe').returncode,0)
+        result=self.run_part('observe-smoke');self.assertEqual(result.returncode,0,result.stdout)
+        result=self.run_part('observe');self.assertEqual(result.returncode,0,result.stdout)
+        runs=[a for a in self.calls() if a['--action']=='run' and a['--reference-profile']=='boundaries']
+        self.assertEqual([a['--job'] for a in runs],['ab_observe_smoke128']+['ab_'+plan+'_'+step for plan in ('all_on','peer_off') for step in ('paced','trace','post')])
+        self.assertEqual([a['--reference-events'] for a in runs],['on','paced','on','paced','paced','on','paced'])
+        self.assertEqual([a['--normal-fadd-fence-plan'] for a in runs],['peer-off']+['all-on']*3+['peer-off']*3)
 
     def test_failed_b_is_collected_and_stops_before_second_pair(self):
         result=self.run_part('smoke');self.assertEqual(result.returncode,0,result.stdout)
