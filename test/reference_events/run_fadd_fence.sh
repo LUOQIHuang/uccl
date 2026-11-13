@@ -15,7 +15,7 @@ while [ "$#" -gt 0 ];do
  esac
 done
 [[ "$RANK" == 0 || "$RANK" == 1 ]] && [[ "$JOB" =~ ^[a-zA-Z0-9_-]+$ ]] && [ -n "$BUILD" ] || exit 2
-[[ "$PART" == smoke || "$PART" == performance || "$PART" == observe-smoke || "$PART" == observe ]] || exit 2
+[[ "$PART" == smoke || "$PART" == performance || "$PART" == observe-smoke || "$PART" == observe || "$PART" == observe-a || "$PART" == observe-b ]] || exit 2
 [[ "$PORT" =~ ^[0-9]+$ ]] && ((PORT>=1024 && PORT<65534)) || exit 2
 PYTHON=${URMA_DIAG_PYTHON:-${VERBS_DIAG_PYTHON:-python3}}
 ENTRY="$HERE/../urma_mode_parity/run.sh"
@@ -43,7 +43,7 @@ elif [ "$PART" = observe-smoke ];then
  run_one observe_smoke128 peer-off 128 1 3 boundaries on
 else
  SMOKE=smoke128;PROFILE=legacy
- if [ "$PART" = observe ];then SMOKE=observe_smoke128;PROFILE=boundaries;fi
+ if [[ "$PART" == observe* ]];then SMOKE=observe_smoke128;PROFILE=boundaries;fi
  # The new dependency setting must pass correctness on this same module/boot.
  "$PYTHON" - "$ROOT/${JOB}_${SMOKE}/node$RANK" "$BUILD" "$RANK" "$PROFILE" <<'PY'
 import json,sys
@@ -63,13 +63,34 @@ if profile=='boundaries':
     assert setup['fingerprint']['reference_profile']==profile and setup['fingerprint']['reference_events']=='on','wrong observer smoke'
     assert runtime['reference_boundary_version']==1 and runtime['reference_profile']==profile,'missing boundary capability'
 PY
- if [ "$PART" = observe ];then
-  run_one all_on_paced all-on 4096 5 10 boundaries paced
-  run_one all_on_trace all-on 4096 5 10 boundaries on
-  run_one all_on_post all-on 4096 5 10 boundaries paced
-  run_one peer_off_paced peer-off 4096 5 10 boundaries paced
-  run_one peer_off_trace peer-off 4096 5 10 boundaries on
-  run_one peer_off_post peer-off 4096 5 10 boundaries paced
+ if [[ "$PART" == observe* ]];then
+  if [ "$PART" = observe-b ];then
+   "$PYTHON" - "$ROOT" "$JOB" "$RANK" "$BUILD" <<'PY'
+import json,sys
+from pathlib import Path
+root,job,rank,build=Path(sys.argv[1]),sys.argv[2],int(sys.argv[3]),Path(sys.argv[4])
+read=lambda p:json.loads(p.read_text())
+for step in ('paced','trace','post'):
+    node=root/(job+'_all_on_'+step)/('node%d'%rank)
+    status=read(node/'normal/status.json');runtime=read(node/'normal/runtime.json')
+    setup=read(node/'setup.json')['fingerprint']
+    assert status['rc']==0 and all(status['checks'].values()),'A did not pass; do not start B'
+    assert setup['normal_fadd_fence_plan']=='all-on' and setup['reference_profile']=='boundaries','wrong A plan/profile'
+    assert setup['reference_events']==('on' if step=='trace' else 'paced'),'wrong A sampling mode'
+    assert runtime['module_sha']==read(build/'manifest.json')['module_sha'],'A module changed'
+    assert read(node/'host.json')['boot_id']==Path('/proc/sys/kernel/random/boot_id').read_text().strip(),'A boot changed'
+PY
+  fi
+  if [ "$PART" != observe-b ];then
+   run_one all_on_paced all-on 4096 5 10 boundaries paced
+   run_one all_on_trace all-on 4096 5 10 boundaries on
+   run_one all_on_post all-on 4096 5 10 boundaries paced
+  fi
+  if [ "$PART" != observe-a ];then
+   run_one peer_off_paced peer-off 4096 5 10 boundaries paced
+   run_one peer_off_trace peer-off 4096 5 10 boundaries on
+   run_one peer_off_post peer-off 4096 5 10 boundaries paced
+  fi
  else
   run_one r01_all_on all-on 4096 5 10
   run_one r01_peer_off peer-off 4096 5 10

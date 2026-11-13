@@ -100,5 +100,15 @@ with (root/'collected.jsonl').open('a') as f:f.write(json.dumps(sys.argv[1:])+'\
         self.assertEqual(len(collected),3)
         self.assertIn('ab_r01_peer_off',collected[-1])
 
+    def test_split_observation_does_not_start_b_until_a_passes(self):
+        result=self.run_part('observe-smoke');self.assertEqual(result.returncode,0,result.stdout)
+        self.assertNotEqual(self.run_part('observe-b').returncode,0)
+        result=self.run_part('observe-a');self.assertEqual(result.returncode,0,result.stdout)
+        runs=[a['--job'] for a in self.calls() if a['--action']=='run']
+        self.assertEqual(runs,['ab_observe_smoke128','ab_all_on_paced','ab_all_on_trace','ab_all_on_post'])
+        result=self.run_part('observe-b');self.assertEqual(result.returncode,0,result.stdout)
+        runs=[a['--job'] for a in self.calls() if a['--action']=='run']
+        self.assertEqual(runs[-3:],['ab_peer_off_paced','ab_peer_off_trace','ab_peer_off_post'])
+
 
 if __name__=='__main__':unittest.main()

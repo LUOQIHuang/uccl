@@ -1,6 +1,6 @@
 # fence稀疏观测首轮：A基线通过，正式trace缺失，后控制遭遇URMA完成错误
 
-补收集已到：[最新分析及收集工具修正](urma_fadd_fence_observe_01_failure_capture/ANALYSIS.zh-CN.md)。新增trace终端记录显示ready阶段停止；当前未取得本测试core栈，采集时202已切标准内核、204设备被占用。下文保留首轮判断，不将提交说明中的SIGSEGV视为已核实。
+最终补收集已到：[最新分析](urma_fadd_fence_observe_01_failure_capture/ANALYSIS_02.zh-CN.md)。已找回成功B样本，但A/B boot不同、正式trace及core仍缺，停止历史补收集。最新快照两端均为URMA内核但设备被占用；待协调后按新JOB先验证A三项。下文保留首轮判断，不将提交说明中的SIGSEGV视为已核实。
 
 本次接收提交03e59628，分析日期2026-11-13。尚未取得完整A/B阶段对照，不能据本轮确认278μs来自哪个阶段。提交说明中的“trace SIGSEGV”与实际上传的all_on_post SIGABRT必须区分。
 

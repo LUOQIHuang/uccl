@@ -1,6 +1,8 @@
 # Normal下一步：确认fence收益是否对应通知推进/FIFO回收改善
 
-**首轮遇到阻断，暂不重跑下文六项。**请先按[本轮结果与只读补收集步骤](results/urma_fadd_fence_observe_01_ANALYSIS.zh-CN.md)收取已有all_on_trace故障日志。A基线通过，但post出现URMA完成错误，B被barrier残留拦截，尚无完整阶段对照。
+最新归档已分析，历史取证结束：请用[新JOB仅验证A三项的步骤](FADD_FENCE_OBSERVE_RESTART.zh-CN.md)，暂不直接重跑下文六项。完整证据见[最新分析](results/urma_fadd_fence_observe_01_failure_capture/ANALYSIS_02.zh-CN.md)。
+
+下文保留原始六项协议供核对；当前执行入口为上面的分段运行文档，不再执行旧JOB补收集。
 
 ## 目的与停止边界
 
