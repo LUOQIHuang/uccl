@@ -1,5 +1,7 @@
 # Normal下一步：确认fence收益是否对应通知推进/FIFO回收改善
 
+**首轮遇到阻断，暂不重跑下文六项。**请先按[本轮结果与只读补收集步骤](results/urma_fadd_fence_observe_01_ANALYSIS.zh-CN.md)收取已有all_on_trace故障日志。A基线通过，但post出现URMA完成错误，B被barrier残留拦截，尚无完整阶段对照。
+
 ## 目的与停止边界
 
 上一轮204数据FADD fence off的ABBA已取得BF16净收益3.35%/3.52%，平均约278μs；不重复原ABBA。已有fence-on trace中，204 WRITE提交结束→通知提交结束平均394.39μs，其中388.52μs发生在CPU取到通知命令之前，取到后只约5.87μs。
