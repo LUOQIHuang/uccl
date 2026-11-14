@@ -1,5 +1,7 @@
 # 历史取证结束：新JOB先验证A的4096稀疏采集
 
+**此任务已完成，到此停止，不再运行下文。**[Observe_02结果](results/urma_fadd_fence_observe_02_A_summary/ANALYSIS.zh-CN.md)：两端运行/正确性通过，但204 BF16采集扰动+6.34%超出5%门槛。遵守预先约定，不执行B、不重复A、不放宽门槛；下文保留当时协议。
+
 目的：只解决“默认fence开启时，4096-token的稀疏采集及后控制能否完成”。这一步不尝试新的优化，不启动完整A/B六项，不再补收旧故障。
 
 最新归档找回成功B数据，但与旧A boot不同，正式trace仍缺失；旧启动的journal/core未保留。见[分析](results/urma_fadd_fence_observe_01_failure_capture/ANALYSIS_02.zh-CN.md)。
