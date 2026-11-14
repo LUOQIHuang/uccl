@@ -10,8 +10,24 @@ from summarize_stage_breakdown import summarize
 LABELS=['layout','dispatch_fp8_chunk32','dispatch_bf16_chunk32','combine_chunk12','combine_chunk16']
 def mask(s):return re.sub(r'//[^\n]*|/\*[\s\S]*?\*/|"(?:\\.|[^"\\])*"|\'(?:\\.|[^\'\\])*\'',lambda m:''.join('\n' if c=='\n' else ' ' for c in m.group()),s)
 class GpuStageTests(unittest.TestCase):
+    def test_normal_fadd_role_annotations_match_tail_and_head_addresses(self):
+        source=(REPO/'ep/src/internode.cu').read_text()
+        calls=re.findall(r'nvshmemi_ibgda_amo_nonfetch_add</\*use_normal_mode=\*/true>\([\s\S]*?\);',source)
+        self.assertEqual(len(calls),5)
+        for call in calls:
+            role='Tail' if 'rdma_channel_tail.buffer' in call else 'Head'
+            self.assertIn('rdma_channel_'+role.lower()+'.buffer',call)
+            self.assertIn('NormalAtomicRole::'+role,call)
     def test_annotations_preserve_original_kernel_statements(self):
         s=(REPO/'ep/src/internode.cu').read_text()
+        # The fence-scope experiment explicitly labels the five existing
+        # Normal FADD call sites; exclude only these metadata arguments from
+        # the legacy timing-only equivalence check, with exact site counts.
+        self.assertEqual(s.count('NormalAtomicRole::Tail'),2)
+        self.assertEqual(s.count('NormalAtomicRole::Head'),3)
+        s=s.replace('              , NormalAtomicRole::Tail);','          );')
+        s=s.replace('                , NormalAtomicRole::Tail);','            );')
+        s=s.replace(', NormalAtomicRole::Head','')
         s=re.sub(r'// REFERENCE_EVENT_BEGIN\n[\s\S]*?// REFERENCE_EVENT_END\n','',s)
         s=re.sub(r'UCCL_GPU_STAGE_DETAIL\((\w+),',r'uccl::gpu_stages::Span \1(',s)
         s=s.replace('UCCL_GPU_STAGE_DISPATCH_SCOPE(dispatch_operator_scope,','uccl::gpu_stages::DispatchScope dispatch_operator_scope(')

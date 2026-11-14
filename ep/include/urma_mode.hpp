@@ -5,6 +5,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <stdexcept>
+#include "normal_atomic_role.hpp"
 
 // Diagnostic A/B only. Default transport semantics remain unchanged. Parse
 // once per transport, never getenv in the WR hot path. Atomic fences are not
@@ -29,9 +30,16 @@ inline bool urma_normal_relaxed_write_from_env() {
 // Barrier requests and LL retain their original per-request fence.
 inline bool urma_normal_fadd_fence_from_env() {
   auto const* value=std::getenv("UCCL_URMA_NORMAL_FADD_FENCE");
-  if (!value || !*value || !std::strcmp(value,"default") || !std::strcmp(value,"on")) return true;
+  if (!value || !*value || !std::strcmp(value,"default") || !std::strcmp(value,"on") || !std::strcmp(value,"tail-off")) return true;
   if (!std::strcmp(value,"off")) return false;
-  throw std::invalid_argument("UCCL_URMA_NORMAL_FADD_FENCE must be default|on|off");
+  throw std::invalid_argument("UCCL_URMA_NORMAL_FADD_FENCE must be default|on|off|tail-off");
+}
+inline bool urma_normal_tail_fence_off_from_env() {
+  auto const* value=std::getenv("UCCL_URMA_NORMAL_FADD_FENCE");
+  return value && !std::strcmp(value,"tail-off");
+}
+inline char const* urma_normal_fadd_fence_name_from_env() {
+  return urma_normal_tail_fence_off_from_env() ? "tail-off" : (urma_normal_fadd_fence_from_env() ? "on" : "off");
 }
 
 enum class UrmaNormalCompletion { All, Ordered, Paired };
@@ -91,6 +99,7 @@ struct UrmaWorkRequest {
   uint32_t bytes = 0;
   int64_t value = 0;
   bool fence = true;
+  NormalAtomicRole normal_role = NormalAtomicRole::Unknown;
   // Explicit adjacency contract: this internal WRITE is immediately followed
   // by its original, fenced notifying FADD on the SAME ring and peer.
   bool notify_pair = false;

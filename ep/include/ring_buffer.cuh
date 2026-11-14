@@ -2,6 +2,7 @@
 #define RING_BUFFER_CUH
 
 #include "common.hpp"
+#include "normal_atomic_role.hpp"
 #include "gpu_stage_trace.cuh"
 #include "util/gpu_rt.h"
 #include <infiniband/verbs.h>

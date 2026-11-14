@@ -1395,6 +1395,7 @@ void Proxy::post_urma_commands(std::vector<uint64_t> const& wrs_to_post,
       request.wr_id = wrs_to_post[i];
       request.remote_offset = cmd.atomic_offset;
       request.value = static_cast<int64_t>(cmd.atomic_val);
+      request.normal_role = NormalAtomicRole::Tail;
       enqueue(peer,request);
     }
   }
@@ -1419,6 +1420,7 @@ void Proxy::post_urma_commands(std::vector<uint64_t> const& wrs_to_post,
     request.wr_id = wrs_to_post[i];
     request.remote_offset = cmd.req_rptr;
     request.value = mode.atomic_value(value,get_is_combine(cmd.cmd_type));
+    if(cfg_.use_normal_mode) request.normal_role=static_cast<NormalAtomicRole>(cmd.atomic_offset);
     enqueue(static_cast<int>(cmd.dst_rank),request);
   }
   for (size_t peer = 0; peer < urma_batches_by_rank_.size(); ++peer)

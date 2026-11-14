@@ -94,8 +94,9 @@ def case_data(root,rank,trace,compiled_off=False,reference_events=None):
         if runtime.get('normal_submit_schedule') not in (None,schedule) or (schedule!='lane-mixed' and runtime.get('normal_submit_schedule')!=schedule):raise ValueError('Normal submission schedule runtime mismatch')
         identity['normal_submit_schedule']=schedule
         fence_plan=c.get('normal_fadd_fence_plan','default')
-        if fence_plan not in ('default','all-on','peer-off'):raise ValueError('unknown Normal FADD fence plan')
-        expected_fence='off' if fence_plan=='peer-off' and rank==1 else 'on'
+        if fence_plan not in ('default','all-on','peer-off','peer-tail-off'):raise ValueError('unknown Normal FADD fence plan')
+        expected_fence=('tail-off' if fence_plan=='peer-tail-off' else 'off') if fence_plan in ('peer-off','peer-tail-off') and rank==1 else 'on'
+        if fence_plan=='peer-tail-off' and (runtime.get('normal_atomic_role_version')!=1 or not status['checks'].get('normal_atomic_roles')):raise ValueError('unverified Normal ATOMIC role support')
         if fence_plan!='default' and (runtime.get('normal_fadd_fence_version')!=1 or runtime.get('normal_fadd_fence')!=expected_fence or not status['checks'].get('normal_fadd_fence')):
             raise ValueError('unverified Normal FADD fence capability/effective transport setting')
         if runtime.get('normal_fadd_fence') not in (None,expected_fence):raise ValueError('Normal FADD fence runtime mismatch')

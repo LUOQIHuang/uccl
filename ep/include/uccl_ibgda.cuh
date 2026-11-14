@@ -182,7 +182,7 @@ __device__ __forceinline__ void nvshmemi_ibgda_amo_nonfetch_add(
     int warp_id, bool is_local_copy = false,
     uint64_t const* d2h_channel_addrs = nullptr, int num_d2h_channel_addrs = 0,
     bool is_combine = true, int low_latency_buffer_idx = 0,
-    bool skip_remote = false) {
+    bool skip_remote = false, NormalAtomicRole normal_role = NormalAtomicRole::Unknown) {
   UCCL_GPU_STAGE_DETAIL(gpu_operator_stage,d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),42);
   if (is_local_copy) {
     atomicAdd(reinterpret_cast<unsigned long long*>(rptr),
@@ -214,6 +214,7 @@ __device__ __forceinline__ void nvshmemi_ibgda_amo_nonfetch_add(
       cmd.cmd_type =
           make_cmd_type(CmdType::ATOMIC, is_combine, low_latency_buffer_idx);
       cmd.value = value;
+      if constexpr (use_normal_mode) cmd.atomic_offset=static_cast<uint16_t>(normal_role);
       cmd.dst_rank = dst_rank;
       cmd.req_rptr = rptr;
       h->atomic_set_and_commit(cmd, &slot);
@@ -236,6 +237,7 @@ __device__ __forceinline__ void nvshmemi_ibgda_amo_nonfetch_add(
         // TODO(MaoZiming): Check fields here.
         // NOTE(MaoZiming): cmd is needed for proxy to process the command.
         cmd.value = value;
+        if constexpr (use_normal_mode) cmd.atomic_offset=static_cast<uint16_t>(normal_role);
         cmd.dst_rank = dst_rank;
         cmd.req_rptr = rptr;
         h->atomic_set_and_commit(cmd, &slot);

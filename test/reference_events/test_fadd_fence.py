@@ -25,6 +25,11 @@ class FaddFencePlanTests(unittest.TestCase):
             self.assertEqual(ns['environment'](args)['UCCL_URMA_NORMAL_FADD_FENCE'],'on')
         with patch.object(sys,'argv',self.arguments()+['--reference-profile','boundaries']):
             self.assertEqual(ns['parser']().reference_profile,'boundaries')
+        with patch.object(sys,'argv',self.arguments()+['--normal-fadd-fence-plan','peer-tail-off']):
+            tail_args=ns['parser']()
+        self.assertEqual(ns['environment'](tail_args)['UCCL_URMA_NORMAL_FADD_FENCE'],'tail-off')
+        tail_args.node_rank=0
+        self.assertEqual(ns['environment'](tail_args)['UCCL_URMA_NORMAL_FADD_FENCE'],'on')
         for extra in (['--mode','low_latency'],['--normal-window-plan','peer4'],['--normal-submit-schedule','writes-first'],['--normal-completion','paired'],['--action','build']):
             with patch.object(sys,'argv',self.arguments()+extra),patch('sys.stderr',io.StringIO()),self.assertRaises(SystemExit):ns['parser']()
 
@@ -40,6 +45,15 @@ class FaddFencePlanTests(unittest.TestCase):
             if version==1 and value=='off':ns['preflight'](args)
             else:
                 with self.assertRaisesRegex(RuntimeError,'NORMAL_FADD_FENCE_RUNTIME_MISMATCH'):ns['preflight'](args)
+
+    def test_role_capability_is_required_for_three_way_baselines_too(self):
+        ns=driver_functions('urma')
+        with patch.object(sys,'argv',self.arguments()+['--normal-fadd-fence-plan','all-on','--require-normal-atomic-roles']):args=ns['parser']()
+        ns['support']=NS(read_build=lambda p:(Path('ep.so'),dict(sources={},module_sha='sha',flags={'UCCL_REFERENCE_EVENTS':'1','UCCL_GPU_STAGE_TRACE':'0'})))
+        ns['urma_support']=NS(library_manifest=lambda p:{},hardware_check=lambda p:{})
+        metadata=dict(normal_fadd_fence_version=1,normal_fadd_fence='on',phase_diagnostics=True,normal_max_inflight=8)
+        ns['subprocess']=NS(run=lambda *a,**kw:NS(returncode=0,stdout='MODE_PARITY_IMPORT_OK '+json.dumps(metadata),stderr=''))
+        with self.assertRaisesRegex(RuntimeError,'NORMAL_ATOMIC_ROLE_REBUILD_REQUIRED'):ns['preflight'](args)
 
 
 if __name__=='__main__':unittest.main()

@@ -24,7 +24,7 @@ class FenceRunnerTests(unittest.TestCase):
         (self.root/'urma_mode_parity/fake.py').write_text('''
 import json,os,sys
 from pathlib import Path
-a={};it=iter(sys.argv[1:]);flags={'--phase-suite','--api-only','--dispatch-focus'}
+a={};it=iter(sys.argv[1:]);flags={'--phase-suite','--api-only','--dispatch-focus','--require-normal-atomic-roles'}
 for key in it:a[key]=True if key in flags else next(it)
 root=Path(a['--output']);root.mkdir(parents=True,exist_ok=True)
 with (root/'calls.jsonl').open('a') as f:f.write(json.dumps(a)+'\\n')
@@ -32,8 +32,8 @@ if a['--action']=='check':sys.exit(0)
 rank=int(a['--node-rank']);node=root/a['--job']/('node%d'%rank);case=node/'normal';case.mkdir(parents=True)
 failed=os.environ.get('FAIL_SUFFIX') and a['--job'].endswith(os.environ['FAIL_SUFFIX'])
 def save(path,value):path.write_text(json.dumps(value))
-save(case/'status.json',dict(rc=7 if failed else 0,checks=dict(correctness=not failed)))
-save(case/'runtime.json',dict(module_sha='same',normal_fadd_fence_version=1,normal_fadd_fence='off' if rank and a['--normal-fadd-fence-plan']=='peer-off' else 'on',reference_boundary_version=1,reference_profile=a['--reference-profile']))
+save(case/'status.json',dict(rc=7 if failed else 0,checks=dict(correctness=not failed,normal_atomic_roles=True)))
+save(case/'runtime.json',dict(module_sha='same',normal_atomic_role_version=1,normal_fadd_fence_version=1,normal_fadd_fence=('tail-off' if a['--normal-fadd-fence-plan']=='peer-tail-off' else 'off') if rank and a['--normal-fadd-fence-plan'] in ('peer-off','peer-tail-off') else 'on',reference_boundary_version=1,reference_profile=a['--reference-profile']))
 save(node/'setup.json',dict(error=None,fingerprint=dict(normal_fadd_fence_plan=a['--normal-fadd-fence-plan'],shape=[int(a['--normal-tokens']),128,7168,256,8],reference_profile=a['--reference-profile'],reference_events=a['--reference-events'])))
 save(node/'host.json',dict(boot_id=Path('/proc/sys/kernel/random/boot_id').read_text().strip()))
 sys.exit(7 if failed else 0)

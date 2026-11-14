@@ -28,9 +28,11 @@ void UrmaTransport::configure(bool normal, size_t channels) {
   normal_completion_ = urma_normal_completion_from_env();
   normal_writes_first_ = urma_normal_writes_first_from_env();
   normal_fadd_fence_ = urma_normal_fadd_fence_from_env();
+  normal_tail_fence_off_ = urma_normal_tail_fence_off_from_env();
+  for(auto& logged:role_logged_)logged=false;
   if (normal_writes_first_ && (!normal || normal_completion_ != UrmaNormalCompletion::All))
     throw std::invalid_argument("writes-first requires Normal completion=all");
-  if (normal && !normal_fadd_fence_ && (normal_completion_!=UrmaNormalCompletion::All || normal_writes_first_))
+  if (normal && (!normal_fadd_fence_ || normal_tail_fence_off_) && (normal_completion_!=UrmaNormalCompletion::All || normal_writes_first_))
     throw std::invalid_argument("Normal FADD fence experiment requires completion=all and lane-mixed");
   mode_ = requested;
 }
@@ -325,9 +327,9 @@ void UrmaTransport::init(ProxyCtx& ctx) {
         mode_.normal ? "normal" : "low_latency", mode_.channels,
         jetties_.size(), capacity(), UrmaMode::kWireVersion,
         (mode_.normal ? normal_relaxed_write_ : ll_relaxed_write_) ? "relax" : "strong",
-        mode_.normal && !normal_fadd_fence_ ? "diagnostic_data_off" : "per_request",
+        mode_.normal && normal_tail_fence_off_ ? "diagnostic_tail_off" : (mode_.normal && !normal_fadd_fence_ ? "diagnostic_data_off" : "per_request"),
         urma_normal_completion_name(normal_completion_),
-        urma_normal_submit_schedule_name(normal_writes_first_),normal_fadd_fence_ ? "on" : "off");
+        urma_normal_submit_schedule_name(normal_writes_first_),normal_tail_fence_off_ ? "tail-off" : (normal_fadd_fence_ ? "on" : "off"));
   } catch (...) {
     destroy();
     throw;
@@ -678,8 +680,18 @@ void UrmaTransport::prepare(PreparedWr& out, Peer& peer, size_t lane,
     out.src.tseg = operand_tseg_;
     out.wr.opcode = URMA_OPC_FADD;
     out.wr.flag.bs.place_order = URMA_STRONG_ORDER;
-    bool fence=request.fence && !(mode_.normal && request.kind==UrmaWorkRequest::Kind::Atomic && !normal_fadd_fence_);
+    bool fence=request.fence && !(mode_.normal && request.kind==UrmaWorkRequest::Kind::Atomic &&
+        (!normal_fadd_fence_ || (normal_tail_fence_off_ && request.normal_role==NormalAtomicRole::Tail)));
     out.wr.flag.bs.fence = fence ? URMA_FENCE_ENABLE : URMA_FENCE_DISABLE;
+    if (mode_.normal && request.kind==UrmaWorkRequest::Kind::Atomic) {
+      auto role=static_cast<unsigned>(request.normal_role);
+      if(role>2)throw std::invalid_argument("invalid Normal ATOMIC role");
+      if(!role_logged_[role]) {
+        role_logged_[role]=true;
+        std::fprintf(stderr,"[URMA_FADD_ROLE] role=%s fence=%s order=strong\n",
+            role==1 ? "tail" : (role==2 ? "head" : "unknown"),fence ? "on" : "off");
+      }
+    }
     if(mode_.normal && request.kind==UrmaWorkRequest::Kind::Atomic)
       uccl::transport_timeline::record("atomic_fence",request.wr_id,lane,fence);
     out.wr.faa.src = &out.src;

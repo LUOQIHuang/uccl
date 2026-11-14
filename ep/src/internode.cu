@@ -1224,7 +1224,7 @@ while (__any_sync(WARP_MASK, num_tokens_to_send > 0)) {
 #else
               true
 #endif
-          );
+              , NormalAtomicRole::Tail);
         }
         __syncwarp();
 // REFERENCE_EVENT_BEGIN
@@ -1592,7 +1592,7 @@ while (true) {
             min_head - last_head,
             translate_dst_rdma_rank<kLowLatencyMode>(lane_id, nvl_rank),
             channel_id + num_channels, lane_id == rdma_rank, d2h_channel_addrs,
-            num_d2h_channel_addrs, false, -1, false);
+            num_d2h_channel_addrs, false, -1, false, NormalAtomicRole::Head);
         last_head = min_head;
         coordinator_stall_start = clock64();
       }
@@ -3026,7 +3026,7 @@ while (cached_nvl_channel_tail_idx <= expected_head) {
 #else
                 true
 #endif
-            );
+                , NormalAtomicRole::Tail);
           }
         }
       }
@@ -3063,7 +3063,7 @@ while (cached_nvl_channel_tail_idx <= expected_head) {
               channel_id +
                   num_channels,  // NOTE(MaoZiming): use channel_id for rb.
               dst_rdma_rank == rdma_rank, d2h_channel_addrs,
-              num_d2h_channel_addrs, false, -1, false);
+              num_d2h_channel_addrs, false, -1, false, NormalAtomicRole::Head);
           last_rdma_head = min_head;
         }
       };
@@ -3197,7 +3197,7 @@ while (true) {
                 channel_id +
                     num_channels,  // NOTE(MaoZiming): use channel_id for rb.
                 dst_rdma_rank == rdma_rank, d2h_channel_addrs,
-                num_d2h_channel_addrs, false, -1, false);
+                num_d2h_channel_addrs, false, -1, false, NormalAtomicRole::Head);
             last_rdma_head = min_head;
           }
         } else {

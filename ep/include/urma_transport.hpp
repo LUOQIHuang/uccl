@@ -82,6 +82,8 @@ class UrmaTransport final : public EpTransport {
   bool normal_relaxed_write_ = true;
   bool normal_writes_first_ = false;
   bool normal_fadd_fence_ = true;
+  bool normal_tail_fence_off_ = false;
+  bool role_logged_[3] = {false,false,false};
   uint64_t dispatch_trial_epoch_ = 0;
   UrmaNormalCompletion normal_completion_ = UrmaNormalCompletion::All;
 #ifdef USE_URMA
