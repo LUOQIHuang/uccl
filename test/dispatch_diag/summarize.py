@@ -89,6 +89,12 @@ def case_data(root,rank,trace,compiled_off=False,reference_events=None):
     actual_window=runtime.get('normal_max_inflight')
     if (window_plan!='default' or actual_window is not None) and actual_window!=expected_window:raise ValueError('Normal window runtime mismatch')
     identity.update(normal_window_plan=window_plan,normal_max_inflight=expected_window)
+    retire_plan=c.get('normal_retire_plan','ordered')
+    if retire_plan not in ('ordered','peer-ready'):raise ValueError('unknown Normal retire plan')
+    retire='ready' if retire_plan=='peer-ready' and rank==1 else 'ordered'
+    if retire_plan!='ordered' and (backend!='urma' or runtime.get('normal_fifo_retire_version')!=1 or runtime.get('normal_fifo_retire')!=retire or not status['checks'].get('normal_fifo_retire')):raise ValueError('unverified FIFO retire capability/setting')
+    if runtime.get('normal_fifo_retire') not in (None,retire):raise ValueError('FIFO retire runtime mismatch')
+    identity.update(normal_retire_plan=retire_plan,normal_fifo_retire=retire)
     if backend=='urma':
         schedule=c.get('normal_submit_schedule','lane-mixed')
         if runtime.get('normal_submit_schedule') not in (None,schedule) or (schedule!='lane-mixed' and runtime.get('normal_submit_schedule')!=schedule):raise ValueError('Normal submission schedule runtime mismatch')

@@ -8,6 +8,7 @@
 #include <vector>
 #include <unordered_set>
 #include "transport_timeline.hpp"
+#include "normal_fifo_retire.hpp"
 #include <cstdlib>
 #include <cstring>
 #include <memory>
@@ -40,6 +41,7 @@ struct Proxy {
   struct {std::vector<Handle> d2h_queues;} cfg_;
   struct {int64_t quiet_wr=1,barrier_wr=-1;bool quiet_inflight=true,barrier_inflight=false;} ctx_;
   struct {void update_timer(){}} adaptive_sleeper_;
+  bool normal_ready_retire_=false;
   std::vector<std::deque<std::pair<uint64_t,size_t>>> fifo_pending_;
   std::unordered_set<uint64_t> acked_wrs_;
   std::atomic<size_t> current_inflight_bytes{8};
@@ -47,14 +49,21 @@ struct Proxy {
 };
 #include "fifo_notify.inc"
 int main(){
- {mscclpp::Fifo fifo(16);auto h=fifo.deviceHandle();assert(fifo.size()==16);
+ for(bool ready:{false,true}) {mscclpp::Fifo fifo(16);auto h=fifo.deviceHandle();assert(fifo.size()==16);
  assert(allocations==4); // tracing must allocate nothing in the production FIFO
 
  h.triggers[0]={123,456};auto t=fifo.poll();assert(t.fst==123 && t.snd==456);fifo.pop();assert(*h.tail==1 && !h.triggers[0].fst);
- Proxy p;p.cfg_.d2h_queues.push_back({&fifo});p.fifo_pending_.resize(1);p.fifo_pending_[0].push_back({0,8});p.fifo_pending_[0].push_back({1,0});p.acked_wrs_={0,1};
+ Proxy p;p.normal_ready_retire_=ready;p.cfg_.d2h_queues.push_back({&fifo});p.fifo_pending_.resize(1);p.fifo_pending_[0].push_back({0,8});p.fifo_pending_[0].push_back({1,0});p.acked_wrs_={0,1};
  uccl::urma_diag::identity(0,0);uccl::transport_timeline::begin();uint64_t tail=0;p.notify_gpu_completion(tail);auto trace=uccl::transport_timeline::end();
  assert(p.fifo_pending_[0].empty() && p.acked_wrs_.empty() && p.current_inflight_bytes==0 && !p.ctx_.quiet_inflight && *h.tail==2);
  size_t acks=0,pops=0;for(auto const& e:uccl::transport_timeline::events){if(std::strcmp(e.stage,"ack_slot")==0)++acks;if(std::strcmp(e.stage,"tail_published")==0)++pops;}assert(acks==2 && pops==1);
+ Proxy blocked;blocked.normal_ready_retire_=ready;blocked.cfg_.d2h_queues.push_back({&fifo});blocked.fifo_pending_.resize(1);
+ blocked.ctx_.quiet_wr=12;blocked.fifo_pending_[0]={{10,0},{11,8},{12,0}};blocked.acked_wrs_={11,12};
+ blocked.notify_gpu_completion(tail);
+ assert(blocked.fifo_pending_[0].size()==(ready?2:3));assert(blocked.current_inflight_bytes==(ready?0:8));
+ assert(blocked.ctx_.quiet_inflight && *h.tail==2);
+ blocked.acked_wrs_.insert(10);blocked.notify_gpu_completion(tail);
+ assert(blocked.fifo_pending_[0].empty() && blocked.acked_wrs_.empty() && blocked.current_inflight_bytes==0 && !blocked.ctx_.quiet_inflight && *h.tail==3);
  }
  assert(allocations==0);
 }

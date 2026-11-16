@@ -18,6 +18,9 @@ a = p.parse_args()
 ep = Path(__file__).resolve().parents[1]
 with tempfile.TemporaryDirectory(prefix='uccl-urma-test-') as tmp:
     tmp = Path(tmp)
+    retire_test=tmp/'normal_fifo_retire_test'
+    subprocess.run([os.environ.get('CXX','c++'),'-std=c++17','-Wall','-Wextra','-Werror','-I'+str(ep/'include'),str(ep/'tests/normal_fifo_retire_test.cpp'),'-o',str(retire_test)],check=True)
+    subprocess.run([str(retire_test)],check=True)
     gpu_stage_test=tmp/'gpu_stage_test'
     subprocess.run([os.environ.get('CXX','c++'),'-std=c++17','-Wall','-Wextra','-Werror','-I'+str(ep/'include'),str(ep/'tests/gpu_stage_trace_test.cpp'),'-o',str(gpu_stage_test)],check=True)
     subprocess.run([str(gpu_stage_test)],check=True)

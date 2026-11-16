@@ -18,6 +18,7 @@ def csv_rows(path):
 def compatible(verbs, urma):
     if verbs['backend'] != 'verbs' or urma['backend'] != 'urma':
         raise ValueError('wrong backend order')
+    if any(x.get('normal_retire_plan','ordered')!='ordered' for x in (verbs,urma)):raise ValueError('analyze retire A/B separately')
     if urma.get('normal_submit_schedule','lane-mixed') != 'lane-mixed':
         raise ValueError('default backend comparison requires lane-mixed URMA; analyze submission A/B separately')
     if urma.get('normal_fadd_fence','on')!='on' or urma.get('normal_fadd_fence_plan','default') not in ('default','all-on'):

@@ -1,4 +1,5 @@
 #include "proxy.hpp"
+#include "normal_fifo_retire.hpp"
 #include "urma_phase_diag.hpp"
 #include "transport_timeline.hpp"
 #include "ep_backend.hpp"
@@ -872,6 +873,12 @@ void Proxy::run_dual() {
   uint64_t my_tail = 0;
   size_t seen = 0;
   std::set<PendingUpdate> pending_atomic_updates;
+  normal_ready_retire_=cfg_.use_normal_mode && use_urma_transport() && normal_fifo_ready_from_env();
+#ifndef USE_MSCCLPP_FIFO_BACKEND
+  if(normal_ready_retire_)throw std::invalid_argument("ready retirement requires FIFO backend");
+#endif
+  if(cfg_.use_normal_mode && use_urma_transport())
+    std::fprintf(stderr,"[NORMAL_FIFO_RETIRE] policy=%s limit=%zu\n",normal_ready_retire_ ? "ready" : "ordered",size_t(get_max_inflight_normal()));
   adaptive_sleeper_.update_timer();
   while (ctx_.progress_run.load(std::memory_order_acquire)) {
     adaptive_sleeper_.maybe_sleep(ctx_);
@@ -925,11 +932,9 @@ void Proxy::notify_gpu_completion(uint64_t& my_tail) {
     auto* fifo = cfg_.d2h_queues[rb_idx].fifo;
     if (!fifo) continue;
     auto& pend = fifo_pending_[rb_idx];
-    while (!pend.empty()) {
-      auto [front_wr, front_bytes] = pend.front();
-      if (acked_wrs_.find(front_wr) == acked_wrs_.end()) break;
-      acked_wrs_.erase(front_wr);  // consume this completion
-      pend.pop_front();            // retire pending entry
+    reap_normal_pending(pend,acked_wrs_,normal_ready_retire_,
+                        static_cast<uint64_t>(ctx_.quiet_wr),static_cast<uint64_t>(ctx_.barrier_wr),
+                        [&](uint64_t front_wr,size_t front_bytes) {
       uccl::transport_timeline::record("ack_slot",front_wr);
 
       if (front_bytes) {
@@ -950,7 +955,7 @@ void Proxy::notify_gpu_completion(uint64_t& my_tail) {
         fifo->pop();
         uccl::transport_timeline::record("tail_published",uint64_t(rb_idx)<<32,0,(front_wr&0xffffffffULL)+1);
       }
-    }
+    });
   }
 #else
   for (auto wr_id : acked_wrs_) {

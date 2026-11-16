@@ -116,6 +116,8 @@ def parser():
     p.add_argument('--normal-window-plan',choices=('default','peer4'),default='default',help='Normal pending-command limit: default=8 on both; peer4=8 on node0 and 4 on node1')
     p.add_argument('--normal-fadd-fence-plan',choices=('default','all-on','peer-off','peer-tail-off'),default='default',help='diagnostic: keep FADD STRONG; disable all data or tagged tail fence on node1 only')
     p.add_argument('--require-normal-atomic-roles',action='store_true',help='reject modules without explicit Normal tail/head role capability')
+    p.add_argument('--normal-retire-plan',choices=('ordered','peer-ready'),default='ordered',help='Normal-only: node1 reaps completed ordinary credits without crossing quiet/barrier')
+    p.add_argument('--require-normal-retire',action='store_true')
     p.add_argument('--normal-completion',choices=('all','ordered','paired'),default='all',help='Normal-only completion A/B; paired suppresses eligible WRITE CQEs')
     p.add_argument('--stage-profile',action='store_true')
     p.add_argument('--save-traces',action='store_true')
@@ -164,6 +166,8 @@ def parser():
         p.error('peer4 requires Normal Dispatch focus paced/on check/run with default submission schedule')
     if args.normal_fadd_fence_plan!='default' and (args.backend!='urma' or args.mode!='normal' or not args.dispatch_focus or args.reference_events not in ('paced','on') or args.normal_submit_schedule!='lane-mixed' or args.normal_window_plan!='default' or args.normal_completion!='all' or args.action not in ('check','run')):
         p.error('FADD fence experiment requires URMA Normal Dispatch focus paced/on check/run with default window/submission/completion')
+    if args.normal_retire_plan!='ordered' and (args.backend!='urma' or args.mode!='normal' or not args.dispatch_focus or args.reference_events!='paced' or args.reference_profile!='legacy' or args.normal_window_plan!='default' or args.normal_submit_schedule!='lane-mixed' or args.normal_completion!='all' or args.normal_fadd_fence_plan not in ('default','all-on') or args.action not in ('check','run')):
+        p.error('peer-ready requires URMA Normal inactive paced default window/order/fence/completion check/run')
     if args.collect_suite and args.action!='collect': p.error('--collect-suite requires --action collect')
     if args.capture_layout and (args.mode!='normal' or not args.api_only or args.backend!='urma'):
         p.error('--capture-layout requires URMA Normal API-only')
@@ -211,6 +215,7 @@ def environment(args):
     env['UCCL_URMA_NORMAL_COMPLETION']=args.normal_completion
     env['UCCL_IB_MAX_INFLIGHT_NORMAL']=str(4 if getattr(args,'normal_window_plan','default')=='peer4' and args.node_rank==1 else 8)
     env['UCCL_REFERENCE_PROFILE']=getattr(args,'reference_profile','legacy')
+    env['UCCL_URMA_NORMAL_RETIRE']='ready' if args.normal_retire_plan=='peer-ready' and args.node_rank==1 else 'ordered'
     env['UCCL_URMA_NORMAL_FADD_FENCE']=('tail-off' if args.normal_fadd_fence_plan=='peer-tail-off' else 'off') if args.normal_fadd_fence_plan in ('peer-off','peer-tail-off') and args.node_rank==1 else 'on'
     env['LD_LIBRARY_PATH']=str(args.urma_lib_dir)+':'+env.get('LD_LIBRARY_PATH','')
     return env
@@ -234,6 +239,9 @@ def preflight(args):
     if getattr(args,'normal_submit_schedule','lane-mixed')!='lane-mixed' and metadata.get('normal_submit_schedule')!=args.normal_submit_schedule:
         raise RuntimeError('NORMAL_SUBMIT_SCHEDULE_REQUIRES_REBUILD')
     expected_window=4 if getattr(args,'normal_window_plan','default')=='peer4' and args.node_rank==1 else 8
+    expected_retire='ready' if args.normal_retire_plan=='peer-ready' and args.node_rank==1 else 'ordered'
+    if (args.normal_retire_plan!='ordered' or args.require_normal_retire) and (metadata.get('normal_fifo_retire_version')!=1 or metadata.get('normal_fifo_retire')!=expected_retire or metadata.get('queue_backend')!='fifo'):raise RuntimeError('NORMAL_FIFO_RETIRE_REBUILD_OR_RUNTIME_MISMATCH')
+    if metadata.get('normal_fifo_retire') not in (None,expected_retire):raise RuntimeError('NORMAL_FIFO_RETIRE_ENVIRONMENT_LEAK')
     if (getattr(args,'normal_window_plan','default')!='default' or metadata.get('normal_max_inflight') is not None) and metadata.get('normal_max_inflight')!=expected_window:
         raise RuntimeError('NORMAL_WINDOW_RUNTIME_MISMATCH_OR_REBUILD_REQUIRED')
     expected_fence=('tail-off' if args.normal_fadd_fence_plan=='peer-tail-off' else 'off') if args.normal_fadd_fence_plan in ('peer-off','peer-tail-off') and args.node_rank==1 else 'on'
@@ -329,6 +337,7 @@ def main():
         fingerprint['reference_events']=args.reference_events
         fingerprint['reference_profile']=args.reference_profile
         fingerprint['normal_fadd_fence_plan']=args.normal_fadd_fence_plan
+        fingerprint['normal_retire_plan']=args.normal_retire_plan
         fingerprint.update(build_hash=support.digest({key:manifest[key] for key in ('sources','sdk','flags')}),libraries=info['libraries'],runtime_libraries=info['runtime'].get('selected_runtime_hashes',{}),torch=info['runtime']['torch'])
         (root/'preflight.json').write_text(json.dumps(info,indent=2))
         (root/'build_manifest.json').write_text(json.dumps(manifest,indent=2))
@@ -427,6 +436,10 @@ def main():
                 if info['runtime'].get('normal_atomic_role_version')==1:
                     roles=re.findall(r'\[URMA_FADD_ROLE\] role=(tail|head|unknown) fence=(on|off) order=strong',text)
                     checks['normal_atomic_roles']=all({f for r,f in roles if r==role}=={('off' if expected_fence=='off' or (expected_fence=='tail-off' and role=='tail') else 'on')} for role in ('tail','head')) and not any(r=='unknown' for r,f in roles)
+            if mode=='normal' and info['runtime'].get('normal_fifo_retire_version')==1:
+                expected='ready' if args.normal_retire_plan=='peer-ready' and args.node_rank==1 else 'ordered'
+                observed=re.findall(r'\[NORMAL_FIFO_RETIRE\] policy=(ready|ordered) limit=8\b',text)
+                checks['normal_fifo_retire']=bool(observed) and set(observed)=={expected}
         if args.phase_suite:
             checks.update(phase_files=(case/'phases.jsonl').is_file() and (case/'api_samples.jsonl').is_file(),
                           samples=text.count('MODE_PARITY_SAMPLES ')==(5 if mode=='normal' else (2 if args.ll_hook_workload=='immediate' else 1)))

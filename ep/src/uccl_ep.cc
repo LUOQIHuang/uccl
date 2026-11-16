@@ -15,6 +15,7 @@ extern "C" int uccl_reference_boundaries_version();
 #include "gpu_p2p_runtime.hpp"
 #include "urma_registration_probe.hpp"
 #include "urma_mode.hpp"
+#include "normal_fifo_retire.hpp"
 #include "urma_layout_diag.hpp"
 #include "urma_micro.hpp"
 #include "urma_dispatch_trial.hpp"
@@ -2594,6 +2595,8 @@ NB_MODULE(ep, m) {
     return std::string(urma_normal_fadd_fence_name_from_env());
   });
   m.def("get_urma_normal_atomic_role_version", []() {return 1;});
+  m.def("get_normal_fifo_retire_version", []() {return 1;});
+  m.def("get_normal_fifo_retire", []() {return std::string(normal_fifo_ready_from_env() ? "ready" : "ordered");});
   m.def("get_reference_events_version", []() { return uccl_reference_events_version(); });
   m.def("get_reference_boundary_version", []() { return uccl_reference_boundaries_version(); });
   m.def("get_urma_ll_write_order", []() {
