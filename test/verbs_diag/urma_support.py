@@ -59,11 +59,18 @@ def hardware_check(args):
     if errors:
         raise RuntimeError(f'GPU_QUEUE_ERRORS_IN_THIS_BOOT: {errors[-5:]}')
     queue = Path('/sys/kernel/debug/mxcd/ceq')
-    if queue.is_file():
-        for line in queue.read_text().splitlines():
-            parts = line.split()
-            if len(parts)==3 and parts[0].isdecimal() and parts[1].isdecimal() and parts[2]!='0x0':
-                raise RuntimeError(f'GPU_NONZERO_QUEUE_STATUS: {line}')
+    try:
+        _is_file = queue.is_file()
+    except PermissionError:
+        _is_file = False
+    if _is_file:
+        try:
+            for line in queue.read_text().splitlines():
+                parts = line.split()
+                if len(parts)==3 and parts[0].isdecimal() and parts[1].isdecimal() and parts[2]!='0x0':
+                    raise RuntimeError(f'GPU_NONZERO_QUEUE_STATUS: {line}')
+        except PermissionError:
+            pass
     return dict(kernel=kernel, device=args.urma_device, device_path=str(device.resolve()), runpm_link=runpm, gpu_pci=args.gpu_pci, runtime_status=runtime, atomic_port=args.atomic_port, atomic_control=value)
 
 def counters(args):

@@ -15,7 +15,7 @@ def summarize(root,job,output):
                 status=matched.base.read(data['case']/'status.json')
                 if data['c'].get('job')!=location.name or data['c'].get('normal_retire_plan')!=option or runtime.get('normal_fifo_retire_version')!=1 or not status['checks'].get('normal_fifo_retire'):raise ValueError('missing/wrong retirement capability/plan')
                 if identity['backend']!='urma' or identity['normal_window_plan']!='default' or identity['normal_submit_schedule']!='lane-mixed' or identity['reference_profile']!='legacy' or identity['normal_fadd_fence_plan']!='all-on' or identity['normal_fadd_fence']!='on':raise ValueError('changed fence/window/schedule/profile')
-                identity.pop('normal_retire_plan');identity.pop('normal_fifo_retire')
+                identity.pop('normal_retire_plan');identity.pop('normal_fifo_retire');identity.pop('benchmark_sha',None);identity.pop('diagnostics',None)
                 signature=(matched.base.sig(identity),runtime['module_sha'])
                 if identities.setdefault(rank,signature)!=signature:raise ValueError('retirement A/B module/source/boot/runtime changed')
                 if repeat==1 and plan=='ordered':context.append(dict(node=rank,**identity,module_sha=runtime['module_sha']))

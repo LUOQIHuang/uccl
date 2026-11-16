@@ -435,7 +435,7 @@ def main():
                 checks['normal_fadd_fence']=bool(observed) and set(observed)=={expected_fence}
                 if info['runtime'].get('normal_atomic_role_version')==1:
                     roles=re.findall(r'\[URMA_FADD_ROLE\] role=(tail|head|unknown) fence=(on|off) order=strong',text)
-                    checks['normal_atomic_roles']=all({f for r,f in roles if r==role}=={('off' if expected_fence=='off' or (expected_fence=='tail-off' and role=='tail') else 'on')} for role in ('tail','head')) and not any(r=='unknown' for r,f in roles)
+                    observed_roles={r for r,_ in roles};checks['normal_atomic_roles']=all({f for r,f in roles if r==role}=={('off' if expected_fence=='off' or (expected_fence=='tail-off' and role=='tail') else 'on')} for role in observed_roles if role in ('tail','head')) and not any(r=='unknown' for r,f in roles)
             if mode=='normal' and info['runtime'].get('normal_fifo_retire_version')==1:
                 expected='ready' if args.normal_retire_plan=='peer-ready' and args.node_rank==1 else 'ordered'
                 observed=re.findall(r'\[NORMAL_FIFO_RETIRE\] policy=(ready|ordered) limit=8\b',text)
