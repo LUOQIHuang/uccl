@@ -9,6 +9,55 @@ from matplotlib.patches import FancyBboxPatch
 LABEL='dispatch_bf16_chunk32'
 
 
+def build_notify_pair_span(root,out):
+    """Decompose the same paired requests; never add separately taken quantiles."""
+    source=root/'notify_completion_audit_01/notify_pairs.csv'
+    with source.open(newline='') as f:
+        pairs=list(csv.DictReader(f))
+    rows=[]
+    for campaign in ('verbs_historical','urma_historical','urma_boundaries'):
+        for node in (0,1):
+            group=[r for r in pairs if r['campaign']==campaign and int(r['node'])==node]
+            if len(group)!=1188:raise ValueError('expected 1188 matched request pairs')
+            first=[];second=[];total=[]
+            for r in group:
+                t0,t1,t2=(int(r[k]) for k in ('write_post_end_ns','write_cqe_ns','atomic_cqe_ns'))
+                if not t0<=t1<=t2:raise ValueError('invalid paired request timestamp order')
+                first.append((t1-t0)/1000)
+                second.append((t2-t1)/1000)
+                total.append((t2-t0)/1000)
+            a,b,c=map(statistics.mean,(first,second,total))
+            if abs(a+b-c)>1e-8:raise ValueError('paired span must be additive')
+            rows.append(dict(campaign=campaign,node=node,pairs=len(group),
+                             write_post_to_write_cqe_mean_us=a,
+                             write_cqe_to_atomic_cqe_mean_us=b,
+                             write_post_to_atomic_cqe_mean_us=c))
+    out.mkdir(parents=True,exist_ok=True)
+    with (out/'notify_pair_span_means.csv').open('w',newline='') as f:
+        w=csv.DictWriter(f,fieldnames=list(rows[0]));w.writeheader();w.writerows(rows)
+    fig,ax=plt.subplots(figsize=(10,5.6))
+    selected=[r for r in rows if r['node']==1]
+    a=[r['write_post_to_write_cqe_mean_us']/1000 for r in selected]
+    b=[r['write_cqe_to_atomic_cqe_mean_us']/1000 for r in selected]
+    ax.bar(range(3),a,color='#4e91c7',label='① WRITE提交结束→WRITE完成观测')
+    ax.bar(range(3),b,bottom=a,color='#df7859',label='② WRITE完成观测→对应FADD完成观测')
+    for i,(x,y) in enumerate(zip(a,b)):
+        ax.text(i,x/2,'① %.3f ms'%x,ha='center',va='center',fontsize=11)
+        ax.text(i,x+y+.08,'总计 %.3f ms\n② %.3f ms'%(x+y,y),ha='center',fontsize=10)
+    ax.set_xticks(range(3),['verbs历史匹配','URMA历史匹配','URMA已验收边界'])
+    ax.set_ylim(0,3.2);ax.set_ylabel('同一请求对的平均跨度（毫秒）')
+    ax.set_title('204：进一步拆开WRITE提交→对应通知完成观测',fontsize=14)
+    ax.legend(loc='upper left',bbox_to_anchor=(0,-.12),frameon=False,fontsize=10)
+    total_delta=(a[1]+b[1])-(a[0]+b[0]);notify_delta=b[1]-b[0]
+    fig.text(.01,-.13,'每组1188对，来自9个窗口，不是1188次独立benchmark。两色在每对内相加后求均值。\n历史匹配组间增量约%.3f ms，其中②约%.3f ms（%.2f%%）；这不是整个Dispatch回退的归因比例。\n终点为本端CPU读到CQE，不是远端原子操作的硬件完成时间。'%(total_delta,notify_delta,100*notify_delta/total_delta),fontsize=9)
+    fig.tight_layout()
+    for ext in ('png','svg'):fig.savefig(out/('06_paired_notify_span.'+ext),dpi=180,bbox_inches='tight',facecolor='white')
+    svg=out/'06_paired_notify_span.svg'
+    svg.write_text('\n'.join(line.rstrip() for line in svg.read_text(encoding='utf-8').splitlines())+'\n',encoding='utf-8')
+    plt.close(fig)
+    return str(source.relative_to(root)),hashlib.sha256(source.read_bytes()).hexdigest()
+
+
 def build(root,out):
     out.mkdir(parents=True,exist_ok=True);sources={}
     def read(path):
@@ -109,7 +158,8 @@ def build(root,out):
     ax.text(6.3,3.6,'回收名额影响下一批命令读取；队首未完成会形成背压',ha='center',fontsize=11,color='#a3432d')
     ax.text(6.5,4.05,'图4  目前定位到的链路位置（不是已证明的唯一根因）',ha='center',fontsize=15)
     ax.text(.1,-.32,'接收GPU不必等待发送CPU收到CQE才消费本批；但后续发送可能受额度回收影响。\nfence放宽约3.4%收益已复现；“已完成条目提前回收”本轮没有主要收益。',fontsize=10);save('04_pipeline_location')
-    (out/'figure_sources.json').write_text(json.dumps(dict(sources=sources,coverage_note='Per-window API and sampled RAW GPU envelope, then arithmetic residual and means; no sum of independent medians, no attribution of residual, no use of inactive API as trace total.'),indent=2))
+    source,digest=build_notify_pair_span(root,out);sources[source]=digest
+    (out/'figure_sources.json').write_text(json.dumps(dict(sources=sources,coverage_note='Per-window API and sampled RAW GPU envelope, then arithmetic residual and means; no sum of independent medians, no attribution of residual, no use of inactive API as trace total.',paired_span_note='Figure 6 uses means of additive intervals within each matched WRITE/FADD pair; its increment share is not a Dispatch critical-path attribution.'),indent=2))
 
 
 if __name__=='__main__':

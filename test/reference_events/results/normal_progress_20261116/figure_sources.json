@@ -8,7 +8,9 @@
     "notify_submission_audit_01\\submission_summary.csv": "935fa18dbe241dccc681004e99ce8048a989cb4a636aadf2caeec26756322bfb",
     "normal_retire_evidence_20261116\\software_retire_wait.csv": "934c7223b41ce4f01536c611dc7effa202f1676ada0d633a8d8fe17c7627e27c",
     "urma_fadd_fence_01_summary\\rounds.csv": "d704cdbffa538d7c02ff3d8de204f87c4f735c6b183dd9d9b4311da7bbe010c2",
-    "urma_retire_01_review_20261116\\rounds.csv": "5fcdba1be99f0027d38281f3f273e33216cd29511dab6b21794302b038e189ee"
+    "urma_retire_01_review_20261116\\rounds.csv": "5fcdba1be99f0027d38281f3f273e33216cd29511dab6b21794302b038e189ee",
+    "notify_completion_audit_01\\notify_pairs.csv": "1e0a047f811840f12f148aa16767358beb7a99da43caaa3060f60036f1034310"
   },
-  "coverage_note": "Per-window API and sampled RAW GPU envelope, then arithmetic residual and means; no sum of independent medians, no attribution of residual, no use of inactive API as trace total."
+  "coverage_note": "Per-window API and sampled RAW GPU envelope, then arithmetic residual and means; no sum of independent medians, no attribution of residual, no use of inactive API as trace total.",
+  "paired_span_note": "Figure 6 uses means of additive intervals within each matched WRITE/FADD pair; its increment share is not a Dispatch critical-path attribution."
 }
