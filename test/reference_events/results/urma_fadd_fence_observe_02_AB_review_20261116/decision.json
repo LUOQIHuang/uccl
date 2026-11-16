@@ -1,0 +1,15 @@
+{
+  "quality": {
+    "all_on": false,
+    "peer_off": false
+  },
+  "peer_off_change_pct": {
+    "paced": -3.4212005208259177,
+    "trace": -25.869526159425604,
+    "post": -3.5444235017583647
+  },
+  "control_gain_reproduced": true,
+  "differential_probe_effect_pp": 22.386714148133464,
+  "eligible_for_mechanism_review": false,
+  "note": "Eligibility permits reviewing whether previously observed 3.43% benefit co-occurs with reduced notification submission/FIFO waits; it is not proof of a unique root or additive critical path. Per-plan BF16 controls must pass 5% drift/impact/CV and clock-offset checks. Both inactive comparisons must improve >=2%; active-vs-inactive A/B effect must differ <=1 percentage point. These are predeclared engineering gates, not significance tests. Invalid captures remain exported; no automatic rerun. FIFO export is per-plan gated, BF16 must be selected when interpreting it. Old ABBA is the primary net-performance evidence; this six-case sequence is a mechanism follow-up, not a new ABBA."
+}
