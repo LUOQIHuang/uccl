@@ -175,3 +175,10 @@ test/**/*.bin
 !test/reference_events/results/**/*.json
 !test/reference_events/results/**/*.jsonl
 !test/reference_events/results/**/*.csv
+
+# Selected Normal tokens-sweep evidence; compiled artifacts remain excluded.
+!test/normal_tokens/results/**/build/
+!test/normal_tokens/results/**/*.log
+!test/normal_tokens/results/**/*.json
+!test/normal_tokens/results/**/*.jsonl
+!test/normal_tokens/results/**/*.csv

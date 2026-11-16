@@ -60,7 +60,7 @@ def parser():
     p.add_argument('--campaign-check',action='store_true')
     p.add_argument('--gid-index',type=int)
     p.add_argument('--samples', type=int, default=50)
-    p.add_argument('--normal-tokens',type=int,choices=(128,4096),default=4096)
+    p.add_argument('--normal-tokens',type=int,choices=(64,128,256,512,1024,2048,4096),default=4096)
     p.add_argument('--normal-window-plan',choices=('default','peer4'),default='default',help='Normal pending-command limit: default=8 on both; peer4=8 on node0 and 4 on node1')
     profile = p.add_mutually_exclusive_group()
     profile.add_argument('--no-profile', action='store_true')

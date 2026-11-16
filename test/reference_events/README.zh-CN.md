@@ -1,5 +1,7 @@
 # 参考版本移植：Normal Dispatch 事件打点
 
+新增[Normal七种tokens规模扫描](../normal_tokens/README.zh-CN.md)：URMA与verbs各测64～4096 tokens/rank，关闭采集、每点3轮，用于比较后端差额随规模的变化；不替代本文阶段观测。
+
 URMA匹配paced/on已全部通过，四个Dispatch采集影响仅+0.28%～+0.90%，见[最新阶段分析](results/MATCHED_TRACE_ANALYSIS.zh-CN.md)。URMA侧开关验收收束，不重复既有实验；下一步只在verbs可用窗口按[同口径文档](VERBS_MATCHED.zh-CN.md)补另一后端记录。原连续基线/on核查见[4096报告](results/FORMAL4096_ANALYSIS.zh-CN.md)，两种采样方式分别保留。
 
 本次smoke128若出现`urma_bind_jetty rc=4096`，先按[建连失败排查流程](RECOVERY.zh-CN.md)处理；保留现有模块，先做一次关闭所有新打桩的128-token对照，不直接重跑4096或重新编译。

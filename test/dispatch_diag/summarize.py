@@ -21,7 +21,17 @@ def write(p,data):
         if data:
             w=csv.DictWriter(f,fieldnames=list(data[0]));w.writeheader();w.writerows(data)
 
-def case_data(root,rank,trace,compiled_off=False,reference_events=None):
+def case_data(root,rank,trace,compiled_off=False,reference_events=None,token_sweep=None):
+    # Explicit opt-in for the inactive tokens experiment; historical callers
+    # retain their fixed 4096-token and sampling acceptance rules.
+    tokens=4096
+    sampling=(5,10) if trace or reference_events in ('on','batch','paced') else (50,50)
+    if token_sweep is not None:
+        if trace or compiled_off or reference_events!='paced' or set(token_sweep)!={'tokens','warmups','samples'}:
+            raise ValueError('tokens sweep requires inactive paced capture')
+        tokens=token_sweep['tokens'];sampling=(token_sweep['warmups'],token_sweep['samples'])
+        if tokens not in (64,128,256,512,1024,2048,4096) or sampling!=(10,31):
+            raise ValueError('wrong fixed tokens sweep recipe')
     node=root/f'node{rank}';c=read(node/'setup.json')
     if c['error']:raise ValueError('failed setup '+str(node))
     c=c['fingerprint'];backend=c.get('backend','verbs')
@@ -33,9 +43,9 @@ def case_data(root,rank,trace,compiled_off=False,reference_events=None):
     if (trace and compiled_off) or bool(c.get('dispatch_compiled_off'))!=compiled_off:raise ValueError('wrong compiled-off configuration')
     if runtime.get('dispatch_trace_version')!=1 or runtime['queue_backend']!='fifo' or runtime['gpu_stage_version']!=(2 if trace or compiled_off else 0):raise ValueError('wrong runtime capability')
     if c.get('reference_events')!=reference_events or runtime.get('reference_events_version',0)!=int(bool(reference_events)):raise ValueError('wrong reference event configuration')
-    shape_ok=c['normal_tokens']==4096 if backend=='verbs' else c['shape']==[4096,128,7168,256,8]
-    if not shape_ok:raise ValueError('formal comparison requires fixed 4096 shape')
-    if (c['warmups'],c['samples'])!=((5,10) if trace or reference_events in ('on','batch','paced') else (50,50)):raise ValueError('wrong formal samples')
+    shape_ok=c['normal_tokens']==tokens if backend=='verbs' else c['shape']==[tokens,128,7168,256,8]
+    if not shape_ok:raise ValueError('formal comparison requires fixed %d shape'%tokens)
+    if (c['warmups'],c['samples'])!=sampling:raise ValueError('wrong formal samples')
     if backend=='urma':
         if not c['api_only'] or c['normal_completion']!='all' or c['normal_write_order']!='default' or c['ll_write_order']!='default' or runtime.get('normal_write_order')!='relax':raise ValueError('changed URMA semantics')
     elif c['variant']!='current' or not c['no_profile'] or c['repeats']!=1:raise ValueError('wrong verbs configuration')
@@ -62,7 +72,7 @@ def case_data(root,rank,trace,compiled_off=False,reference_events=None):
         import sys
         sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'reference_events'))
         from event_runtime import validate_control
-        if not status['checks'].get('reference_control') or not validate_control(case,reference_events,5,10,c.get('reference_profile','legacy')):raise ValueError('unvalidated sampling control')
+        if not status['checks'].get('reference_control') or not validate_control(case,reference_events,*sampling,c.get('reference_profile','legacy')):raise ValueError('unvalidated sampling control')
     raw=rows(case/'api_samples.jsonl');saved=rows(case/'sample_summary.jsonl');means={}
     if len(raw)!=5*c['samples'] or {r['label'] for r in raw}!=ALL_LABELS or len(saved)!=5 or {r['label'] for r in saved}!=ALL_LABELS:raise ValueError('incomplete Normal samples')
     for label in ALL_LABELS:
