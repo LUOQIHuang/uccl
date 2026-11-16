@@ -52,7 +52,7 @@ def build(root,out):
     for i,v in enumerate(values):axes[0].text(i,v+.09,'%.3f'%v,ha='center')
     axes[0].set_title('关闭采集：整体API均值\n202回退13.50%；204并非回退');axes[0].set_ylabel('毫秒');axes[0].set_ylim(0,9.5)
     bottom=[0.]*4
-    for key,color,label in [('first_token_to_first_write_us','#4e91c7','首token→首次WRITE包络'),('first_write_to_last_visible_us','#df7859','首次WRITE→最后远端token可见包络'),('uncovered_residual_us','#cbd5e1','未覆盖余量（算术差，非独立阶段）')]:
+    for key,color,label in [('first_token_to_first_write_us','#4e91c7','首token→本机首次WRITE发布前'),('first_write_to_last_visible_us','#df7859','本机首WRITE发布前→本机末入站token可见'),('uncovered_residual_us','#cbd5e1','未覆盖余量（算术差，非独立阶段）')]:
         vals=[r[key]/1000 for r in means];axes[1].bar(range(4),vals,bottom=bottom,color=color,width=.6,label=label)
         for i,v in enumerate(vals):axes[1].text(i,bottom[i]+v/2,'%.3f'%v,ha='center',va='center',fontsize=9)
         bottom=[a+b for a,b in zip(bottom,vals)]
@@ -60,7 +60,7 @@ def build(root,out):
     axes[1].set_title('开启采集：同一窗口内计算后取均值\n整根柱为该组trace API，不混用左侧总量');axes[1].set_ylim(0,9.5)
     axes[1].legend(loc='upper left',bbox_to_anchor=(0,-.14),fontsize=9,frameon=False)
     for ax in axes:ax.set_xticks(range(4),labels);ax.grid(axis='y',alpha=.15);ax.set_axisbelow(True)
-    fig.text(.01,-.13,'范围：4096 tokens / hidden7168 / topk8；历史匹配组，每组9有效样本。\n右图是部分观测覆盖，不是完整关键路径：灰色余量可分布在观测前后，灰色位置仅为堆叠展示；橙色包含并行准备、排队、传输与通知。',fontsize=9)
+    fig.text(.01,-.13,'范围：4096 tokens / hidden7168 / topk8；历史匹配组，每组9有效样本。\n橙色为同机打点的双向通信推进包络，并非同一请求的单程传输时间；灰色是未覆盖余量，可分布在观测前后，不是独立阶段。',fontsize=9)
     fig.tight_layout();save('01_dispatch_coverage')
 
     submit=csvs(Path('notify_submission_audit_01/submission_summary.csv'));retire=csvs(Path('normal_retire_evidence_20261116/software_retire_wait.csv'))
@@ -85,6 +85,17 @@ def build(root,out):
     for i,v in enumerate(data):ax.text(i,v-.17,'%.2f%%'%v,ha='center',va='top',fontsize=12)
     ax.set_title('图3  干预结果：顺序约束有部分净收益；提前回收未获主要改善',fontsize=14)
     fig.text(.01,-.04,'不同实验各自内部对照，不跨实验相减。最新回收配对1含诊断脚本指纹漂移，不能当严格对照。\n回收配对2：8.134→8.023 ms（-1.37%，最大CV0.60%）；不采用该策略，不继续扫描。',fontsize=9);fig.tight_layout();save('03_interventions')
+
+    selected=[r for r in fence if r['label']==LABEL]
+    a=statistics.mean(float(r['all_on_max_mean_us']) for r in selected)/1000
+    b=statistics.mean(float(r['peer_off_max_mean_us']) for r in selected)/1000
+    fig,ax=plt.subplots(figsize=(8,5));ax.bar([0,1],[a,b],color=['#64748b','#428c79'],width=.55)
+    for i,v in enumerate((a,b)):ax.text(i,v+.1,'%.3f ms'%v,ha='center',fontsize=13)
+    ax.set_xticks([0,1],['两端数据FADD fence开启','仅204数据FADD fence关闭'])
+    ax.set_ylim(0,9.6);ax.set_ylabel('BF16 Dispatch 毫秒（关闭采集）')
+    ax.set_title('图5  已取得的有限净收益：%.2f%%，约%.0f μs'%((1-b/a)*100,(a-b)*1000),fontsize=14)
+    fig.text(.01,-.03,'严格ABBA两配对的等权均值；单配对分别改善3.35%/3.52%。\n这是诊断候选收益，尚未作为生产默认启用；不与历史RDMA差额相减宣称已追回比例。',fontsize=9)
+    fig.tight_layout();save('05_achieved_gain')
 
     fig,ax=plt.subplots(figsize=(13,4.8));ax.set_xlim(0,13);ax.set_ylim(0,4.5);ax.axis('off')
     def box(x,y,w,text,color):
