@@ -1,0 +1,156 @@
+{
+  "backend": "verbs",
+  "build_dir": "/home/h00918771/metax_dev/normal_tokens_build/verbs_v1",
+  "capture": "inactive-paced",
+  "cases": [
+    {
+      "job": "normal_tokens_01_verbs_r01_t64",
+      "repeat": 1,
+      "tokens": 64
+    },
+    {
+      "job": "normal_tokens_01_verbs_r01_t128",
+      "repeat": 1,
+      "tokens": 128
+    },
+    {
+      "job": "normal_tokens_01_verbs_r01_t256",
+      "repeat": 1,
+      "tokens": 256
+    },
+    {
+      "job": "normal_tokens_01_verbs_r01_t512",
+      "repeat": 1,
+      "tokens": 512
+    },
+    {
+      "job": "normal_tokens_01_verbs_r01_t1024",
+      "repeat": 1,
+      "tokens": 1024
+    },
+    {
+      "job": "normal_tokens_01_verbs_r01_t2048",
+      "repeat": 1,
+      "tokens": 2048
+    },
+    {
+      "job": "normal_tokens_01_verbs_r01_t4096",
+      "repeat": 1,
+      "tokens": 4096
+    },
+    {
+      "job": "normal_tokens_01_verbs_r02_t4096",
+      "repeat": 2,
+      "tokens": 4096
+    },
+    {
+      "job": "normal_tokens_01_verbs_r02_t2048",
+      "repeat": 2,
+      "tokens": 2048
+    },
+    {
+      "job": "normal_tokens_01_verbs_r02_t1024",
+      "repeat": 2,
+      "tokens": 1024
+    },
+    {
+      "job": "normal_tokens_01_verbs_r02_t512",
+      "repeat": 2,
+      "tokens": 512
+    },
+    {
+      "job": "normal_tokens_01_verbs_r02_t256",
+      "repeat": 2,
+      "tokens": 256
+    },
+    {
+      "job": "normal_tokens_01_verbs_r02_t128",
+      "repeat": 2,
+      "tokens": 128
+    },
+    {
+      "job": "normal_tokens_01_verbs_r02_t64",
+      "repeat": 2,
+      "tokens": 64
+    },
+    {
+      "job": "normal_tokens_01_verbs_r03_t512",
+      "repeat": 3,
+      "tokens": 512
+    },
+    {
+      "job": "normal_tokens_01_verbs_r03_t1024",
+      "repeat": 3,
+      "tokens": 1024
+    },
+    {
+      "job": "normal_tokens_01_verbs_r03_t2048",
+      "repeat": 3,
+      "tokens": 2048
+    },
+    {
+      "job": "normal_tokens_01_verbs_r03_t4096",
+      "repeat": 3,
+      "tokens": 4096
+    },
+    {
+      "job": "normal_tokens_01_verbs_r03_t64",
+      "repeat": 3,
+      "tokens": 64
+    },
+    {
+      "job": "normal_tokens_01_verbs_r03_t128",
+      "repeat": 3,
+      "tokens": 128
+    },
+    {
+      "job": "normal_tokens_01_verbs_r03_t256",
+      "repeat": 3,
+      "tokens": 256
+    }
+  ],
+  "cpu_affinity": "inherited",
+  "dependency_hashes": {
+    "ep/bench/buffer.py": "0c354281716863069303f485bc84eee1d5d720d240c30f02746a343761aca2ff",
+    "ep/bench/test_internode.py": "5e09c00a24d8b661888ea317bdbbcb349460f4f20f4649eee266299d2f659956",
+    "ep/bench/utils.py": "c8b5f033722339883d468ac8ae762573d521c1140cd931203e77ffb693565dde",
+    "test/reference_events/event_runtime.py": "9fdf2ab1295528bc8206f518a49ec738bc7de0599f794678c2f67741c4fe473f",
+    "test/urma_mode_parity/driver.py": "ed9354cdcadd32499c3f8cc7f8c84be0d7d684a9c3aab585597a9719d4359590",
+    "test/urma_mode_parity/phase_runtime.py": "c21349346000f030e7684c3bfc364ac9a9afe4d80fd87e612c09cc69aca38688",
+    "test/urma_mode_parity/phase_support.py": "bfc1062297006da98d418100fb0717a9b192c697b066c9f192e8b6cc67d73047",
+    "test/urma_mode_parity/support.py": "4a22a78cf6fad7667f70aa1670cdafa0382e26a5d4bc48a434a25f1fccc2ef32",
+    "test/urma_mode_parity/worker.py": "1855ed27518b635ec93b0de7b0943cb2c9117698baa7dbbda43e79fdeb1e0b9d",
+    "test/verbs_baseline/common.py": "dfca3868b2d13d52924656a51cc88138a258c10945a4e16875122bcbd7c05e94",
+    "test/verbs_baseline/driver.py": "93320d53e00f73227a6a2243e06b239e536c97b8dee49a2fffb3b77aa4331872",
+    "test/verbs_baseline/worker.py": "8f4054d51f08071edc12cbe2a9c4ef60bfee90d0c5e16346750a75a7aaeecfb6",
+    "test/verbs_diag/profile_support.py": "42c5ad17ae18f2697e958cc91e050cbabe3225b6a537dd833d2df048da5f7f63"
+  },
+  "expected_kernel": "6.6.0-145.3.34.165.oe2403sp3.aarch64",
+  "gid_index": 3,
+  "hca": "rocep40s0f0",
+  "ifname": "enp33s0",
+  "job": "normal_tokens_01",
+  "master_addr": "141.61.17.202",
+  "node_rank": 0,
+  "port": 33780,
+  "repeats": 3,
+  "samples": 31,
+  "script_hashes": {
+    "plan.py": "3e7664f4f345451c3c4496a619886474d8861121304938d2febd3851d7aa2d54",
+    "run.sh": "0dd8500d11d211b24015b1ce54bfa7bf7f203db8d959ffe120f242ac4337e633",
+    "runner.py": "37237c5407bf6f7457a1949141729a5e21ac26c3c3b24383b3f6b2c7ee9c232f",
+    "summarize.py": "ba71f39504ae6e8898b3dea786c70c9d4e1c0247833a2578e408d53dca5bf5d1"
+  },
+  "tokens": [
+    64,
+    128,
+    256,
+    512,
+    1024,
+    2048,
+    4096
+  ],
+  "urma_device": "udmac0d1e2",
+  "version": 1,
+  "warmups": 10
+}
