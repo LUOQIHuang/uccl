@@ -1,0 +1,11 @@
+{
+  "mechanism_usable": true,
+  "reason": "BF16 5% impact/drift/CV gate passed",
+  "direct_device_stage_timestamps": false,
+  "return_marker_supported": false,
+  "return_marker_bounded_pairs_by_node": {
+    "0": 0,
+    "1": 0
+  },
+  "note": "A local FADD return-data observation is not a remote GPU counter timestamp. CPU no-poll gaps are bounded by checkpoints; CQE hardware readiness is not timestamped. Before-return spans retain dependency/remote/response ambiguity. Bounds and censored counts are preserved; no medians are added to an API critical path."
+}

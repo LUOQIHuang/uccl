@@ -1,0 +1,35 @@
+{
+  "version": 1,
+  "base": "da574d6143f04897b732f54a8ca8ba543e9849a0",
+  "bundle": {
+    "runner.py": "eb1c8183404c301ad5f489bb894a967c4a523f8609e44c2854e3804a1b7d36fa",
+    "run.sh": "4e926b4d5152a80f9a94b24b95e97e02a8a259b176448684cf7717c04921a29a",
+    "analyze.py": "e28659801868dc0a6055950f3ea8d60e52a75ef2223f6094027ca3808a05aabb",
+    "overlay.py": "b05707b7af5b4e18ebe814119f1aaae463cd3f85463f654975300f7530490d6d",
+    "test_probe.py": "606b98b5c8ea073b6af4b52d05b8e5c4f42563607fe67bc674b6e0f3f049ed69",
+    "native/verbs_hooks.hpp": "b109614727f5d6ca15f78ed1b248cffecf92e25b8b7e06fb0241613462f95da5",
+    "native/probe_test.cpp": "3a4c178911972de9d2f113b1bd61a646f3764a4df3fa6c6750f5406b6e8f4e40",
+    "native/probe.hpp": "472cba23bf082e3f37124614cb9578d26095fdac268ecd051eaa1a48c2f32e4b"
+  },
+  "overlaid": {
+    "ep/src/urma_transport.cpp": "863d9f2afb2fec9b9495e869ed41239b2436a37feb64ac381b18a2c498d57e94",
+    "ep/include/verbs_stage_diag.hpp": "f6c86d2561b2eedd08380d31f8a272c521d126683804e11ed55fc9b5eb10a52d",
+    "ep/src/uccl_ep.cc": "62a206385530bcb932b6750ea82082963e767715e3bb477fade84b494222c0fb",
+    "test/urma_mode_parity/driver.py": "3db601445b30fe864c97c1be6796fad5eda71bef3b523db7af94111c373fc5b4",
+    "test/verbs_baseline/driver.py": "9b3f2eb39ed016b61ec6f906a5e714f6643856c882a46557911ddc23937a96a0",
+    "test/urma_mode_parity/support.py": "e76dff14e1763991fd5dd5d06c73ebe919971654c9d3de40376334df8d4b931b",
+    "test/verbs_baseline/common.py": "d8ca670b314f6dbb0324d78e0df3a93825934d9297da5c5530b497a3a9b5fe50",
+    "test/reference_events/event_runtime.py": "4f470a86d03d200cb9691ca43c1d11c3a8c6af43e7b69e06e6a96dc575bcc341",
+    "ep/include/fadd_path_probe.hpp": "472cba23bf082e3f37124614cb9578d26095fdac268ecd051eaa1a48c2f32e4b",
+    "ep/include/fadd_path_verbs.hpp": "b109614727f5d6ca15f78ed1b248cffecf92e25b8b7e06fb0241613462f95da5",
+    "test/fadd_path/runner.py": "eb1c8183404c301ad5f489bb894a967c4a523f8609e44c2854e3804a1b7d36fa",
+    "test/fadd_path/run.sh": "4e926b4d5152a80f9a94b24b95e97e02a8a259b176448684cf7717c04921a29a",
+    "test/fadd_path/analyze.py": "e28659801868dc0a6055950f3ea8d60e52a75ef2223f6094027ca3808a05aabb",
+    "test/fadd_path/overlay.py": "b05707b7af5b4e18ebe814119f1aaae463cd3f85463f654975300f7530490d6d",
+    "test/fadd_path/test_probe.py": "606b98b5c8ea073b6af4b52d05b8e5c4f42563607fe67bc674b6e0f3f049ed69",
+    "test/fadd_path/native/verbs_hooks.hpp": "b109614727f5d6ca15f78ed1b248cffecf92e25b8b7e06fb0241613462f95da5",
+    "test/fadd_path/native/probe_test.cpp": "3a4c178911972de9d2f113b1bd61a646f3764a4df3fa6c6750f5406b6e8f4e40",
+    "test/fadd_path/native/probe.hpp": "472cba23bf082e3f37124614cb9578d26095fdac268ecd051eaa1a48c2f32e4b"
+  },
+  "note": "Only this isolated tree is overlaid; original benchmark and GPU kernels are unchanged."
+}
