@@ -12,7 +12,37 @@ base=summarize_matched.base
 LABEL='dispatch_bf16_chunk32'
 
 
-def pair_metrics(pair,polls,backend):
+def dense_metrics(pair,polls,marker_status):
+    """Partition a LOCAL observed interval into SDK calls and service gaps."""
+    w,a=pair['write_sdk_return'],pair['atomic_sdk_return']
+    calls=sorted((r for r in polls if r['cq']==pair['cq'] and
+                  pair['write_poll_seq']<r['seq']<=pair['atomic_poll_seq']),key=lambda r:r['seq'])
+    if [r['seq'] for r in calls]!=list(range(pair['write_poll_seq']+1,pair['atomic_poll_seq']+1)):
+        raise ValueError('dense capture missing SDK calls')
+    segments=[];previous=w
+    for r in calls:
+        if not previous<=r['begin']<=r['end']<=a:
+            raise ValueError('dense SDK timestamps overlap or escape pair interval')
+        segments.extend([('between',previous,r['begin']),('sdk',r['begin'],r['end'])])
+        previous=r['end']
+    if previous!=a:raise ValueError('dense capture does not end at FADD return')
+    def partition(start,prefix):
+        totals={'sdk':0,'between':0};maximum={'sdk':0,'between':0}
+        for kind,left,right in segments:
+            duration=max(0,right-max(left,start))
+            totals[kind]+=duration;maximum[kind]=max(maximum[kind],duration)
+        if sum(totals.values())!=a-start:raise ValueError('dense partition does not cover interval')
+        return {prefix+'elapsed_us':(a-start)/1000,
+                prefix+'sdk_us':totals['sdk']/1000,prefix+'between_sdk_us':totals['between']/1000,
+                prefix+'max_sdk_us':maximum['sdk']/1000,prefix+'max_between_sdk_us':maximum['between']/1000}
+    result=partition(w,'dense_')
+    result.update({k:None for k in ('after_seen_elapsed_us','after_seen_sdk_us','after_seen_between_sdk_us',
+                                  'after_seen_max_sdk_us','after_seen_max_between_sdk_us')})
+    if marker_status=='bounded':result.update(partition(max(w,pair['result_upper']),'after_seen_'))
+    return result
+
+
+def pair_metrics(pair,polls,backend,poll_stride=64):
     p=pair
     if p['atomic_id']!=p['write_id']+1 or p['write_id']>>32 or p['bytes']!=p['operand']*14352 or not 0<p['operand']<=32:
         raise ValueError('not an adjacent BF16 payload/tail pair')
@@ -42,6 +72,9 @@ def pair_metrics(pair,polls,backend):
              return_bracket_width_us=None,empty_polls_after_return=0,
              sdk_poll_calls_between=None,sdk_empty_calls_between=None,
              last_empty_prefix_us=None,last_empty_tail_upper_us=None,max_poll_checkpoint_gap_us=None)
+    if poll_stride==1:
+        row.update({prefix+key:None for prefix in ('dense_','after_seen_')
+                    for key in ('elapsed_us','sdk_us','between_sdk_us','max_sdk_us','max_between_sdk_us')})
     if a<w:
         row['marker_status']='negative_completion_gap';return row
     calls=p['atomic_poll_seq']-p['write_poll_seq']
@@ -75,30 +108,32 @@ def pair_metrics(pair,polls,backend):
                    after_return_lower_us=(a-high)/1000,after_return_upper_us=(a-low)/1000,
                    return_bracket_width_us=(p['result_upper']-p['result_lower'])/1000,
                    empty_polls_after_return=sum(r['count']==0 and r['begin']>=p['result_upper'] and r['end']<=a for r in selected))
+    if poll_stride==1:row.update(dense_metrics(p,selected,row['marker_status']))
     return row
 
 
-def capture_rows(case,backend):
+def capture_rows(case,backend,poll_stride=64):
     windows=base.rows(case/'fadd_path.jsonl')
     if len(windows)!=10 or [w['index'] for w in windows]!=list(range(10)):
         raise ValueError('expected all ten BF16 capture windows')
     result=[]
     for w in windows:
-        if (w['version'],w['clock'],w['target_payload'],w['ring'],w['poll_stride'],w['label'])!=(1,'CLOCK_MONOTONIC_RAW',6,0,64,LABEL):
+        if (w['version'],w['clock'],w['target_payload'],w['ring'],w['poll_stride'],w['label'])!=(1,'CLOCK_MONOTONIC_RAW',6,0,poll_stride,LABEL):
             raise ValueError('wrong completion-path capture recipe')
         streams=w['streams']
         if len(streams)!=4 or {s['proxy'] for s in streams}!={0,1,2,3}:raise ValueError('missing/ambiguous Proxy coverage')
         for stream in streams:
             if stream['dropped'] or stream['errors'] or len(stream['pairs'])!=1:raise ValueError('dropped/error/ambiguous completion path capture')
-            metrics=pair_metrics(stream['pairs'][0],stream['polls'],backend)
+            metrics=pair_metrics(stream['pairs'][0],stream['polls'],backend,poll_stride)
             if w['index']>0:result.append(dict(index=w['index'],proxy=stream['proxy'],**metrics))
     return result
 
 
-def summarize(root,backend,output):
+def summarize(root,backend,output,poll_stride=64):
     campaign=root/backend/'cases';contexts=[];api=[];pairs=[];bounds=[]
     overlays=[base.read(root/backend/('overlay_node%d.json'%r)) for r in (0,1)]
     if overlays[0]!=overlays[1]:raise ValueError('two-node isolated source overlays differ')
+    if overlays[0].get('poll_stride',64)!=poll_stride:raise ValueError('overlay polling stride differs from analysis recipe')
     for rank in (0,1):
         runs={stage:base.case_data(campaign/('%s_%s_%s'%(root.name,backend,stage)),rank,False,reference_events='paced')
               for stage in ('pre','probe','post')}
@@ -118,12 +153,15 @@ def summarize(root,backend,output):
             api.append(dict(node=rank,label=label,pre_us=pre['mean_us'],probe_us=on['mean_us'],post_us=post['mean_us'],
                             probe_change_pct=change,control_drift_pct=drift,max_cv_pct=cv,
                             representative=abs(change)<=5 and abs(drift)<=5 and cv<=5))
-        pp=[dict(node=rank,**r) for r in capture_rows(runs['probe']['case'],backend)];pairs.extend(pp)
+        pp=[dict(node=rank,**r) for r in capture_rows(runs['probe']['case'],backend,poll_stride)];pairs.extend(pp)
         visible=[r for r in pp if r['marker_status']=='bounded']
         numeric=('gap_us','max_poll_checkpoint_gap_us','last_empty_prefix_us','last_empty_tail_upper_us',
                  'before_return_lower_us','before_return_upper_us','after_return_lower_us','after_return_upper_us','return_bracket_width_us')
+        if poll_stride==1:
+            numeric+=('dense_elapsed_us','dense_sdk_us','dense_between_sdk_us','dense_max_sdk_us','dense_max_between_sdk_us',
+                      'after_seen_elapsed_us','after_seen_sdk_us','after_seen_between_sdk_us','after_seen_max_sdk_us','after_seen_max_between_sdk_us')
         for key in numeric:
-            values=[r[key] for r in pp if r[key] is not None]
+            values=[r[key] for r in pp if r.get(key) is not None]
             bounds.append(dict(node=rank,metric=key,observations=len(values),median_us=statistics.median(values) if values else None))
         bounds.extend([dict(node=rank,metric='marker_bounded_pairs',observations=len(visible),median_us=None),
                        dict(node=rank,metric='bounded_pairs_with_empty_after_return',observations=sum(r['empty_polls_after_return']>0 for r in visible),median_us=None),
@@ -149,7 +187,23 @@ def summarize(root,backend,output):
            'after_return_lower_us':'返回值可见→FADD返回：下界','after_return_upper_us':'返回值可见→FADD返回：上界',
            'return_bracket_width_us':'返回值采样时间不确定区间','marker_bounded_pairs':'返回值在FADD CQE之前已观测到的配对数',
            'bounded_pairs_with_empty_after_return':'返回值已见、之后仍有SDK返回0的配对数','all_pairs':'全部配对数'}
+    names.update(dense_elapsed_us='密集：WRITE→FADD完成观测总间隔',dense_sdk_us='密集：区间内SDK调用累计耗时',
+                 dense_between_sdk_us='密集：区间内SDK调用之间累计耗时',dense_max_sdk_us='密集：最长单次SDK调用',
+                 dense_max_between_sdk_us='密集：最长SDK调用间隙',after_seen_elapsed_us='返回值已见后的观测等待',
+                 after_seen_sdk_us='返回值已见后：SDK调用累计耗时',after_seen_between_sdk_us='返回值已见后：SDK之间累计耗时',
+                 after_seen_max_sdk_us='返回值已见后：最长单次SDK调用',after_seen_max_between_sdk_us='返回值已见后：最长调用间隙')
     for r in bounds:lines.append('| %s | %s | %s | %s |'%('202' if r['node']==0 else '204',names[r['metric']],r['observations'],'—' if r['median_us'] is None else '%.3f'%r['median_us']))
+    if poll_stride==1:
+        lines+=['','密集分解严格覆盖同一条本端观测间隔。SDK调用内耗时不是设备执行时间；调用间隙包含Proxy其他工作、调度及探针开销，不等于CPU空闲。',
+                '返回值已见后取首次非0观测上界作为起点；它是后续实测等待，不代替原子结果物理到达时刻。','',
+                '| 节点 | 有效返回分界配对数 | 返回值已见后SDK时间占比（累计比） | 最长查询间隙中位数μs |',
+                '| --- | ---: | ---: | ---: |']
+        for rank in (0,1):
+            rr=[r for r in pairs if r['node']==rank and r.get('after_seen_elapsed_us') is not None]
+            total=sum(r['after_seen_elapsed_us'] for r in rr)
+            fraction='—' if not total else '%.2f%%'%(sum(r['after_seen_sdk_us'] for r in rr)/total*100)
+            maximum='—' if not rr else '%.3f'%statistics.median(r['after_seen_max_between_sdk_us'] for r in rr)
+            lines.append('| %s | %d | %s | %s |'%('202' if rank==0 else '204',len(rr),fraction,maximum))
     lines+=['','| 节点 | W→A之间SDK poll次数中位数 | 其中空返回次数中位数 |','| --- | ---: | ---: |']
     for rank in (0,1):
         selected=[r for r in pairs if r['node']==rank and r['sdk_poll_calls_between'] is not None]
@@ -169,4 +223,5 @@ if __name__=='__main__':
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument('--root',type=Path,required=True);p.add_argument('--output',type=Path,required=True)
     p.add_argument('--backend',choices=('urma','verbs'),required=True)
-    a=p.parse_args();summarize(a.root,a.backend,a.output)
+    p.add_argument('--poll-stride',type=int,choices=(1,64),default=64)
+    a=p.parse_args();summarize(a.root,a.backend,a.output,a.poll_stride)

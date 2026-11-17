@@ -1,5 +1,7 @@
 # Normal通知FADD：进一步定位完成推进等待
 
+2026-11-17更新：稀疏URMA/verbs对照已完成，见[同口径分析](results/fadd_path_01/BACKEND_COMPARISON.zh-CN.md)。下一步仅URMA侧的每次轮询观测见[密集局部运行文档](DENSE.zh-CN.md)。下文是已完成的stride64协议，保留用于复核，不要求原样重跑。
+
 ## 1. 本轮明确要回答的问题
 
 此前204的WRITE完成观测→对应FADD完成观测约0.63ms，verbs约4μs。现有时间戳无法分清下面四项。本轮新增**本端FADD返回数据可见**的观测，并记录SDK轮询检查点，判断等待主要位于返回数据到本端之前，还是之后。

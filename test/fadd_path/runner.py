@@ -81,6 +81,8 @@ def main(argv=None):
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument('--action',choices=('prepare','build','check','run','collect'),required=True)
     p.add_argument('--backend',choices=('urma','verbs'),required=True)
+    p.add_argument('--poll-stride',type=int,choices=(1,64),default=64,
+                   help='1 records every relevant SDK poll; prepare/build/check/run must match')
     p.add_argument('--node-rank',type=int,choices=(0,1),required=True)
     p.add_argument('--job',default='fadd_path_01')
     p.add_argument('--tree',type=Path,default=home/'metax_dev/fadd_path_src_v1')
@@ -95,10 +97,10 @@ def main(argv=None):
     a.tree=a.tree.resolve();a.output=a.output.resolve();a.destination=a.destination.resolve()
     a.build_dir=(a.build_dir or home/('metax_dev/fadd_path_build/%s_v1'%a.backend)).resolve()
     if a.action=='prepare':
-        overlay.prepare(a.tree)
+        overlay.prepare(a.tree,a.poll_stride)
         print('FADD_PATH_PREPARE_PASSED '+str(a.tree));return
     # Reuse exactly the prepared sources; refuse silent overlay updates.
-    provenance=(json.loads((a.tree/'.fadd_path_overlay.json').read_text()) if a.action=='collect' else overlay.prepare(a.tree))
+    provenance=(json.loads((a.tree/'.fadd_path_overlay.json').read_text()) if a.action=='collect' else overlay.prepare(a.tree,a.poll_stride))
     root=a.output/a.job/a.backend;root.mkdir(parents=True,exist_ok=True)
     marker=root/('overlay_node%d.json'%a.node_rank)
     encoded=json.dumps(provenance,indent=2)

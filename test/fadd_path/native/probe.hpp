@@ -131,7 +131,7 @@ inline void begin(unsigned ordinal){
 inline std::string end(){
   std::lock_guard<std::mutex> lock(mutex);active.store(false,std::memory_order_release);
   auto frame=epoch.load();std::ostringstream out;
-  out<<"{\"version\":1,\"clock\":\"CLOCK_MONOTONIC_RAW\",\"target_payload\":6,\"ring\":0,\"poll_stride\":64,\"origin_ns\":"<<origin<<",\"streams\":[";
+  out<<"{\"version\":1,\"clock\":\"CLOCK_MONOTONIC_RAW\",\"target_payload\":6,\"ring\":0,\"poll_stride\":"<<kStride<<",\"origin_ns\":"<<origin<<",\"streams\":[";
   bool comma=false;
   for(auto const& s:streams){
     while(s->writing.load(std::memory_order_acquire))std::this_thread::yield();

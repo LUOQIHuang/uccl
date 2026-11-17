@@ -25,7 +25,51 @@ def record():
     return pair,polls
 
 
+def dense_record():
+    p,_=record();p.update(write_poll_seq=1,atomic_poll_seq=4,result_lower=3000,result_upper=4000)
+    polls=[dict(cq=1,seq=1,begin=900,end=1000,count=1),
+           dict(cq=1,seq=2,begin=2000,end=2500,count=0),
+           dict(cq=1,seq=3,begin=5000,end=6000,count=0),
+           dict(cq=1,seq=4,begin=9000,end=10000,count=1)]
+    return p,polls
+
+
 class ProbeTests(unittest.TestCase):
+    def test_dense_partitions_same_request_before_and_after_seen_result(self):
+        p,q=dense_record();r=analyze.pair_metrics(p,q,'urma',1)
+        self.assertEqual(r['dense_elapsed_us'],9)
+        self.assertEqual(r['dense_sdk_us'],2.5)
+        self.assertEqual(r['dense_between_sdk_us'],6.5)
+        self.assertEqual(r['after_seen_elapsed_us'],6)
+        self.assertEqual(r['after_seen_sdk_us'],2)
+        self.assertEqual(r['after_seen_between_sdk_us'],4)
+        self.assertEqual(r['after_seen_max_between_sdk_us'],3)
+
+    def test_dense_missing_or_overlapping_calls_are_not_filled_in(self):
+        p,q=dense_record()
+        with self.assertRaisesRegex(ValueError,'missing SDK'):analyze.pair_metrics(p,q[:2]+q[3:],'urma',1)
+        q[2]['begin']=2400
+        with self.assertRaisesRegex(ValueError,'overlap'):analyze.pair_metrics(p,q,'urma',1)
+
+    def test_dense_same_sdk_batch_is_zero_not_device_zero(self):
+        p,q=dense_record();p.update(atomic_sdk_return=1000,atomic_handled=1020,atomic_poll_seq=1,
+                                   result_upper=1010)
+        r=analyze.pair_metrics(p,q[:1],'urma',1)
+        self.assertEqual(r['dense_elapsed_us'],0)
+        self.assertEqual(r['dense_between_sdk_us'],0)
+        self.assertIsNone(r['after_seen_elapsed_us'])
+
+    def test_dense_marker_missing_preserves_sdk_partition_and_censoring(self):
+        p,q=dense_record();p.update(result_upper=10020)
+        r=analyze.pair_metrics(p,q,'urma',1)
+        self.assertEqual(r['dense_elapsed_us'],9)
+        self.assertIsNone(r['after_seen_sdk_us'])
+
+    def test_dense_header_is_pinned_and_default_remains_sparse(self):
+        self.assertIn('kStride=1, kLimit=4096',overlay.probe_header(1))
+        self.assertIn('kStride=64, kLimit=4096',overlay.probe_header(64))
+        with self.assertRaises(ValueError):overlay.probe_header(2)
+
     def test_response_bounds_and_empty_after_local_return(self):
         p,q=record();r=analyze.pair_metrics(p,q,'urma')
         self.assertEqual(r['gap_us'],9)
@@ -66,10 +110,10 @@ class ProbeTests(unittest.TestCase):
         self.assertEqual(r['marker_status'],'negative_completion_gap')
 
     def test_full_report_preserves_failed_perturbation_gate(self):
-        for impact in (1.0,1.2):
+        for impact,poll_stride in ((1.0,64),(1.2,64),(1.0,1),(1.2,1)):
             with tempfile.TemporaryDirectory() as temporary,redirect_stdout(io.StringIO()):
                 root=Path(temporary)/'job';backend='urma';folder=root/backend;folder.mkdir(parents=True)
-                for rank in (0,1):(folder/('overlay_node%d.json'%rank)).write_text('{"version":1}')
+                for rank in (0,1):(folder/('overlay_node%d.json'%rank)).write_text(json.dumps(dict(version=1,poll_stride=poll_stride)))
                 for rank in (0,1):
                     for stage in ('pre','probe','post'):
                         case=folder/'cases'/('job_urma_'+stage)/('node%d'%rank)/'normal';case.mkdir(parents=True)
@@ -78,9 +122,10 @@ class ProbeTests(unittest.TestCase):
                             for index in range(10):
                                 streams=[]
                                 for proxy in range(4):
-                                    p,q=record();streams.append(dict(proxy=proxy,dropped=0,errors=0,pairs=[p],polls=q))
+                                    p,q=dense_record() if poll_stride==1 else record()
+                                    streams.append(dict(proxy=proxy,dropped=0,errors=0,pairs=[p],polls=q))
                                 windows.append(dict(version=1,clock='CLOCK_MONOTONIC_RAW',target_payload=6,ring=0,
-                                                    poll_stride=64,label=analyze.LABEL,index=index,streams=streams))
+                                                    poll_stride=poll_stride,label=analyze.LABEL,index=index,streams=streams))
                             (case/'fadd_path.jsonl').write_text(''.join(json.dumps(w)+'\n' for w in windows))
                 def case_data(location,rank,*args,**kwargs):
                     stage=location.name.rsplit('_',1)[-1]
@@ -89,9 +134,10 @@ class ProbeTests(unittest.TestCase):
                         means={label:dict(mean_us=10000*(impact if stage=='probe' and label==analyze.LABEL else 1),cv_pct=.2)
                                for label in analyze.base.ALL_LABELS})
                 with patch.object(analyze.base,'case_data',side_effect=case_data):
-                    decision=analyze.summarize(root,backend,root/'summary')
+                    decision=analyze.summarize(root,backend,root/'summary',poll_stride)
                 self.assertEqual(decision['mechanism_usable'],impact==1)
                 self.assertTrue((root/'summary/pairs.csv').exists())
+                if poll_stride==1:self.assertIn('after_seen_between_sdk_us',(root/'summary/pairs.csv').read_text())
 
     def test_overlay_anchors_match_pinned_sources_and_do_not_edit_checkout(self):
         for name in overlay.TARGETS:
@@ -109,14 +155,20 @@ class ProbeTests(unittest.TestCase):
     @unittest.skipUnless(os.name=='posix' and shutil.which('c++'),'native CPU compiler')
     def test_native_export_matches_python_decoder(self):
         native=Path(__file__).with_name('native')
-        with tempfile.TemporaryDirectory() as temporary:
-            binary=Path(temporary)/'probe_test'
-            subprocess.run(['c++','-std=c++17','-O2','-pthread','-Wall','-Wextra','-Werror',
-                            '-I'+str(native),str(native/'probe_test.cpp'),'-o',str(binary)],check=True)
-            window=json.loads(subprocess.check_output([str(binary)]).decode())
-            stream=window['streams'][0]
-            row=analyze.pair_metrics(stream['pairs'][0],stream['polls'],'urma')
-            self.assertEqual(row['marker_status'],'bounded')
+        for stride in (64,1):
+            with tempfile.TemporaryDirectory() as temporary:
+                folder=Path(temporary);binary=folder/'probe_test'
+                (folder/'probe.hpp').write_text(overlay.probe_header(stride))
+                shutil.copy2(str(native/'probe_test.cpp'),str(folder/'probe_test.cpp'))
+                subprocess.run(['c++','-std=c++17','-O2','-pthread','-Wall','-Wextra','-Werror',
+                                '-I'+str(folder),str(folder/'probe_test.cpp'),'-o',str(binary)],check=True)
+                window=json.loads(subprocess.check_output([str(binary)]).decode())
+                self.assertEqual(window['poll_stride'],stride)
+                stream=window['streams'][0]
+                row=analyze.pair_metrics(stream['pairs'][0],stream['polls'],'urma',stride)
+                self.assertEqual(row['marker_status'],'bounded')
+                if stride==1:
+                    self.assertAlmostEqual(row['dense_sdk_us']+row['dense_between_sdk_us'],row['gap_us'])
 
 
 if __name__=='__main__':unittest.main()

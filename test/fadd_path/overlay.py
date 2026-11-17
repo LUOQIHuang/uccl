@@ -89,7 +89,15 @@ TARGETS=('ep/src/urma_transport.cpp','ep/include/verbs_stage_diag.hpp','ep/src/u
          'test/urma_mode_parity/support.py','test/verbs_baseline/common.py','test/reference_events/event_runtime.py')
 
 
-def prepare(tree):
+def probe_header(poll_stride):
+    if poll_stride not in (1,64):
+        raise ValueError('unsupported polling stride')
+    return replace((HERE/'native/probe.hpp').read_text(),
+                   'kStride=64, kLimit=4096', 'kStride=%d, kLimit=4096'%poll_stride)
+
+
+def prepare(tree, poll_stride=64):
+    header=probe_header(poll_stride)
     tree=tree.resolve()
     if tree==REPO or REPO in tree.parents:
         raise ValueError('diagnostic worktree must be outside the active checkout')
@@ -99,7 +107,7 @@ def prepare(tree):
     marker=tree/'.fadd_path_overlay.json'
     if marker.exists():
         data=json.loads(marker.read_text())
-        if data['base']!=version or data['bundle']!=bundle or any(sha(tree/n)!=v for n,v in data['overlaid'].items()):
+        if data.get('poll_stride',64)!=poll_stride or data['base']!=version or data['bundle']!=bundle or any(sha(tree/n)!=v for n,v in data['overlaid'].items()):
             raise ValueError('DIAGNOSTIC_TREE_CHANGED: use a new worktree path')
         return data
     if tree.exists():
@@ -108,13 +116,13 @@ def prepare(tree):
     sources={n:changes(n,subprocess.check_output(['git','-C',str(REPO),'show',version+':'+n]).decode()) for n in TARGETS}
     subprocess.run(['git','-C',str(REPO),'worktree','add','--detach',str(tree),version],check=True)
     for name,text in sources.items():(tree/name).write_text(text)
-    shutil.copy2(str(HERE/'native/probe.hpp'),str(tree/'ep/include/fadd_path_probe.hpp'))
+    (tree/'ep/include/fadd_path_probe.hpp').write_text(header)
     shutil.copy2(str(HERE/'native/verbs_hooks.hpp'),str(tree/'ep/include/fadd_path_verbs.hpp'))
     # Freeze this experiment's entry points with the build, independent of the
     # original checkout and of an in-progress tokens sweep.
     shutil.copytree(str(HERE),str(tree/'test/fadd_path'),ignore=shutil.ignore_patterns('results','__pycache__'))
     files=TARGETS+('ep/include/fadd_path_probe.hpp','ep/include/fadd_path_verbs.hpp')+tuple('test/fadd_path/'+n for n in bundle)
-    data=dict(version=1,base=version,bundle=bundle,overlaid={n:sha(tree/n) for n in files},
+    data=dict(version=1,base=version,poll_stride=poll_stride,bundle=bundle,overlaid={n:sha(tree/n) for n in files},
               note='Only this isolated tree is overlaid; original benchmark and GPU kernels are unchanged.')
     marker.write_text(json.dumps(data,indent=2))
     return data
