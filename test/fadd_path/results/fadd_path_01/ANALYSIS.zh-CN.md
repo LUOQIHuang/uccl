@@ -1,5 +1,7 @@
 # FADD路径首轮结果分析：返回值到达后仍存在完成观测等待
 
+更新：verbs同口径结果现已接收并复算通过，见[两后端对照](BACKEND_COMPARISON.zh-CN.md)。下文保留URMA首轮分析及当时的下一步安排；其中补测verbs的任务已经完成。
+
 本轮结果来自提交`04cdfa41`，只包含URMA后端。两端pre/probe/post完整，所有status检查通过；开发端重新运行analyze.py，得到`mechanism_usable=true`。本轮没有改变传输策略，不是优化收益实验，也没有新增同口径verbs结果。
 
 ## 1. 观测具有怎样的代表性
