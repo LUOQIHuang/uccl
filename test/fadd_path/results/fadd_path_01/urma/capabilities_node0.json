@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "host": "master",
+  "kernel": "6.6.0-gdr_f00955680_diag",
+  "direct_device_timestamps_used": false,
+  "result_marker": "read-only existing FADD host scratch, not remote GPU visibility",
+  "sdk_headers": {
+    "urma_api.h": "71490ac581a691d343a2763b17f4c97cdb6128b68fcb07477508794544b7b28f",
+    "urma_types.h": "42a8667b7f3c9677ebb5f8dea63768d45d6115dad435756c0f1414bba2f32e92",
+    "urma_provider.h": "54e8e8bff88a2503d59df544a5e81d99ed0435703f074701f0d18d7890a9110e"
+  },
+  "completion_fields": "\n    urma_cr_status_t status;\n    uint64_t user_ctx;       // user_ctx related to a work request\n    urma_cr_opcode_t opcode; // Only for recv\n    urma_cr_flag_t flag;     // indicate notify data or swap data is valid or not\n    uint32_t completion_len; // The number of bytes transferred\n\n    uint32_t local_id;         // Local jetty ID, or JFS ID, or JFR ID, depends on flag\n    urma_jetty_id_t remote_id; // Valid only for receiving CR. The remote jetty where the\n                               // received msg comes from Jetty ID or JFS ID, depends on flag.\n    union {\n        uint64_t imm_data;             // Valid only for receiving CR: send/write/read with imm.\n        urma_cr_token_t invalid_token; // Valid only for receiving CR: send with invalidate.\n    };\n    uint32_t tpn;        // TP number or TPG number\n    uintptr_t user_data; // e.g. use as pointer to local jetty struct.\n",
+  "tracepoints": [],
+  "tracepoint_access_errors": [
+    "[Errno 13] Permission denied: '/sys/kernel/tracing/available_events'",
+    "[Errno 13] Permission denied: '/sys/kernel/debug/tracing/available_events'"
+  ]
+}
