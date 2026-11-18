@@ -189,3 +189,10 @@ test/**/*.bin
 !test/fadd_path/results/**/*.json
 !test/fadd_path/results/**/*.jsonl
 !test/fadd_path/results/**/*.csv
+
+# Strict serial WRITE/FADD evidence; no binary/object uploads.
+!test/serial_pair/results/**/build/
+!test/serial_pair/results/**/*.log
+!test/serial_pair/results/**/*.json
+!test/serial_pair/results/**/*.jsonl
+!test/serial_pair/results/**/*.csv
