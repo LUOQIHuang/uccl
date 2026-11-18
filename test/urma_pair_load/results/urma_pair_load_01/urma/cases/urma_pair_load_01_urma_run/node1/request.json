@@ -1,0 +1,21 @@
+{
+  "action": "run",
+  "backend": "urma",
+  "node_rank": 1,
+  "job": "urma_pair_load_01",
+  "tree": "/home/h00918771/metax_dev/urma_pair_load_src_v1",
+  "build_dir": "/home/h00918771/metax_dev/urma_pair_load_build/urma_v1",
+  "output": "/home/h00918771/metax_dev/urma_pair_load_results",
+  "destination": "/home/h00918771/uccl-ep-xpu-integration-new/test/urma_pair_load/results",
+  "master_addr": "141.61.17.202",
+  "port": 34480,
+  "gid_index": 3,
+  "hca": "rocep40s0f0",
+  "worker_cpu": "192",
+  "gpu_pci": "0000:a1:00.0",
+  "rounds": 3,
+  "warmups": 20,
+  "samples": 101,
+  "case": "/home/h00918771/metax_dev/urma_pair_load_results/urma_pair_load_01/urma/cases/urma_pair_load_01_urma_run/node1",
+  "case_root": "/home/h00918771/metax_dev/urma_pair_load_results/urma_pair_load_01/urma/cases/urma_pair_load_01_urma_run"
+}
