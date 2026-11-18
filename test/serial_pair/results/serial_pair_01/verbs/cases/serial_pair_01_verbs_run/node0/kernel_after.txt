@@ -1,0 +1,400 @@
+Nov 19 02:46:43 master kernel: URMA|ubcore|1789|1789|ubcore_get_eid_list[2134]|There is no eids in device: udmac1d1e2 eid_table.
+Nov 19 02:46:43 master kernel: URMA|ubcore|1789|1789|ubcore_register_device:[1423]|ubcore device: udmac1d1e2 register success.
+Nov 19 02:46:43 master kernel: ipourma3 (uninitialized): ipourma jetty cnt: 9, tx ring size: 16, rx ring size: 32
+Nov 19 02:46:43 master kernel: ubase 0000a: UDMA: init udma successfully.
+Nov 19 02:46:43 master kernel: ipourma3: Device opened.
+Nov 19 02:46:43 master kernel: ipourma3: ipourma create jetty set priority : 4, tp_type : ctp
+Nov 19 02:46:43 master kernel: ipourma3: ipourma create jetty set priority : 4, tp_type : ctp
+Nov 19 02:46:43 master kernel: ipourma3: ipourma create jetty set priority : 4, tp_type : ctp
+Nov 19 02:46:43 master kernel: ipourma3: ipourma create jetty set priority : 4, tp_type : ctp
+Nov 19 02:46:43 master kernel: ipourma3: ipourma create jetty set priority : 4, tp_type : ctp
+Nov 19 02:46:43 master kernel: ipourma3: ipourma create jetty set priority : 4, tp_type : ctp
+Nov 19 02:46:43 master kernel: ipourma3: ipourma create jetty set priority : 4, tp_type : ctp
+Nov 19 02:46:43 master kernel: ipourma3: ipourma create jetty set priority : 4, tp_type : ctp
+Nov 19 02:46:43 master kernel: ipourma3: ipourma create jetty set priority : 4, tp_type : ctp
+Nov 19 02:46:43 master kernel: ubase 0000a: (pid 1789) udma.5 updated adev status, status = 0x0.
+Nov 19 02:46:43 master kernel: ubase 0000a: register share port at 0 success
+Nov 19 02:46:43 master kernel: ub 0000b: delay task work coming, type[0], src[0x200]
+Nov 19 02:46:43 master kernel: ubase 0000b: Adding to iommu group 10
+Nov 19 02:46:43 master kernel: ubase 0000b: dma_configure ret = 0
+Nov 19 02:46:43 master kernel: ubase 0000b: Sync request entity enable msg, enable=1
+Nov 19 02:46:43 master kernel: [sentry][urma]: urma 0 dev is not exist, ignore to release the urma source.
+Nov 19 02:46:43 master kernel: [sentry][urma]: urma 1 dev is not exist, ignore to release the urma source.
+Nov 19 02:46:43 master kernel: URMA|ubcore|24305|24305|ubcore_register_client:[434]|ubcore client: sentry_ubcore_client register success.
+Nov 19 02:46:43 master kernel: [sentry][urma]: ubcore_register_client success
+Nov 19 02:46:43 master kernel: [sentry][urma]: ubcore init success
+Nov 19 02:46:43 master kernel: [sentry][urma]: Match device udmac0d1e2, use it to send/recv data
+Nov 19 02:46:43 master kernel: <ipc_worker_2:26575:26592> [mami mctrlq] [INFO] [_ctrlq_cq_enable 440] Already on. (devid=0; chan_id=19)
+Nov 19 02:46:43 master kernel: [sentry][urma]: ubcore_create_jfc success
+Nov 19 02:46:43 master kernel: ubase 0000b: Change the entity status to normal
+Nov 19 02:46:43 master kernel: [sentry][urma]: ubcore_create_jfc success
+Nov 19 02:46:43 master kernel: ubase 0000b: (pid 1789) cmdq handshake1 = 0x0.
+Nov 19 02:46:43 master kernel: [sentry][urma]: ubcore_create_jfr success
+Nov 19 02:46:43 master kernel: ubase 0000b: (pid 1789) The firmware version is 6.0.21.27
+Nov 19 02:46:43 master kernel: [sentry][urma]: ubcore_register_seg success
+Nov 19 02:46:43 master kernel: ubase 0000b: (pid 1789) udev cap_bits[0] = 0x1aa23d
+Nov 19 02:46:43 master kernel: [sentry][urma]: Match device udmac1d1e2, use it to send/recv data
+Nov 19 02:46:43 master kernel: ubase 0000b: (pid 1789) udev cap_bits[1] = 0x0
+Nov 19 02:46:43 master kernel: [sentry][urma]: ubcore_create_jfc success
+Nov 19 02:46:43 master kernel: ubase 0000b: (pid 1789) udev cap_bits[2] = 0x0
+Nov 19 02:46:43 master kernel: [sentry][urma]: ubcore_create_jfc success
+Nov 19 02:46:43 master kernel: ubase 0000b: device id alloc success, id: 53252.
+Nov 19 02:46:43 master kernel: [sentry][urma]: ubcore_create_jfr success
+Nov 19 02:46:43 master kernel: ubase 0000b: (pid 27022) ubase ae task start.
+Nov 19 02:46:43 master kernel: [sentry][urma]: ubcore_register_seg success
+Nov 19 02:46:43 master kernel: ubase 0000b: (pid 1789) vl 3 has been allocated to other traffic type
+Nov 19 02:46:43 master kernel: [UVB]: register cis func for callid=c00b2010 recvid=10000000 success
+Nov 19 02:46:43 master kernel: ubase 0000b: (pid 1789) vl 3 has been allocated to other traffic type
+Nov 19 02:46:43 master kernel: [sentry][urma]: proc_client_info_write kbuf is 0000:0000:003f:0200:0010:0000:df00:0b00,0000:0000:003f:0200:0010:0000:df01:cb00,0000:0000:003f:0200:0010:0000:df01:8b00,0000:0000:003f:0200:0010:0000:df01:4b00,0000:0000:003f:0200:0010:0000:df00:cb00,0000:0000:003f:0200:0010:0000:df00:4b00,0000:0000:003f:0200:0010:0000:df01:0b00,0000:0000:003f:0200:0010:0000:df00:8b00;0000:0000:007f:0200:0010:0000:df04:0b00,0000:0000:007f:0200:0010:0000:df05:cb00,0000:0000:007f:0200:0010:0000:df05:8b00,0000:0000:007f:0200:0010:0000:df05:4b00,0000:0000:007f:0200:0010:0000:df04:cb00,0000:0000:007f:0200:0010:0000:df04:4b00,0000:0000:007f:0200:0010:0000:df05:0b00,0000:0000:007f:0200:0010:0000:df04:8b00 1000
+Nov 19 02:46:43 master kernel: ubase 0000b: (pid 1789) pre-alloc memory feature is enabled.
+Nov 19 02:46:43 master kernel: [sentry][urma]: client_jetty_id is 1000
+Nov 19 02:46:43 master kernel: udma.udma ubase.udma.6: UDMA: udma init dev called, matched aux dev(udma.6).
+Nov 19 02:46:43 master kernel: [sentry][urma]: create jetty set priority : 1, tp_type : ctp
+Nov 19 02:46:43 master kernel: URMA|ubcore|1789|1789|ubcore_get_eid_list[2134]|There is no eids in device: udmac1d1e3 eid_table.
+Nov 19 02:46:43 master kernel: [sentry][urma]: ubcore_create_jetty success for device udmac0d1e2
+Nov 19 02:46:43 master kernel: URMA|ubcore|1789|1789|ubcore_get_eid_list[2134]|There is no eids in device: udmac1d1e3 eid_table.
+Nov 19 02:46:43 master kernel: [sentry][urma]: import: 7/7 success for device udmac0d1e2
+Nov 19 02:46:43 master kernel: URMA|ubcore|1789|1789|ubcore_register_device:[1423]|ubcore device: udmac1d1e3 register success.
+Nov 19 02:46:43 master kernel: [sentry][urma]: create jetty set priority : 1, tp_type : ctp
+Nov 19 02:46:43 master kernel: ipourma4 (uninitialized): ipourma jetty cnt: 9, tx ring size: 16, rx ring size: 32
+Nov 19 02:46:43 master kernel: ubase 0000b: UDMA: init udma successfully.
+Nov 19 02:46:43 master kernel: ubase 0000b: (pid 1789) udma.6 updated adev status, status = 0x0.
+Nov 19 02:46:43 master kernel: ubase 0000b: register share port at 1 success
+Nov 19 02:46:43 master kernel: ub 0000c: delay task work coming, type[0], src[0x200]
+Nov 19 02:46:43 master kernel: ubase 0000c: Adding to iommu group 11
+Nov 19 02:46:43 master kernel: [sentry][urma]: ubcore_create_jetty success for device udmac1d1e2
+Nov 19 02:46:43 master kernel: ubase 0000c: dma_configure ret = 0
+Nov 19 02:46:43 master kernel: ipourma4: Device opened.
+Nov 19 02:46:43 master kernel: ipourma4: ipourma create jetty set priority : 4, tp_type : ctp
+Nov 19 02:46:43 master kernel: ipourma4: ipourma create jetty set priority : 4, tp_type : ctp
+Nov 19 02:46:43 master kernel: ipourma4: ipourma create jetty set priority : 4, tp_type : ctp
+Nov 19 02:46:43 master kernel: ipourma4: ipourma create jetty set priority : 4, tp_type : ctp
+Nov 19 02:46:43 master kernel: ipourma4: ipourma create jetty set priority : 4, tp_type : ctp
+Nov 19 02:46:43 master kernel: ipourma4: ipourma create jetty set priority : 4, tp_type : ctp
+Nov 19 02:46:43 master kernel: ipourma4: ipourma create jetty set priority : 4, tp_type : ctp
+Nov 19 02:46:43 master kernel: ipourma4: ipourma create jetty set priority : 4, tp_type : ctp
+Nov 19 02:46:43 master kernel: ipourma4: ipourma create jetty set priority : 4, tp_type : ctp
+Nov 19 02:46:43 master kernel: [sentry][urma]: import: 7/7 success for device udmac1d1e2
+Nov 19 02:46:43 master kernel: ubase 0000c: Sync request entity enable msg, enable=1
+Nov 19 02:46:43 master kernel: URMA|ubagg|26992|26992|ubagg_cmd_set_topo_info:[1556]|Finish to set topo info, node_num: 8.
+Nov 19 02:46:43 master kernel: <ipc_worker_3:26575:26593> [mami mctrlq] [INFO] [_ctrlq_cq_enable 440] Already on. (devid=0; chan_id=20)
+Nov 19 02:46:43 master kernel: URMA|ubcore|26992|26992|ubcore_get_eid_list[2134]|There is no eids in device: bonding_dev_0 eid_table.
+Nov 19 02:46:43 master kernel: ubase 0000c: Change the entity status to normal
+Nov 19 02:46:43 master kernel: URMA|ubcore|26992|26992|ubcore_get_eid_list[2134]|There is no eids in device: bonding_dev_0 eid_table.
+Nov 19 02:46:43 master kernel: ubase 0000c: (pid 1789) cmdq handshake1 = 0x0.
+Nov 19 02:46:43 master kernel: ubctl: <ubctl_add_udma_device:374>device not added, ret = -22.
+Nov 19 02:46:43 master kernel: ubase 0000c: (pid 1789) The firmware version is 6.0.21.27
+Nov 19 02:46:43 master kernel: URMA|ubcore|26992|26992|ubcore_clients_add[1137]|ubcore device: bonding_dev_0 add client:ub_fwctl context failed.
+Nov 19 02:46:43 master kernel: ubase 0000c: (pid 1789) udev cap_bits[0] = 0x1aa23d
+Nov 19 02:46:43 master kernel: URMA|ubcore|26992|26992|ubcore_clients_add[1137]|ubcore device: bonding_dev_0 add client:ipourma context failed.
+Nov 19 02:46:43 master kernel: ubase 0000c: (pid 1789) udev cap_bits[1] = 0x0
+Nov 19 02:46:43 master kernel: URMA|ubcore|26992|26992|ubcore_register_device:[1423]|ubcore device: bonding_dev_0 register success.
+Nov 19 02:46:43 master kernel: ubase 0000c: (pid 1789) udev cap_bits[2] = 0x0
+Nov 19 02:46:43 master kernel: ubase 0000c: device id alloc success, id: 53253.
+Nov 19 02:46:43 master kernel: URMA|ubagg|26992|26992|ubagg_create_dev:[1703]|Finish to create ubagg device: bonding_dev_0.
+Nov 19 02:46:43 master kernel: ubase 0000c: (pid 27045) ubase ae task start.
+Nov 19 02:46:43 master kernel: ubase 0000c: (pid 1789) pre-alloc memory feature is enabled.
+Nov 19 02:46:43 master kernel: udma.udma ubase.udma.7: UDMA: udma init dev called, matched aux dev(udma.7).
+Nov 19 02:46:43 master kernel: URMA|ubcore|1789|1789|ubcore_get_eid_list[2134]|There is no eids in device: udmac1d1e4 eid_table.
+Nov 19 02:46:43 master kernel: URMA|ubcore|1789|1789|ubcore_get_eid_list[2134]|There is no eids in device: udmac1d1e4 eid_table.
+Nov 19 02:46:43 master kernel: URMA|ubcore|1789|1789|ubcore_register_device:[1423]|ubcore device: udmac1d1e4 register success.
+Nov 19 02:46:43 master kernel: ipourma5 (uninitialized): ipourma jetty cnt: 9, tx ring size: 16, rx ring size: 32
+Nov 19 02:46:43 master kernel: ubase 0000c: UDMA: init udma successfully.
+Nov 19 02:46:43 master kernel: ipourma5: Device opened.
+Nov 19 02:46:43 master kernel: ipourma5: ipourma create jetty set priority : 6, tp_type : ctp
+Nov 19 02:46:43 master kernel: ipourma5: ipourma create jetty set priority : 6, tp_type : ctp
+Nov 19 02:46:43 master kernel: ipourma5: ipourma create jetty set priority : 6, tp_type : ctp
+Nov 19 02:46:43 master kernel: ipourma5: ipourma create jetty set priority : 6, tp_type : ctp
+Nov 19 02:46:43 master kernel: ipourma5: ipourma create jetty set priority : 6, tp_type : ctp
+Nov 19 02:46:43 master kernel: ipourma5: ipourma create jetty set priority : 6, tp_type : ctp
+Nov 19 02:46:43 master kernel: ipourma5: ipourma create jetty set priority : 6, tp_type : ctp
+Nov 19 02:46:43 master kernel: ipourma5: ipourma create jetty set priority : 6, tp_type : ctp
+Nov 19 02:46:43 master kernel: ipourma5: ipourma create jetty set priority : 6, tp_type : ctp
+Nov 19 02:46:43 master kernel: ubase 0000c: (pid 1789) udma.7 updated adev status, status = 0x0.
+Nov 19 02:46:43 master kernel: ubase 0000c: register share port at 2 success
+Nov 19 02:46:48 master kernel: URMA|ubagg|26961|26961|ubagg_cmd_set_topo_info:[1556]|Finish to set topo info, node_num: 8.
+Nov 19 02:46:48 master kernel: URMA|ubagg|26994|26994|ubagg_cmd_set_topo_info:[1556]|Finish to set topo info, node_num: 8.
+Nov 19 02:54:38 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 02:54:38 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 02:55:22 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 02:55:22 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 02:56:05 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 02:56:05 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 02:56:49 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 02:56:49 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 02:57:32 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 02:57:32 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 02:58:16 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 02:58:16 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 02:58:59 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 02:58:59 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 02:59:43 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 02:59:43 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 03:00:27 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 03:00:27 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 03:01:10 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 03:01:10 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 03:01:54 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 03:01:54 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 03:02:37 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 03:02:37 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 03:03:21 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 03:03:21 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 03:04:04 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 03:04:04 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 03:04:48 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 03:04:48 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 03:05:31 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 03:05:31 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 03:06:15 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 03:06:15 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 03:06:58 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 03:06:58 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 03:07:42 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 03:07:42 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 03:08:25 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 03:08:25 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 03:09:09 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 03:09:09 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 03:09:52 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 03:09:52 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 03:10:36 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 03:10:36 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 03:11:20 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 03:11:20 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 03:12:03 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 03:12:03 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 03:12:47 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 03:12:47 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 03:13:30 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 03:13:30 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 03:14:14 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 03:14:14 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 03:14:57 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 03:14:57 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 03:15:41 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 03:15:41 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 03:16:24 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 03:16:24 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 03:17:08 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 03:17:08 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 03:17:51 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 03:17:51 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 03:18:35 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 03:18:35 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 03:19:18 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 03:19:18 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 03:20:02 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 03:20:02 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 03:20:45 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 03:20:45 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 03:21:29 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 03:21:29 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 03:22:12 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 03:22:12 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 03:22:56 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 03:22:56 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 03:23:39 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 03:23:39 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 03:24:02 master kernel: ubase 00007: UDMA: current mm released.
+Nov 19 03:24:02 master kernel: ubase 00007: UDMA: current mm released.
+Nov 19 03:24:02 master kernel: ubase 00007: UDMA: current mm released.
+Nov 19 03:24:02 master kernel: ubase 00007: UDMA: current mm released.
+Nov 19 03:24:02 master kernel: ubase 00007: UDMA: current mm released.
+Nov 19 03:24:07 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 03:24:07 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 03:24:50 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 03:24:50 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 03:25:34 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 03:25:34 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 03:26:17 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 03:26:17 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 03:27:01 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 03:27:01 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 03:27:44 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 03:27:44 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 03:28:28 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 03:28:28 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 03:29:11 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 03:29:11 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 03:29:55 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 03:29:55 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 03:30:38 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 03:30:38 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 03:31:22 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 03:31:22 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 03:32:05 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 03:32:05 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 03:32:49 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 03:32:49 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 03:33:32 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 03:33:32 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 03:34:16 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 03:34:16 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 03:34:59 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 03:34:59 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 03:35:43 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 03:35:43 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 03:36:26 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 03:36:26 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 03:37:10 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 03:37:10 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 03:37:54 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 03:37:54 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 03:38:37 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 03:38:37 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 03:39:21 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 03:39:21 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 03:40:04 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 03:40:04 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 03:40:48 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 03:40:48 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 03:41:31 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 03:41:31 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 03:42:15 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 03:42:15 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 03:42:58 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 03:42:58 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 03:43:23 master kernel: docker0: port 1(veth9399327) entered blocking state
+Nov 19 03:43:23 master kernel: docker0: port 1(veth9399327) entered disabled state
+Nov 19 03:43:23 master kernel: veth9399327: entered allmulticast mode
+Nov 19 03:43:23 master kernel: veth9399327: entered promiscuous mode
+Nov 19 03:43:23 master kernel: eth0: renamed from veth413e850
+Nov 19 03:43:23 master kernel: docker0: port 1(veth9399327) entered blocking state
+Nov 19 03:43:23 master kernel: docker0: port 1(veth9399327) entered forwarding state
+Nov 19 03:43:24 master kernel: docker0: port 1(veth9399327) entered disabled state
+Nov 19 03:43:24 master kernel: veth413e850: renamed from eth0
+Nov 19 03:43:24 master kernel: docker0: port 1(veth9399327) entered disabled state
+Nov 19 03:43:24 master kernel: veth9399327 (unregistering): left allmulticast mode
+Nov 19 03:43:24 master kernel: veth9399327 (unregistering): left promiscuous mode
+Nov 19 03:43:24 master kernel: docker0: port 1(veth9399327) entered disabled state
+Nov 19 03:43:42 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 03:43:42 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 03:44:22 master kernel: docker0: port 1(veth6f6ba6c) entered blocking state
+Nov 19 03:44:22 master kernel: docker0: port 1(veth6f6ba6c) entered disabled state
+Nov 19 03:44:22 master kernel: veth6f6ba6c: entered allmulticast mode
+Nov 19 03:44:22 master kernel: veth6f6ba6c: entered promiscuous mode
+Nov 19 03:44:22 master kernel: eth0: renamed from vethaa2a9bb
+Nov 19 03:44:22 master kernel: docker0: port 1(veth6f6ba6c) entered blocking state
+Nov 19 03:44:22 master kernel: docker0: port 1(veth6f6ba6c) entered forwarding state
+Nov 19 03:44:26 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 03:44:26 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 03:45:09 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 03:45:09 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 03:45:53 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 03:45:53 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 03:46:25 master kernel: docker0: port 1(veth6f6ba6c) entered disabled state
+Nov 19 03:46:25 master kernel: vethaa2a9bb: renamed from eth0
+Nov 19 03:46:25 master kernel: docker0: port 1(veth6f6ba6c) entered disabled state
+Nov 19 03:46:25 master kernel: veth6f6ba6c (unregistering): left allmulticast mode
+Nov 19 03:46:25 master kernel: veth6f6ba6c (unregistering): left promiscuous mode
+Nov 19 03:46:25 master kernel: docker0: port 1(veth6f6ba6c) entered disabled state
+Nov 19 03:46:36 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 03:46:36 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 03:47:20 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 03:47:20 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 03:47:30 master kernel: docker0: port 1(vethd0885fd) entered blocking state
+Nov 19 03:47:30 master kernel: docker0: port 1(vethd0885fd) entered disabled state
+Nov 19 03:47:30 master kernel: vethd0885fd: entered allmulticast mode
+Nov 19 03:47:30 master kernel: vethd0885fd: entered promiscuous mode
+Nov 19 03:47:31 master kernel: eth0: renamed from veth7e79798
+Nov 19 03:47:31 master kernel: docker0: port 1(vethd0885fd) entered blocking state
+Nov 19 03:47:31 master kernel: docker0: port 1(vethd0885fd) entered forwarding state
+Nov 19 03:47:36 master kernel: docker0: port 1(vethd0885fd) entered disabled state
+Nov 19 03:47:36 master kernel: veth7e79798: renamed from eth0
+Nov 19 03:47:36 master kernel: docker0: port 1(vethd0885fd) entered disabled state
+Nov 19 03:47:36 master kernel: vethd0885fd (unregistering): left allmulticast mode
+Nov 19 03:47:36 master kernel: vethd0885fd (unregistering): left promiscuous mode
+Nov 19 03:47:36 master kernel: docker0: port 1(vethd0885fd) entered disabled state
+Nov 19 03:48:03 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 03:48:03 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 03:48:33 master kernel: docker0: port 1(vethaa876d6) entered blocking state
+Nov 19 03:48:33 master kernel: docker0: port 1(vethaa876d6) entered disabled state
+Nov 19 03:48:33 master kernel: vethaa876d6: entered allmulticast mode
+Nov 19 03:48:33 master kernel: vethaa876d6: entered promiscuous mode
+Nov 19 03:48:33 master kernel: eth0: renamed from vethd002f2b
+Nov 19 03:48:34 master kernel: docker0: port 1(vethaa876d6) entered blocking state
+Nov 19 03:48:34 master kernel: docker0: port 1(vethaa876d6) entered forwarding state
+Nov 19 03:48:34 master kernel: docker0: port 1(vethaa876d6) entered disabled state
+Nov 19 03:48:34 master kernel: vethd002f2b: renamed from eth0
+Nov 19 03:48:34 master kernel: docker0: port 1(vethaa876d6) entered disabled state
+Nov 19 03:48:34 master kernel: vethaa876d6 (unregistering): left allmulticast mode
+Nov 19 03:48:34 master kernel: vethaa876d6 (unregistering): left promiscuous mode
+Nov 19 03:48:34 master kernel: docker0: port 1(vethaa876d6) entered disabled state
+Nov 19 03:48:47 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 03:48:47 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 03:49:30 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 03:49:30 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 03:49:36 master kernel: docker0: port 1(veth642ab51) entered blocking state
+Nov 19 03:49:36 master kernel: docker0: port 1(veth642ab51) entered disabled state
+Nov 19 03:49:36 master kernel: veth642ab51: entered allmulticast mode
+Nov 19 03:49:36 master kernel: veth642ab51: entered promiscuous mode
+Nov 19 03:49:36 master kernel: eth0: renamed from vethfe71356
+Nov 19 03:49:36 master kernel: docker0: port 1(veth642ab51) entered blocking state
+Nov 19 03:49:36 master kernel: docker0: port 1(veth642ab51) entered forwarding state
+Nov 19 03:49:36 master kernel: docker0: port 1(veth642ab51) entered disabled state
+Nov 19 03:49:36 master kernel: vethfe71356: renamed from eth0
+Nov 19 03:49:37 master kernel: docker0: port 1(veth642ab51) entered disabled state
+Nov 19 03:49:37 master kernel: veth642ab51 (unregistering): left allmulticast mode
+Nov 19 03:49:37 master kernel: veth642ab51 (unregistering): left promiscuous mode
+Nov 19 03:49:37 master kernel: docker0: port 1(veth642ab51) entered disabled state
+Nov 19 03:50:14 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 03:50:14 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 03:50:39 master kernel: docker0: port 1(vethe865290) entered blocking state
+Nov 19 03:50:39 master kernel: docker0: port 1(vethe865290) entered disabled state
+Nov 19 03:50:39 master kernel: vethe865290: entered allmulticast mode
+Nov 19 03:50:39 master kernel: vethe865290: entered promiscuous mode
+Nov 19 03:50:39 master kernel: eth0: renamed from veth2127e99
+Nov 19 03:50:39 master kernel: docker0: port 1(vethe865290) entered blocking state
+Nov 19 03:50:39 master kernel: docker0: port 1(vethe865290) entered forwarding state
+Nov 19 03:50:46 master kernel: docker0: port 1(vethe865290) entered disabled state
+Nov 19 03:50:46 master kernel: veth2127e99: renamed from eth0
+Nov 19 03:50:47 master kernel: docker0: port 1(vethe865290) entered disabled state
+Nov 19 03:50:47 master kernel: vethe865290 (unregistering): left allmulticast mode
+Nov 19 03:50:47 master kernel: vethe865290 (unregistering): left promiscuous mode
+Nov 19 03:50:47 master kernel: docker0: port 1(vethe865290) entered disabled state
+Nov 19 03:50:57 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 03:50:57 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 03:51:41 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 03:51:41 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 03:52:24 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 03:52:24 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 03:53:08 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 03:53:08 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 03:53:51 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 03:53:51 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 03:54:35 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 03:54:35 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 03:55:19 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 03:55:19 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 03:56:02 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 03:56:02 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 03:56:46 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 03:56:46 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 03:57:29 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 03:57:29 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 03:58:13 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 03:58:13 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 03:58:56 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 03:58:56 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 03:59:40 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 03:59:40 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 04:00:23 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 04:00:23 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 04:01:07 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 04:01:07 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 04:01:50 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 04:01:50 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 04:02:34 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 04:02:34 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 04:03:18 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 04:03:18 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 04:04:01 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 04:04:01 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 04:04:45 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 19 04:04:45 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 19 04:04:52 master kernel: ubase 00007: UDMA: current mm released.
+Nov 19 04:04:52 master kernel: ubase 00007: UDMA: current mm released.
+Nov 19 04:04:52 master kernel: ubase 00007: UDMA: current mm released.
+Nov 19 04:04:52 master kernel: ubase 00007: UDMA: current mm released.
+Nov 19 04:04:52 master kernel: ubase 00007: UDMA: current mm released.
