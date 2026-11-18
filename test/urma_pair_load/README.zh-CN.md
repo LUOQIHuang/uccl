@@ -1,5 +1,7 @@
 # URMA Normal：恢复少量并发，定位长等待触发条件
 
+**`urma_pair_load_01`四对实验已完成，不用重测。最新结果见[分析](results/urma_pair_load_01/ANALYSIS.zh-CN.md)，下一步只运行[三队列深度对照文档](DEPTH12.zh-CN.md)。**以下保留basic4的定义与操作，v2仍支持该套件，但更换了独立TREE/BUILD默认目录，避免混入v1扩展。
+
 ## 1. 目的与已有依据
 
 上一轮 `serial_pair_01` 在URMA环境已经得到：单线程、单数据队列、最多一对WRITE/FADD在途时，单对中位数约37–39 μs，1800个有效请求对均在同次SDK轮询返回两条完成，W→A观测间隔为0。此前完整Normal的对应间隔中位数，202约682.990 μs、204约427.350 μs。
@@ -44,8 +46,8 @@ export URMA_DIAG_LIBRARY_DIR="$URMA_DIAG_HOME/metax_dev/urma_after_kernel_202610
 export VERBS_DIAG_LIBRARY_DIR="$URMA_DIAG_LIBRARY_DIR"
 export URMA_DIAG_INCLUDE_DIR="$URMA_DIAG_HOME/metax_dev/urma_sdk_private_include"
 export JOB=urma_pair_load_01
-export TREE="$URMA_DIAG_HOME/metax_dev/urma_pair_load_src_v1"
-export BUILD="$URMA_DIAG_HOME/metax_dev/urma_pair_load_build/urma_v1"
+export TREE="$URMA_DIAG_HOME/metax_dev/urma_pair_load_src_v2"
+export BUILD="$URMA_DIAG_HOME/metax_dev/urma_pair_load_build/urma_v2"
 export ROOT="$URMA_DIAG_HOME/metax_dev/urma_pair_load_results"
 export DEST="$PWD/test/urma_pair_load/results"
 test -x "$URMA_PAIR_LOAD_PYTHON"

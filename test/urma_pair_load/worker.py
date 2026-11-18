@@ -36,12 +36,15 @@ def choose_cpu():
     return dict(cpu=cpu,gpu_numa_node=node,allowed_before=sorted(allowed),effective=sorted(os.sched_getaffinity(0)))
 peer=None;session=None
 SHAPES=[('serial4',1,1),('queue4',1,4),('lanes4',4,4)]
+suite=r.get('suite','basic4');count=4
+if suite=='depth12':SHAPES=[('lane3_w1',3,3),('lane3_w4',3,12)];count=12
+elif suite!='basic4':raise ValueError('unsupported load suite')
 try:
-    if backend!='urma' or ep.get_urma_pair_load_version()!=1 or runtime['module_sha']!=r['module_sha']:raise RuntimeError('load module missing or changed')
+    if backend!='urma' or ep.get_urma_pair_load_version()!=2 or runtime['module_sha']!=r['module_sha']:raise RuntimeError('load module missing or changed')
     placement=choose_cpu();(case/'affinity.json').write_text(json.dumps(placement,indent=2));(case/'runtime.json').write_text(json.dumps(runtime,indent=2))
     peer=Peer(rank,r['master_addr'],r['port'])
-    plan=dict(version=1,backend=backend,job=r['job'],rounds=r['rounds'],warmups=r['warmups'],samples=r['samples'],
-        bytes=459264,notify_add=32,pairs_per_iteration=4,active_threads=1,shapes=SHAPES,source_id=r['source_id'])
+    plan=dict(version=2,suite=suite,backend=backend,job=r['job'],rounds=r['rounds'],warmups=r['warmups'],samples=r['samples'],
+        bytes=459264,notify_add=32,pairs_per_iteration=count,active_threads=1,shapes=SHAPES,source_id=r['source_id'])
     # JSON transport converts tuples to lists.
     plan=json.loads(json.dumps(plan));peer.agree('plan',plan);(case/'plan.json').write_text(json.dumps(plan,indent=2))
     completed=0
@@ -56,10 +59,10 @@ try:
             if path.get('channels')!=lanes or path['control_memory']!='gpu' or path['write_order']!='relax' or path['atomic_order']!='strong' or path['atomic_fence']!='per_request' or path['normal_completion']!='all':raise ValueError('changed load path/order')
             remote=peer.exchange('descriptors',[bytes(b).hex() for b in session.descriptors(1)])
             session.connect([bytes.fromhex(b) for b in remote])
-            session.load_prepare(limit,rank);session.experiment(send,not send,False,[placement['cpu']])
+            session.load_prepare(limit,rank,count);session.experiment(send,not send,False,[placement['cpu']])
             for seq in range(r['warmups']+r['samples']):
                 peer.agree('ready',dict(repeat=repeat,label=label,seq=seq))
-                sample=json.loads(session.load_step(seq,limit))
+                sample=json.loads(session.load_step(seq,limit,count))
                 peer.agree('done',dict(repeat=repeat,label=label,seq=seq))
                 error=None
                 try:session.load_validate(seq)
