@@ -1,6 +1,8 @@
 # Normal下一轮：缩小fence放宽范围，A-B-C-C-B-A关闭采集实验
 
-**下一次 URMA 窗口优先跑本页实验。**完整 Normal 的[同批交替提交 A/B](results/urma_normal_tail_order_01_ANALYSIS.zh-CN.md)两轮均无收益，trace 中只有约 1%–5% 的请求对真正改变链内位置。[提前回收](results/normal_progress_20261116/README.zh-CN.md)也只有小幅收益。当前最值得复验的改动是已取得约 3.4% 收益的 fence 放宽，并缩小放宽范围。
+**本页 A/B/C 暂缓，作为已测 fence 收益的备选验证。**已有两套后端对照中，202 的 URMA BF16 Dispatch 分别约 8.081 和 8.114 ms，verbs 约 7.216 和 7.149 ms。追平需要减少约 0.866–0.965 ms，即对应 URMA 基线的约 10.7%–11.9%。之前的 fence 干预约节省 0.278 ms，量级约为历史差额的三分之一。两项来自不同轮次，不直接相减作为剩余差额。本页只测放宽范围，当前窗口优先保留给主要瓶颈验证。[后端对照一](../fadd_path/results/fadd_path_01/BACKEND_COMPARISON.zh-CN.md) · [后端对照二](results/BACKEND_MATCHED_ANALYSIS.zh-CN.md) · [fence 干预数据](results/normal_progress_20261116/README.zh-CN.md)
+
+现有数据优先指向从开始传输到接收侧最后一个远端 token 可消费的区间。202 上该段中位约 6.428→7.110 ms，增加约 0.682 ms。历史 204 的第 6 块 WRITE 从提交到完成观测，中位约 2.224→3.492 ms。另一次 204 密集采样发现 FADD 返回值可读后，仍反复空轮询约 0.285 ms。后两项是发送侧局部观测，可能并行或重叠，不能直接加到 202 的 Dispatch 差值。先依托已有日志和与实机匹配的 provider/驱动版本，核对通知完成交付、后续命令推进与接收端尾部的关系。新的实机 A/B 需要先验证改动覆盖到了主要等待，并以完整 BF16 Dispatch 为收益指标。[同批交替 A/B](results/urma_normal_tail_order_01_ANALYSIS.zh-CN.md) · [204 完成采样](../fadd_path/results/fadd_dense_01/ANALYSIS.zh-CN.md)
 
 ## 目的与依据
 
