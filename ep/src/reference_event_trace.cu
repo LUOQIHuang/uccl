@@ -46,8 +46,9 @@ extern "C" __attribute__((visibility("default"))) int uccl_reference_events_vers
   return 0;
 #endif
 }
-static int reference_begin(unsigned value,bool boundaries){
+static int reference_begin(unsigned value,int profile){
 #ifdef UCCL_REFERENCE_EVENTS
+  bool boundaries=profile==1;
   using namespace uccl::reference_events;std::lock_guard<std::mutex> lock(mutex);
   if(page || running.load())return -1;
   int rc=cudaDeviceSynchronize();if(rc)return rc;
@@ -62,7 +63,6 @@ static int reference_begin(unsigned value,bool boundaries){
     if(!zero){cudaFreeHost(page);page=nullptr;mapped=nullptr;return -3;}
     if(!rc)rc=cudaMemcpyToSymbol(trace,zero.get(),sizeof(Trace));
   }
-  int profile=boundaries ? 1 : 0;
   if(!rc)rc=cudaMemcpyToSymbol(boundary_profile,&profile,sizeof(profile));
   capture_boundaries=boundaries;
   if(!rc)rc=cudaMemcpyToSymbol(epoch,&value,sizeof(value));
@@ -79,7 +79,7 @@ static int reference_begin(unsigned value,bool boundaries){
   }
   return rc;
 #else
-  (void)value;(void)boundaries;return -1;
+  (void)value;(void)profile;return -1;
 #endif
 }
 static int reference_end(void* output,void* clock_output,bool boundaries){
@@ -103,7 +103,8 @@ static int reference_end(void* output,void* clock_output,bool boundaries){
   (void)output;(void)clock_output;(void)boundaries;return -1;
 #endif
 }
-extern "C" __attribute__((visibility("default"))) int uccl_reference_events_begin(unsigned epoch){return reference_begin(epoch,false);}
+extern "C" __attribute__((visibility("default"))) int uccl_reference_events_begin(unsigned epoch){return reference_begin(epoch,0);}
+extern "C" __attribute__((visibility("default"))) int uccl_reference_order_begin(unsigned epoch){return reference_begin(epoch,2);}
 extern "C" __attribute__((visibility("default"))) int uccl_reference_events_end(void* trace,void* stats){return reference_end(trace,stats,false);}
 extern "C" __attribute__((visibility("default"))) int uccl_reference_boundaries_version(){
 #ifdef UCCL_REFERENCE_EVENTS
@@ -112,5 +113,5 @@ extern "C" __attribute__((visibility("default"))) int uccl_reference_boundaries_
   return 0;
 #endif
 }
-extern "C" __attribute__((visibility("default"))) int uccl_reference_boundaries_begin(unsigned epoch){return reference_begin(epoch,true);}
+extern "C" __attribute__((visibility("default"))) int uccl_reference_boundaries_begin(unsigned epoch){return reference_begin(epoch,1);}
 extern "C" __attribute__((visibility("default"))) int uccl_reference_boundaries_end(void* trace,void* stats){return reference_end(trace,stats,true);}

@@ -66,6 +66,7 @@ def load_extension(module):
                           dispatch_trace_version=extension.get_dispatch_trace_version() if hasattr(extension,'get_dispatch_trace_version') else 0,
                           reference_events_version=extension.get_reference_events_version() if hasattr(extension,'get_reference_events_version') else 0,
                           reference_boundary_version=extension.get_reference_boundary_version() if hasattr(extension,'get_reference_boundary_version') else 0,
+                          reference_order_version=extension.get_reference_order_version() if hasattr(extension,'get_reference_order_version') else 0,
                           reference_profile=os.environ.get('UCCL_REFERENCE_PROFILE','legacy'),
                           notify_version=extension.get_urma_notify_version() if hasattr(extension,'get_urma_notify_version') else 0,
                           dispatch_trial=all(hasattr(extension,n) for n in ('urma_dispatch_trial_begin','urma_dispatch_trial_end')),

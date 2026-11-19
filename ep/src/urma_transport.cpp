@@ -26,13 +26,13 @@ void UrmaTransport::configure(bool normal, size_t channels) {
   ll_relaxed_write_ = urma_ll_relaxed_write_from_env();
   normal_relaxed_write_ = urma_normal_relaxed_write_from_env();
   normal_completion_ = urma_normal_completion_from_env();
-  normal_writes_first_ = urma_normal_writes_first_from_env();
+  normal_submit_schedule_ = urma_normal_submit_schedule_from_env();
   normal_fadd_fence_ = urma_normal_fadd_fence_from_env();
   normal_tail_fence_off_ = urma_normal_tail_fence_off_from_env();
   for(auto& logged:role_logged_)logged=false;
-  if (normal_writes_first_ && (!normal || normal_completion_ != UrmaNormalCompletion::All))
-    throw std::invalid_argument("writes-first requires Normal completion=all");
-  if (normal && (!normal_fadd_fence_ || normal_tail_fence_off_) && (normal_completion_!=UrmaNormalCompletion::All || normal_writes_first_))
+  if (normal_submit_schedule_!=UrmaSubmitSchedule::LaneMixed && (!normal || normal_completion_ != UrmaNormalCompletion::All))
+    throw std::invalid_argument("alternate submission requires Normal completion=all");
+  if (normal && (!normal_fadd_fence_ || normal_tail_fence_off_) && (normal_completion_!=UrmaNormalCompletion::All || normal_submit_schedule_!=UrmaSubmitSchedule::LaneMixed))
     throw std::invalid_argument("Normal FADD fence experiment requires completion=all and lane-mixed");
   mode_ = requested;
 }
@@ -329,7 +329,7 @@ void UrmaTransport::init(ProxyCtx& ctx) {
         (mode_.normal ? normal_relaxed_write_ : ll_relaxed_write_) ? "relax" : "strong",
         mode_.normal && normal_tail_fence_off_ ? "diagnostic_tail_off" : (mode_.normal && !normal_fadd_fence_ ? "diagnostic_data_off" : "per_request"),
         urma_normal_completion_name(normal_completion_),
-        urma_normal_submit_schedule_name(normal_writes_first_),normal_tail_fence_off_ ? "tail-off" : (normal_fadd_fence_ ? "on" : "off"));
+        urma_normal_submit_schedule_name(normal_submit_schedule_),normal_tail_fence_off_ ? "tail-off" : (normal_fadd_fence_ ? "on" : "off"));
   } catch (...) {
     destroy();
     throw;

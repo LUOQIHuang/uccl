@@ -19,12 +19,14 @@ def decision(changes, stable):
     return 'threshold_not_met_keep_default'
 
 
-def summarize(root, job, output):
+def summarize(root, job, output, candidate='writes-first'):
+    schedules=('lane-mixed',candidate)
+    name=candidate.replace('-','_')
     cases = {}
     identities = {}
     rows, paired, context = [], [], []
     for repeat in (1, 2):
-        for schedule in ('lane-mixed', 'writes-first'):
+        for schedule in schedules:
             case_root = root / ('%s_r%02d_%s' % (job, repeat, schedule.replace('-', '_')))
             for rank in (0, 1):
                 data = matched.base.case_data(case_root, rank, False, reference_events='paced')
@@ -33,6 +35,8 @@ def summarize(root, job, output):
                     raise ValueError('missing/wrong runtime submission schedule')
                 if data['identity']['backend'] != 'urma':
                     raise ValueError('URMA-only experiment')
+                if candidate=='tail-interleaved' and data['identity']['reference_profile']!='order':
+                    raise ValueError('order profile required')
                 if not matched.base.read(data['case'] / 'status.json')['checks'].get('normal_submit_schedule'):
                     raise ValueError('missing submission schedule log check')
                 identity = dict(data['identity'])
@@ -58,17 +62,17 @@ def summarize(root, job, output):
     for repeat in (1, 2):
         for label in sorted(matched.base.ALL_LABELS):
             selected = {s: [r['paired_max_us'] for r in paired if r['repeat'] == repeat and r['schedule'] == s and r['label'] == label]
-                        for s in ('lane-mixed', 'writes-first')}
-            native, first = [statistics.mean(selected[s]) for s in ('lane-mixed', 'writes-first')]
+                        for s in schedules}
+            native, first = [statistics.mean(selected[s]) for s in schedules]
             cv = max(r['cv_pct'] for r in rows if r['repeat'] == repeat and r['label'] == label)
             paired_cv = max(statistics.pstdev(v) / statistics.mean(v) * 100 for v in selected.values())
             rounds.append(dict(repeat=repeat, label=label, lane_mixed_paired_max_mean_us=native,
-                               writes_first_paired_max_mean_us=first, writes_first_change_pct=(first/native-1)*100,
+                               **{name+'_paired_max_mean_us':first,name+'_change_pct':(first/native-1)*100},
                                max_node_cv_pct=cv, max_paired_cv_pct=paired_cv))
     decisions = []
     for label in sorted(matched.base.ALL_LABELS):
         rr = [r for r in rounds if r['label'] == label]
-        changes = [r['writes_first_change_pct'] for r in rr]
+        changes = [r[name+'_change_pct'] for r in rr]
         decisions.append(dict(label=label, r01_change_pct=changes[0], r02_change_pct=changes[1],
                               decision=decision(changes, all(max(r['max_node_cv_pct'], r['max_paired_cv_pct']) <= 5 for r in rr))))
     output.mkdir(parents=True, exist_ok=False)
@@ -85,5 +89,6 @@ if __name__ == '__main__':
     p.add_argument('--root', type=Path, required=True)
     p.add_argument('--job', required=True)
     p.add_argument('--output', type=Path, required=True)
+    p.add_argument('--candidate', choices=('writes-first','tail-interleaved'), default='writes-first')
     a = p.parse_args()
-    summarize(a.root, a.job, a.output)
+    summarize(a.root, a.job, a.output, a.candidate)

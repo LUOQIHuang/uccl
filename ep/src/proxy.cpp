@@ -10,6 +10,7 @@
 #include "rdma_util.hpp"
 #include "util/util.h"
 #include <arpa/inet.h>  // for htonl, ntohl
+#include <array>
 #include <chrono>
 #include <cstdlib>
 #include <stdexcept>
@@ -406,6 +407,7 @@ void Proxy::init_common() {
                     "URMA and verbs must use the same channel limit");
       transport->configure(cfg_.use_normal_mode,
           std::min<size_t>(cfg_.d2h_queues.size(),kChannelPerProxy));
+      urma_interleave_dispatch_tail_ = transport->normal_tail_interleaved();
       transport->init(ctx_);
       urma_batches_by_rank_[peer].reserve(transport->capacity());
       transport->register_main_buffer(cfg_.gpu_buffer, cfg_.total_size,
@@ -1371,6 +1373,45 @@ void Proxy::post_urma_commands(std::vector<uint64_t> const& wrs_to_post,
     if (batch.size() == limit) flush(peer);
     batch.push_back(request);
   };
+  UrmaMode mode{cfg_.use_normal_mode,1};
+  auto enqueue_atomic = [&](size_t index) {
+    auto const& cmd=cmds_to_post[index];
+    int value=cmd.value==kLargeAtomicValue ? kMaxSendAtomicValue : cmd.value;
+    UrmaWorkRequest request;
+    request.kind=UrmaWorkRequest::Kind::Atomic;
+    request.wr_id=wrs_to_post[index];
+    request.remote_offset=cmd.req_rptr;
+    request.value=mode.atomic_value(value,get_is_combine(cmd.cmd_type));
+    if(cfg_.use_normal_mode) request.normal_role=static_cast<NormalAtomicRole>(cmd.atomic_offset);
+    enqueue(static_cast<int>(cmd.dst_rank),request);
+  };
+  std::vector<bool> early_tail;
+  if (urma_interleave_dispatch_tail_) {
+    early_tail.resize(cmds_to_post.size());
+    // Move only a prefix of standalone atomics on each peer/ring. A head,
+    // unmatched tail, or notifying WRITE retains the original atomic order.
+    std::vector<std::array<bool,UrmaMode::kMaxChannels>> blocked(urma_batches_by_rank_.size());
+    for (size_t i=0;i<cmds_to_post.size();++i) {
+      auto const& cmd=cmds_to_post[i];
+      if (get_base_cmd(cmd.cmd_type)==CmdType::WRITE && cmd.atomic_offset && cmd.atomic_val)
+        blocked.at(cmd.dst_rank).at(wrs_to_post[i]>>32)=true;
+    }
+    for (size_t i=0;i<cmds_to_post.size();++i) {
+      auto const& tail=cmds_to_post[i];
+      if (get_base_cmd(tail.cmd_type)!=CmdType::ATOMIC) continue;
+      auto ring=wrs_to_post[i]>>32;
+      auto& keep_order=blocked.at(tail.dst_rank).at(ring);
+      if (keep_order) continue;
+      if (i && !get_is_combine(tail.cmd_type) && tail.value>0 &&
+          tail.atomic_offset==static_cast<uint16_t>(NormalAtomicRole::Tail) &&
+          (wrs_to_post[i-1]>>32)==ring && wrs_to_post[i-1]+1==wrs_to_post[i]) {
+        auto const& write=cmds_to_post[i-1];
+        early_tail[i]=get_base_cmd(write.cmd_type)==CmdType::WRITE && !get_is_combine(write.cmd_type) &&
+            write.dst_rank==tail.dst_rank && write.bytes && !write.atomic_offset && write.atomic_val==tail.value;
+      }
+      keep_order=!early_tail[i];
+    }
+  }
   // Same staging as verbs: WRITE commands (and their optional paired FADD)
   // first, standalone atomics second, control last. Group by ring in Normal,
   // and by destination only in LL. A ring's WRITE/FADD always share a lane.
@@ -1381,7 +1422,8 @@ void Proxy::post_urma_commands(std::vector<uint64_t> const& wrs_to_post,
     bool signal = cfg_.use_normal_mode && cmd.atomic_offset > 0 && cmd.atomic_val > 0;
     // Never split a notifying WRITE/FADD across SDK submissions, in either
     // A/B variant. This makes the adjacency contract explicit and testable.
-    if (signal && urma_batches_by_rank_.at(peer).size()+2 > limit) flush(peer);
+    bool early = i+1<early_tail.size() && early_tail[i+1];
+    if ((signal || early) && urma_batches_by_rank_.at(peer).size()+2 > limit) flush(peer);
     UrmaWorkRequest request;
     request.wr_id = signal ? kUrmaInternalWrId : wrs_to_post[i];
     request.local_offset = decode_write_offset(cmd.req_lptr,!cfg_.use_normal_mode);
@@ -1394,6 +1436,10 @@ void Proxy::post_urma_commands(std::vector<uint64_t> const& wrs_to_post,
       request.notify_pair = true;
     }
     enqueue(peer,request);
+    if (early) {
+      enqueue_atomic(i+1);
+      uccl::transport_timeline::record("dispatch_tail_interleaved",wrs_to_post[i+1],0,wrs_to_post[i]);
+    }
     if (signal) {
       request = {};
       request.kind = UrmaWorkRequest::Kind::Atomic;
@@ -1414,19 +1460,10 @@ void Proxy::post_urma_commands(std::vector<uint64_t> const& wrs_to_post,
       if (transport && transport->normal_writes_first()) flush(static_cast<int>(peer));
     }
   }
-  UrmaMode mode{cfg_.use_normal_mode,1};
   for (size_t i = 0; i < cmds_to_post.size(); ++i) {
     auto const& cmd = cmds_to_post[i];
-    if (get_base_cmd(cmd.cmd_type) != CmdType::ATOMIC) continue;
-    int value = static_cast<int>(cmd.value);
-    if (value == kLargeAtomicValue) value = kMaxSendAtomicValue;
-    UrmaWorkRequest request;
-    request.kind = UrmaWorkRequest::Kind::Atomic;
-    request.wr_id = wrs_to_post[i];
-    request.remote_offset = cmd.req_rptr;
-    request.value = mode.atomic_value(value,get_is_combine(cmd.cmd_type));
-    if(cfg_.use_normal_mode) request.normal_role=static_cast<NormalAtomicRole>(cmd.atomic_offset);
-    enqueue(static_cast<int>(cmd.dst_rank),request);
+    if (get_base_cmd(cmd.cmd_type) != CmdType::ATOMIC || (i<early_tail.size() && early_tail[i])) continue;
+    enqueue_atomic(i);
   }
   for (size_t peer = 0; peer < urma_batches_by_rank_.size(); ++peer)
     flush(static_cast<int>(peer));

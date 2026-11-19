@@ -11,13 +11,15 @@ CAPACITY=8192
 LABELS={'dispatch_fp8_chunk32','dispatch_bf16_chunk32'}
 NAMES=['dispatch_sender_first_token','dispatch_first_remote_write','dispatch_last_remote_token_visible',
        'combine_first_forward_token','combine_first_remote_write','combine_receiver_done']
+ORDER_NAMES=NAMES[:3]+['dispatch_first_remote_token_visible']+NAMES[4:]
+PROFILE_NAMES={'legacy':None,'boundaries':'dispatch_boundaries_v1','order':'dispatch_order_v1'}
 BOUNDARY_NAMES=NAMES[:3]+['dispatch_last_payload_ready','dispatch_last_payload_tail_published',
     'dispatch_final_tail_check_begin','dispatch_final_tail_observed','dispatch_last_epoch_check_begin',
     'dispatch_forwarder_done','dispatch_receiver_done','dispatch_chunk6_ready','dispatch_chunk6_tail_published']
 
 def selected_profile():
     profile=os.environ.get('UCCL_REFERENCE_PROFILE','legacy')
-    if profile not in ('legacy','boundaries'):raise ValueError('unknown reference profile')
+    if profile not in PROFILE_NAMES:raise ValueError('unknown reference profile')
     return profile
 
 
@@ -50,6 +52,10 @@ class Capture:
             self.lib.uccl_reference_boundaries_end.argtypes=[C.c_void_p,C.c_void_p]
             self.begin_fn=self.lib.uccl_reference_boundaries_begin;self.end_fn=self.lib.uccl_reference_boundaries_end
             self.trace_type=BoundaryTrace;self.names=BOUNDARY_NAMES
+        elif self.profile=='order':
+            self.lib.uccl_reference_order_begin.argtypes=[C.c_uint]
+            self.begin_fn=self.lib.uccl_reference_order_begin
+            self.names=ORDER_NAMES
     def begin(self):
         self.epoch+=1
         rc=self.begin_fn(self.epoch)
@@ -65,7 +71,7 @@ class Capture:
                     block=t.block_id[event][i],warp=t.warp_id[event][i],epoch=t.epoch[event][i]))
         result=dict(version=1,reference_commit='940f7c7b',clock='CLOCK_MONOTONIC_RAW',epoch=self.epoch,dropped=t.dropped,
             counts=list(t.count),clock_stats={k:getattr(c,k) for k,_ in c._fields_ if k!='reserved'},records=records)
-        if self.profile=='boundaries':result['profile']='dispatch_boundaries_v1'
+        if PROFILE_NAMES[self.profile]:result['profile']=PROFILE_NAMES[self.profile]
         return result
 
 
@@ -120,7 +126,7 @@ def append(path,data):
 
 def control_marker(case,label,mode,warmups,samples):
     marker=dict(label=label,mode=mode,warmups=warmups,samples=samples,gpu_events=False,cpu_events=False,host_clock=False)
-    if selected_profile()=='boundaries':marker['profile']='dispatch_boundaries_v1'
+    if PROFILE_NAMES[selected_profile()]:marker['profile']=PROFILE_NAMES[selected_profile()]
     append(case/'reference_control.jsonl',marker)
 
 
@@ -129,8 +135,8 @@ def validate_control(case,mode,warmups,samples,profile='legacy'):
     if profile not in ('legacy','boundaries'):raise ValueError('unknown reference profile')
     if mode not in ('batch','paced'):raise ValueError('unknown reference control')
     expected=[dict(label=l,mode=mode,warmups=warmups,samples=samples,gpu_events=False,cpu_events=False,host_clock=False) for l in sorted(LABELS)]
-    if profile=='boundaries':
-        for row in expected:row['profile']='dispatch_boundaries_v1'
+    if PROFILE_NAMES[profile]:
+        for row in expected:row['profile']=PROFILE_NAMES[profile]
     actual=[json.loads(s) for s in (case/'reference_control.jsonl').read_text().splitlines()]
     if sorted(actual,key=lambda r:r['label'])!=expected:raise ValueError('missing/wrong reference control execution markers')
     if any((case/name).exists() for name in ('event_trace.jsonl','reference_correctness.json','gpu_stages.jsonl','urma_timeline.jsonl','verbs_timeline.jsonl')):raise ValueError('control unexpectedly enabled tracing')
@@ -140,14 +146,14 @@ def validate_control(case,mode,warmups,samples,profile='legacy'):
 def correctness_passed(case,profile='legacy',tokens=4096):
     try:
         data=json.loads((Path(case)/'reference_correctness.json').read_text())
-        events=range(12 if tokens==4096 else 10) if profile=='boundaries' else range(3)
-        return profile in ('legacy','boundaries') and data['verified'] is True and data['version']==1 and data.get('profile')==('dispatch_boundaries_v1' if profile=='boundaries' else None) and all(data['counts'][e]>0 for e in events)
+        events=range(12 if tokens==4096 else 10) if profile=='boundaries' else range(4 if profile=='order' else 3)
+        return profile in PROFILE_NAMES and data['verified'] is True and data['version']==1 and data.get('profile')==PROFILE_NAMES[profile] and all(data['counts'][e]>0 for e in events)
     except (OSError,ValueError,KeyError,TypeError,IndexError):return False
 
 
 def validate(case,samples,profile='legacy',tokens=4096):
     case=Path(case)
-    if profile not in ('legacy','boundaries'):raise ValueError('unknown reference profile')
+    if profile not in PROFILE_NAMES:raise ValueError('unknown reference profile')
     data=[json.loads(s) for s in (case/'event_trace.jsonl').read_text().splitlines()]
     if len(data)!=len(LABELS)*samples or {(r['label'],r['index']) for r in data}!={(l,i) for l in LABELS for i in range(samples)}:raise ValueError('missing reference event windows')
     sample_file=case/'api_samples.jsonl'
@@ -156,7 +162,8 @@ def validate(case,samples,profile='legacy',tokens=4096):
         if api is not None and api.get((row['label'],row['index']))!=row['us']:raise ValueError('reference event/API sample mismatch')
         gpu=row['gpu'];cpu=row['cpu'];required=set(range(12 if tokens==4096 else 10)) if profile=='boundaries' else ({0,1,2} if row['label'].startswith('dispatch') else {3,4,5})
         names=BOUNDARY_NAMES if profile=='boundaries' else NAMES
-        if gpu.get('profile')!=('dispatch_boundaries_v1' if profile=='boundaries' else None) or len(gpu['counts'])!=len(names):raise ValueError('reference profile/ABI mismatch')
+        if profile=='order':required={0,1,2,3};names=ORDER_NAMES
+        if gpu.get('profile')!=PROFILE_NAMES[profile] or len(gpu['counts'])!=len(names):raise ValueError('reference profile/ABI mismatch')
         if profile=='boundaries' and cpu.get('heartbeat_stride')!=128:raise ValueError('boundary CPU heartbeat configuration missing')
         if gpu['version']!=1 or gpu['clock']!='CLOCK_MONOTONIC_RAW' or cpu.get('clock')!='CLOCK_MONOTONIC_RAW' or gpu['dropped'] or cpu['dropped']:raise ValueError('wrong/truncated reference events')
         if not math.isfinite(row['us']) or row['us']<=0 or not gpu['clock_stats']['updates']:raise ValueError('invalid reference measurement/clock')
@@ -167,6 +174,11 @@ def validate(case,samples,profile='legacy',tokens=4096):
             slots.add(key);counts[r['event']]+=1
             seen.add(r['event'])
         if seen!=required or any(gpu['counts'][e]>CAPACITY or gpu['counts'][e]!=counts[e] for e in range(len(names))):raise ValueError('incomplete GPU reference coverage')
+        if profile=='order':
+            first={(r['block'],r['warp']):r['host_ns'] for r in gpu['records'] if r['event']==3}
+            last={(r['block'],r['warp']):r['host_ns'] for r in gpu['records'] if r['event']==2}
+            if len(first)!=counts[3] or len(last)!=counts[2] or first.keys()!=last.keys() or any(t>last[k] for k,t in first.items()):
+                raise ValueError('missing/invalid first and last remote token pairs')
         if profile=='boundaries':
             by=collections.Counter((r['block']//2,r['event']) for r in gpu['records'])
             for r in gpu['records']:

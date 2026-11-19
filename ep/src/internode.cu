@@ -1194,7 +1194,13 @@ while (__any_sync(WARP_MASK, num_tokens_to_send > 0)) {
           // CPU-emulated atomics, allow us to piggyback the atomic operation
           // with the RDMA send.
 #ifndef EFA
+#if defined(USE_URMA) && defined(UCCL_REFERENCE_EVENTS)
+              // With offset zero this is only a Dispatch payload marker.
+              // The following standalone tail command still owns notification.
+              0, num_tokens_to_issue <= 255 ? num_tokens_to_issue : 0
+#else
               0, 0
+#endif
 #else
               reinterpret_cast<uint64_t>(rdma_channel_tail.buffer(rdma_rank)) -
                   reinterpret_cast<uint64_t>(original_atomic_buffer_ptr),
@@ -1309,6 +1315,9 @@ while (true) {
     // NOTES: always start from the local rank
     int src_rdma_rank = sm_id % kNumRDMARanks;
     int cached_rdma_channel_head = 0, cached_rdma_channel_tail = 0;
+#ifdef UCCL_REFERENCE_EVENTS
+    bool first_remote_visible=false;
+#endif
     int cached_nvl_channel_head = 0, cached_nvl_channel_tail = 0,
         rdma_nvl_token_idx = 0;
     { UCCL_GPU_STAGE_DETAIL(gpu_stage_10,d2hq::stage_state(d2h_channel_addrs,num_d2h_channel_addrs),10);
@@ -1441,6 +1450,10 @@ while (true) {
 #ifdef UCCL_REFERENCE_EVENTS
         int trace_remaining=__shfl_sync(WARP_MASK,num_tokens_to_recv_from_rdma,src_rdma_rank);
         if(lane_id==0 && src_rdma_rank!=rdma_rank && trace_remaining==1) uccl::reference_events::tick(2);
+        if(lane_id==0 && src_rdma_rank!=rdma_rank && !first_remote_visible && uccl::reference_events::dispatch_order_active()){
+          uccl::reference_events::tick(3);
+          first_remote_visible=true;
+        }
 #endif
 // REFERENCE_EVENT_END
         if (seen_bits == 0) trap();

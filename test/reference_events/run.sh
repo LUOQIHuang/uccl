@@ -17,7 +17,7 @@ done
 case "$STEP" in baseline|trace|post|off|batch|paced);;*) echo 'step must be baseline/trace/post/off/batch/paced' >&2;exit 2;;esac
 case "$ACTION" in build|check|run);;*) exit 2;;esac
 [[ "$TOKENS" == 128 || "$TOKENS" == 4096 ]] || exit 2
-[[ "$PROFILE" == legacy || "$PROFILE" == boundaries ]] || exit 2
+[[ "$PROFILE" == legacy || "$PROFILE" == boundaries || ( "$PROFILE" == order && "$BACKEND" == urma ) ]] || exit 2
 WARMUPS=50 SAMPLES=50
 if [[ "$STEP" == trace || "$STEP" == batch || "$STEP" == paced ]];then WARMUPS=5 SAMPLES=10;fi
 if [ "$TOKENS" = 128 ];then WARMUPS=1 SAMPLES=3;fi

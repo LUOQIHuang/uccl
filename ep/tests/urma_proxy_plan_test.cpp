@@ -4,6 +4,7 @@
 #include "urma_phase_diag.hpp"
 #include "transport_timeline.hpp"
 #include <algorithm>
+#include <array>
 #include <cassert>
 #include <cstdint>
 #include <stdexcept>
@@ -28,6 +29,7 @@ struct UrmaTransport {
 struct Proxy {
   struct { bool use_normal_mode; } cfg_;
   std::vector<std::vector<UrmaWorkRequest>> urma_batches_by_rank_{3};
+  bool urma_interleave_dispatch_tail_ = false;
   UrmaTransport transport;
   size_t urma_outstanding_ops_=0;
   std::unordered_set<uint64_t> acked_wrs_;
@@ -46,6 +48,24 @@ struct Proxy {
 #include "proxy_plan.inc"
 
 int main() {
+  {
+    Proxy p; p.cfg_.use_normal_mode=true; p.urma_interleave_dispatch_tail_=true;
+    TransferCmd w{},a{},head{},quiet{};
+    w.cmd_type=CmdType::WRITE; w.dst_rank=1; w.bytes=459264; w.atomic_val=32;
+    a.cmd_type=CmdType::ATOMIC; a.dst_rank=1; a.value=32; a.req_rptr=8;
+    a.atomic_offset=static_cast<uint16_t>(NormalAtomicRole::Tail);
+    head=a; head.atomic_offset=static_cast<uint16_t>(NormalAtomicRole::Head);
+    quiet.cmd_type=CmdType::QUIET;
+    // A Head closes the interleavable prefix. Later tail notification must
+    // remain after Head even when its matching Write is in this same batch.
+    p.post_urma_commands({0,1,2,3,4,5,6,7},{w,a,w,a,head,w,a,quiet});
+    auto const& batch=p.transport.batches.at(0);
+    std::vector<uint64_t> ids;
+    for (auto const& r:batch) {ids.push_back(r.wr_id);assert(r.fence && !r.notify_pair);}
+    assert((ids==std::vector<uint64_t>{0,1,2,3,5,4,6}));
+    assert(batch[1].normal_role==NormalAtomicRole::Tail && batch[5].normal_role==NormalAtomicRole::Head);
+    assert(p.acked_wrs_.count(7) && p.drains==1);
+  }
   for(bool normal : {true,false}) {
     Proxy p; p.cfg_.use_normal_mode=normal;
     TransferCmd write{},atomic{},quiet{},barrier{};

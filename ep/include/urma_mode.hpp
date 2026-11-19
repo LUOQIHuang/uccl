@@ -44,14 +44,17 @@ inline char const* urma_normal_fadd_fence_name_from_env() {
 
 enum class UrmaNormalCompletion { All, Ordered, Paired };
 // Diagnostic submission scheduling only; no placement/fence/CQE changes.
-inline bool urma_normal_writes_first_from_env() {
+enum class UrmaSubmitSchedule { LaneMixed, WritesFirst, TailInterleaved };
+inline UrmaSubmitSchedule urma_normal_submit_schedule_from_env() {
   auto const* value=std::getenv("UCCL_URMA_NORMAL_SUBMIT_SCHEDULE");
-  if (!value || !*value || !std::strcmp(value,"lane-mixed")) return false;
-  if (!std::strcmp(value,"writes-first")) return true;
-  throw std::invalid_argument("UCCL_URMA_NORMAL_SUBMIT_SCHEDULE must be lane-mixed|writes-first");
+  if (!value || !*value || !std::strcmp(value,"lane-mixed")) return UrmaSubmitSchedule::LaneMixed;
+  if (!std::strcmp(value,"writes-first")) return UrmaSubmitSchedule::WritesFirst;
+  if (!std::strcmp(value,"tail-interleaved")) return UrmaSubmitSchedule::TailInterleaved;
+  throw std::invalid_argument("UCCL_URMA_NORMAL_SUBMIT_SCHEDULE must be lane-mixed|writes-first|tail-interleaved");
 }
-inline char const* urma_normal_submit_schedule_name(bool writes_first) {
-  return writes_first ? "writes-first" : "lane-mixed";
+inline char const* urma_normal_submit_schedule_name(UrmaSubmitSchedule schedule) {
+  if (schedule==UrmaSubmitSchedule::TailInterleaved) return "tail-interleaved";
+  return schedule==UrmaSubmitSchedule::WritesFirst ? "writes-first" : "lane-mixed";
 }
 inline UrmaNormalCompletion urma_normal_completion_from_env() {
   auto const* value=std::getenv("UCCL_URMA_NORMAL_COMPLETION");

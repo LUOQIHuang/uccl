@@ -90,8 +90,9 @@ def case_data(root,rank,trace,compiled_off=False,reference_events=None,token_swe
     bench=node/('normal.py' if backend=='urma' else 'benchmark/test_internode.py')
     identity=dict(backend=backend,host=host['host'],boot=host['boot_id'],kernel=c['kernel'],torch=runtime['torch'],sources=manifest['sources'],flags=flags,sdk=manifest.get('sdk',{}),libraries=c['libraries'],maca=libraries,gpu_versions=[v.strip() for v in versions],benchmark_sha=sha(bench),diagnostics=c.get('diagnostics_hash',c.get('diagnostics')))
     profile=c.get('reference_profile','legacy')
-    if profile not in ('legacy','boundaries'):raise ValueError('unknown reference profile')
+    if profile not in ('legacy','boundaries','order'):raise ValueError('unknown reference profile')
     if profile=='boundaries' and (runtime.get('reference_boundary_version')!=1 or runtime.get('reference_profile')!=profile):raise ValueError('boundary runtime capability mismatch')
+    if profile=='order' and (runtime.get('reference_order_version')!=1 or runtime.get('reference_profile')!=profile):raise ValueError('order runtime capability mismatch')
     identity['reference_profile']=profile
     window_plan=c.get('normal_window_plan','default')
     if window_plan not in ('default','peer4'):raise ValueError('unknown Normal window plan')

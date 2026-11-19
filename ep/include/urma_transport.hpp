@@ -43,7 +43,8 @@ class UrmaTransport final : public EpTransport {
   void init(ProxyCtx& ctx) override;
   void configure(bool normal, size_t channels);
   UrmaMode mode() const { return mode_; }
-  bool normal_writes_first() const { return normal_writes_first_; }
+  bool normal_writes_first() const { return normal_submit_schedule_==UrmaSubmitSchedule::WritesFirst; }
+  bool normal_tail_interleaved() const { return normal_submit_schedule_==UrmaSubmitSchedule::TailInterleaved; }
   bool normal_fadd_fence() const { return normal_fadd_fence_; }
   size_t capacity() const;
   // Input order is retained within each lane. All WRITE/FADD operations from
@@ -80,7 +81,7 @@ class UrmaTransport final : public EpTransport {
   UrmaMode mode_;
   bool ll_relaxed_write_ = false;
   bool normal_relaxed_write_ = true;
-  bool normal_writes_first_ = false;
+  UrmaSubmitSchedule normal_submit_schedule_ = UrmaSubmitSchedule::LaneMixed;
   bool normal_fadd_fence_ = true;
   bool normal_tail_fence_off_ = false;
   bool role_logged_[3] = {false,false,false};

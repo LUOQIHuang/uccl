@@ -91,7 +91,7 @@ def parser():
     p.add_argument('--timeline',action='store_true')
     p.add_argument('--gpu-stages',action='store_true')
     p.add_argument('--reference-events',choices=('build','off','on','batch','paced'),help='reference events or inactive batch/paced controls')
-    p.add_argument('--reference-profile',choices=('legacy','boundaries'),default='legacy')
+    p.add_argument('--reference-profile',choices=('legacy','boundaries','order'),default='legacy')
     p.add_argument('--dispatch-focus',action='store_true')
     p.add_argument('--dispatch-compiled-off',action='store_true',help='Dispatch trace build with capture completely disabled; same API timing boundary as baseline')
     p.add_argument('--gpu-stage-roles-only',action='store_true',help='sparse compile-time role probes; currently only build or compiled-off validation')
@@ -112,7 +112,7 @@ def parser():
     p.add_argument('--api-only',action='store_true',help='phase suite: skip Kineto and retain whole-call samples only')
     p.add_argument('--ll-write-order',choices=('default','strong','relax'),default='default',help='diagnostic LL WRITE ordering; FADD fences unchanged')
     p.add_argument('--normal-write-order',choices=('default','strong','relax'),default='default',help='diagnostic Normal WRITE placement; FADD, fence and completion unchanged')
-    p.add_argument('--normal-submit-schedule',choices=('lane-mixed','writes-first'),default='lane-mixed',help='Normal-only causal A/B: flush WRITE stage before standalone FADD; retains explicit notifying pairs')
+    p.add_argument('--normal-submit-schedule',choices=('lane-mixed','writes-first','tail-interleaved'),default='lane-mixed')
     p.add_argument('--normal-window-plan',choices=('default','peer4'),default='default',help='Normal pending-command limit: default=8 on both; peer4=8 on node0 and 4 on node1')
     p.add_argument('--normal-fadd-fence-plan',choices=('default','all-on','peer-off','peer-tail-off'),default='default',help='diagnostic: keep FADD STRONG; disable all data or tagged tail fence on node1 only')
     p.add_argument('--require-normal-atomic-roles',action='store_true',help='reject modules without explicit Normal tail/head role capability')
@@ -161,7 +161,7 @@ def parser():
     if args.normal_completion!='all' and (args.backend!='urma' or args.mode!='normal'):
         p.error('normal completion diagnostics require --backend urma --mode normal')
     if args.normal_submit_schedule!='lane-mixed' and (args.backend!='urma' or args.mode!='normal' or args.normal_completion!='all' or not args.api_only or not args.dispatch_focus or args.reference_events not in ('paced','on') or args.action not in ('check','run')):
-        p.error('writes-first requires URMA Normal Dispatch focus API-only completion=all and reference-events paced/on check/run')
+        p.error('alternate submission requires URMA Normal Dispatch focus API-only completion=all and reference-events paced/on check/run')
     if args.normal_window_plan!='default' and (args.backend!='urma' or args.mode!='normal' or not args.dispatch_focus or args.reference_events not in ('paced','on') or args.normal_submit_schedule!='lane-mixed' or args.action not in ('check','run')):
         p.error('peer4 requires Normal Dispatch focus paced/on check/run with default submission schedule')
     if args.normal_fadd_fence_plan!='default' and (args.backend!='urma' or args.mode!='normal' or not args.dispatch_focus or args.reference_events not in ('paced','on') or args.normal_submit_schedule!='lane-mixed' or args.normal_window_plan!='default' or args.normal_completion!='all' or args.action not in ('check','run')):
@@ -182,6 +182,10 @@ def parser():
         if args.action!='build' and (args.action not in ('check','run') or not args.dispatch_focus):p.error('reference events require Normal Dispatch focus check/run')
     if args.reference_profile=='boundaries' and (args.reference_events not in ('build','paced','on') or args.normal_window_plan!='default' or args.normal_submit_schedule!='lane-mixed'):
         p.error('boundary profile requires reference build/paced/on and default window/submission')
+    if args.reference_profile=='order' and (args.backend!='urma' or args.mode!='normal' or args.reference_events not in ('build','paced','on') or args.normal_submit_schedule not in ('lane-mixed','tail-interleaved')):
+        p.error('order profile requires the URMA Normal reference order experiment')
+    if args.normal_submit_schedule=='tail-interleaved' and args.reference_profile!='order':
+        p.error('tail-interleaved requires reference profile order')
     if args.dispatch_compiled_off and (not args.dispatch_focus or args.gpu_stages or args.gpu_stage_build or args.action not in ('check','run')):p.error('compiled-off requires Dispatch focus check/run without GPU capture/build switches')
     if args.gpu_stage_roles_only and not ((args.action=='build' and args.gpu_stage_build) or args.dispatch_compiled_off):p.error('roles-only currently requires trace build or compiled-off; active capture is gated on the disabled-cost result')
     if args.gpu_stage_mode.startswith('dispatch') and not args.dispatch_focus:p.error('Dispatch GPU modes require --dispatch-focus')
@@ -230,6 +234,8 @@ def preflight(args):
     metadata=next(json.loads(line.split(' ',1)[1]) for line in probe.stdout.splitlines() if line.startswith('MODE_PARITY_IMPORT_OK '))
     if getattr(args,'reference_profile','legacy')=='boundaries' and (metadata.get('reference_boundary_version')!=1 or metadata.get('reference_profile')!='boundaries'):
         raise RuntimeError('REFERENCE_BOUNDARY_PROFILE_REQUIRES_REBUILD')
+    if getattr(args,'reference_profile','legacy')=='order' and (metadata.get('reference_order_version')!=1 or metadata.get('reference_profile')!='order'):
+        raise RuntimeError('REFERENCE_ORDER_PROFILE_REQUIRES_REBUILD')
     if args.phase_suite and not metadata.get('phase_diagnostics'):
         raise RuntimeError('PHASE_DIAGNOSTICS_REQUIRES_REBUILD')
     if args.ll_write_order!='default' and metadata.get('ll_write_order')!=args.ll_write_order:

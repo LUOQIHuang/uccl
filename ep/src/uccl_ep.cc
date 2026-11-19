@@ -2599,6 +2599,7 @@ NB_MODULE(ep, m) {
   m.def("get_normal_fifo_retire", []() {return std::string(normal_fifo_ready_from_env() ? "ready" : "ordered");});
   m.def("get_reference_events_version", []() { return uccl_reference_events_version(); });
   m.def("get_reference_boundary_version", []() { return uccl_reference_boundaries_version(); });
+  m.def("get_reference_order_version", []() { return uccl_reference_events_version(); });
   m.def("get_urma_ll_write_order", []() {
     return std::string(urma_ll_relaxed_write_from_env() ? "relax" : "strong");
   });
@@ -2606,7 +2607,7 @@ NB_MODULE(ep, m) {
     return std::string(urma_normal_relaxed_write_from_env() ? "relax" : "strong");
   });
   m.def("get_urma_normal_submit_schedule", []() {
-    return std::string(urma_normal_submit_schedule_name(urma_normal_writes_first_from_env()));
+    return std::string(urma_normal_submit_schedule_name(urma_normal_submit_schedule_from_env()));
   });
   m.def("get_urma_normal_completion", []() {
     return std::string(urma_normal_completion_name(urma_normal_completion_from_env()));

@@ -17,7 +17,7 @@ from unittest.mock import Mock,patch
 
 HERE=Path(__file__).resolve().parent
 sys.path.insert(0,str(HERE));sys.path.append(str(HERE.parent/'dispatch_diag'));sys.path.append(str(HERE.parent/'urma_mode_parity'))
-from event_runtime import Trace,Clock,LABELS,NAMES,validate,measure,validate_control,control_marker
+from event_runtime import Trace,Clock,LABELS,NAMES,ORDER_NAMES,validate,measure,validate_control,control_marker
 from correctness import install
 import test_dispatch as fixtures
 from test_dispatch import dump,lines
@@ -34,6 +34,22 @@ def window(label,index=0):
 
 
 class ReferenceTests(unittest.TestCase):
+    def test_order_capture_requires_paired_first_and_last_remote_events(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            case=Path(tmp)
+            captures=[window(label) for label in LABELS]
+            for capture in captures:
+                gpu=capture['gpu']
+                gpu['profile']='dispatch_order_v1'
+                gpu['records'].append(dict(gpu['records'][2],event=3,name=ORDER_NAMES[3],host_ns=1001))
+                gpu['counts'][3]=1
+            lines(case/'event_trace.jsonl',captures)
+            self.assertTrue(validate(case,1,'order'))
+            captures[0]['gpu']['records'][-1]['warp']=1
+            lines(case/'event_trace.jsonl',captures)
+            with self.assertRaisesRegex(ValueError,'first and last remote token'):
+                validate(case,1,'order')
+
     def test_batch_control_uses_original_continuous_runtime_and_no_timeline(self):
         from phase_runtime import Measurements
         class Event:

@@ -41,16 +41,18 @@ template<unsigned Events> __device__ __forceinline__ void append(TraceStorage<Ev
 #endif
   }else atomicAdd(&storage.dropped,1u);
 }
-__device__ __forceinline__ bool boundaries_active(){return enabled && boundary_profile;}
+__device__ __forceinline__ bool boundaries_active(){return enabled && boundary_profile==1;}
+__device__ __forceinline__ bool dispatch_order_active(){return enabled && boundary_profile==2;}
 __device__ __forceinline__ void tick(unsigned event) {
   if(!enabled || !host_clock)return;
-  if(boundary_profile)append(boundary_trace,event);else append(trace,event);
+  if(boundary_profile==1)append(boundary_trace,event);else append(trace,event);
 }
 __device__ __forceinline__ void boundary(unsigned event){if(boundaries_active())tick(event);}
 #endif
 }
 extern "C" int uccl_reference_events_version();
 extern "C" int uccl_reference_events_begin(unsigned epoch);
+extern "C" int uccl_reference_order_begin(unsigned epoch);
 extern "C" int uccl_reference_events_end(void* trace,void* stats);
 extern "C" int uccl_reference_boundaries_version();
 extern "C" int uccl_reference_boundaries_begin(unsigned epoch);
