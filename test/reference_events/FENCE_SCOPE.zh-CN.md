@@ -1,6 +1,6 @@
 # Normal下一轮：缩小fence放宽范围，A-B-C-C-B-A关闭采集实验
 
-**优先级更新：本候选暂缓，不与其他实验并行。**下一阶段只执行[Normal已完成请求额度回收ABBA](NORMAL_RETIRE_AB.zh-CN.md)，其依据是已有完成后WRITE回收长尾。若本页任务已经完成，只提供现有日志，不追加任务；下文保留本候选协议。
+**下一次 URMA 窗口优先跑本页实验。**完整 Normal 的[同批交替提交 A/B](results/urma_normal_tail_order_01_ANALYSIS.zh-CN.md)两轮均无收益，trace 中只有约 1%–5% 的请求对真正改变链内位置。[提前回收](results/normal_progress_20261116/README.zh-CN.md)也只有小幅收益。当前最值得复验的改动是已取得约 3.4% 收益的 fence 放宽，并缩小放宽范围。
 
 ## 目的与依据
 
@@ -22,7 +22,7 @@ Normal GPU原有5处FADD调用显式标注2处Tail、3处Head，覆盖Dispatch�
 
 transport按角色设置SDK fence，C只放宽已标Tail的请求；Head及未知角色保留fence。每个transport对每类角色首次准备SDK WR时记录一次URMA_FADD_ROLE，不逐请求打印，不读取时钟。驱动要求Tail/Head均实际出现、fence与配置一致且无Unknown，才能接受结果。
 
-**必须新构建。**本轮增加GPU命令元数据和transport行为，旧urma_fadd_fence_v1不能复用。A/B/C必须共用各自本端同一新模块；新能力normal_atomic_role_version=1，脚本要求A/B也具备，避免拿旧A/B与新C混比。
+**优先复用刚跑完 `urma_normal_tail_order_01` 的构建。** 该构建包含 `normal_atomic_role_version=1`，当前两个试验共用参考事件模块。校验会核对扩展 SHA、当前源码、构建参数和实际角色 fence。A/B/C 必须在各自节点使用同一个合格模块。若已有模块校验通过，构建入口会报告 `BUILD_ALREADY_PASSED`。若源码或构建参数改变，使用新构建目录。旧 `urma_fadd_fence_v1` 缺少本轮所需角色能力。
 
 ## 1. 两端环境
 
@@ -35,9 +35,10 @@ export URMA_DIAG_HOME=/home/h00918771
 export URMA_DIAG_PYTHON=/home/h00918771/metax_dev/venv-maca-py312/bin/python
 export MACA_PATH=/opt/maca-3.9.0
 export URMA_DIAG_LIBRARY_DIR=/home/h00918771/metax_dev/urma_after_kernel_20261029/diag/umdk_private_618957c3/lib
+export VERBS_DIAG_LIBRARY_DIR="$URMA_DIAG_LIBRARY_DIR"
 export URMA_DIAG_INCLUDE_DIR=/home/h00918771/metax_dev/urma_sdk_private_include
 RANK=0  # 204改为1
-BUILD=/home/h00918771/metax_dev/reference_event_build/urma_fence_scope_v1
+BUILD="$URMA_DIAG_HOME/metax_dev/reference_event_build/urma_tail_order_v1"
 ROOT=/home/h00918771/metax_dev/reference_event_results
 JOB=urma_fence_scope_01
 DEST="$PWD/test/reference_events/results"
@@ -47,7 +48,7 @@ uname -r
 mx-smi
 ```
 
-## 2. 两端各构建一次
+## 2. 两端确认构建可复用
 
 ```bash
 bash test/reference_events/run.sh --backend urma --action build --step trace \
@@ -55,7 +56,7 @@ bash test/reference_events/run.sh --backend urma --action build --step trace \
   2>&1 | tee "$CONSOLE/build.log"
 ```
 
-step trace只选择支持现有paced计时协议的构建，后续采集始终关闭。成功为BUILD_PASSED/BUILD_ALREADY_PASSED。失败停止，提供build.log、host_tests.log、manifest/request与precision_probe日志，不修改manifest绕校验。
+`--step trace` 选择支持 paced 计时的构建，正式对照的 GPU/CPU 事件采集和时钟线程关闭。成功标志为 `BUILD_PASSED` 或 `BUILD_ALREADY_PASSED`。若确认旧构建因源码或参数变化无法复用，换用 `urma_fence_scope_v1` 等新目录。其他构建错误保留 build.log、host_tests.log、manifest/request 和 precision_probe 日志。
 
 ## 3. 两端128-token正确性门禁
 
@@ -127,6 +128,8 @@ urma_fence_scope_01_r02_all_on/
 本轮意图保留约3.4%的有限收益，不把5%作为必须达到的收益目标。若两配对B/A及C/A均改善至少2%、C/B绝对差均<1%、相关CV均≤3%，支持C是保留收益的较小作用范围候选；不是统计等效性证明或可立即生产使用的结论。仍需扩大形状/复用正确性验证。
 
 若B保留收益而C明显变慢，说明仅tail放宽不足，head反馈相关约束也可能参与收益；不能据此断言只由head硬件时延导致。若B本轮不再改善、方向不一致、CV超标或正确性失败，保留数据和默认on，不自动重跑或展开矩阵。FP8/Combine如有回退同样记录，不隐去副作用。
+
+若 C 通过，在考虑默认采用前，补长时间缓冲复用和环回检查，覆盖 4096 tokens 和一种不同负载。核对 tail 更新后接收端的 payload/epoch、head 反馈和 quiet/barrier。现有 A/B/C 的常规正确性通过可作为下一道验证的起点。若 C 未保住收益，优先核对 B 与 C 的区别并继续定位完成交付，当前结果不足以支持把 head 的 fence 也默认关掉。[204 密集完成采样](../fadd_path/results/fadd_dense_01/ANALYSIS.zh-CN.md)
 
 RDMA不参与本轮内部因果对照；历史RDMA只作背景参考。候选稳定后再在各自适用内核、相同程序与计时口径下做最终比较。
 
