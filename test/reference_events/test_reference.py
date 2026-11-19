@@ -34,6 +34,15 @@ def window(label,index=0):
 
 
 class ReferenceTests(unittest.TestCase):
+    def test_order_profile_paced_control_round_trip(self):
+        with tempfile.TemporaryDirectory() as tmp, patch.dict(os.environ, {'UCCL_REFERENCE_PROFILE': 'order'}):
+            case=Path(tmp)
+            for label in LABELS:
+                control_marker(case,label,'paced',1,3)
+            self.assertTrue(validate_control(case,'paced',1,3,'order'))
+            with self.assertRaisesRegex(ValueError,'wrong reference control'):
+                validate_control(case,'paced',1,3,'legacy')
+
     def test_order_capture_requires_paired_first_and_last_remote_events(self):
         with tempfile.TemporaryDirectory() as tmp:
             case=Path(tmp)
