@@ -2,6 +2,8 @@
 
 当前窗口只有 RDMA 时，先按[RDMA 运行步骤](DEPTH12_VERBS.zh-CN.md)采集同工作量对照。下文是 URMA 运行步骤。两边默认使用同一个 JOB，结果按后端保存在独立子目录。
 
+URMA 双端 `urma_pair_depth12_01` 已完成。当前 URMA 窗口优先做完整 Normal 密集采样，有余量再做同深度的链内顺序对照。[实测结果](results/urma_pair_depth12_01/ANALYSIS.zh-CN.md) · [当前 URMA 窗口步骤](ORDER12.zh-CN.md)
+
 ## 1. 只回答这个问题
 
 `urma_pair_load_01`已完成，不再重测：单队列四对时，靠前两对W→A观测间隔约65–73μs，靠后两对约7–10μs；四队列各一对时全部同次轮询返回。单队列第0对间隔中，约95%–97%位于“尚未取得同批全部WRITE完成”的区间。与此同时，整批并发比串行更快，未复现原Normal的427–683μs间隔。
@@ -25,7 +27,7 @@
 
 ## 2. 两端公共环境
 
-取得本次代码后，在仓库根目录执行。使用本机已验证的私有 SDK 路径。v3 的源码树可由两后端复用，构建路径按后端区分。若此前已经准备了 v2 URMA 扩展，v2 的运行步骤仍可在原提交下使用，已取得的 v2 结果也可直接参加对照。
+取得本次代码后，在仓库根目录执行。使用本机已验证的私有 SDK 路径。v4 的源码树可由两后端复用，构建路径按后端区分。已准备 v3 的用户可按原提交 `026522c9` 运行，已采集的 v2/v3 结果可直接参加对照。
 
 ```bash
 export URMA_DIAG_HOME=/home/h00918771
@@ -38,8 +40,8 @@ export URMA_DIAG_LIBRARY_DIR="$URMA_DIAG_HOME/metax_dev/urma_after_kernel_202610
 export VERBS_DIAG_LIBRARY_DIR="$URMA_DIAG_LIBRARY_DIR"
 export URMA_DIAG_INCLUDE_DIR="$URMA_DIAG_HOME/metax_dev/urma_sdk_private_include"
 export JOB=urma_pair_depth12_01
-export TREE="$URMA_DIAG_HOME/metax_dev/urma_pair_load_src_v3"
-export BUILD="$URMA_DIAG_HOME/metax_dev/urma_pair_load_build/urma_v3"
+export TREE="$URMA_DIAG_HOME/metax_dev/urma_pair_load_src_v4"
+export BUILD="$URMA_DIAG_HOME/metax_dev/urma_pair_load_build/urma_v4"
 export ROOT="$URMA_DIAG_HOME/metax_dev/urma_pair_load_results"
 export DEST="$PWD/test/urma_pair_load/results"
 test -x "$URMA_PAIR_LOAD_PYTHON"

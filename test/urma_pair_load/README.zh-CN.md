@@ -1,6 +1,6 @@
 # URMA Normal：恢复少量并发，定位长等待触发条件
 
-**`urma_pair_load_01` 四对实验已完成。下一次窗口优先跑三队列深度对照。** 两端运行步骤按环境选择。[四对结果分析](results/urma_pair_load_01/ANALYSIS.zh-CN.md) · [RDMA](DEPTH12_VERBS.zh-CN.md) · [URMA](DEPTH12.zh-CN.md)
+**`urma_pair_load_01` 四对实验及 URMA 三队列深度对照均已完成。** 两端运行步骤按环境选择。[四对结果分析](results/urma_pair_load_01/ANALYSIS.zh-CN.md) · [RDMA 深度对照](DEPTH12_VERBS.zh-CN.md) · [URMA 窗口步骤](ORDER12.zh-CN.md)
 
 ## 1. 目的与已有依据
 
@@ -46,8 +46,8 @@ export URMA_DIAG_LIBRARY_DIR="$URMA_DIAG_HOME/metax_dev/urma_after_kernel_202610
 export VERBS_DIAG_LIBRARY_DIR="$URMA_DIAG_LIBRARY_DIR"
 export URMA_DIAG_INCLUDE_DIR="$URMA_DIAG_HOME/metax_dev/urma_sdk_private_include"
 export JOB=urma_pair_load_01
-export TREE="$URMA_DIAG_HOME/metax_dev/urma_pair_load_src_v3"
-export BUILD="$URMA_DIAG_HOME/metax_dev/urma_pair_load_build/urma_v3"
+export TREE="$URMA_DIAG_HOME/metax_dev/urma_pair_load_src_v4"
+export BUILD="$URMA_DIAG_HOME/metax_dev/urma_pair_load_build/urma_v4"
 export ROOT="$URMA_DIAG_HOME/metax_dev/urma_pair_load_results"
 export DEST="$PWD/test/urma_pair_load/results"
 test -x "$URMA_PAIR_LOAD_PYTHON"

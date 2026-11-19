@@ -2,7 +2,9 @@
 import argparse,csv,json,statistics as st
 from pathlib import Path
 SHAPES={'serial4':(1,1),'queue4':(1,4),'lanes4':(4,4)}
-SUITES={'basic4':(SHAPES,4),'depth12':({'lane3_w1':(3,3),'lane3_w4':(3,12)},12)}
+SUBMISSION_ORDERS={'writes_then_fadds':1,'interleaved':2}
+SUITES={'basic4':(SHAPES,4),'depth12':({'lane3_w1':(3,3),'lane3_w4':(3,12)},12),
+        'order12':({name:(3,12) for name in SUBMISSION_ORDERS},12)}
 LABELS={name+'_%dto%d'%(sender,1-sender):(name,lanes,limit,sender) for name,(lanes,limit) in SHAPES.items() for sender in (0,1)}
 def read(p):return json.loads(p.read_text())
 def rows(p):return [json.loads(s) for s in p.read_text().splitlines() if s.strip()]
@@ -21,7 +23,7 @@ def validate_path(path,backend,lanes):
     if any(path.get(key)!=value for key,value in expected.items()):
         raise ValueError('changed load path/order')
 
-def metrics(s,lanes,limit,count=4):
+def metrics(s,lanes,limit,count=4,submission_order=None):
     if (lanes,limit,count) not in [(l,m,c) for shapes,c in SUITES.values() for l,m in shapes.values()] or s.get('version')!=1 or s.get('clock')!='CLOCK_MONOTONIC_RAW' or s.get('data_lanes')!=lanes or s.get('max_inflight_pairs')!=limit or s.get('observed_max_inflight_pairs')!=limit or s.get('pairs_expected')!=count or len(s['pairs'])!=count:raise ValueError('wrong load recipe')
     out=[];previous=0;ids=set()
     for j,p in enumerate(s['pairs']):
@@ -35,6 +37,8 @@ def metrics(s,lanes,limit,count=4):
             gap_us=(ac-wc)/1000,write_post_us=(p['write_post_end']-w)/1000,atomic_post_us=(p['atomic_post_end']-a)/1000,
             same_poll_batch=p['write_poll_seq']==p['atomic_poll_seq']))
     pp=s['pairs'];span=(max(max(p['write_cqe'],p['atomic_cqe']) for p in pp)-min(p['write_post_begin'] for p in pp))/1000
+    if submission_order is not None:
+        check_submission_order(s,lanes,submission_order)
     if s['loop_api_ns']/1000<span or s['sdk_poll_calls']<max(max(p['write_poll_seq'],p['atomic_poll_seq']) for p in pp):raise ValueError('API/poll count does not cover batch')
     # Every wave is submitted before polling, and fully retired before next.
     previous=0
@@ -54,6 +58,17 @@ def metrics(s,lanes,limit,count=4):
                 until_lane_last_write_us=(lane_last-p['write_cqe'])/1000,after_lane_last_write_us=(p['atomic_cqe']-lane_last)/1000)
         previous=max(max(p['write_cqe'],p['atomic_cqe']) for p in cohort)
     return out,span
+
+def check_submission_order(sample,lanes,submission_order):
+    expected=[]
+    for lane in range(lanes):
+        pairs=sample['pairs'][lane::lanes]
+        if submission_order==SUBMISSION_ORDERS['writes_then_fadds']:
+            expected.extend(p[key] for key in ('write_id','atomic_id') for p in pairs)
+        else:
+            expected.extend(p[key] for p in pairs for key in ('write_id','atomic_id'))
+    if sample.get('post_order')!=expected:
+        raise ValueError('unexpected measured submission order')
 
 def summarize(root,out,backend='urma'):
     folder=root/backend;campaign=folder/'cases'/(root.name+'_'+backend+'_run')
@@ -83,21 +98,34 @@ def summarize(root,out,backend='urma'):
             if rank!=sender:
                 if not s.get('receiver_only') or 'pairs' in s:raise ValueError('receiver also sent traffic')
                 continue
-            mm,span=metrics(s,lanes,limit,count)
+            mm,span=metrics(s,lanes,limit,count,SUBMISSION_ORDERS.get(shape))
             if r['used']:
                 tags=dict(node=rank,label=r['label'],repeat=r['repeat'],index=r['index'],shape=shape)
-                iterations.append(dict(tags,sdk_span_us=span,loop_api_us=s['loop_api_ns']/1000,sdk_poll_calls=s['sdk_poll_calls'],write_bytes=count*459264))
+                iteration=dict(tags,sdk_span_us=span,loop_api_us=s['loop_api_ns']/1000,sdk_poll_calls=s['sdk_poll_calls'],write_bytes=count*459264)
+                if plan.get('suite')=='order12':
+                    start=min(p['write_post_begin'] for p in s['pairs'])
+                    first_atomic=min(p['atomic_cqe'] for p in s['pairs'])
+                    last_atomic=max(p['atomic_cqe'] for p in s['pairs'])
+                    last_write=max(p['write_cqe'] for p in s['pairs'])
+                    iteration.update(first_fadd_cqe_us=(first_atomic-start)/1000,
+                                     last_write_cqe_us=(last_write-start)/1000,
+                                     last_fadd_after_last_write_us=(last_atomic-last_write)/1000)
+                iterations.append(iteration)
                 for m in mm:data.append(dict(tags,**m))
         contexts.append(dict(node=rank,request=req,affinity=affinity,runtime=runtime,manifest=manifest,paths=paths));plans.append(plan)
     if plans[0]!=plans[1]:raise ValueError('two-node plans differ')
     plan=plans[0]
     if any(plan[k]!=v for k,v in [('bytes',459264),('notify_add',32),('pairs_per_iteration',count),('active_threads',1)]):raise ValueError('changed byte/thread plan')
     per_run=[];summary=[];positions=[]
+    order_suite=plan.get('suite')=='order12'
     for label in labels:
         for rr in range(1,plan['rounds']+1):
-            v=[r['sdk_span_us'] for r in iterations if r['label']==label and r['repeat']==rr]
+            point=[r for r in iterations if r['label']==label and r['repeat']==rr]
+            v=[r['sdk_span_us'] for r in point]
             if len(v)!=plan['samples']-1:raise ValueError('wrong valid sample count')
             per_run.append(dict(label=label,repeat=rr,n=len(v),mean_sdk_span_us=st.mean(v),cv_pct=st.pstdev(v)/st.mean(v)*100))
+            if order_suite:
+                per_run[-1]['median_first_fadd_cqe_us']=st.median(r['first_fadd_cqe_us'] for r in point)
         runs=[r for r in per_run if r['label']==label];means=[r['mean_sdk_span_us'] for r in runs];median=st.median(means)
         pp=[r for r in data if r['label']==label];drift=(max(means)-min(means))/median*100;cv=max(r['cv_pct'] for r in runs)
         gaps=[r['gap_us'] for r in pp]
@@ -105,6 +133,10 @@ def summarize(root,out,backend='urma'):
             median_pair_us=st.median(r['pair_us'] for r in pp),p95_pair_us=percentile([r['pair_us'] for r in pp],.95),median_gap_us=st.median(r['gap_us'] for r in pp),
             same_batch_pairs=sum(r['same_poll_batch'] for r in pp),round_span_pct=drift,max_round_cv_pct=cv,stable=drift<=5 and cv<=5,
             p95_gap_us=percentile(gaps,.95),p99_gap_us=percentile(gaps,.99),max_gap_us=max(gaps),gap_ge_100us=sum(x>=100 for x in gaps),gap_ge_400us=sum(x>=400 for x in gaps)))
+        if order_suite:
+            point=[r for r in iterations if r['label']==label]
+            for key in ('first_fadd_cqe_us','last_write_cqe_us','last_fadd_after_last_write_us'):
+                summary[-1]['median_'+key]=st.median(r[key] for r in point)
         for j in range(count):
             v=[r for r in pp if r['pair_index']==j]
             positions.append(dict(label=label,pair_index=j,lane=j%labels[label][1],n=len(v),median_pair_us=st.median(r['pair_us'] for r in v),
@@ -112,24 +144,36 @@ def summarize(root,out,backend='urma'):
                 median_until_lane_last_write_us=st.median(r['until_lane_last_write_us'] for r in v),
                 median_after_lane_last_write_us=st.median(r['after_lane_last_write_us'] for r in v)))
     contrasts=[]
+    comparisons=[('serial4','queue4'),('queue4','lanes4')] if count==4 else [('lane3_w1','lane3_w4')]
+    if order_suite:comparisons=[tuple(SUBMISSION_ORDERS)]
     for sender in (0,1):
-        for old,new in ([('serial4','queue4'),('queue4','lanes4')] if count==4 else [('lane3_w1','lane3_w4')]):
+        for old,new in comparisons:
             before=old+'_%dto%d'%(sender,1-sender);after=new+'_%dto%d'%(sender,1-sender)
             for rr in range(1,plan['rounds']+1):
-                x=next(r['mean_sdk_span_us'] for r in per_run if r['label']==before and r['repeat']==rr)
-                y=next(r['mean_sdk_span_us'] for r in per_run if r['label']==after and r['repeat']==rr)
+                before_run=next(r for r in per_run if r['label']==before and r['repeat']==rr)
+                after_run=next(r for r in per_run if r['label']==after and r['repeat']==rr)
+                x=before_run['mean_sdk_span_us'];y=after_run['mean_sdk_span_us']
                 contrasts.append(dict(sender=sender,repeat=rr,before=old,after=new,before_us=x,after_us=y,delta_us=y-x,change_pct=(y/x-1)*100))
+                if order_suite:
+                    key='median_first_fadd_cqe_us'
+                    contrasts[-1].update(first_fadd_before_us=before_run[key],first_fadd_after_us=after_run[key],
+                                         first_fadd_delta_us=after_run[key]-before_run[key])
     out.mkdir(parents=True,exist_ok=False)
     for name,rs in [('pairs',data),('iterations',iterations),('per_run',per_run),('summary',summary),('positions',positions),('contrasts',contrasts)]:write(out/(name+'.csv'),rs)
     (out/'context.json').write_text(json.dumps(dict(plan=plan,nodes=contexts,overlay=overlays[0]),indent=2))
     lines=['# %s等量负载对照'%backend.upper(),'',
         '套件：%s；每迭代%d对、%dB，单线程。'%(plan.get('suite','basic4'),count,count*459264),
-        'basic4比较串行/单队列4对/四队列各1对；depth12固定三队列，比较每队列深度1（四轮）与深度4（一轮）。',
+        'basic4比较串行/单队列4对/四队列各1对；depth12比较每队列深度1与4；order12固定深度4并比较同队列链内排列。',
         '先判断等量整批SDK跨度，再看对应请求W→A间隔。queue4按原实现先W0..W3后A0..A3，间隔增长本身不能判定退化。',
         '时间来自本端SDK观测；同批返回可为0，负间隔保留。GPU校验与TCP同步不在计时内。','',
         '| 点 | 整批SDK跨度 μs | W→A中位 μs | W→A P95 μs | W→A最大 μs | ≥400 μs对数 | 稳定 |',
         '| --- | ---: | ---: | ---: | ---: | ---: | --- |']
     for r in summary:lines.append('| %s | %.3f | %.3f | %.3f | %.3f | %d/%d | %s |'%(r['label'],r['median_run_mean_sdk_span_us'],r['median_gap_us'],r['p95_gap_us'],r['max_gap_us'],r['gap_ge_400us'],r['pairs'],r['stable']))
+    if order_suite:
+        lines+=['','| 点 | 首个 FADD 完成观测中位 μs | 最后 WRITE 完成观测中位 μs | 最后 WRITE 至最后 FADD 中位 μs |',
+                '| --- | ---: | ---: | ---: |']
+        for r in summary:
+            lines.append('| %s | %.3f | %.3f | %.3f |'%(r['label'],r['median_first_fadd_cqe_us'],r['median_last_write_cqe_us'],r['median_last_fadd_after_last_write_us']))
     lines+=['','整批值为各轮迭代均值的中位数。contrasts.csv保留每轮成对差值；positions.csv按请求位置分别统计，避免混合掩盖排队。',
         '稳定门槛：各轮整批CV≤5%，轮均值跨度/中位数≤5%。失败保留日志，不自动重跑。',
         'SDK提交耗时可能属于同一次链式调用，不能相加。单对在途时延在并发情况下重叠，也不能相加当整批时延。',

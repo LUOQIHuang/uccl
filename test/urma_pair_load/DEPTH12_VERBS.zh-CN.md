@@ -8,6 +8,8 @@
 
 更新仓库后在根目录操作。两端使用已验证的 verbs 内核 `6.6.0-145.3.34.165.oe2403sp3.aarch64`、MACA 3.9 和 GID3。202 用 `RANK=0`，204 用 `RANK=1`，两端都用 `CPU=192`，与计划中的 URMA 窗口对齐。运行时会检查 GPU NUMA 和实际绑核。两个内核的 CPU 编号拓扑有差异，CPU 编号相同仅表示对齐逻辑编号。
 
+以下使用当前 v4 源码树。如已经准备好 v3，可继续使用原提交 `026522c9` 中的入口和目录。
+
 ```bash
 export VERBS_DIAG_HOME=/home/h00918771
 export URMA_DIAG_HOME="$VERBS_DIAG_HOME"
@@ -16,8 +18,8 @@ export URMA_PAIR_LOAD_PYTHON="$VERBS_DIAG_PYTHON"
 export MACA_PATH=/opt/maca-3.9.0
 RANK=0 CPU=192 # 204改为 RANK=1 CPU=192
 JOB=urma_pair_depth12_01
-TREE="$VERBS_DIAG_HOME/metax_dev/urma_pair_load_src_v3"
-BUILD="$VERBS_DIAG_HOME/metax_dev/urma_pair_load_build/verbs_v3"
+TREE="$VERBS_DIAG_HOME/metax_dev/urma_pair_load_src_v4"
+BUILD="$VERBS_DIAG_HOME/metax_dev/urma_pair_load_build/verbs_v4"
 ROOT="$VERBS_DIAG_HOME/metax_dev/urma_pair_load_results"
 DEST="$PWD/test/urma_pair_load/results"
 
@@ -51,6 +53,6 @@ verbs_depth run
 | 环境 | 本窗口必测 | 有余量可提前准备 | 可直接使用的结果 |
 | --- | --- | --- | --- |
 | RDMA | 当前文档的 depth12，两种深度、双方向、三轮一次完成 | 汇总留给离线处理 | 最小串行、完整 Normal 的 BF16 阶段采集及 FADD 专项 |
-| URMA | 同样的 [depth12](DEPTH12.zh-CN.md)，优先确认能否复现 427–683 μs | 准备 [完整 Normal 的密集 FADD 轮询采集](../fadd_path/DENSE.zh-CN.md)，若窗口还有完整的 pre/probe/post 时间就一起执行 | 最小串行、四对负载、完整 Normal 阶段采集和 fence 干预 |
+| URMA | [完整 Normal 的密集 FADD 轮询采集](../fadd_path/DENSE.zh-CN.md) | [固定深度的链内顺序对照](ORDER12.zh-CN.md) | 三队列深度对照、最小串行、四对负载、完整 Normal 阶段采集和 fence 干预 |
 
 密集采集解决的是完整 Normal 中“返回值已经能读到后，为何还没取得完成记录”的问题。仓库已有稀疏采样的两后端结果，尚缺密集采样结果。它和 depth12 回答不同问题，不能用一个代替另一个。窗口紧张时先拿齐 depth12 的双端原始文件与正确性结果。

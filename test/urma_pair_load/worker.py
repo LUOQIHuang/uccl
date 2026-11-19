@@ -1,7 +1,7 @@
 """Execute equal-byte WRITE/FADD load shapes on the selected backend."""
 import faulthandler,json,os,sys,traceback
 from pathlib import Path
-from analyze import SUITES, validate_path
+from analyze import SUBMISSION_ORDERS, SUITES, validate_path
 HERE=Path(__file__).resolve().parent;REPO=HERE.parents[1]
 r=json.loads(Path(os.environ['SERIAL_PAIR_REQUEST']).read_text());case=Path(r['case']);backend=r['backend'];rank=r['node_rank']
 sys.path.insert(0,str(REPO/'test'/('urma_mode_parity' if backend=='urma' else 'verbs_baseline')))
@@ -44,7 +44,7 @@ shapes,count=SUITES[suite]
 SHAPES=[(name,lanes,limit) for name,(lanes,limit) in shapes.items()]
 try:
     session_type=ep.UrmaMicroSession if backend=='urma' else ep.VerbsWriteSession
-    if ep.get_urma_pair_load_version()!=2 or not hasattr(session_type,'load_prepare') or runtime['module_sha']!=r['module_sha']:
+    if ep.get_urma_pair_load_version()!=3 or not hasattr(session_type,'load_prepare') or runtime['module_sha']!=r['module_sha']:
         raise RuntimeError('load module missing or changed')
     placement=choose_cpu();(case/'affinity.json').write_text(json.dumps(placement,indent=2));(case/'runtime.json').write_text(json.dumps(runtime,indent=2))
     peer=Peer(rank,r['master_addr'],r['port'])
@@ -74,7 +74,9 @@ try:
             else:session.experiment(send,not send,[placement['cpu']])
             for seq in range(r['warmups']+r['samples']):
                 peer.agree('ready',dict(repeat=repeat,label=label,seq=seq))
-                sample=json.loads(session.load_step(seq,limit,count))
+                order=SUBMISSION_ORDERS.get(name)
+                args=(seq,limit,count,order) if order is not None else (seq,limit,count)
+                sample=json.loads(session.load_step(*args))
                 peer.agree('done',dict(repeat=repeat,label=label,seq=seq))
                 error=None
                 try:session.load_validate(seq)

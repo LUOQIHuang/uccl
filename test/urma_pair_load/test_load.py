@@ -3,7 +3,7 @@ from contextlib import redirect_stdout
 from pathlib import Path
 import analyze,overlay
 HERE=Path(__file__).resolve().parent
-def sample(lanes=1,limit=1,count=4):
+def sample(lanes=1,limit=1,count=4,order=None):
     pairs=[]
     for j in range(count):
         b=1000+(j//limit)*10000+(j%lanes)*100
@@ -11,8 +11,15 @@ def sample(lanes=1,limit=1,count=4):
             write_post_begin=b,write_post_end=b+100,atomic_post_begin=b,atomic_post_end=b+100,
             write_cqe=b+2000,atomic_cqe=b+4000,write_poll_seq=(j//limit)*2+1,
             atomic_poll_seq=(j//limit)*2+2,sdk_poll_calls=count*2))
-    return dict(version=1,clock='CLOCK_MONOTONIC_RAW',data_lanes=lanes,max_inflight_pairs=limit,
+    result=dict(version=1,clock='CLOCK_MONOTONIC_RAW',data_lanes=lanes,max_inflight_pairs=limit,
         observed_max_inflight_pairs=limit,pairs_expected=count,sdk_poll_calls=count*2,loop_api_ns=count*10000,pairs=pairs)
+    if order is not None:
+        result['post_order']=[]
+        for lane in range(lanes):
+            ids=[p['write_id'] for p in pairs[lane::lanes]]
+            if order==1:result['post_order'].extend(ids+[i+1 for i in ids])
+            else:result['post_order'].extend(op for i in ids for op in (i,i+1))
+    return result
 class Tests(unittest.TestCase):
     def test_shapes_and_negative_gap(self):
         for shapes,count in analyze.SUITES.values():
@@ -34,6 +41,8 @@ class Tests(unittest.TestCase):
         with self.assertRaises(ValueError):analyze.metrics(s,3,3,12)
         s=sample(3,12,12);s['pairs'][3]['atomic_post_begin']+=1
         with self.assertRaises(ValueError):analyze.metrics(s,3,12,12)
+        with self.assertRaisesRegex(ValueError,'submission order'):
+            analyze.metrics(sample(3,12,12,1),3,12,12,2)
     def test_overlay_and_python(self):
         for name in overlay.base.TARGETS:
             text=subprocess.check_output(['git','-C',str(overlay.REPO),'show',overlay.BASE+':'+name]).decode()
@@ -42,7 +51,7 @@ class Tests(unittest.TestCase):
         for p in HERE.glob('*.py'):ast.parse(p.read_text())
     @unittest.skipUnless(os.name=='posix','real TCP workers with fake OS/GPU boundaries')
     def test_two_node_worker_report_and_missing_sample(self):
-        for backend,suite in (('urma','basic4'),('urma','depth12'),('verbs','depth12')):
+        for backend,suite in (('urma','basic4'),('urma','depth12'),('verbs','depth12'),('urma','order12')):
             self.run_workers(suite,backend)
     def run_workers(self,suite,backend):
         with tempfile.TemporaryDirectory() as tmp,redirect_stdout(io.StringIO()):
@@ -68,12 +77,12 @@ class Session:
  def connect(self,peer):assert peer==[b'fake']
  def load_prepare(self,limit,rank,count):self.limit=limit;self.count=count
  def experiment(self,send,receive,*args):self.send=send;assert send!=receive
- def load_step(self,seq,limit,count):
+ def load_step(self,seq,limit,count,order=None):
   assert seq==self.seq and limit==self.limit and count==self.count;self.seq+=1
-  return json.dumps(sample(self.lanes,limit,count) if self.send else dict(version=1,receiver_only=True))
+  return json.dumps(sample(self.lanes,limit,count,order) if self.send else dict(version=1,receiver_only=True))
  def load_validate(self,seq):assert seq+1==self.seq
  def close(self):pass
-ep=types.SimpleNamespace(get_urma_pair_load_version=lambda:2,UrmaMicroSession=Session,VerbsWriteSession=Session)
+ep=types.SimpleNamespace(get_urma_pair_load_version=lambda:3,UrmaMicroSession=Session,VerbsWriteSession=Session)
 sys.modules['support']=types.SimpleNamespace(load_extension=lambda path:(ep,dict(module_sha='x')))
 sys.modules['common']=sys.modules['support']
 runpy.run_path(str(Path(sys.argv[1])/'worker.py'),run_name='__main__')
@@ -92,6 +101,7 @@ runpy.run_path(str(Path(sys.argv[1])/'worker.py'),run_name='__main__')
                     text=proc.communicate(timeout=25)[0].decode();self.assertEqual(proc.returncode,0,text)
                 result=analyze.summarize(root,root/'summary',backend);self.assertEqual(len(result),6 if suite=='basic4' else 4)
                 self.assertTrue(all(r['pairs']==(40 if suite=='basic4' else 120) and r['stable'] for r in result))
+                if suite=='order12':self.assertTrue(all(r['median_first_fadd_cqe_us']>0 for r in result))
                 p=folder/'cases'/('job_'+backend+'_run')/'node0/samples.jsonl';p.write_text('\n'.join(p.read_text().splitlines()[1:]))
                 with self.assertRaisesRegex(ValueError,'missing'):analyze.summarize(root,root/'bad',backend)
             finally:

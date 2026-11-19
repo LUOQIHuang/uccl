@@ -5,7 +5,7 @@ HERE=Path(__file__).resolve().parent;REPO=HERE.parents[1]
 SERIAL=HERE.parent/'serial_pair'
 spec=importlib.util.spec_from_file_location('serial_source_overlay',SERIAL/'overlay.py')
 base=importlib.util.module_from_spec(spec);spec.loader.exec_module(base)
-BASE=base.BASE;MARKER='.urma_pair_load_overlay_v3.json'
+BASE=base.BASE;MARKER='.urma_pair_load_overlay_v4.json'
 replace=base.replace
 def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
 def header():
@@ -18,7 +18,7 @@ def changes(name,text):
     s=base.changes(name,text)
     if name=='ep/include/urma_micro.hpp':
         s=replace(s,'bool serial=false);','bool serial=false,size_t serial_lanes=1);')
-        s=replace(s,'  void close();','  void load_prepare(size_t limit,int rank,size_t count=4);\n  std::string load_step(size_t seq,size_t limit,size_t count=4);\n  void load_validate(size_t seq);\n  void close();')
+        s=replace(s,'  void close();','  void load_prepare(size_t limit,int rank,size_t count=4);\n  std::string load_step(size_t seq,size_t limit,size_t count=4,int order=0);\n  void load_validate(size_t seq);\n  void close();')
     elif name=='ep/src/urma_micro.cpp':
         s=replace(s,'  bool serial=false;','  bool serial=false;size_t serial_lanes=1,load_limit=0;')
         s=replace(s,'size_t max_bytes,bool serial) {','size_t max_bytes,bool serial,size_t serial_lanes) {')
@@ -39,14 +39,14 @@ def changes(name,text):
         s=replace(s,'p.serial?1:8','p.serial?p.serial_lanes:8',3)
         s=replace(s,'void VerbsWriteSession::close(){',(HERE/'native/verbs_load.inc').read_text()+'\nvoid VerbsWriteSession::close(){')
     elif name=='ep/src/uccl_ep.cc':
-        s=replace(s,'  m.def("get_serial_pair_version", []() { return 1; });','  m.def("get_urma_pair_load_version", []() { return 2; });\n  m.def("get_serial_pair_version", []() { return 1; });')
+        s=replace(s,'  m.def("get_serial_pair_version", []() { return 1; });','  m.def("get_urma_pair_load_version", []() { return 3; });\n  m.def("get_serial_pair_version", []() { return 1; });')
         ctor='.def(nb::init<std::string const&,int,size_t,size_t,bool,bool>())'
         s=replace(s,ctor,ctor+'\n      .def(nb::init<std::string const&,int,size_t,size_t,bool,bool,size_t>())')
         a='.def("serial_prepare",&VerbsWriteSession::serial_prepare)'
         s=replace(s,a,a+'\n      .def("load_prepare",&VerbsWriteSession::load_prepare)\n      .def("load_step",[](VerbsWriteSession& s,size_t seq,size_t limit,size_t count){nb::gil_scoped_release release;return s.load_step(seq,limit,count);})\n      .def("load_validate",&VerbsWriteSession::load_validate)')
         s=replace(s,'.def(nb::init<int,size_t,size_t,bool>())','.def(nb::init<int,size_t,size_t,bool>())\n      .def(nb::init<int,size_t,size_t,bool,size_t>())')
         a='.def("serial_prepare",&UrmaMicroSession::serial_prepare)'
-        s=replace(s,a,a+'\n      .def("load_prepare",&UrmaMicroSession::load_prepare,nb::arg("limit"),nb::arg("rank"),nb::arg("count")=4)\n      .def("load_step",[](UrmaMicroSession& s,size_t seq,size_t limit,size_t count){nb::gil_scoped_release release;return s.load_step(seq,limit,count);},nb::arg("seq"),nb::arg("limit"),nb::arg("count")=4)\n      .def("load_validate",&UrmaMicroSession::load_validate)')
+        s=replace(s,a,a+'\n      .def("load_prepare",&UrmaMicroSession::load_prepare,nb::arg("limit"),nb::arg("rank"),nb::arg("count")=4)\n      .def("load_step",[](UrmaMicroSession& s,size_t seq,size_t limit,size_t count,int order){nb::gil_scoped_release release;return s.load_step(seq,limit,count,order);},nb::arg("seq"),nb::arg("limit"),nb::arg("count")=4,nb::arg("order")=0)\n      .def("load_validate",&UrmaMicroSession::load_validate)')
     return s
 def bundle(root):
     return {p.relative_to(root).as_posix():sha(p) for p in root.rglob('*') if p.is_file() and p.suffix in ('.py','.hpp','.inc','.cpp','.sh') and not any(x in p.parts for x in ('results','__pycache__'))}
@@ -70,5 +70,5 @@ def prepare(tree):
     driver=(SERIAL/'session_driver.py').read_text().replace('SERIAL_PAIR_ALL_PASSED','URMA_PAIR_LOAD_ALL_PASSED')
     (tree/'test/urma_pair_load/session_driver.py').write_text(driver)
     names=base.TARGETS+('ep/include/serial_pair.hpp','test/urma_pair_load/session_driver.py')+tuple('test/serial_pair/'+n for n in deps)+tuple('test/urma_pair_load/'+n for n in own)
-    d=dict(version=3,base=version,dependencies=deps,bundle=own,files={n:sha(tree/n) for n in names})
+    d=dict(version=4,base=version,dependencies=deps,bundle=own,files={n:sha(tree/n) for n in names})
     marker.write_text(json.dumps(d,indent=2));return d

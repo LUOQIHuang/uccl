@@ -1,5 +1,6 @@
 inline thread_local Pair* current=nullptr;
 inline thread_local std::vector<Pair>* frame=nullptr;
+inline thread_local std::vector<uint64_t>* frame_post_order=nullptr;
 inline thread_local uint64_t frame_polls=0;
 inline thread_local size_t frame_limit=0,frame_high=0;
 inline Pair& find(uint64_t id){
@@ -14,6 +15,7 @@ inline void posted(uint64_t id,bool write,bool atomic,uint64_t t){
   if(write && id==p.wid){require(!p.wb,"duplicate WRITE submission");p.wb=t;}
   else if(atomic && id==p.aid){require(!p.ab,"duplicate FADD submission");p.ab=t;}
   else throw std::runtime_error("invalid load opcode/identity");
+  if(frame_post_order)frame_post_order->push_back(id);
   if(frame){size_t n=0;for(auto const& x:*frame)n+=x.wb && !x.done();frame_high=std::max(frame_high,n);require(n<=frame_limit,"load inflight limit exceeded");}
 }
 inline void post_end(uint64_t t,int rc){

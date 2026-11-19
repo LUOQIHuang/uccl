@@ -32,6 +32,11 @@ int main(){
             'UrmaMicroSession a(2,1,459264,true,lanes),b(2,1,459264,true,lanes);',
             'VerbsWriteSession a("fake",3,1,459264,true,true,lanes),b("fake",3,1,459264,true,true,lanes);'
         ).replace(',false,{cpu}',',{cpu}')
+    else:
+        body=body.replace('shape<5','shape<7').replace('shape==4?12:4','shape>=4?12:4')
+        body=body.replace('a.load_step(seq,limit,count);auto y=b.load_step(seq,limit,count);',
+                          'a.load_step(seq,limit,count,shape>=5?int(shape-4):0);'
+                          'auto y=b.load_step(seq,limit,count,shape>=5?int(shape-4):0);')
     with tempfile.TemporaryDirectory(prefix='serial-native-') as t:
         t=Path(t);compiler=os.environ.get('CXX','c++')
         # Generic host regression deliberately uses capacity16. This diagnostic
@@ -65,7 +70,7 @@ int main(){
         runtime=runtime[:start]+'void prepare_atomic_buffer(void* p,size_t n,int d){prepare_main_buffer(p,n,d);}\n'+runtime[end:]
         gpu=t/'runtime.cpp';gpu.write_text(runtime)
         cmd=flags+['-DUSE_URMA','-DUCCL_URMA_MICRO_TEST','-I'+str(sdk),'-I'+str(t),'-I'+str(ep/'tests'),str(gpu),str(ep/'src/urma_transport.cpp'),str(ep/'src/urma_micro.cpp'),str(source),'-o',str(t/'test')]
-        build_and_check(cmd,t,30,a.backend)
+        build_and_check(cmd,t,42,a.backend)
 
 def build_and_check(cmd, directory, expected, backend):
     build=subprocess.run(cmd,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,universal_newlines=True)
@@ -74,6 +79,8 @@ def build_and_check(cmd, directory, expected, backend):
     if run.returncode:raise RuntimeError(run.stderr[-6000:])
     samples=[json.loads(l.split(' ',1)[1]) for l in run.stdout.splitlines() if l.startswith('LOAD_SAMPLE ')]
     if len(samples)!=expected:raise ValueError('missing simulated load samples')
-    for s in samples:metrics(s,s['data_lanes'],s['max_inflight_pairs'],s['pairs_expected'])
+    for index,s in enumerate(samples):
+        order=index//6-4 if backend=='urma' and index>=30 else None
+        metrics(s,s['data_lanes'],s['max_inflight_pairs'],s['pairs_expected'],order)
     print('PAIR_LOAD_NATIVE_SIMULATION_PASSED backend='+backend+' samples='+str(len(samples)))
 if __name__=='__main__':main()

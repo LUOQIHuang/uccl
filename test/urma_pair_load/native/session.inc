@@ -6,25 +6,27 @@ void UrmaMicroSession::load_prepare(size_t limit,int rank,size_t count){
   p.geometry.window=count/p.serial_lanes;p.geometry.slots=count;p.load_limit=limit;
   urma_micro_gpu_prepare(p.main,p.geometry,rank);
 }
-std::string UrmaMicroSession::load_step(size_t seq,size_t limit,size_t count){
+std::string UrmaMicroSession::load_step(size_t seq,size_t limit,size_t count,int order){
   auto& p=*impl_;std::lock_guard<std::mutex> lock(p.mutex);
   using namespace uccl::serial_pair;
   require(p.serial && p.prepared && !p.closed && !p.armed && seq==p.expected_sequence && p.geometry.slots==count && p.load_limit==limit && p.cpus.size()==1,"invalid URMA load state");
+  require(order==0 || ((order==1 || order==2) && count==12 && limit==12),"invalid URMA submission order experiment");
   verify_cpu(p.cpus[0]);uccl::gpu_p2p::set_device(p.device);
   if(!p.send){++p.expected_sequence;return "{\"version\":1,\"receiver_only\":true}";}
   auto result=load_measure(seq,p.serial_lanes,limit,count,[&](size_t first,size_t n,std::vector<Pair> const& pairs){
     std::vector<UrmaWorkRequest> batch;batch.reserve(n*2);
-    // Match production staging: all ordinary WRITEs first, then standalone
-    // notifying FADDs. UrmaTransport groups this list by data lane.
-    for(size_t i=first;i<first+n;++i){UrmaWorkRequest w;w.wr_id=pairs[i].wid;w.bytes=459264;
+    auto write=[&](size_t i){UrmaWorkRequest w;w.wr_id=pairs[i].wid;w.bytes=459264;
       size_t slot=(i%p.serial_lanes)*p.geometry.window+i/p.serial_lanes;
       w.local_offset=(seq%2)*p.geometry.region+slot*p.geometry.stride+p.geometry.src_pad;
-      w.remote_offset=2*p.geometry.region+slot*p.geometry.stride+p.remote_dst_pad;batch.push_back(w);}
-    for(size_t i=first;i<first+n;++i){UrmaWorkRequest a;a.kind=UrmaWorkRequest::Kind::Atomic;a.wr_id=pairs[i].aid;
-      a.remote_offset=(i%p.serial_lanes)*8;a.value=32;a.normal_role=NormalAtomicRole::Tail;a.fence=true;batch.push_back(a);}
+      w.remote_offset=2*p.geometry.region+slot*p.geometry.stride+p.remote_dst_pad;batch.push_back(w);};
+    auto atomic=[&](size_t i){UrmaWorkRequest a;a.kind=UrmaWorkRequest::Kind::Atomic;a.wr_id=pairs[i].aid;
+      a.remote_offset=(i%p.serial_lanes)*8;a.value=32;a.normal_role=NormalAtomicRole::Tail;a.fence=true;batch.push_back(a);};
+    // The transport preserves order within each lane and posts one chain per lane.
+    for(size_t i=first;i<first+n;++i){write(i);if(order==2)atomic(i);}
+    if(order!=2)for(size_t i=first;i<first+n;++i)atomic(i);
     p.transports[0]->post_batch(0,batch);
   },[&](){TransportCompletion out[16];int n=p.transports[0]->poll(out,16);
-    for(int i=0;i<n;++i)require(!out[i].status && out[i].retired_ops==1 && !out[i].has_secondary,"unexpected load completion policy");});
+    for(int i=0;i<n;++i)require(!out[i].status && out[i].retired_ops==1 && !out[i].has_secondary,"unexpected load completion policy");},order!=0);
   ++p.expected_sequence;return result;
 }
 void UrmaMicroSession::load_validate(size_t seq){
