@@ -132,7 +132,7 @@ def control_marker(case,label,mode,warmups,samples):
 
 def validate_control(case,mode,warmups,samples,profile='legacy'):
     case=Path(case)
-    if profile not in ('legacy','boundaries'):raise ValueError('unknown reference profile')
+    if profile not in PROFILE_NAMES:raise ValueError('unknown reference profile')
     if mode not in ('batch','paced'):raise ValueError('unknown reference control')
     expected=[dict(label=l,mode=mode,warmups=warmups,samples=samples,gpu_events=False,cpu_events=False,host_clock=False) for l in sorted(LABELS)]
     if PROFILE_NAMES[profile]:
