@@ -42,7 +42,7 @@ def dense_metrics(pair,polls,marker_status):
     return result
 
 
-def pair_metrics(pair,polls,backend,poll_stride=64):
+def pair_metrics(pair,polls,backend,poll_stride=64,expected_fence=1):
     p=pair
     if p['atomic_id']!=p['write_id']+1 or p['write_id']>>32 or p['bytes']!=p['operand']*14352 or not 0<p['operand']<=32:
         raise ValueError('not an adjacent BF16 payload/tail pair')
@@ -52,7 +52,7 @@ def pair_metrics(pair,polls,backend,poll_stride=64):
     if not 0<p['write_post_begin']<=p['write_post_end']<=w or not 0<p['atomic_post_begin']<=p['atomic_post_end']<=a:
         raise ValueError('invalid posting/completion chronology')
     if not (p['write_handled']>=w and p['atomic_handled']>=a):raise ValueError('invalid CPU handling timestamp')
-    if backend=='urma' and (p['fence']!=1 or p['order']!=2):raise ValueError('changed URMA fence/STRONG')
+    if backend=='urma' and (p['fence']!=expected_fence or p['order']!=2):raise ValueError('changed URMA fence/STRONG')
     if backend=='verbs' and p['fence']!=0:raise ValueError('changed verbs FADD flags')
     selected=[r for r in polls if r['cq']==p['cq']]
     if len({r['seq'] for r in selected})!=len(selected) or [r['seq'] for r in selected]!=sorted(r['seq'] for r in selected):
@@ -112,7 +112,7 @@ def pair_metrics(pair,polls,backend,poll_stride=64):
     return row
 
 
-def capture_rows(case,backend,poll_stride=64):
+def capture_rows(case,backend,poll_stride=64,tail_fence=None):
     windows=base.rows(case/'fadd_path.jsonl')
     if len(windows)!=10 or [w['index'] for w in windows]!=list(range(10)):
         raise ValueError('expected all ten BF16 capture windows')
@@ -124,8 +124,29 @@ def capture_rows(case,backend,poll_stride=64):
         if len(streams)!=4 or {s['proxy'] for s in streams}!={0,1,2,3}:raise ValueError('missing/ambiguous Proxy coverage')
         for stream in streams:
             if stream['dropped'] or stream['errors'] or len(stream['pairs'])!=1:raise ValueError('dropped/error/ambiguous completion path capture')
-            metrics=pair_metrics(stream['pairs'][0],stream['polls'],backend,poll_stride)
+            pair=stream['pairs'][0];polls=stream['polls']
+            metrics=pair_metrics(pair,polls,backend,poll_stride,1 if tail_fence is None else tail_fence)
+            if tail_fence is not None:metrics.update(tail_result_bounds(pair,polls))
             if w['index']>0:result.append(dict(index=w['index'],proxy=stream['proxy'],**metrics))
+    return result
+
+
+def tail_result_bounds(pair,polls):
+    """Use the FADD submit clock even when its CQE precedes the WRITE CQE."""
+    begin,cqe=pair['atomic_post_begin'],pair['atomic_sdk_return']
+    result=dict(fence=pair['fence'],submit_to_cqe_us=(cqe-begin)/1000,
+                submit_to_result_lower_us=None,submit_to_result_upper_us=None,
+                result_to_cqe_lower_us=None,result_to_cqe_upper_us=None,
+                result_observed_before_cqe=False,empty_polls_after_observed_result=None)
+    if not pair['initial_zero'] or not pair['result_at_completion'] or pair['result_value']!=pair['result_at_completion']:
+        return result
+    lower,upper=pair['result_lower'],pair['result_upper']
+    if not begin<=lower<=upper:raise ValueError('invalid FADD return-value observation bracket')
+    result.update(submit_to_result_lower_us=(lower-begin)/1000,submit_to_result_upper_us=(upper-begin)/1000,
+                  result_to_cqe_lower_us=max(0,cqe-upper)/1000,result_to_cqe_upper_us=max(0,cqe-lower)/1000,
+                  result_observed_before_cqe=upper<=cqe)
+    if upper<=cqe:
+        result['empty_polls_after_observed_result']=sum(r['cq']==pair['cq'] and r['count']==0 and upper<=r['begin']<=r['end']<=cqe for r in polls)
     return result
 
 

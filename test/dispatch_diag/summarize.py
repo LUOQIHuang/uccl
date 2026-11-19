@@ -21,7 +21,7 @@ def write(p,data):
         if data:
             w=csv.DictWriter(f,fieldnames=list(data[0]));w.writeheader();w.writerows(data)
 
-def case_data(root,rank,trace,compiled_off=False,reference_events=None,token_sweep=None):
+def case_data(root,rank,trace,compiled_off=False,reference_events=None,token_sweep=None,bf16_only=False):
     # Explicit opt-in for the inactive tokens experiment; historical callers
     # retain their fixed 4096-token and sampling acceptance rules.
     tokens=4096
@@ -35,6 +35,9 @@ def case_data(root,rank,trace,compiled_off=False,reference_events=None,token_swe
     node=root/f'node{rank}';c=read(node/'setup.json')
     if c['error']:raise ValueError('failed setup '+str(node))
     c=c['fingerprint'];backend=c.get('backend','verbs')
+    if bool(c.get('fadd_tail_scope'))!=bf16_only or bf16_only and (backend!='urma' or reference_events!='paced' or trace or compiled_off or token_sweep is not None):
+        raise ValueError('wrong BF16-only campaign configuration')
+    labels={'dispatch_bf16_chunk32'} if bf16_only else ALL_LABELS
     if read(node/'dispatch_sites.json')!=SITES:raise ValueError('different recorded Dispatch sites')
     case=node/'normal' if backend=='urma' else node/'r01_baseline/normal'
     status=read(case/'status.json');runtime=read(case/'runtime.json')
@@ -72,10 +75,10 @@ def case_data(root,rank,trace,compiled_off=False,reference_events=None,token_swe
         import sys
         sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'reference_events'))
         from event_runtime import validate_control
-        if not status['checks'].get('reference_control') or not validate_control(case,reference_events,*sampling,c.get('reference_profile','legacy')):raise ValueError('unvalidated sampling control')
+        if not status['checks'].get('reference_control') or not validate_control(case,reference_events,*sampling,c.get('reference_profile','legacy'),labels=labels if bf16_only else None):raise ValueError('unvalidated sampling control')
     raw=rows(case/'api_samples.jsonl');saved=rows(case/'sample_summary.jsonl');means={}
-    if len(raw)!=5*c['samples'] or {r['label'] for r in raw}!=ALL_LABELS or len(saved)!=5 or {r['label'] for r in saved}!=ALL_LABELS:raise ValueError('incomplete Normal samples')
-    for label in ALL_LABELS:
+    if len(raw)!=len(labels)*c['samples'] or {r['label'] for r in raw}!=labels or len(saved)!=len(labels) or {r['label'] for r in saved}!=labels:raise ValueError('incomplete Normal samples')
+    for label in labels:
         rr=[r for r in raw if r['label']==label]
         if [r['index'] for r in rr]!=list(range(c['samples'])) or any(r['used']!=(r['index']>0) or r['mode']!='normal' or not math.isfinite(r['us']) or r['us']<=0 for r in rr):raise ValueError('invalid sampling boundary/value')
         values=[r['us'] for r in rr if r['used']];mean=statistics.mean(values)

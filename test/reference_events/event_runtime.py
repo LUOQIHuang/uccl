@@ -130,11 +130,11 @@ def control_marker(case,label,mode,warmups,samples):
     append(case/'reference_control.jsonl',marker)
 
 
-def validate_control(case,mode,warmups,samples,profile='legacy'):
+def validate_control(case,mode,warmups,samples,profile='legacy',labels=None):
     case=Path(case)
     if profile not in PROFILE_NAMES:raise ValueError('unknown reference profile')
     if mode not in ('batch','paced'):raise ValueError('unknown reference control')
-    expected=[dict(label=l,mode=mode,warmups=warmups,samples=samples,gpu_events=False,cpu_events=False,host_clock=False) for l in sorted(LABELS)]
+    expected=[dict(label=l,mode=mode,warmups=warmups,samples=samples,gpu_events=False,cpu_events=False,host_clock=False) for l in sorted(LABELS if labels is None else labels)]
     if PROFILE_NAMES[profile]:
         for row in expected:row['profile']=PROFILE_NAMES[profile]
     actual=[json.loads(s) for s in (case/'reference_control.jsonl').read_text().splitlines()]

@@ -8,6 +8,8 @@ import subprocess
 HERE=Path(__file__).resolve().parent
 REPO=HERE.parents[1]
 BASE='da574d61'
+TAIL_BASE='d822cf31'
+BF16_LABEL='dispatch_bf16_chunk32'
 
 
 def sha(path):
@@ -96,33 +98,109 @@ def probe_header(poll_stride):
                    'kStride=64, kLimit=4096', 'kStride=%d, kLimit=4096'%poll_stride)
 
 
-def prepare(tree, poll_stride=64):
+def tail_changes(path, source):
+    if path=='test/reference_events/event_runtime.py':
+        source=replace(source,'    capture=(capture_factory or Capture)(ep.__file__) if record_events else None',
+            '''    tail_probe=os.environ.get('FADD_PATH_TAIL_SCOPE')=='1' and os.environ.get('FADD_PATH_CAPTURE')=='1'
+    receiver=tail_probe and dist.get_rank()==0
+    capture=(capture_factory or Capture)(ep.__file__) if record_events or receiver else None''')
+        source=replace(source,'        cpu_active=False;gpu=None',
+                              '        cpu_active=False;gpu=None;fadd_capture=False')
+        source=replace(source,'            if capture is not None:\n',
+                              '            if capture is not None and not receiver:\n')
+        source=replace(source,"            fadd_capture=os.environ.get('FADD_PATH_CAPTURE')=='1' and label=='dispatch_bf16_chunk32'",
+            "            fadd_capture=os.environ.get('FADD_PATH_CAPTURE')=='1' and label=='dispatch_bf16_chunk32' and not receiver")
+        source=replace(source,"                if fadd_capture:append(case/'fadd_path.jsonl',dict(label=label,index=i,**json.loads(ep.fadd_path_end())))",
+            "                if fadd_capture and not tail_probe:append(case/'fadd_path.jsonl',dict(label=label,index=i,**json.loads(ep.fadd_path_end())))")
+        source=replace(source,'                if capture is not None:gpu=capture.end()',
+            '''                if capture is not None:gpu=capture.end()
+                if tail_probe and not receiver and fadd_capture:
+                    append(case/'fadd_path.jsonl',dict(label=label,index=i,**json.loads(ep.fadd_path_end())))''')
+        source=replace(source,"        if capture is not None:append(case/'event_trace.jsonl',dict(label=label,index=i,us=value,gpu=gpu,cpu=cpu))",
+            "        if receiver:append(case/'tail_receiver.jsonl',dict(label=label,index=i,us=value,gpu=gpu))\n"
+            "        elif capture is not None:append(case/'event_trace.jsonl',dict(label=label,index=i,us=value,gpu=gpu,cpu=cpu))")
+        return single_control_label(source)
+    if path=='test/urma_mode_parity/driver.py':
+        source=replace(source,"    error=None; fingerprint=dict(fadd_path_capture=", "    tail_scope=os.environ.get('FADD_PATH_TAIL_SCOPE')=='1'\n    error=None; fingerprint=dict(fadd_tail_scope=tail_scope,fadd_path_capture=")
+        source=replace(source,"        expected_points=4 if mode=='normal' else 2", "        expected_points=(1 if tail_scope else 4) if mode=='normal' else 2")
+        source=replace(source,"profiles=text.count(point_marker)==4,tuning=text.count('[tuning] SMs ')==4)","profiles=text.count(point_marker)==expected_points,tuning=text.count('[tuning] SMs ')==(0 if tail_scope else 4))")
+        source=replace(source,"validate_control(case,args.reference_events,args.warmups,args.samples,args.reference_profile)","validate_control(case,args.reference_events,args.warmups,args.samples,args.reference_profile,\n                                                          labels={'dispatch_bf16_chunk32'} if tail_scope else None)")
+        source=replace(source,"and not any(r=='unknown' for r,f in roles)",
+                              "and not any(r=='unknown' for r,f in roles)\n                    if tail_scope:checks['normal_atomic_roles'] &= observed_roles=={'tail','head'}")
+        return replace(source,"text.count('MODE_PARITY_SAMPLES ')==(5 if mode=='normal'", "text.count('MODE_PARITY_SAMPLES ')==((1 if tail_scope else 5) if mode=='normal'")
+    if path=='test/urma_mode_parity/worker.py':
+        source=replace(source,"normal_plan=[('dispatch_fp8',32),('dispatch_bf16',32),('combine',12),('combine',16)]",
+            "normal_plan=([('dispatch_bf16',32)] if os.environ.get('FADD_PATH_TAIL_SCOPE')=='1' else\n             [('dispatch_fp8',32),('dispatch_bf16',32),('combine',12),('combine',16)])")
+        source=replace(source,"index==(3 if mode=='normal' else 1)","index==(len(normal_plan)-1 if mode=='normal' else 1)")
+        return replace(source,"assert count==(4 if mode=='normal' else 2),count", "assert count==(len(normal_plan) if mode=='normal' else 2),count")
+    if path=='ep/bench/test_internode.py':
+        # Keep the real correctness matrix and the same dispatch handle; omit
+        # the layout timer and the other three performance points.
+        begin=source.index('    t = bench(lambda: buffer.get_dispatch_layout')
+        end=source.index('    group.barrier()\n',begin)
+        source=source[:begin]+source[end:]
+        begin=source.index('    # Tune dispatch performance\n')
+        # Keep the original tuning-loop anchors for prepare_benchmark(), which
+        # also records the benchmark fingerprint. The early return skips them.
+        focused='''    if os.environ.get('FADD_PATH_TAIL_SCOPE')=='1':
+        config = Config(num_sms, 4, nvl_buffer_size, 32, rdma_buffer_size)
+        bench_kineto(lambda: buffer.dispatch(x=x, handle=handle, config=config), ("dispatch", "notify"))
+        return hash_value
+
+'''
+        return source[:begin]+focused+source[begin:]
+    if path=='test/reference_events/run.sh':
+        source=replace(source,'GID=3 PROFILE=legacy','GID=3 PROFILE=legacy FENCE=default')
+        source=replace(source,' --reference-profile) PROFILE=${2:?};shift 2;;',
+                              ' --reference-profile) PROFILE=${2:?};shift 2;;\n --normal-fadd-fence-plan) FENCE=${2:?};shift 2;;')
+        return replace(source,'else\n ENTRY="$HERE/../verbs_baseline/run.sh"',
+            ''' if [[ "$ACTION" != build && "$FENCE" != default ]];then
+  COMMON+=(--normal-fadd-fence-plan "$FENCE" --require-normal-atomic-roles)
+ fi
+else
+ ENTRY="$HERE/../verbs_baseline/run.sh"''')
+    return source
+
+
+def single_control_label(source):
+    source=replace(source,"def validate_control(case,mode,warmups,samples,profile='legacy'):",
+                          "def validate_control(case,mode,warmups,samples,profile='legacy',labels=None):")
+    return replace(source,'for l in sorted(LABELS)]','for l in sorted(LABELS if labels is None else labels)]')
+
+
+def prepare(tree, poll_stride=64, tail_scope=False):
     header=probe_header(poll_stride)
     tree=tree.resolve()
     if tree==REPO or REPO in tree.parents:
         raise ValueError('diagnostic worktree must be outside the active checkout')
     bundle={p.relative_to(HERE).as_posix():sha(p) for p in HERE.rglob('*')
             if p.is_file() and p.suffix in ('.py','.hpp','.cpp','.sh') and not any(x in p.parts for x in ('results','__pycache__'))}
-    version=subprocess.check_output(['git','-C',str(REPO),'rev-parse',BASE+'^{commit}']).decode().strip()
+    version=subprocess.check_output(['git','-C',str(REPO),'rev-parse',(TAIL_BASE if tail_scope else BASE)+'^{commit}']).decode().strip()
     marker=tree/'.fadd_path_overlay.json'
     if marker.exists():
         data=json.loads(marker.read_text())
-        if data.get('poll_stride',64)!=poll_stride or data['base']!=version or data['bundle']!=bundle or any(sha(tree/n)!=v for n,v in data['overlaid'].items()):
+        if data.get('poll_stride',64)!=poll_stride or data.get('tail_scope',False)!=tail_scope or data['base']!=version or data['bundle']!=bundle or any(sha(tree/n)!=v for n,v in data['overlaid'].items()):
             raise ValueError('DIAGNOSTIC_TREE_CHANGED: use a new worktree path')
         return data
     if tree.exists():
         raise ValueError('unmarked diagnostic worktree path already exists')
     # Construct/verify all replacements before creating or modifying a tree.
-    sources={n:changes(n,subprocess.check_output(['git','-C',str(REPO),'show',version+':'+n]).decode()) for n in TARGETS}
-    subprocess.run(['git','-C',str(REPO),'worktree','add','--detach',str(tree),version],check=True)
-    for name,text in sources.items():(tree/name).write_text(text)
+    targets=TARGETS+('test/urma_mode_parity/worker.py','ep/bench/test_internode.py','test/reference_events/run.sh') if tail_scope else TARGETS
+    sources={}
+    for name in targets:
+        source=subprocess.check_output(['git','-C',str(REPO),'show',version+':'+name]).decode()
+        if name in TARGETS:source=changes(name,source)
+        sources[name]=tail_changes(name,source) if tail_scope else source
+    subprocess.run(['git','-c','core.longpaths=true','-C',str(REPO),'worktree','add','--detach',str(tree),version],check=True)
+    for name,text in sources.items():(tree/name).write_text(text,encoding='utf-8',newline='\n')
     (tree/'ep/include/fadd_path_probe.hpp').write_text(header)
     shutil.copy2(str(HERE/'native/verbs_hooks.hpp'),str(tree/'ep/include/fadd_path_verbs.hpp'))
     # Freeze this experiment's entry points with the build, independent of the
     # original checkout and of an in-progress tokens sweep.
-    shutil.copytree(str(HERE),str(tree/'test/fadd_path'),ignore=shutil.ignore_patterns('results','__pycache__'))
-    files=TARGETS+('ep/include/fadd_path_probe.hpp','ep/include/fadd_path_verbs.hpp')+tuple('test/fadd_path/'+n for n in bundle)
+    shutil.copytree(str(HERE),str(tree/'test/fadd_path'),ignore=shutil.ignore_patterns('results','__pycache__'),dirs_exist_ok=tail_scope)
+    files=targets+('ep/include/fadd_path_probe.hpp','ep/include/fadd_path_verbs.hpp')+tuple('test/fadd_path/'+n for n in bundle)
     data=dict(version=1,base=version,poll_stride=poll_stride,bundle=bundle,overlaid={n:sha(tree/n) for n in files},
               note='Only this isolated tree is overlaid; original benchmark and GPU kernels are unchanged.')
+    if tail_scope:data.update(tail_scope=True,note='Isolated BF16 harness with rank0 receiver events and rank1 completion probe. GPU kernels are unchanged.')
     marker.write_text(json.dumps(data,indent=2))
     return data

@@ -12,6 +12,9 @@ import sys
 
 import overlay
 HERE=Path(__file__).resolve().parent
+TAIL_RUNS=(('all_pre','all-on',False),('tail_pre','peer-tail-off',False),
+           ('all_probe','all-on',True),('tail_probe','peer-tail-off',True),
+           ('tail_post','peer-tail-off',False),('all_post','all-on',False))
 
 
 def copy_checked(source,destination):
@@ -43,21 +46,24 @@ def capabilities(destination):
     destination.write_text(json.dumps(data,indent=2))
 
 
-def command(a,job,action):
-    return ['bash',str(a.tree/'test/reference_events/run.sh'),'--action',action,'--step','paced',
+def command(a,job,action,plan=None):
+    argv=['bash',str(a.tree/'test/reference_events/run.sh'),'--action',action,'--step','paced',
             '--backend',a.backend,'--node-rank',str(a.node_rank),'--job',job,'--tokens','4096',
             '--master-addr',a.master_addr,'--port',str(a.port),'--gid-index',str(a.gid_index),
             '--build-dir',str(a.build_dir),'--output',str(a.output/a.job/a.backend/'cases')]
+    if plan is not None:argv.extend(('--normal-fadd-fence-plan',plan))
+    return argv
 
 
-def run_one(a,suffix,action,capture=False):
+def run_one(a,suffix,action,capture=False,plan=None):
     job='%s_%s_%s'%(a.job,a.backend,suffix)
     source=a.output/a.job/a.backend/'cases'/job
     env=os.environ.copy();env['FADD_PATH_CAPTURE']='1' if capture else '0'
+    env['FADD_PATH_TAIL_SCOPE']='1' if a.tail_scope else '0'
     rc=0
     try:
         print('FADD_PATH_CASE_BEGIN '+job,flush=True)
-        process=subprocess.Popen(command(a,job,action),env=env,start_new_session=True)
+        process=subprocess.Popen(command(a,job,action,plan),env=env,start_new_session=True)
         try:
             rc=process.wait()
         except KeyboardInterrupt:
@@ -83,6 +89,7 @@ def main(argv=None):
     p.add_argument('--backend',choices=('urma','verbs'),required=True)
     p.add_argument('--poll-stride',type=int,choices=(1,64),default=64,
                    help='1 records every relevant SDK poll; prepare/build/check/run must match')
+    p.add_argument('--tail-scope',action='store_true',help='fixed URMA BF16 all-on / peer-tail-off comparison')
     p.add_argument('--node-rank',type=int,choices=(0,1),required=True)
     p.add_argument('--job',default='fadd_path_01')
     p.add_argument('--tree',type=Path,default=home/'metax_dev/fadd_path_src_v1')
@@ -94,13 +101,16 @@ def main(argv=None):
     p.add_argument('--gid-index',type=int,default=3)
     a=p.parse_args(argv)
     if not re.fullmatch(r'[a-zA-Z0-9_-]+',a.job) or not 1024<=a.port<=65533 or not 0<=a.gid_index<256:p.error('invalid job/port/GID')
+    if a.tail_scope and (a.backend!='urma' or a.poll_stride!=1):p.error('tail scope requires --backend urma --poll-stride 1')
     a.tree=a.tree.resolve();a.output=a.output.resolve();a.destination=a.destination.resolve()
     a.build_dir=(a.build_dir or home/('metax_dev/fadd_path_build/%s_v1'%a.backend)).resolve()
     if a.action=='prepare':
-        overlay.prepare(a.tree,a.poll_stride)
+        overlay.prepare(a.tree,a.poll_stride,a.tail_scope)
         print('FADD_PATH_PREPARE_PASSED '+str(a.tree));return
     # Reuse exactly the prepared sources; refuse silent overlay updates.
-    provenance=(json.loads((a.tree/'.fadd_path_overlay.json').read_text()) if a.action=='collect' else overlay.prepare(a.tree,a.poll_stride))
+    provenance=(json.loads((a.tree/'.fadd_path_overlay.json').read_text()) if a.action=='collect' else overlay.prepare(a.tree,a.poll_stride,a.tail_scope))
+    if provenance.get('tail_scope',False)!=a.tail_scope or provenance.get('poll_stride',64)!=a.poll_stride:
+        raise ValueError('wrong source overlay for this campaign')
     root=a.output/a.job/a.backend;root.mkdir(parents=True,exist_ok=True)
     marker=root/('overlay_node%d.json'%a.node_rank)
     encoded=json.dumps(provenance,indent=2)
@@ -110,7 +120,8 @@ def main(argv=None):
     if not cap.exists():capabilities(cap)
     copy_checked(cap,a.destination/a.job/a.backend/cap.name)
     if a.action=='collect':
-        for suffix in ('build','check','pre','probe','post'):
+        phases=tuple(suffix for suffix,_,_ in TAIL_RUNS) if a.tail_scope else ('pre','probe','post')
+        for suffix in ('build','check')+phases:
             job='%s_%s_%s'%(a.job,a.backend,suffix);source=root/'cases'/job
             if source.exists():
                 subprocess.run([sys.executable,str(a.tree/'test/gpu_stage_recovery/collect.py'),str(source),
@@ -118,7 +129,10 @@ def main(argv=None):
                     '--destination',str(a.destination/a.job/a.backend/'cases'/job)],check=True)
         return
     if a.action in ('build','check'):
-        run_one(a,a.action,a.action)
+        run_one(a,a.action,a.action,plan='peer-tail-off' if a.tail_scope and a.action=='check' else None)
+    elif a.tail_scope:
+        for suffix,plan,capture in TAIL_RUNS:
+            run_one(a,suffix,'run',capture,plan)
     else:
         for suffix,on in (('pre',False),('probe',True),('post',False)):
             run_one(a,suffix,'run',on)
