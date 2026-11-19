@@ -5,9 +5,8 @@ import json
 from analyze import metrics
 def main():
     p=argparse.ArgumentParser(description=__doc__);p.add_argument('--tree',type=Path,required=True)
-    p.add_argument('--backend',choices=('urma',),required=True);p.add_argument('--sdk-include',type=Path)
+    p.add_argument('--backend',choices=('urma','verbs'),required=True);p.add_argument('--sdk-include',type=Path)
     p.add_argument('--reference-sdk-fixture',action='store_true');a=p.parse_args();ep=a.tree.resolve()/'ep'
-    if a.backend!='urma':p.error('this experiment uses URMA only')
     body=r"""
 int main(){
  cpu_set_t allowed;CPU_ZERO(&allowed);assert(sched_getaffinity(0,sizeof(allowed),&allowed)==0);
@@ -28,6 +27,11 @@ int main(){
  assert(sched_setaffinity(0,sizeof(allowed),&allowed)==0);
 }
 """
+    if a.backend=='verbs':
+        body=body.replace('size_t shape=0','size_t shape=3').replace(
+            'UrmaMicroSession a(2,1,459264,true,lanes),b(2,1,459264,true,lanes);',
+            'VerbsWriteSession a("fake",3,1,459264,true,true,lanes),b("fake",3,1,459264,true,true,lanes);'
+        ).replace(',false,{cpu}',',{cpu}')
     with tempfile.TemporaryDirectory(prefix='serial-native-') as t:
         t=Path(t);compiler=os.environ.get('CXX','c++')
         # Generic host regression deliberately uses capacity16. This diagnostic
@@ -37,6 +41,12 @@ int main(){
         shim.write_text((ep/'tests/urma_support/ep_shim.hpp').read_text().replace('= 16;','= 64;'))
         flags=[compiler,'-std=c++17','-pthread','-Wall','-Wextra','-Werror','-I'+str(ep/'include'),
                '-I'+str(ep/'tests/urma_support'),'-include',str(shim)]
+        if a.backend=='verbs':
+            text=(ep/'tests/verbs_notify_test.cpp').read_text().split('int main(){',1)[0]
+            text=text.replace('#include "../src/verbs_write_micro.cpp"','#include "'+str(ep/'src/verbs_write_micro.cpp')+'"')
+            source=t/'verbs.cpp';source.write_text(text+body)
+            build_and_check(flags+['-DUSE_DMABUF',str(source),'-libverbs','-o',str(t/'test')],t,12,a.backend)
+            return
         if not a.sdk_include:p.error('URMA host simulation requires --sdk-include')
         sdk=a.sdk_include.resolve()
         if a.reference_sdk_fixture:
@@ -55,12 +65,15 @@ int main(){
         runtime=runtime[:start]+'void prepare_atomic_buffer(void* p,size_t n,int d){prepare_main_buffer(p,n,d);}\n'+runtime[end:]
         gpu=t/'runtime.cpp';gpu.write_text(runtime)
         cmd=flags+['-DUSE_URMA','-DUCCL_URMA_MICRO_TEST','-I'+str(sdk),'-I'+str(t),'-I'+str(ep/'tests'),str(gpu),str(ep/'src/urma_transport.cpp'),str(ep/'src/urma_micro.cpp'),str(source),'-o',str(t/'test')]
-        build=subprocess.run(cmd,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,universal_newlines=True)
-        if build.returncode:raise RuntimeError(build.stdout)
-        run=subprocess.run([str(t/'test')],stdout=subprocess.PIPE,stderr=subprocess.PIPE,universal_newlines=True,timeout=60)
-        if run.returncode:raise RuntimeError(run.stderr[-6000:])
-        samples=[json.loads(l.split(' ',1)[1]) for l in run.stdout.splitlines() if l.startswith('LOAD_SAMPLE ')]
-        if len(samples)!=30:raise ValueError('missing simulated load samples')
-        for s in samples:metrics(s,s['data_lanes'],s['max_inflight_pairs'],s['pairs_expected'])
-        print('URMA_LOAD_NATIVE_SIMULATION_PASSED backend='+a.backend+' samples='+str(len(samples))+'; not hardware/private ABI validation')
+        build_and_check(cmd,t,30,a.backend)
+
+def build_and_check(cmd, directory, expected, backend):
+    build=subprocess.run(cmd,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,universal_newlines=True)
+    if build.returncode:raise RuntimeError(build.stdout)
+    run=subprocess.run([str(directory/'test')],stdout=subprocess.PIPE,stderr=subprocess.PIPE,universal_newlines=True,timeout=60)
+    if run.returncode:raise RuntimeError(run.stderr[-6000:])
+    samples=[json.loads(l.split(' ',1)[1]) for l in run.stdout.splitlines() if l.startswith('LOAD_SAMPLE ')]
+    if len(samples)!=expected:raise ValueError('missing simulated load samples')
+    for s in samples:metrics(s,s['data_lanes'],s['max_inflight_pairs'],s['pairs_expected'])
+    print('PAIR_LOAD_NATIVE_SIMULATION_PASSED backend='+backend+' samples='+str(len(samples)))
 if __name__=='__main__':main()

@@ -1,6 +1,6 @@
 # URMA Normal：恢复少量并发，定位长等待触发条件
 
-**`urma_pair_load_01`四对实验已完成，不用重测。最新结果见[分析](results/urma_pair_load_01/ANALYSIS.zh-CN.md)，下一步只运行[三队列深度对照文档](DEPTH12.zh-CN.md)。**以下保留basic4的定义与操作，v2仍支持该套件，但更换了独立TREE/BUILD默认目录，避免混入v1扩展。
+**`urma_pair_load_01` 四对实验已完成。下一次窗口优先跑三队列深度对照。** 两端运行步骤按环境选择。[四对结果分析](results/urma_pair_load_01/ANALYSIS.zh-CN.md) · [RDMA](DEPTH12_VERBS.zh-CN.md) · [URMA](DEPTH12.zh-CN.md)
 
 ## 1. 目的与已有依据
 
@@ -46,8 +46,8 @@ export URMA_DIAG_LIBRARY_DIR="$URMA_DIAG_HOME/metax_dev/urma_after_kernel_202610
 export VERBS_DIAG_LIBRARY_DIR="$URMA_DIAG_LIBRARY_DIR"
 export URMA_DIAG_INCLUDE_DIR="$URMA_DIAG_HOME/metax_dev/urma_sdk_private_include"
 export JOB=urma_pair_load_01
-export TREE="$URMA_DIAG_HOME/metax_dev/urma_pair_load_src_v2"
-export BUILD="$URMA_DIAG_HOME/metax_dev/urma_pair_load_build/urma_v2"
+export TREE="$URMA_DIAG_HOME/metax_dev/urma_pair_load_src_v3"
+export BUILD="$URMA_DIAG_HOME/metax_dev/urma_pair_load_build/urma_v3"
 export ROOT="$URMA_DIAG_HOME/metax_dev/urma_pair_load_results"
 export DEST="$PWD/test/urma_pair_load/results"
 test -x "$URMA_PAIR_LOAD_PYTHON"
@@ -92,7 +92,7 @@ urma_load check
 
 这三个操作可分别执行，不要求两端同时开始。应依次看到 `URMA_PAIR_LOAD_PREPARE_PASSED`、`URMA_PAIR_LOAD_BUILD_PASSED`、`URMA_PAIR_LOAD_CHECK_PASSED`。build沿用原构建入口，编译并行数1；check检查SDK、GPU原子配置、扩展来源和设备可用状态。
 
-TREE首次必须不存在且在仓库外；BUILD不能复用上次串行构建目录。相同代码重复prepare仅检查哈希。如果提示 `LOAD_TREE_CHANGED`，保留旧目录，换新TREE和BUILD，如后缀v2；不要手改哈希文件。
+TREE 首次必须不存在且在仓库外。BUILD 使用本套件自己的构建目录。相同代码重复 prepare 仅检查哈希。如果提示 `LOAD_TREE_CHANGED`，保留旧目录，换新的 TREE 和 BUILD。
 
 任何一步失败即停止，保留已收集日志，不继续run。每次新开终端需重新设置变量和函数。
 

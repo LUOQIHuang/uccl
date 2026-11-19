@@ -1,5 +1,7 @@
 # 下一步：三队列，每队列深度1与4的等量对照
 
+当前窗口只有 RDMA 时，先按[RDMA 运行步骤](DEPTH12_VERBS.zh-CN.md)采集同工作量对照。下文是 URMA 运行步骤。两边默认使用同一个 JOB，结果按后端保存在独立子目录。
+
 ## 1. 只回答这个问题
 
 `urma_pair_load_01`已完成，不再重测：单队列四对时，靠前两对W→A观测间隔约65–73μs，靠后两对约7–10μs；四队列各一对时全部同次轮询返回。单队列第0对间隔中，约95%–97%位于“尚未取得同批全部WRITE完成”的区间。与此同时，整批并发比串行更快，未复现原Normal的427–683μs间隔。
@@ -23,7 +25,7 @@
 
 ## 2. 两端公共环境
 
-取得本次代码后，在仓库根目录执行。目录必须是本机已成功的真实私有SDK位置；如迁移过，只替换相应路径。使用新TREE和新BUILD，不能复用v1扩展。
+取得本次代码后，在仓库根目录执行。使用本机已验证的私有 SDK 路径。v3 的源码树可由两后端复用，构建路径按后端区分。若此前已经准备了 v2 URMA 扩展，v2 的运行步骤仍可在原提交下使用，已取得的 v2 结果也可直接参加对照。
 
 ```bash
 export URMA_DIAG_HOME=/home/h00918771
@@ -31,12 +33,13 @@ export VERBS_DIAG_HOME="$URMA_DIAG_HOME"
 export URMA_PAIR_LOAD_PYTHON="$URMA_DIAG_HOME/metax_dev/venv-maca-py312/bin/python"
 export URMA_DIAG_PYTHON="$URMA_PAIR_LOAD_PYTHON"
 export VERBS_DIAG_PYTHON="$URMA_PAIR_LOAD_PYTHON"
+export MACA_PATH=/opt/maca-3.9.0
 export URMA_DIAG_LIBRARY_DIR="$URMA_DIAG_HOME/metax_dev/urma_after_kernel_20261029/diag/umdk_private_618957c3/lib"
 export VERBS_DIAG_LIBRARY_DIR="$URMA_DIAG_LIBRARY_DIR"
 export URMA_DIAG_INCLUDE_DIR="$URMA_DIAG_HOME/metax_dev/urma_sdk_private_include"
 export JOB=urma_pair_depth12_01
-export TREE="$URMA_DIAG_HOME/metax_dev/urma_pair_load_src_v2"
-export BUILD="$URMA_DIAG_HOME/metax_dev/urma_pair_load_build/urma_v2"
+export TREE="$URMA_DIAG_HOME/metax_dev/urma_pair_load_src_v3"
+export BUILD="$URMA_DIAG_HOME/metax_dev/urma_pair_load_build/urma_v3"
 export ROOT="$URMA_DIAG_HOME/metax_dev/urma_pair_load_results"
 export DEST="$PWD/test/urma_pair_load/results"
 test -x "$URMA_PAIR_LOAD_PYTHON"
@@ -52,7 +55,7 @@ mx-smi
 
 ```bash
 export RANK=0
-export CPU=168
+export CPU=192
 ```
 
 204单独执行：
@@ -62,7 +65,7 @@ export RANK=1
 export CPU=192
 ```
 
-CPU沿用上轮成功值；不可用时停止，不静默换核。
+两端都用 CPU192，和 RDMA 对照对齐。202 的 GPU 本地 CPU 列表在两个内核下不同，旧 URMA 串行使用的 CPU168 在 RDMA 内核下属于其他 NUMA 节点。以本次实际绑定和 GPU NUMA 记录为准。已有 v2 URMA 结果如果沿用 CPU168，仍可用于该后端内部的深度对照，跨后端对照时单列该差异。
 
 ## 3. 准备、构建、检查
 
@@ -81,9 +84,9 @@ urma_depth build
 urma_depth check
 ```
 
-这三步不要求两端同时启动。依次出现 `URMA_PAIR_LOAD_PREPARE_PASSED`、`URMA_PAIR_LOAD_BUILD_PASSED`、`URMA_PAIR_LOAD_CHECK_PASSED`。prepare在固定基线`fed2a437`的独立树上叠加v2代码，保存哈希；build并行数1，沿用原构建/host检查；check验证真实SDK、设备及GPU Atomic条件。
+这三步各节点可独立执行。依次出现 `URMA_PAIR_LOAD_PREPARE_PASSED`、`URMA_PAIR_LOAD_BUILD_PASSED`、`URMA_PAIR_LOAD_CHECK_PASSED`。prepare 在固定基线 `fed2a437` 的独立树上叠加代码并保存哈希。build 沿用原构建和 CPU 检查。check 验证真实 SDK、设备及 GPU Atomic 条件。
 
-TREE首次必须不存在且在仓库外。若v2目录已经由其他代码准备过并提示哈希变化，保留原目录，将TREE/BUILD都改新后缀，不手改来源文件。失败停止，保留已有日志。每次新终端需重设变量和函数。
+TREE首次必须不存在且在仓库外。若已由其他源码准备过并提示哈希变化，保留原目录，将TREE/BUILD都改新后缀。失败时保留已有日志。每次新终端需重设变量和函数。
 
 ## 4. 正式运行
 
@@ -124,7 +127,7 @@ test/urma_pair_load/results/urma_pair_depth12_01/urma/
 
 ## 6. 读数与停止条件
 
-优先看同数据量的整批SDK跨度及同轮深度4对深度1的增减，再看每队列各个请求位置的W→A。positions.csv按lane和请求位置列出；pairs.csv新增`wave`、`until_wave_last_write_us`、`after_wave_last_write_us`，将本对W→A按“本轮全部WRITE完成观测”分界。后一个值可为负，表示本对FADD先于其他队列最后WRITE完成被观测，不能截成0或解释为负执行时间。
+优先看同数据量的整批 SDK 跨度及同轮深度 4 对深度 1 的增减。再看各队列请求位置的 W→A，以及 P95、最大值和超过 100/400 μs 的对数。`pairs.csv` 同时保留该批同队列及全队列最后 WRITE 完成观测两个分界。`after_*_last_write_us` 的负值表示 FADD 完成记录先于该分界被读到。
 
 | 结果 | 如何推进 |
 | --- | --- |
@@ -134,10 +137,10 @@ test/urma_pair_load/results/urma_pair_depth12_01/urma/
 | 两种深度都未复现 | 一个线程、三队列各最多4对仍不足，下一步回到原Proxy持续服务/多线程/GPU反馈；不重复单对或四对实验 |
 | 正确性或稳定性失败 | 保留原日志，先看具体失败，不扩展矩阵、不自动重跑 |
 
-稳定门槛沿用每轮整批CV≤5%、轮均值跨度/中位数≤5%。软件完成观测不能分开设备排队、远端执行、响应生成和provider交付，结论必须保留这一边界；本轮仍未补verbs，因此也不能单独证明URMA特有。
+稳定门槛沿用每轮整批CV≤5%、轮均值跨度/中位数≤5%。软件完成观测混合设备排队、远端执行、响应生成和 provider 交付。RDMA 同工作量对照用于区分两个后端是否复现同一种现象。各自的内核、设备、完成 API 和顺序语义仍列入比较条件。
 
 ## 7. 开发验证
 
-v2已通过旧basic4与新depth12的真实TCP双端worker/报告检查、遗漏样本拒绝、跨轮次重叠和每队列链式提交约束；实际C++ session在模拟GPU/provider下跑通五种形态、两个方向、各3次，共30次迭代并校验数据/计数器。原URMA host回归及本文7段Bash语法检查通过，v2分析器成功重算已上传v1数据。模拟测试单独把临时测试shim容量从16增为64，以容纳24条请求；生产容量min(2048,1024)未修改，代码还会检查实际容量足够。
+已通过真实 TCP 双端流程及报告检查。C++ 会话在模拟设备下做了 URMA 30 个、verbs 12 个迭代的 payload 和计数器检查。分析器能读取已上传的 v1 结果。模拟测试使用容量 64 的临时 shim 以容纳深度 4 的 24 条请求。
 
 开发机没有MetaX GPU，模拟验证不保证真实私有SDK ABI，服务器构建检查和实机校验仍为必要步骤。
