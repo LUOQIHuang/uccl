@@ -1,0 +1,36 @@
+["readelf", "-SW", "/home/h00918771/metax_dev/urma_after_kernel_20261029/diag/umdk_private_618957c3/lib/urma/liburma-udma.so"]
+There are 26 section headers, starting at offset 0x205b0:
+
+节头：
+  [Nr] Name              Type            Address          Off    Size   ES Flg Lk Inf Al
+  [ 0]                   NULL            0000000000000000 000000 000000 00      0   0  0
+  [ 1] .note.gnu.build-id NOTE            00000000000001c8 0001c8 000024 00   A  0   0  4
+  [ 2] .gnu.hash         GNU_HASH        00000000000001f0 0001f0 00040c 00   A  3   0  8
+  [ 3] .dynsym           DYNSYM          0000000000000600 000600 0016c8 18   A  4   3  8
+  [ 4] .dynstr           STRTAB          0000000000001cc8 001cc8 0012bf 00   A  0   0  1
+  [ 5] .gnu.version      VERSYM          0000000000002f88 002f88 0001e6 02   A  3   0  2
+  [ 6] .gnu.version_r    VERNEED         0000000000003170 003170 000050 00   A  4   2  8
+  [ 7] .rela.dyn         RELA            00000000000031c0 0031c0 000a80 18   A  3   0  8
+  [ 8] .rela.plt         RELA            0000000000003c40 003c40 000f30 18  AI  3  20  8
+  [ 9] .init             PROGBITS        0000000000004b70 004b70 000018 00  AX  0   0  4
+  [10] .plt              PROGBITS        0000000000004b90 004b90 000a40 00  AX  0   0 16
+  [11] .text             PROGBITS        00000000000055d0 0055d0 00ce24 00  AX  0   0 16
+  [12] .fini             PROGBITS        00000000000123f4 0123f4 000014 00  AX  0   0  4
+  [13] .rodata           PROGBITS        0000000000012410 012410 003b20 00   A  0   0 16
+  [14] .eh_frame_hdr     PROGBITS        0000000000015f30 015f30 00058c 00   A  0   0  4
+  [15] .eh_frame         PROGBITS        00000000000164c0 0164c0 0022fc 00   A  0   0  8
+  [16] .init_array       INIT_ARRAY      000000000002f7d8 01f7d8 000018 08  WA  0   0  8
+  [17] .fini_array       FINI_ARRAY      000000000002f7f0 01f7f0 000010 08  WA  0   0  8
+  [18] .data.rel.ro      PROGBITS        000000000002f800 01f800 000070 00  WA  0   0 16
+  [19] .dynamic          DYNAMIC         000000000002f870 01f870 000230 10  WA  4   0  8
+  [20] .got              PROGBITS        000000000002faa0 01faa0 000560 08  WA  0   0  8
+  [21] .data             PROGBITS        0000000000030000 020000 0003a8 00  WA  0   0  8
+  [22] .bss              NOBITS          00000000000303a8 0203a8 000058 00  WA  0   0  8
+  [23] .comment          PROGBITS        0000000000000000 0203a8 000033 01  MS  0   0  1
+  [24] .gnu.build.attributes NOTE            0000000000030400 0203dc 0000d8 00      0   0  4
+  [25] .shstrtab         STRTAB          0000000000000000 0204b4 0000f7 00      0   0  1
+Key to Flags:
+  W (write), A (alloc), X (execute), M (merge), S (strings), I (info),
+  L (link order), O (extra OS processing required), G (group), T (TLS),
+  C (compressed), x (unknown), o (OS specific), E (exclude),
+  D (mbind), p (processor specific)

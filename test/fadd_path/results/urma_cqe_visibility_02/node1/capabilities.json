@@ -1,0 +1,316 @@
+{
+  "version": 1,
+  "host": "worker1",
+  "kernel": "6.6.0-gdr_f00955680_diag",
+  "boot_id": "e91e5b97-a07e-4f8d-b992-82ba00d6c1f2",
+  "reference": {
+    "case": "/home/h00918771/uccl-ep-xpu-integration-new/test/fadd_path/results/urma_fadd_tail_scope_01/urma/cases/urma_fadd_tail_scope_01_urma_tail_probe/node1",
+    "kernel": "6.6.0-gdr_f00955680_diag",
+    "device": "udmac0d1e2",
+    "boot_id": "e91e5b97-a07e-4f8d-b992-82ba00d6c1f2",
+    "module_sha": "e4306fe59c87c98a470e60342f0205572c53ce43a50be8d9f49effdcaac2f939",
+    "kernel_matches": true,
+    "boot_matches": true,
+    "archived_library_map": [
+      "/home/h00918771/metax_dev/urma_after_kernel_20261029/diag/umdk_private_618957c3/lib/liburma.so.0",
+      "/home/h00918771/metax_dev/urma_after_kernel_20261029/diag/umdk_private_618957c3/lib/liburma_common.so.0"
+    ],
+    "sdk_hashes": {
+      "urma_types.h": "42a8667b7f3c9677ebb5f8dea63768d45d6115dad435756c0f1414bba2f32e92",
+      "urma_provider.h": "54e8e8bff88a2503d59df544a5e81d99ed0435703f074701f0d18d7890a9110e",
+      "urma_api.h": "71490ac581a691d343a2763b17f4c97cdb6128b68fcb07477508794544b7b28f",
+      "urma_cmd.h": "e435756a1aff2580f18735c22511f6f71ea1b0c367a5039edc23efb534ec407b",
+      "urma_perf.h": "84f3fac58c354f0ba0d9b7047cc03e54f755de227d2a5f81dcc10691b73f829e",
+      "urma_opcode.h": "63bd16604efa0935a5f3415b8787d4863e50e012e7ec63620298be1ba30a4600",
+      "urma_types_str.h": "15f7cd9578fcd1503d9bc4afbd2f2c19f35add256ac5916cae8ce7c27ddc0795"
+    }
+  },
+  "known_library_checks": {
+    "liburma.so": {
+      "archived_sha256": "56d6374553c2843c13eb7f7bc98a5bb65fa2fa4eb5f3b4a331f56cf126fb1f22",
+      "observed_sha256": "56d6374553c2843c13eb7f7bc98a5bb65fa2fa4eb5f3b4a331f56cf126fb1f22",
+      "state": "match"
+    },
+    "liburma.so.0": {
+      "archived_sha256": "56d6374553c2843c13eb7f7bc98a5bb65fa2fa4eb5f3b4a331f56cf126fb1f22",
+      "observed_sha256": "56d6374553c2843c13eb7f7bc98a5bb65fa2fa4eb5f3b4a331f56cf126fb1f22",
+      "state": "match"
+    },
+    "liburma.so.0.0.3": {
+      "archived_sha256": "56d6374553c2843c13eb7f7bc98a5bb65fa2fa4eb5f3b4a331f56cf126fb1f22",
+      "observed_sha256": "56d6374553c2843c13eb7f7bc98a5bb65fa2fa4eb5f3b4a331f56cf126fb1f22",
+      "state": "match"
+    },
+    "liburma_common.so": {
+      "archived_sha256": "c159fffbce1c82944ceccc98555d8e181fe405414384ed671e9ce3fb0b437fad",
+      "observed_sha256": "c159fffbce1c82944ceccc98555d8e181fe405414384ed671e9ce3fb0b437fad",
+      "state": "match"
+    },
+    "liburma_common.so.0": {
+      "archived_sha256": "c159fffbce1c82944ceccc98555d8e181fe405414384ed671e9ce3fb0b437fad",
+      "observed_sha256": "c159fffbce1c82944ceccc98555d8e181fe405414384ed671e9ce3fb0b437fad",
+      "state": "match"
+    },
+    "liburma_common.so.0.0.1": {
+      "archived_sha256": "c159fffbce1c82944ceccc98555d8e181fe405414384ed671e9ce3fb0b437fad",
+      "observed_sha256": "c159fffbce1c82944ceccc98555d8e181fe405414384ed671e9ce3fb0b437fad",
+      "state": "match"
+    }
+  },
+  "live_library_map": {
+    "pid": null,
+    "libraries": [],
+    "error": null
+  },
+  "library_candidates": [
+    {
+      "path": "/home/h00918771/metax_dev/urma_after_kernel_20261029/diag/umdk_private_618957c3/lib/liburma.so",
+      "aliases": [
+        "/home/h00918771/metax_dev/urma_after_kernel_20261029/diag/umdk_private_618957c3/lib/liburma.so"
+      ],
+      "sha256": "56d6374553c2843c13eb7f7bc98a5bb65fa2fa4eb5f3b4a331f56cf126fb1f22",
+      "build_id": "58a7292a4e71483f72534c46e88ba8f5bd510b29",
+      "readelf_error": null,
+      "candidate_symbols": [
+        "urma_poll_jfc"
+      ],
+      "archived_map_paths": [],
+      "live_map_paths": []
+    },
+    {
+      "path": "/home/h00918771/metax_dev/urma_after_kernel_20261029/diag/umdk_private_618957c3/lib/liburma.so.0",
+      "aliases": [
+        "/home/h00918771/metax_dev/urma_after_kernel_20261029/diag/umdk_private_618957c3/lib/liburma.so.0"
+      ],
+      "sha256": "56d6374553c2843c13eb7f7bc98a5bb65fa2fa4eb5f3b4a331f56cf126fb1f22",
+      "build_id": "58a7292a4e71483f72534c46e88ba8f5bd510b29",
+      "readelf_error": null,
+      "candidate_symbols": [
+        "urma_poll_jfc"
+      ],
+      "archived_map_paths": [
+        "/home/h00918771/metax_dev/urma_after_kernel_20261029/diag/umdk_private_618957c3/lib/liburma.so.0"
+      ],
+      "live_map_paths": []
+    },
+    {
+      "path": "/home/h00918771/metax_dev/urma_after_kernel_20261029/diag/umdk_private_618957c3/lib/liburma.so.0.0.3",
+      "aliases": [
+        "/home/h00918771/metax_dev/urma_after_kernel_20261029/diag/umdk_private_618957c3/lib/liburma.so.0.0.3"
+      ],
+      "sha256": "56d6374553c2843c13eb7f7bc98a5bb65fa2fa4eb5f3b4a331f56cf126fb1f22",
+      "build_id": "58a7292a4e71483f72534c46e88ba8f5bd510b29",
+      "readelf_error": null,
+      "candidate_symbols": [
+        "urma_poll_jfc"
+      ],
+      "archived_map_paths": [],
+      "live_map_paths": []
+    },
+    {
+      "path": "/home/h00918771/metax_dev/urma_after_kernel_20261029/diag/umdk_private_618957c3/lib/liburma_common.so",
+      "aliases": [
+        "/home/h00918771/metax_dev/urma_after_kernel_20261029/diag/umdk_private_618957c3/lib/liburma_common.so"
+      ],
+      "sha256": "c159fffbce1c82944ceccc98555d8e181fe405414384ed671e9ce3fb0b437fad",
+      "build_id": "a9a6a96d39a97cd367c926f731c5960c2eaa59ff",
+      "readelf_error": null,
+      "candidate_symbols": [],
+      "archived_map_paths": [],
+      "live_map_paths": []
+    },
+    {
+      "path": "/home/h00918771/metax_dev/urma_after_kernel_20261029/diag/umdk_private_618957c3/lib/liburma_common.so.0",
+      "aliases": [
+        "/home/h00918771/metax_dev/urma_after_kernel_20261029/diag/umdk_private_618957c3/lib/liburma_common.so.0"
+      ],
+      "sha256": "c159fffbce1c82944ceccc98555d8e181fe405414384ed671e9ce3fb0b437fad",
+      "build_id": "a9a6a96d39a97cd367c926f731c5960c2eaa59ff",
+      "readelf_error": null,
+      "candidate_symbols": [],
+      "archived_map_paths": [
+        "/home/h00918771/metax_dev/urma_after_kernel_20261029/diag/umdk_private_618957c3/lib/liburma_common.so.0"
+      ],
+      "live_map_paths": []
+    },
+    {
+      "path": "/home/h00918771/metax_dev/urma_after_kernel_20261029/diag/umdk_private_618957c3/lib/liburma_common.so.0.0.1",
+      "aliases": [
+        "/home/h00918771/metax_dev/urma_after_kernel_20261029/diag/umdk_private_618957c3/lib/liburma_common.so.0.0.1"
+      ],
+      "sha256": "c159fffbce1c82944ceccc98555d8e181fe405414384ed671e9ce3fb0b437fad",
+      "build_id": "a9a6a96d39a97cd367c926f731c5960c2eaa59ff",
+      "readelf_error": null,
+      "candidate_symbols": [],
+      "archived_map_paths": [],
+      "live_map_paths": []
+    },
+    {
+      "path": "/home/h00918771/metax_dev/urma_after_kernel_20261029/diag/umdk_private_618957c3/lib/urma/liburma-udma.so",
+      "aliases": [
+        "/home/h00918771/metax_dev/urma_after_kernel_20261029/diag/umdk_private_618957c3/lib/urma/liburma-udma.so"
+      ],
+      "sha256": "18ea061e598330ba56ac07d7f9b4691414884aaf805c7f7a1973b1bc5c028967",
+      "build_id": "a94dc33688722b1604ae5dc2d8f06b783b8e474a",
+      "readelf_error": null,
+      "candidate_symbols": [
+        "udma_u_ack_jfc",
+        "udma_u_active_jfc",
+        "udma_u_alloc_jfc",
+        "udma_u_clean_jfc",
+        "udma_u_create_jfc",
+        "udma_u_create_jfce",
+        "udma_u_deactive_jfc",
+        "udma_u_delete_jfc",
+        "udma_u_delete_jfce",
+        "udma_u_free_jfc",
+        "udma_u_get_jfc_opt",
+        "udma_u_modify_jfc",
+        "udma_u_poll_jfc",
+        "udma_u_query_cqe_aux_info",
+        "udma_u_rearm_jfc",
+        "udma_u_set_jfc_opt",
+        "udma_u_wait_jfc"
+      ],
+      "archived_map_paths": [],
+      "live_map_paths": []
+    },
+    {
+      "path": "/usr/lib64/liburma.so.0.0.3",
+      "aliases": [
+        "/usr/lib64/liburma.so",
+        "/usr/lib64/liburma.so.0",
+        "/usr/lib64/liburma.so.0.0.3"
+      ],
+      "sha256": "5fe0d8378379f99fd87690de6433652f80027b76fb4f9953c3ef3449c2dd98ed",
+      "build_id": "a569a7110b751d08459774ba5ce72aadbe529ad6",
+      "readelf_error": null,
+      "candidate_symbols": [
+        "urma_poll_jfc"
+      ],
+      "archived_map_paths": [],
+      "live_map_paths": []
+    },
+    {
+      "path": "/usr/lib64/liburma_common.so.0.0.1",
+      "aliases": [
+        "/usr/lib64/liburma_common.so",
+        "/usr/lib64/liburma_common.so.0",
+        "/usr/lib64/liburma_common.so.0.0.1"
+      ],
+      "sha256": "8557bc0d5f4a4553a7968bbec394109142ab206f6c89c05cd20b3693b71a8326",
+      "build_id": "f39baec40d2d9ae56b61b642179bbeeae3b20e8f",
+      "readelf_error": null,
+      "candidate_symbols": [],
+      "archived_map_paths": [],
+      "live_map_paths": []
+    },
+    {
+      "path": "/usr/lib64/urma/liburma-udma.so",
+      "aliases": [
+        "/usr/lib64/urma/liburma-udma.so"
+      ],
+      "sha256": "bcdf6f4419e50f8e97e08ebc4239d7c6b88b962bfadfee3fab1dbf9efafd4654",
+      "build_id": "f000068845a16b4c4cff6ceb9146725a51ff522e",
+      "readelf_error": null,
+      "candidate_symbols": [
+        "udma_u_ack_jfc",
+        "udma_u_active_jfc",
+        "udma_u_alloc_jfc",
+        "udma_u_clean_jfc",
+        "udma_u_create_ccu_jfc",
+        "udma_u_create_jfc",
+        "udma_u_create_jfce",
+        "udma_u_deactive_jfc",
+        "udma_u_delete_jfc",
+        "udma_u_delete_jfce",
+        "udma_u_free_jfc",
+        "udma_u_get_jfc_opt",
+        "udma_u_modify_jfc",
+        "udma_u_poll_jfc",
+        "udma_u_query_cqe_aux_info",
+        "udma_u_rearm_jfc",
+        "udma_u_set_jfc_opt",
+        "udma_u_wait_jfc"
+      ],
+      "archived_map_paths": [],
+      "live_map_paths": []
+    },
+    {
+      "path": "/usr/lib64/urma/liburma-udma.so.orig",
+      "aliases": [
+        "/usr/lib64/urma/liburma-udma.so.orig"
+      ],
+      "sha256": "f8277ec18390bffb49767638a72e8b6fce523cc090b7b3abfc3a2134798cc3e6",
+      "build_id": "73064891dad91f7e89f6ac083a56b05b12da333f",
+      "readelf_error": null,
+      "candidate_symbols": [
+        "udma_u_ack_jfc",
+        "udma_u_active_jfc",
+        "udma_u_alloc_jfc",
+        "udma_u_clean_jfc",
+        "udma_u_create_ccu_jfc",
+        "udma_u_create_jfc",
+        "udma_u_create_jfce",
+        "udma_u_deactive_jfc",
+        "udma_u_delete_jfc",
+        "udma_u_delete_jfce",
+        "udma_u_free_jfc",
+        "udma_u_get_jfc_opt",
+        "udma_u_modify_jfc",
+        "udma_u_poll_jfc",
+        "udma_u_query_cqe_aux_info",
+        "udma_u_rearm_jfc",
+        "udma_u_set_jfc_opt",
+        "udma_u_wait_jfc"
+      ],
+      "archived_map_paths": [],
+      "live_map_paths": []
+    }
+  ],
+  "library_access_errors": [],
+  "kernel_modules": {
+    "udma": {
+      "filename": "/lib/modules/6.6.0-gdr_f00955680_diag/updates/urma/hw/udma/udma.ko",
+      "version": "1.0",
+      "srcversion": "A3473D20CABD75A33EAD171",
+      "vermagic": "6.6.0-gdr_f00955680_diag SMP mod_unload modversions aarch64",
+      "loaded": true,
+      "modinfo_error": null,
+      "loaded_srcversion": "A3473D20CABD75A33EAD171"
+    },
+    "ubcore": {
+      "filename": "/lib/modules/6.6.0-gdr_f00955680_diag/updates/urma/ubcore/ubcore.ko",
+      "srcversion": "53C2130D466B6E57BA01331",
+      "vermagic": "6.6.0-gdr_f00955680_diag SMP mod_unload modversions aarch64",
+      "loaded": true,
+      "modinfo_error": null,
+      "loaded_srcversion": "53C2130D466B6E57BA01331"
+    },
+    "uburma": {
+      "filename": "/lib/modules/6.6.0-gdr_f00955680_diag/updates/urma/uburma/uburma.ko",
+      "srcversion": "ACC682CB49B082B37E5EDE3",
+      "vermagic": "6.6.0-gdr_f00955680_diag SMP mod_unload modversions aarch64",
+      "loaded": true,
+      "modinfo_error": null,
+      "loaded_srcversion": "ACC682CB49B082B37E5EDE3"
+    }
+  },
+  "tracefs": {
+    "state": "unavailable",
+    "root": null,
+    "attempts": [
+      {
+        "path": "/sys/kernel/tracing/available_events",
+        "error": "[Errno 13] Permission denied: '/sys/kernel/tracing/available_events'"
+      },
+      {
+        "path": "/sys/kernel/debug/tracing/available_events",
+        "error": "[Errno 13] Permission denied: '/sys/kernel/debug/tracing/available_events'"
+      }
+    ],
+    "events": [],
+    "completion_candidates": []
+  },
+  "physical_cqe_readiness_measured": false
+}

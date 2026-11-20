@@ -1,0 +1,35 @@
+["readelf", "-d", "/home/h00918771/metax_dev/urma_after_kernel_20261029/diag/umdk_private_618957c3/lib/urma/liburma-udma.so"]
+
+Dynamic section at offset 0x1f870 contains 31 entries:
+  标记        类型                         名称/值
+ 0x0000000000000001 (NEEDED)             共享库：[liburma.so.0]
+ 0x0000000000000001 (NEEDED)             共享库：[liburma_common.so.0]
+ 0x0000000000000001 (NEEDED)             共享库：[libummu.so.1]
+ 0x0000000000000001 (NEEDED)             共享库：[libc.so.6]
+ 0x0000000000000001 (NEEDED)             共享库：[ld-linux-aarch64.so.1]
+ 0x000000000000000e (SONAME)             Library soname: [liburma-udma.so]
+ 0x000000000000000c (INIT)               0x4b70
+ 0x000000000000000d (FINI)               0x123f4
+ 0x0000000000000019 (INIT_ARRAY)         0x2f7d8
+ 0x000000000000001b (INIT_ARRAYSZ)       24 (bytes)
+ 0x000000000000001a (FINI_ARRAY)         0x2f7f0
+ 0x000000000000001c (FINI_ARRAYSZ)       16 (bytes)
+ 0x000000006ffffef5 (GNU_HASH)           0x1f0
+ 0x0000000000000005 (STRTAB)             0x1cc8
+ 0x0000000000000006 (SYMTAB)             0x600
+ 0x000000000000000a (STRSZ)              4799 (bytes)
+ 0x000000000000000b (SYMENT)             24 (bytes)
+ 0x0000000000000003 (PLTGOT)             0x2faa0
+ 0x0000000000000002 (PLTRELSZ)           3888 (bytes)
+ 0x0000000000000014 (PLTREL)             RELA
+ 0x0000000000000017 (JMPREL)             0x3c40
+ 0x0000000000000007 (RELA)               0x31c0
+ 0x0000000000000008 (RELASZ)             2688 (bytes)
+ 0x0000000000000009 (RELAENT)            24 (bytes)
+ 0x0000000000000018 (BIND_NOW)           
+ 0x000000006ffffffb (FLAGS_1)            标志： NOW
+ 0x000000006ffffffe (VERNEED)            0x3170
+ 0x000000006fffffff (VERNEEDNUM)         2
+ 0x000000006ffffff0 (VERSYM)             0x2f88
+ 0x000000006ffffff9 (RELACOUNT)          26
+ 0x0000000000000000 (NULL)               0x0
