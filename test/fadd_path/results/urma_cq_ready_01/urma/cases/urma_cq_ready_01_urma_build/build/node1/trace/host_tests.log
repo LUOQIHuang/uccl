@@ -1,0 +1,17 @@
+URMA concurrent phase diagnostics tests passed
+Real Normal dispatch trial control tests passed
+[URMA_ALLOC] control raw=0x440600 aligned=0x441000 logical=81960 backing=90112 alignment=4096 finegrained=1
+URMA production fine-grained allocation tests passed
+In file included from /home/h00918771/metax_dev/cq_ready_src_v1/ep/include/fadd_path_probe.hpp:1,
+                 from /home/h00918771/metax_dev/cq_ready_src_v1/ep/src/urma_transport.cpp:2:
+/home/h00918771/metax_dev/cq_ready_src_v1/ep/include/cq_ready_probe.hpp: 在函数‘void uccl::cq_ready::bind(urma_jfc_t*)’中:
+/home/h00918771/metax_dev/cq_ready_src_v1/ep/include/cq_ready_probe.hpp:51:35: 错误：static assertion failed: CQ readiness requires the recorded private SDK ABI
+   51 |   static_assert(sizeof(urma_jfc_t)==248,"CQ readiness requires the recorded private SDK ABI");
+      |                 ~~~~~~~~~~~~~~~~~~^~~~~
+/home/h00918771/metax_dev/cq_ready_src_v1/ep/include/cq_ready_probe.hpp:51:35: 附注：the comparison reduces to ‘(256 == 248)’
+Traceback (most recent call last):
+  File "/home/h00918771/metax_dev/cq_ready_src_v1/ep/tests/run_urma_tests.py", line 150, in <module>
+    subprocess.run(cmd, check=True)
+  File "/home/h00918771/metax_dev/python/cpython-3.12.15-linux-aarch64-gnu/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['c++', '-std=c++17', '-pthread', '-Wall', '-Wextra', '-Werror', '-DUSE_URMA', '-I/home/h00918771/metax_dev/cq_ready_src_v1/ep/tests/urma_support', '-I/home/h00918771/metax_dev/cq_ready_src_v1/ep/include', '-I/home/h00918771/metax_dev/urma_sdk_private_include', '-I/tmp/uccl-urma-test-3hfaxiue', '-include', '/home/h00918771/metax_dev/cq_ready_src_v1/ep/tests/urma_support/ep_shim.hpp', '/home/h00918771/metax_dev/cq_ready_src_v1/ep/src/gpu_p2p_runtime.cpp', '/home/h00918771/metax_dev/cq_ready_src_v1/ep/src/urma_transport.cpp', '/home/h00918771/metax_dev/cq_ready_src_v1/ep/tests/urma_transport_test.cpp', '-ldl', '-o', '/tmp/uccl-urma-test-3hfaxiue/test']' returned non-zero exit status 1.
