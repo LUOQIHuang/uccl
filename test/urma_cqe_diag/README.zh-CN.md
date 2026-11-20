@@ -1,5 +1,7 @@
 # URMA Normal 下一项：确认 204 上可用的 CQE 发布观测
 
+已收到 `ddcac8a6` 的详细provider采集并确认私有库绑定。下一项双机CQE有效位观测的代码和运行步骤见 [CQ_READY.zh-CN.md](../fadd_path/CQ_READY.zh-CN.md)。本页保留前序主机采集步骤。
+
 `tail-off` 下，204 采到的 36 条 FADD 都在 SDK 交付完成之前读到了本端返回值。中间还有约 **351 μs** 的中位等待下界，空轮询中位数为 **85 次**。下一项要区分设备晚写出有效 CQE，还是有效 CQE 已写出、SDK 晚交付。应用已能记录返回值和 SDK 交付，缺的是中间的 CQE 发布时刻。[本轮数据](../fadd_path/results/urma_fadd_tail_scope_01/summary_tail_scope/REPORT.zh-CN.md)
 
 ## 当前请执行详细采集

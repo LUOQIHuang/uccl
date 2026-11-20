@@ -15,6 +15,7 @@ HERE=Path(__file__).resolve().parent
 TAIL_RUNS=(('all_pre','all-on',False),('tail_pre','peer-tail-off',False),
            ('all_probe','all-on',True),('tail_probe','peer-tail-off',True),
            ('tail_post','peer-tail-off',False),('all_post','all-on',False))
+CQ_RUNS=(('pre','peer-tail-off',False),('probe','peer-tail-off',True),('post','peer-tail-off',False))
 
 
 def copy_checked(source,destination):
@@ -60,6 +61,8 @@ def run_one(a,suffix,action,capture=False,plan=None):
     source=a.output/a.job/a.backend/'cases'/job
     env=os.environ.copy();env['FADD_PATH_CAPTURE']='1' if capture else '0'
     env['FADD_PATH_TAIL_SCOPE']='1' if a.tail_scope else '0'
+    env['FADD_PATH_CQ_CAMPAIGN']='1' if a.cq_ready else '0'
+    env['FADD_PATH_CQ_READY']='1' if a.cq_ready and a.node_rank==1 and action=='run' else '0'
     rc=0
     try:
         print('FADD_PATH_CASE_BEGIN '+job,flush=True)
@@ -90,6 +93,7 @@ def main(argv=None):
     p.add_argument('--poll-stride',type=int,choices=(1,64),default=64,
                    help='1 records every relevant SDK poll; prepare/build/check/run must match')
     p.add_argument('--tail-scope',action='store_true',help='fixed URMA BF16 all-on / peer-tail-off comparison')
+    p.add_argument('--cq-ready',action='store_true',help='tail-off only: observe owner bits of the next 16 CQEs on rank1')
     p.add_argument('--node-rank',type=int,choices=(0,1),required=True)
     p.add_argument('--job',default='fadd_path_01')
     p.add_argument('--tree',type=Path,default=home/'metax_dev/fadd_path_src_v1')
@@ -102,15 +106,22 @@ def main(argv=None):
     a=p.parse_args(argv)
     if not re.fullmatch(r'[a-zA-Z0-9_-]+',a.job) or not 1024<=a.port<=65533 or not 0<=a.gid_index<256:p.error('invalid job/port/GID')
     if a.tail_scope and (a.backend!='urma' or a.poll_stride!=1):p.error('tail scope requires --backend urma --poll-stride 1')
+    if a.cq_ready and not a.tail_scope:p.error('--cq-ready requires --tail-scope')
+    if a.cq_ready and a.action!='collect':
+        library=Path(os.environ.get('URMA_DIAG_LIBRARY_DIR','/missing'))/'urma/liburma-udma.so'
+        expected='18ea061e598330ba56ac07d7f9b4691414884aaf805c7f7a1973b1bc5c028967'
+        if not library.is_file() or overlay.sha(library)!=expected:
+            raise ValueError('CQ_READY_REQUIRES_RECORDED_PRIVATE_PROVIDER: '+str(library))
     a.tree=a.tree.resolve();a.output=a.output.resolve();a.destination=a.destination.resolve()
     a.build_dir=(a.build_dir or home/('metax_dev/fadd_path_build/%s_v1'%a.backend)).resolve()
     if a.action=='prepare':
-        overlay.prepare(a.tree,a.poll_stride,a.tail_scope)
+        overlay.prepare(a.tree,a.poll_stride,a.tail_scope,a.cq_ready)
         print('FADD_PATH_PREPARE_PASSED '+str(a.tree));return
     # Reuse exactly the prepared sources; refuse silent overlay updates.
-    provenance=(json.loads((a.tree/'.fadd_path_overlay.json').read_text()) if a.action=='collect' else overlay.prepare(a.tree,a.poll_stride,a.tail_scope))
+    provenance=(json.loads((a.tree/'.fadd_path_overlay.json').read_text()) if a.action=='collect' else overlay.prepare(a.tree,a.poll_stride,a.tail_scope,a.cq_ready))
     if provenance.get('tail_scope',False)!=a.tail_scope or provenance.get('poll_stride',64)!=a.poll_stride:
         raise ValueError('wrong source overlay for this campaign')
+    if provenance.get('cq_ready',False)!=a.cq_ready:raise ValueError('wrong CQ probe overlay')
     root=a.output/a.job/a.backend;root.mkdir(parents=True,exist_ok=True)
     marker=root/('overlay_node%d.json'%a.node_rank)
     encoded=json.dumps(provenance,indent=2)
@@ -120,7 +131,7 @@ def main(argv=None):
     if not cap.exists():capabilities(cap)
     copy_checked(cap,a.destination/a.job/a.backend/cap.name)
     if a.action=='collect':
-        phases=tuple(suffix for suffix,_,_ in TAIL_RUNS) if a.tail_scope else ('pre','probe','post')
+        phases=tuple(suffix for suffix,_,_ in (CQ_RUNS if a.cq_ready else TAIL_RUNS)) if a.tail_scope else ('pre','probe','post')
         for suffix in ('build','check')+phases:
             job='%s_%s_%s'%(a.job,a.backend,suffix);source=root/'cases'/job
             if source.exists():
@@ -131,7 +142,7 @@ def main(argv=None):
     if a.action in ('build','check'):
         run_one(a,a.action,a.action,plan='peer-tail-off' if a.tail_scope and a.action=='check' else None)
     elif a.tail_scope:
-        for suffix,plan,capture in TAIL_RUNS:
+        for suffix,plan,capture in (CQ_RUNS if a.cq_ready else TAIL_RUNS):
             run_one(a,suffix,'run',capture,plan)
     else:
         for suffix,on in (('pre',False),('probe',True),('post',False)):

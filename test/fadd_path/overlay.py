@@ -168,8 +168,42 @@ def single_control_label(source):
     return replace(source,'for l in sorted(LABELS)]','for l in sorted(LABELS if labels is None else labels)]')
 
 
-def prepare(tree, poll_stride=64, tail_scope=False):
+def cq_changes(path, source):
+    if path=='ep/src/urma_transport.cpp':
+        source=replace(source,'    // RC jetty creation requires a JFR (shared) even for one-sided usage.',
+            '    uccl::cq_ready::bind(jfc_);\n    // RC jetty creation requires a JFR (shared) even for one-sided usage.')
+        source=replace(source,'    int n = urma_poll_jfc(jfc_,wanted,crs);',
+            '''    uccl::cq_ready::before(jfc_,fadd_poll.frame,fadd_poll.seq,ctx_->thread_idx,uccl::fadd_path::now);
+    int n = urma_poll_jfc(jfc_,wanted,crs);''')
+        source=replace(source,'    auto fadd_return=uccl::fadd_path::poll_end(fadd_poll,fadd_cq,n);',
+            '''    auto fadd_return=uccl::fadd_path::poll_end(fadd_poll,fadd_cq,n);
+    uccl::cq_ready::after(fadd_poll.frame,n,fadd_return);''')
+        source=replace(source,'      uccl::fadd_path::completed(fadd_poll,fadd_cq,op.wr_id,fadd_return,completion.status);',
+            '''      uccl::cq_ready::completed(fadd_poll.frame,op.wr_id,token,i);
+      uccl::fadd_path::completed(fadd_poll,fadd_cq,op.wr_id,fadd_return,completion.status);''')
+    elif path=='test/reference_events/event_runtime.py':
+        source=replace(source,"    receiver=tail_probe and dist.get_rank()==0",
+            "    receiver=tail_probe and dist.get_rank()==0 and os.environ.get('FADD_PATH_CQ_CAMPAIGN')!='1'")
+        source=replace(source,"and label=='dispatch_bf16_chunk32' and not receiver",
+            "and label=='dispatch_bf16_chunk32' and not receiver and (os.environ.get('FADD_PATH_CQ_CAMPAIGN')!='1' or dist.get_rank()==1)")
+    elif path=='test/urma_mode_parity/driver.py':
+        source=replace(source,'fingerprint=dict(fadd_tail_scope=tail_scope,',
+            "fingerprint=dict(cq_ready_campaign=os.environ.get('FADD_PATH_CQ_CAMPAIGN')=='1',fadd_tail_scope=tail_scope,")
+    elif path=='ep/tests/run_urma_tests.py':
+        source=replace(source,"cmd += [str(ep / 'tests/urma_transport_test.cpp'), '-o', str(tmp / 'test')]",
+            "cmd += [str(ep / 'tests/urma_transport_test.cpp'), '-ldl', '-o', str(tmp / 'test')]")
+    elif path=='ep/setup.py':
+        source=replace(source,'    extra_link_args = []',"    extra_link_args = ['-ldl']")
+    return source
+
+
+def prepare(tree, poll_stride=64, tail_scope=False, cq_ready=False):
     header=probe_header(poll_stride)
+    if cq_ready:
+        if not tail_scope or poll_stride!=1:raise ValueError('CQ readiness requires dense tail scope')
+        header='#include "cq_ready_probe.hpp"\n'+header
+        header=replace(header,'  out<<"]}";return out.str();',
+            '  out<<"],\\"cq_ready\\":"<<uccl::cq_ready::dump(frame)<<"}";return out.str();')
     tree=tree.resolve()
     if tree==REPO or REPO in tree.parents:
         raise ValueError('diagnostic worktree must be outside the active checkout')
@@ -179,28 +213,33 @@ def prepare(tree, poll_stride=64, tail_scope=False):
     marker=tree/'.fadd_path_overlay.json'
     if marker.exists():
         data=json.loads(marker.read_text())
-        if data.get('poll_stride',64)!=poll_stride or data.get('tail_scope',False)!=tail_scope or data['base']!=version or data['bundle']!=bundle or any(sha(tree/n)!=v for n,v in data['overlaid'].items()):
+        if data.get('poll_stride',64)!=poll_stride or data.get('tail_scope',False)!=tail_scope or data.get('cq_ready',False)!=cq_ready or data['base']!=version or data['bundle']!=bundle or any(sha(tree/n)!=v for n,v in data['overlaid'].items()):
             raise ValueError('DIAGNOSTIC_TREE_CHANGED: use a new worktree path')
         return data
     if tree.exists():
         raise ValueError('unmarked diagnostic worktree path already exists')
     # Construct/verify all replacements before creating or modifying a tree.
     targets=TARGETS+('test/urma_mode_parity/worker.py','ep/bench/test_internode.py','test/reference_events/run.sh') if tail_scope else TARGETS
+    if cq_ready:targets+=('ep/tests/run_urma_tests.py','ep/setup.py')
     sources={}
     for name in targets:
         source=subprocess.check_output(['git','-C',str(REPO),'show',version+':'+name]).decode()
         if name in TARGETS:source=changes(name,source)
         sources[name]=tail_changes(name,source) if tail_scope else source
+        if cq_ready:sources[name]=cq_changes(name,sources[name])
     subprocess.run(['git','-c','core.longpaths=true','-C',str(REPO),'worktree','add','--detach',str(tree),version],check=True)
     for name,text in sources.items():(tree/name).write_text(text,encoding='utf-8',newline='\n')
     (tree/'ep/include/fadd_path_probe.hpp').write_text(header)
+    if cq_ready:shutil.copy2(str(HERE/'native/cq_ready.hpp'),str(tree/'ep/include/cq_ready_probe.hpp'))
     shutil.copy2(str(HERE/'native/verbs_hooks.hpp'),str(tree/'ep/include/fadd_path_verbs.hpp'))
     # Freeze this experiment's entry points with the build, independent of the
     # original checkout and of an in-progress tokens sweep.
     shutil.copytree(str(HERE),str(tree/'test/fadd_path'),ignore=shutil.ignore_patterns('results','__pycache__'),dirs_exist_ok=tail_scope)
     files=targets+('ep/include/fadd_path_probe.hpp','ep/include/fadd_path_verbs.hpp')+tuple('test/fadd_path/'+n for n in bundle)
+    if cq_ready:files+=('ep/include/cq_ready_probe.hpp',)
     data=dict(version=1,base=version,poll_stride=poll_stride,bundle=bundle,overlaid={n:sha(tree/n) for n in files},
               note='Only this isolated tree is overlaid; original benchmark and GPU kernels are unchanged.')
     if tail_scope:data.update(tail_scope=True,note='Isolated BF16 harness with rank0 receiver events and rank1 completion probe. GPU kernels are unchanged.')
+    if cq_ready:data.update(cq_ready=True,note='URMA tail-off only. Rank1 records read-only CQ owner snapshots; no GPU capture.')
     marker.write_text(json.dumps(data,indent=2))
     return data
