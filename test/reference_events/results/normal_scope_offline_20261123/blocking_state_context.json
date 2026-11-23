@@ -1,0 +1,20 @@
+{
+  "accepted_labels": [
+    "dispatch_bf16_chunk32"
+  ],
+  "limit": 8,
+  "fence_plan": "default",
+  "positions": "both",
+  "blocking_state_note": "States are mutually exclusive only inside each positive publication-to-poll interval. Pre-submit, first-post-to-last-post-end, wait for software-observed CQE, and observed-but-unretired use the actual queue HEAD identity at every ownership change. Missing submission lifecycle records remain unresolved; a retired network head missing its CQE record is still rejected as incomplete by the occupancy validator. credit_available does not prove CPU inactivity. Submission span can include gaps across multiple physical posts. CQE wait contains device/ordering/transport/provider/polling and is NOT hardware execution time. Weighted shares sum only over the selected overlapping observation intervals; neither they nor independent medians form additive Dispatch attribution. Censored intervals are not assigned zero waiting.",
+  "notes": "All collect/ack_slot events are replayed, including local commands, not just completed network business chains. Reject missing, duplicate, out-of-order, over-limit or unretired ownership. Publication is GPU event4 for last payload or event11 for chunk6, after payload/tail publication; correspondence uses one remote peer, channel and issue ordinal. Nonpositive signed intervals are censored, not zero queueing; overlap and sampled clock uncertainty can both cause them. Percentages apply ONLY to positive fully covered intervals; report observed/censored counts before comparing backends. They describe software pending ownership, not hardware occupancy or a counterfactual speedup. Boundary timestamps include observer overhead. Per-workload controls are required on both nodes; global usable=False does not discard a different workload that passed.",
+  "offline_only": true,
+  "source_cases": [
+    "test/reference_events/results/urma_boundaries_01_paced",
+    "test/reference_events/results/urma_boundaries_01_trace",
+    "test/reference_events/results/urma_boundaries_01_post"
+  ],
+  "source_result_commit": "08adc33d",
+  "analysis_parent_commit": "5ebc2ac5",
+  "script": "tools/reference_events/audit_boundary_fifo.py",
+  "script_sha256": "1936aed1a0119c1373145319b59c147798600248e43b5793d3d4312e681a3ed3"
+}

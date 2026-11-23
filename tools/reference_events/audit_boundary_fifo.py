@@ -91,6 +91,78 @@ def observe_interval(segments,groups,proxy,start,end):
         interval_status='positive_covered_interval',**occupancy(segments,groups,proxy,start,end))
 
 
+BLOCKING_STATES=(
+    'credit_available', 'full_local_or_untyped_head', 'full_unresolved_network_head',
+    'full_head_pre_submit', 'full_head_submission_span', 'full_payload_wait_cqe',
+    'full_metadata_wait_cqe', 'full_atomic_wait_cqe', 'full_head_cqe_observed_unretired')
+
+
+def blocking_segments(segments,groups,proxy,start,end,limit=8):
+    """Partition ONE positive observation interval, not the Dispatch critical path.
+
+    Split at both ownership changes and head submission/CQE timestamps. Polling
+    software observes CQEs here; this never supplies physical CQE arrival time.
+    """
+    if end<=start:raise ValueError('nonpositive blocking-state observation')
+    result=[]
+    for a,b,pending in segments:
+        lo,hi=max(a,start),min(b,end)
+        if hi<=lo:continue
+        wid=pending[0] if pending else None
+        events=groups[proxy,wid] if wid is not None else {}
+        head=kind(events) if events else ''
+        cuts={lo,hi};times=None
+        if len(pending)==limit and head in ('payload','metadata','atomic'):
+            required=('post_begin','post_end','cqe')
+            if all(events.get(k) for k in required):
+                times=(min(e['ns'] for e in events['post_begin']),
+                       max(e['ns'] for e in events['post_end']),
+                       max(e['ns'] for e in events['cqe']))
+                if times!=tuple(sorted(times)):raise ValueError('non-monotonic blocking head lifecycle')
+                cuts.update(t for t in times if lo<t<hi)
+        points=sorted(cuts)
+        for left,right in zip(points,points[1:]):
+            if len(pending)<limit:state='credit_available'
+            elif head=='local':state='full_local_or_untyped_head'
+            elif times is None:state='full_unresolved_network_head'
+            elif left<times[0]:state='full_head_pre_submit'
+            elif left<times[1]:state='full_head_submission_span'
+            elif left<times[2]:state='full_'+head+'_wait_cqe'
+            else:state='full_head_cqe_observed_unretired'
+            result.append(dict(start_ns=left,end_ns=right,duration_ns=right-left,
+                duration_us=(right-left)/1000,pending=len(pending),state=state,
+                head_kind=head,head_wr_id=wid if wid is not None else '',
+                head_physical_posts=len(events.get('post_begin',[]))))
+    if sum(r['duration_ns'] for r in result)!=end-start:
+        raise ValueError('blocking states do not cover observation interval')
+    return result
+
+
+def blocking_summary(observations,segments):
+    """Keep zero-duration states in every interval; preserve censoring counts."""
+    def key(r):return (r['node'],r['label'],r['index'],r['channel'],r['payload_ordinal'])
+    durations=collections.defaultdict(collections.Counter)
+    for r in segments:durations[key(r)][r['state']]+=r['duration_ns']
+    grouped=collections.defaultdict(list)
+    for r in observations:grouped[r['node'],r['label'],r['payload_ordinal']].append(r)
+    result=[]
+    for (rank,label,ordinal),rows in sorted(grouped.items()):
+        positive=[r for r in rows if r['interval_observed']]
+        totals={key(r):r['poll_ns']-r['publication_ns'] for r in positive}
+        for k,total in totals.items():
+            if sum(durations[k].values())!=total:raise ValueError('incomplete per-interval state accounting')
+        for state in BLOCKING_STATES:
+            values=[durations[key(r)][state] for r in positive]
+            percentages=[100*durations[key(r)][state]/totals[key(r)] for r in positive]
+            result.append(dict(node=rank,label=label,payload_ordinal=ordinal,state=state,
+                observations=len(rows),observed_intervals=len(positive),censored_intervals=len(rows)-len(positive),
+                intervals_with_state=sum(v>0 for v in values),
+                duration_median_us=statistics.median(values)/1000 if values else '',
+                interval_share_median_pct=statistics.median(percentages) if percentages else '',
+                pooled_interval_share_pct=100*sum(values)/sum(totals.values()) if values else ''))
+    return result
+
+
 def audit(control,trace,post,output,fence_plan='default',positions='last'):
     if positions not in ('last','both'):raise ValueError('unknown FIFO focus positions')
     with tempfile.TemporaryDirectory() as temporary:
@@ -103,7 +175,7 @@ def audit(control,trace,post,output,fence_plan='default',positions='last'):
         windows=[r for r in quality if r['label']==label]
         if {r['node'] for r in controls}=={0,1} and all(r['representative'] for r in controls) and windows and all(int(r['gpu_before_origin'])==0 and int(r['scheduler_error'])==0 for r in windows):labels.append(label)
     if not labels:raise ValueError('no workload passed controls on both nodes')
-    rows=[]
+    rows=[];blocking=[]
     for rank in (0,1):
         node=trace/('node'+str(rank))
         case=node/'normal' if (node/'normal').is_dir() else node/'r01_baseline/normal'
@@ -117,12 +189,18 @@ def audit(control,trace,post,output,fence_plan='default',positions='last'):
                 if len(payloads)!=11:raise ValueError('unexpected payload count for channel/ordinal mapping')
                 for ordinal,event in (((6,11),(11,4)) if positions=='both' else ((11,4),)):
                     polled,wid=payloads[ordinal-1];published=gpu[channel][event][0]['host_ns']
-                    rows.append(dict(node=rank,label=window['label'],index=window['index'],channel=channel,proxy=proxy,ring=ring,wr_id=wid,
-                        payload_ordinal=ordinal,publication_ns=published,poll_ns=polled,
+                    identity=dict(node=rank,label=window['label'],index=window['index'],channel=channel,proxy=proxy,ring=ring,wr_id=wid,
+                        payload_ordinal=ordinal)
+                    rows.append(dict(**identity,
+                        publication_ns=published,poll_ns=polled,
                         **observe_interval(rings[proxy,ring],groups,proxy,published,polled)))
+                    if polled>published:
+                        blocking.extend(dict(**identity,**r) for r in blocking_segments(rings[proxy,ring],groups,proxy,published,polled))
     output.mkdir(parents=True,exist_ok=False)
     boundaries.matched.base.write(output/'last_write_fifo.csv',[r for r in rows if r['payload_ordinal']==11])
     if positions=='both':boundaries.matched.base.write(output/'chunk6_write_fifo.csv',[r for r in rows if r['payload_ordinal']==6])
+    boundaries.matched.base.write(output/'blocking_state_intervals.csv',blocking)
+    boundaries.matched.base.write(output/'blocking_state_summary.csv',blocking_summary(rows,blocking))
     medians=[]
     for rank in (0,1):
         for label in labels:
@@ -136,6 +214,7 @@ def audit(control,trace,post,output,fence_plan='default',positions='last'):
                     min_full_pct=min(r['full_pct'] for r in observed) if observed else '',**metrics))
     boundaries.matched.base.write(output/'fifo_medians.csv',medians)
     (output/'context.json').write_text(json.dumps(dict(accepted_labels=labels,limit=8,fence_plan=fence_plan,positions=positions,
+        blocking_state_note='States are mutually exclusive only inside each positive publication-to-poll interval. Pre-submit, first-post-to-last-post-end, wait for software-observed CQE, and observed-but-unretired use the actual queue HEAD identity at every ownership change. Missing submission lifecycle records remain unresolved; a retired network head missing its CQE record is still rejected as incomplete by the occupancy validator. credit_available does not prove CPU inactivity. Submission span can include gaps across multiple physical posts. CQE wait contains device/ordering/transport/provider/polling and is NOT hardware execution time. Weighted shares sum only over the selected overlapping observation intervals; neither they nor independent medians form additive Dispatch attribution. Censored intervals are not assigned zero waiting.',
         notes='All collect/ack_slot events are replayed, including local commands, not just completed network business chains. Reject missing, duplicate, out-of-order, over-limit or unretired ownership. Publication is GPU event4 for last payload or event11 for chunk6, after payload/tail publication; correspondence uses one remote peer, channel and issue ordinal. Nonpositive signed intervals are censored, not zero queueing; overlap and sampled clock uncertainty can both cause them. Percentages apply ONLY to positive fully covered intervals; report observed/censored counts before comparing backends. They describe software pending ownership, not hardware occupancy or a counterfactual speedup. Boundary timestamps include observer overhead. Per-workload controls are required on both nodes; global usable=False does not discard a different workload that passed.'),indent=2))
     print('BOUNDARY_FIFO_AUDIT_PASSED labels='+','.join(labels)+' '+str(output))
     return medians

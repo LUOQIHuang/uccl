@@ -124,6 +124,26 @@ FIFO只对两端均通过该负载控制和时钟筛选的label重放，区分�
 
 输出目录必须是新目录。`usable=False`时也提供全部原始结果，它表示代表性/时钟检查未通过，不等于功能失败。当前summarize_boundaries只做各后端验收；旧compare_matched严格针对全开默认语义，不能拿它直接比较tail-off，不能移除其保护来强行通过。两后端结果到齐后由开发侧按本轮事件定义核对对应通道和请求分布。
 
+### 进一步细化软件边界：不增加硬件case
+
+2026-11-23补充的工具直接复用同一份CPU事件，硬件代码、打点位置和运行五项都不变。已经用5ebc2ac5执行或正在执行的结果也能分析，无需重新编译、重新测试。收到日志后用最新版原仓库运行上述FIFO命令，新增输出 `blocking_state_intervals.csv` 和 `blocking_state_summary.csv`。
+
+| 输出状态 | 严格观测含义 |
+| --- | --- |
+| credit_available | 软件名额未满；不能据此认定CPU空闲，可能在处理其他队列/请求或受其他条件限制 |
+| full_head_pre_submit | 名额满，队首网络请求的首个SDK提交尚未开始 |
+| full_head_submission_span | 名额满，队首首次提交开始至最后一次提交结束之间；多次物理提交时不等同单个SDK调用CPU耗时 |
+| full_payload_wait_cqe / full_metadata_wait_cqe | 名额满，队首数据/元数据WRITE已提交，应用尚未观测到完整CQE |
+| full_atomic_wait_cqe | 名额满，队首ATOMIC已提交，应用尚未观测到完整CQE |
+| full_head_cqe_observed_unretired | 队首CQE已经被应用观测，但软件名额尚未释放 |
+| full_local_or_untyped_head / full_unresolved_network_head | 本地/未分类控制请求，或缺失可解析的提交边界；明确保留未知，不归成设备等待 |
+
+状态表保留每次队首变化的 `head_wr_id`、请求类别、开始/结束时间、pending数和物理提交次数。每一个可观测的正区间单独按这些边界切开，账目按记录的纳秒单位覆盖其区间并且不重复计算；这是记录单位，不表示GPU边界具有纳秒测量精度。汇总包含所有可观测区间中的零状态、删失数、独立中位数及按区间时长加权份额；独立中位数仍不可相加。所选区间彼此可能重叠，这些份额不是整个Dispatch瓶颈占比。
+
+这样可以具体区分“还没送出去”“提交过程中”“送出后尚无完成观测”“完成已经观测到但回收迟”，并指向实际阻挡的WR。若最大差异在提交前，就不先研究CQE；若在完成后回收，就查Proxy/FIFO；只有提交后且尚无CQE的差异占主导，才进入设备顺序、传输、CQ发布/provider的细拆。
+
+应用日志到这里仍无法区分物理传输、设备内部排队、硬件CQE发布时间与provider尚未交付，不能将wait_cqe直接称为网络传输时间。接收端已有tail/epoch/转发/输出边界继续保留；暂不恢复此前显著扰动性能的逐token/密集GPU区间打点。
+
 ## 4. 需要提供的文件
 
 提供完整 `test/reference_events/results/normal_scope_20261123/`，包括两端smoke/batch_pre/paced/trace/post/batch_post自动收集的status、runtime、host、setup、benchmark、api_samples、sample_summary、reference_control、reference_correctness、event_trace及已有summary/cadence/fifo目录。无需为了做离线分析延长设备占用。

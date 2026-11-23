@@ -1,7 +1,7 @@
 import collections
 import copy
 import unittest
-from audit_boundary_fifo import replay,occupancy,observe_interval
+from audit_boundary_fifo import replay,occupancy,observe_interval,blocking_segments,blocking_summary
 
 
 class FifoOwnershipTests(unittest.TestCase):
@@ -54,6 +54,49 @@ class FifoOwnershipTests(unittest.TestCase):
         self.assertEqual(row['atomic_head_no_observed_cqe_pct'],0)
         late=occupancy(rings[0,0],groups,0,75,80,2)
         self.assertEqual(late['payload_head_no_observed_cqe_pct'],80)
+
+    def lifecycle_window(self):
+        window=self.window()
+        window['cpu']['events'][5]['ns']=60
+        window['cpu']['events'] += [dict(proxy=0,wr_id=1,stage='post_begin',ns=25,value=0),
+                                  dict(proxy=0,wr_id=1,stage='post_end',ns=35,value=0)]
+        return window
+
+    def test_head_lifecycle_partition_covers_time_without_double_counting(self):
+        groups,rings=replay(self.lifecycle_window(),2)
+        rows=blocking_segments(rings[0,0],groups,0,15,81,2)
+        durations=collections.Counter()
+        for row in rows:durations[row['state']]+=row['duration_ns']
+        self.assertEqual(dict(durations),dict(credit_available=6,full_head_pre_submit=5,
+            full_head_submission_span=10,full_atomic_wait_cqe=25,full_head_cqe_observed_unretired=20))
+        self.assertEqual(sum(durations.values()),66)
+        self.assertTrue(all(r['head_wr_id']==1 for r in rows if r['state'].startswith('full_')))
+
+    def test_missing_stage_is_unresolved_not_called_pre_submit(self):
+        groups,rings=replay(self.window(),2)
+        rows=blocking_segments(rings[0,0],groups,0,25,75,2)
+        self.assertEqual({r['state'] for r in rows},{'full_unresolved_network_head'})
+        bad=self.lifecycle_window();bad['cpu']['events'][-1]['ns']=70
+        groups,rings=replay(bad,2)
+        with self.assertRaisesRegex(ValueError,'non-monotonic'):
+            blocking_segments(rings[0,0],groups,0,25,75,2)
+
+    def test_partition_summary_includes_zero_states_and_censoring(self):
+        common=dict(node=0,label='bf16',channel=0,payload_ordinal=6)
+        observations=[dict(common,index=1,publication_ns=0,poll_ns=10,interval_observed=True),
+                      dict(common,index=2,publication_ns=0,poll_ns=90,interval_observed=True),
+                      dict(common,index=3,publication_ns=10,poll_ns=5,interval_observed=False)]
+        segments=[dict(common,index=1,state='full_atomic_wait_cqe',duration_ns=10),
+                  dict(common,index=2,state='credit_available',duration_ns=90)]
+        rows=blocking_summary(observations,segments)
+        atomic=next(r for r in rows if r['state']=='full_atomic_wait_cqe')
+        self.assertEqual(atomic['pooled_interval_share_pct'],10)
+        self.assertEqual(atomic['interval_share_median_pct'],50)
+        self.assertEqual(atomic['observed_intervals'],2)
+        self.assertEqual(atomic['censored_intervals'],1)
+        self.assertEqual(sum(r['pooled_interval_share_pct'] for r in rows),100)
+        with self.assertRaisesRegex(ValueError,'incomplete'):
+            blocking_summary(observations,segments[:1])
 
 
 if __name__=='__main__':unittest.main()
