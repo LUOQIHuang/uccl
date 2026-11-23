@@ -5,6 +5,8 @@
 #include <algorithm>
 #include <array>
 #include <cstdint>
+#include <cstddef>
+#include <cstdio>
 #include <cstring>
 #include <cstdlib>
 #include <dlfcn.h>
@@ -44,11 +46,29 @@ inline int check_note(dl_phdr_info* info,size_t,void* argument){
 }
 template<class T> inline T load(uintptr_t p){return __atomic_load_n(reinterpret_cast<const T*>(p),__ATOMIC_ACQUIRE);}
 struct Layout {uintptr_t jfc=0,base=0;uint32_t shift=0,depth=0,mask=0,log_depth=0;};
+// Provider offsets below are ABSOLUTE offsets from its AArch64 JFC pointer.
+// x86_64 glibc has a 40-byte pthread_mutex_t; AArch64 glibc has 48 bytes.
+// The same archived SDK therefore produces 248 / 256-byte public objects.
+// Never shift provider offsets by the host-side sizeof(urma_jfc_t).
+static_assert(sizeof(void*)==8 && offsetof(urma_jfc_t,jfc_cfg)==32,
+              "CQ readiness requires the recorded 64-bit SDK layout");
+#if defined(__linux__) && defined(__aarch64__)
+static_assert(sizeof(pthread_mutex_t)==48 && sizeof(urma_jfc_t)==256 &&
+              offsetof(urma_jfc_t,urma_jfc_opt)==176,
+              "CQ readiness requires the recorded AArch64 private SDK ABI");
+#elif defined(__linux__) && defined(__x86_64__)
+static_assert(sizeof(pthread_mutex_t)==40 && sizeof(urma_jfc_t)==248 &&
+              offsetof(urma_jfc_t,urma_jfc_opt)==168,
+              "CQ readiness CPU simulation requires the recorded x86_64 SDK ABI");
+#else
+#error "CQ readiness supports recorded Linux AArch64 provider or x86_64 CPU simulation only"
+#endif
+constexpr size_t cq_base_offset=264, consumer_offset=300, shift_offset=328,
+                 depth_offset=332, mask_offset=336, log_depth_offset=432;
 inline std::mutex registry_mutex;
 inline std::vector<Layout> layouts;
 inline void bind(urma_jfc_t* jfc){
   if(!enabled())return;
-  static_assert(sizeof(urma_jfc_t)==248,"CQ readiness requires the recorded private SDK ABI");
   Dl_info info{};
   if(!jfc || !jfc->urma_ctx || !jfc->urma_ctx->ops ||
      !dladdr(reinterpret_cast<void*>(jfc->urma_ctx->ops->poll_jfc),&info) || !info.dli_fbase)
@@ -57,11 +77,14 @@ inline void bind(urma_jfc_t* jfc){
   dl_iterate_phdr(check_note,&check);
   if(!check.matched)throw std::runtime_error("CQ_READY_PROVIDER_BUILD_ID_MISMATCH");
   Layout x;x.jfc=reinterpret_cast<uintptr_t>(jfc);
-  x.base=load<uint64_t>(x.jfc+264);x.shift=load<uint32_t>(x.jfc+328);
-  x.depth=load<uint32_t>(x.jfc+332);x.mask=load<uint32_t>(x.jfc+336);x.log_depth=load<uint32_t>(x.jfc+432);
+  x.base=load<uint64_t>(x.jfc+cq_base_offset);x.shift=load<uint32_t>(x.jfc+shift_offset);
+  x.depth=load<uint32_t>(x.jfc+depth_offset);x.mask=load<uint32_t>(x.jfc+mask_offset);x.log_depth=load<uint32_t>(x.jfc+log_depth_offset);
   if(!x.base || x.base%4 || x.shift<6 || x.shift>8 || x.log_depth<4 || x.log_depth>20 ||
      x.depth!=(1u<<x.log_depth) || x.mask!=x.depth-1 || x.depth!=jfc->jfc_cfg.depth)
     throw std::runtime_error("CQ_READY_LAYOUT_REJECTED");
+  std::fprintf(stderr,"[CQ_READY_LAYOUT] sdk_jfc_bytes=%zu opt_offset=%zu mutex_bytes=%zu provider_base_offset=%zu consumer_offset=%zu stride=%u depth=%u mask=%u log_depth=%u\n",
+      sizeof(urma_jfc_t),offsetof(urma_jfc_t,urma_jfc_opt),sizeof(pthread_mutex_t),
+      cq_base_offset,consumer_offset,1u<<x.shift,x.depth,x.mask,x.log_depth);
   std::lock_guard<std::mutex> lock(registry_mutex);layouts.push_back(x);
 }
 inline uint32_t ready_mask(const Layout& layout, uint32_t consumer) {
@@ -110,7 +133,7 @@ inline void before(urma_jfc_t* jfc, uint64_t frame, uint64_t seq, int proxy,
   Poll poll;
   poll.seq = seq;
   poll.begin = clock();
-  poll.ci = load<uint32_t>(local->layout.jfc + 300);
+  poll.ci = load<uint32_t>(local->layout.jfc + consumer_offset);
   poll.ready = ready_mask(local->layout, poll.ci);
   poll.end = clock();
   local->polls.push_back(std::move(poll));
@@ -120,7 +143,7 @@ inline void after(uint64_t frame, int count, uint64_t returned) {
   auto& poll = local->polls.back();
   poll.count = count;
   poll.sdk_return = returned;
-  poll.after_ci = load<uint32_t>(local->layout.jfc + 300);
+  poll.after_ci = load<uint32_t>(local->layout.jfc + consumer_offset);
   if (count < 0 || poll.after_ci < poll.ci ||
       poll.after_ci - poll.ci != static_cast<unsigned>(count))
     throw std::runtime_error("CQ_READY_COMPLETION_POSITION_MISMATCH");
