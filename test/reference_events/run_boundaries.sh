@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Keep smoke separate; one explicit transport plan is fixed for all three cases.
+# Keep smoke separate; one explicit transport plan is fixed for all cases.
 set -euo pipefail
 HERE=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
 BACKEND=urma RANK= BUILD= JOB= PART=smoke MASTER=141.61.17.202 PORT=33180 GID=3 FENCE=default
@@ -16,7 +16,7 @@ while [ "$#" -gt 0 ];do
  esac
 done
 [[ "$BACKEND" == urma || "$BACKEND" == verbs ]] && [[ "$RANK" == 0 || "$RANK" == 1 ]] && [[ "$JOB" =~ ^[a-zA-Z0-9_-]+$ ]] && [ -n "$BUILD" ] || exit 2
-[[ "$PART" == smoke || "$PART" == formal ]] || exit 2
+[[ "$PART" == smoke || "$PART" == formal || "$PART" == coverage ]] || exit 2
 [[ "$FENCE" == default || ( "$FENCE" == peer-tail-off && "$BACKEND" == urma ) ]] || exit 2
 if [ "$BACKEND" = urma ];then PYTHON=${URMA_DIAG_PYTHON:-${VERBS_DIAG_PYTHON:-python3}};CASE=normal
 else PYTHON=${VERBS_DIAG_PYTHON:-python3};CASE=r01_baseline/normal;fi
@@ -34,8 +34,10 @@ if [ "$PART" = smoke ];then
  run_one smoke128 trace 128
 else
  "$PYTHON" -c 'import json,sys;d=json.load(open(sys.argv[1]));assert d["rc"]==0 and all(d["checks"].values()),"smoke not accepted"' "$ROOT/${JOB}_smoke128/node$RANK/$CASE/status.json"
+ if [ "$PART" = coverage ];then run_one batch_pre batch 4096;fi
  run_one paced paced 4096
  run_one trace trace 4096
  run_one post paced 4096
+ if [ "$PART" = coverage ];then run_one batch_post batch 4096;fi
 fi
 echo "BOUNDARY_SUITE_PASSED backend=$BACKEND part=$PART rank=$RANK job=$JOB destination=$DEST"

@@ -1,7 +1,7 @@
 import collections
 import copy
 import unittest
-from audit_boundary_fifo import replay,occupancy
+from audit_boundary_fifo import replay,occupancy,observe_interval
 
 
 class FifoOwnershipTests(unittest.TestCase):
@@ -35,6 +35,25 @@ class FifoOwnershipTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'exceeds'):replay(window,1)
         bad=copy.deepcopy(window);bad['cpu']['events'].pop()
         with self.assertRaisesRegex(ValueError,'incomplete'):replay(bad,2)
+
+    def test_overlapping_publication_is_censored_not_zero_queueing(self):
+        groups,rings=replay(self.window(),2)
+        for start,end in ((30,25),(30,30)):
+            row=observe_interval(rings[0,0],groups,0,start,end)
+            self.assertFalse(row['interval_observed'])
+            self.assertEqual(row['full_pct'],'')
+            self.assertEqual(row['published_to_poll_us'],'')
+        row=observe_interval(rings[0,0],groups,0,25,75)
+        self.assertTrue(row['interval_observed'])
+
+    def test_write_head_and_atomic_head_are_separate_blockers(self):
+        window=self.window();window['cpu']['events'][1].update(stage='payload_bytes',value=8192)
+        groups,rings=replay(window,2)
+        row=occupancy(rings[0,0],groups,0,25,75,2)
+        self.assertEqual(row['payload_head_no_observed_cqe_pct'],100)
+        self.assertEqual(row['atomic_head_no_observed_cqe_pct'],0)
+        late=occupancy(rings[0,0],groups,0,75,80,2)
+        self.assertEqual(late['payload_head_no_observed_cqe_pct'],80)
 
 
 if __name__=='__main__':unittest.main()

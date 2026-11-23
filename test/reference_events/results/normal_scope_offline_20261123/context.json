@@ -1,0 +1,18 @@
+{
+  "accepted_labels": [
+    "dispatch_bf16_chunk32"
+  ],
+  "limit": 8,
+  "fence_plan": "default",
+  "positions": "both",
+  "notes": "All collect/ack_slot events are replayed, including local commands, not just completed network business chains. Reject missing, duplicate, out-of-order, over-limit or unretired ownership. Publication is GPU event4 for last payload or event11 for chunk6, after payload/tail publication; correspondence uses one remote peer, channel and issue ordinal. Nonpositive signed intervals are censored, not zero queueing; overlap and sampled clock uncertainty can both cause them. Percentages apply ONLY to positive fully covered intervals; report observed/censored counts before comparing backends. They describe software pending ownership, not hardware occupancy or a counterfactual speedup. Boundary timestamps include observer overhead. Per-workload controls are required on both nodes; global usable=False does not discard a different workload that passed.",
+  "offline_only": true,
+  "source_cases": [
+    "test/reference_events/results/urma_boundaries_01_paced",
+    "test/reference_events/results/urma_boundaries_01_trace",
+    "test/reference_events/results/urma_boundaries_01_post"
+  ],
+  "source_result_commit": "08adc33d",
+  "script": "tools/reference_events/audit_boundary_fifo.py",
+  "script_sha256": "8d6d40d74f3d252bf1710379c8b762a6ef2a746c8fc828090fa1aa0e8c7a5173"
+}
