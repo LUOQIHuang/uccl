@@ -78,13 +78,14 @@ def cpu_focus(window):
 
 
 def summarize(control,trace,post,output,fence_plan='default'):
-    if fence_plan not in ('default','all-on','peer-off'):raise ValueError('unknown fence observation plan')
+    if fence_plan not in ('default','all-on','peer-off','peer-tail-off'):raise ValueError('unknown fence observation plan')
     controls=[];cases=[];contexts=[]
     for rank in (0,1):
         b=matched.base.case_data(control,rank,False,reference_events='paced')
         t=matched.base.case_data(trace,rank,False,reference_events='on')
         p=matched.base.case_data(post,rank,False,reference_events='paced')
-        if any(x['identity'].get('reference_profile')!='boundaries' or x['identity'].get('normal_window_plan')!='default' or x['identity'].get('normal_submit_schedule','lane-mixed')!='lane-mixed' or x['identity'].get('normal_fadd_fence_plan','default')!=fence_plan or x['identity'].get('normal_fadd_fence','on')!=('off' if fence_plan=='peer-off' and rank==1 else 'on') for x in (b,t,p)):
+        expected_fence=('tail-off' if fence_plan=='peer-tail-off' else 'off') if rank==1 and fence_plan in ('peer-off','peer-tail-off') else 'on'
+        if any(x['identity'].get('reference_profile')!='boundaries' or x['identity'].get('normal_window_plan')!='default' or x['identity'].get('normal_submit_schedule','lane-mixed')!='lane-mixed' or x['identity'].get('normal_fadd_fence_plan','default')!=fence_plan or x['identity'].get('normal_fadd_fence','on')!=expected_fence for x in (b,t,p)):
             raise ValueError('wrong boundary/default transport profile')
         if not matched.base.sig(b['identity'])==matched.base.sig(t['identity'])==matched.base.sig(p['identity']) or len({x['runtime']['module_sha'] for x in (b,t,p)})!=1:
             raise ValueError('boundary controls changed source/module/boot/runtime/workload')
@@ -124,4 +125,5 @@ def summarize(control,trace,post,output,fence_plan='default'):
 if __name__=='__main__':
     p=argparse.ArgumentParser(description=__doc__)
     for key in ('control','trace','post','output'):p.add_argument('--'+key,type=Path,required=True)
-    a=p.parse_args();summarize(a.control,a.trace,a.post,a.output)
+    p.add_argument('--fence-plan',choices=('default','all-on','peer-off','peer-tail-off'),default='default')
+    a=p.parse_args();summarize(a.control,a.trace,a.post,a.output,a.fence_plan)

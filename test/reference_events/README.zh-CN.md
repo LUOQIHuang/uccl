@@ -1,5 +1,9 @@
 # 参考版本移植：Normal Dispatch 事件打点
 
+## 2026-11-23 当前优先级
+
+先看[Normal实验复盘及下一步判定方案](NORMAL_REVIEW_20261123.zh-CN.md)，下一轮按[优化后大区间匹配对照](NORMAL_REVIEW_RUN.zh-CN.md)执行。复用现有稀疏边界，URMA固定仅204 tail-off，verbs保持原语义；先确定剩余整体差距积累在哪个大区间，不先重复CQE专项或fence矩阵。下文保留历次参考事件的操作说明。
+
 新增[Normal七种tokens规模扫描](../normal_tokens/README.zh-CN.md)：URMA与verbs各测64～4096 tokens/rank，关闭采集、每点3轮，用于比较后端差额随规模的变化；不替代本文阶段观测。
 
 URMA匹配paced/on已全部通过，四个Dispatch采集影响仅+0.28%～+0.90%，见[最新阶段分析](results/MATCHED_TRACE_ANALYSIS.zh-CN.md)。URMA侧开关验收收束，不重复既有实验；下一步只在verbs可用窗口按[同口径文档](VERBS_MATCHED.zh-CN.md)补另一后端记录。原连续基线/on核查见[4096报告](results/FORMAL4096_ANALYSIS.zh-CN.md)，两种采样方式分别保留。

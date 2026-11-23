@@ -1,5 +1,7 @@
 # Normal tail-off 的 CQE 就绪观测
 
+2026-11-23优先级调整：本专项已修复构建错误，但暂不作为下一项必跑实验。先按[Normal大区间复盘](../reference_events/NORMAL_REVIEW_20261123.zh-CN.md)及[匹配运行步骤](../reference_events/NORMAL_REVIEW_RUN.zh-CN.md)确定优化后剩余差距的主要位置。只有证据继续指向提交后完成链路时，再启用下方专项。本页保留代码和步骤，不需要同时执行两套任务。
+
 ## 2026-11-23 构建错误修复与重跑
 
 已查收提交 `49fd92a6`。两端prepare成功，build的CPU transport检查都被 `sizeof(urma_jfc_t)==248` 静态断言阻断，实际值为256。正式benchmark尚未运行，本次没有新增时延数据。precision编译日志中的MACA warning不是这次停止的原因。
