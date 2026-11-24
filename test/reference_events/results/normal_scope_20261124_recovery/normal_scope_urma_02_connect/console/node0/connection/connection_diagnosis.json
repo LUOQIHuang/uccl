@@ -1,0 +1,11 @@
+{
+  "classification": "DISPATCH_CPU_TIMEOUT_CHECK_PEER",
+  "primary_error": "[rank0]: RuntimeError: DeepEP error: timeout (dispatch CPU)",
+  "dmesg_scope": "appended_during_run",
+  "evidence": {
+    "tp_exchange": [],
+    "mad_tx": [],
+    "device_activation": []
+  },
+  "note": "The peer may have failed first. Compare its first URMA completion error before attributing this CPU wait to GPU performance."
+}

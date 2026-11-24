@@ -1,0 +1,22 @@
+{
+  "classification": "URMA_ACK_TIMEOUT",
+  "primary_error": "[URMA_COMPLETION_ERROR] rank=0 proxy=0 status=9 token=65536 wr_id=18446744073709551615 write=0 atomic=1",
+  "dmesg_scope": "appended_during_run",
+  "evidence": {
+    "tp_exchange": [],
+    "mad_tx": [],
+    "device_activation": []
+  },
+  "note": "SDK status=9 is ACK timeout (retry limit exceeded). The UINT64_MAX WR id denotes internal control, not a measured tail FADD. In the first Dispatch prepare, code submits a host-memory arrival-barrier FADD. Check both peers, URMA EID/TP and run-scoped driver errors; IP ping/NCCL bootstrap do not validate this path. GPU P2P or fence causality is not established.",
+  "completion": {
+    "rank": "0",
+    "proxy": "0",
+    "status": "9",
+    "token": "65536",
+    "wr_id": "18446744073709551615",
+    "write": "0",
+    "atomic": "1"
+  },
+  "internal_control_atomic": true,
+  "initial_barrier_candidate": true
+}
