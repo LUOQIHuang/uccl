@@ -90,7 +90,7 @@ class CaseControlTests(unittest.TestCase):
                 stat=Path('/proc/{}/stat'.format(pid))
                 try:
                     if stat.read_text().rsplit(')',1)[1].split()[0]=='Z':break
-                except FileNotFoundError:
+                except (FileNotFoundError, ProcessLookupError):
                     break
                 time.sleep(0.05)
             else:

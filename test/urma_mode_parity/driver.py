@@ -391,7 +391,7 @@ def main():
             except KeyboardInterrupt: legacy.terminate(process); raise
         text=(case/'bench.log').read_text(errors='replace')
         kernel_snapshot(case,'kernel_after.txt')
-        checks=dict(mode=f'TRANSPORT_MODE_OK backend={args.backend} mode={mode}' in text,done='MODE_PARITY_BENCH_DONE' in text,exit_ack=f'UCCL_EXIT_ACK_OK node_rank={args.node_rank}' in text,no_errors=not re.search(r'Traceback \(most recent call last\)|AssertionError|Failed CR status|Segmentation fault|ChildFailedError|\[WARNING\]',text))
+        checks=dict(mode=f'TRANSPORT_MODE_OK backend={args.backend} mode={mode}' in text,done='MODE_PARITY_BENCH_DONE' in text,exit_ack=f'UCCL_EXIT_ACK_OK node_rank={args.node_rank}' in text,no_errors=not re.search(r'\[URMA_COMPLETION_ERROR\]|Traceback \(most recent call last\)|AssertionError|Failed CR status|Segmentation fault|ChildFailedError|\[WARNING\]',text))
         expected_points=4 if mode=='normal' else 2
         point_marker='MODE_PARITY_API_ONLY_POINT ' if args.api_only else 'MODE_PARITY_PROFILE '
         if mode=='normal': checks.update(correctness=text.count('[testing] Running with')==24,profiles=text.count(point_marker)==4,tuning=text.count('[tuning] SMs ')==4)

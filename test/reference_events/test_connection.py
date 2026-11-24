@@ -9,12 +9,56 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-from connection_diag import command, diagnose, read
+from connection_diag import command, diagnose, log_delta, read
 
 HERE = Path(__file__).resolve().parent
 
 
 class ConnectionTests(unittest.TestCase):
+    def test_latest_permission_failure_uses_overlapping_journal_and_correlates_peer_address(self):
+        source=HERE/'results/normal_scope_20261124_recovery/normal_scope_urma_02_connect'
+        for rank, new_lines in ((0,139),(1,48)):
+            with tempfile.TemporaryDirectory() as tmp, redirect_stdout(io.StringIO()):
+                root=Path(tmp)
+                result=diagnose(root,source/('node'+str(rank)),
+                    source/'console'/('node'+str(rank))/'connection', source/('node'+str(1-rank)))
+                self.assertEqual(result['dmesg_scope'],'unavailable_see_kernel_log')
+                self.assertEqual(result['kernel_log']['source'],'benchmark_journal_tail')
+                self.assertEqual(result['kernel_log']['scope'],'overlapping_tail_added_lines')
+                self.assertEqual(len((root/'kernel_delta.txt').read_text(encoding='utf-8').splitlines()),new_lines)
+                self.assertEqual((root/'dmesg_delta.txt').read_text(),'')
+                self.assertIn('dmesg_before',result['kernel_log']['collection_errors'])
+                if rank==1:
+                    self.assertEqual(len(result['ummu_events']),1)
+                    event=result['ummu_events'][0]
+                    self.assertEqual(event['code'],'0x13')
+                    self.assertEqual(len(event['matches']),1)
+                    match=event['matches'][0]
+                    self.assertEqual(match['owner'],'peer')
+                    self.assertEqual(match['registration']['node'],'node0')
+                    self.assertEqual(match['registration']['size'],64)
+                    self.assertEqual(match['registration']['kind'],'host')
+                    self.assertEqual(int(match['word'],16),int('fffb90bc7000',16))
+
+    def test_failed_kernel_reads_are_unavailable_and_changed_boot_is_not_a_delta(self):
+        with tempfile.TemporaryDirectory() as tmp, redirect_stdout(io.StringIO()):
+            root=Path(tmp)
+            for phase in ('before','after'):
+                (root/('connection_'+phase+'.json')).write_text(json.dumps(dict(
+                    boot_id=dict(text='boot1'),commands=[dict(command=['dmesg'],rc=1,
+                    stdout='',stderr='Operation not permitted')])))
+            result=diagnose(root,root)
+            self.assertEqual(result['kernel_log']['scope'],'kernel_log_unavailable')
+            for phase,boot in (('before','boot1'),('after','boot2')):
+                (root/('connection_'+phase+'.json')).write_text(json.dumps(dict(
+                    boot_id=dict(text=boot),commands=[dict(command=['dmesg'],rc=0,
+                    stdout='old\nnew\n' if phase=='after' else 'old\n')])))
+            self.assertEqual(diagnose(root,root)['kernel_log']['scope'],'different_boot_no_run_delta')
+
+    def test_tail_overlap_keeps_duplicates_and_unknown_history_unscoped(self):
+        self.assertEqual(log_delta('a\nb\nb\n','b\nb\nc\n'),('c\n','overlapping_tail_added_lines'))
+        self.assertEqual(log_delta('a\n','z\n'),('z\n','full_snapshot_no_exact_delta'))
+
     def test_uploaded_scope_smoke_fails_in_internal_ack_not_fp8(self):
         source = HERE / 'results/normal_scope_20261123/normal_scope_urma_01_smoke128'
         sdk = HERE.parents[1] / 'test/fadd_path/results/urma_cqe_visibility_02/node1/sdk/urma_opcode.h'

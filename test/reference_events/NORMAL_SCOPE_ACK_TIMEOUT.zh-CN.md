@@ -1,5 +1,7 @@
 # Normal scope smoke ACK超时：结论与恢复步骤
 
+更新：第二次关闭采集的检查仍失败，且发现与202屏障地址对应的204 UMMU事件。**已完成第二次检查的环境不要重复执行本页第5节**，下一步按 [第二次结果分析与只读查询](NORMAL_SCOPE_ACK_02_ANALYSIS.zh-CN.md) 操作。旧connection的空dmesg差分来自权限失败，不能表示无新内核事件。
+
 适用结果：`results/normal_scope_20261123/normal_scope_urma_01_smoke128/`，上传提交 `3d4d1752`。这是运行失败的排查，不是新一轮性能调参。
 
 ## 1. 本轮实际停在哪里

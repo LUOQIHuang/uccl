@@ -1,5 +1,7 @@
 # 最新Normal大区间匹配对照运行步骤
 
+第二次连通检查仍遇到ACK超时，且新增UMMU地址对应证据。若已跑 `normal_scope_urma_02_connect`，先按 [最新结果与只读查询步骤](NORMAL_SCOPE_ACK_02_ANALYSIS.zh-CN.md) 执行，不重复128/4096 benchmark。
+
 最新smoke在首次BF16 prepare遇到内部屏障FADD的ACK超时，尚未进入性能采样。已有失败请先按 [ACK超时恢复步骤](NORMAL_SCOPE_ACK_TIMEOUT.zh-CN.md) 操作；该文档包含更新后的两端接口/GPU PCI参数、限时检查和已有构建复用方法。不要直接继续4096。新运行也应显式确认本机接口及GPU PCI，不能沿用旧硬编码拓扑。
 
 2026-11-24口径说明：Combine早期约7ms、近期约133ms的变化仍待解释，见[基线审计](COMBINE_BASELINE_AUDIT_20261124.zh-CN.md)。本主套继续定位Dispatch；Combine原始控制数据保留，但暂不用于计算“Dispatch＋Combine总性能差距”。硬件代码和以下运行五项不变，已开始的测试无需重做。

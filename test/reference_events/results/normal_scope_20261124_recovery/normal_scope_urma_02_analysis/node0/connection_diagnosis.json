@@ -1,0 +1,57 @@
+{
+  "classification": "DISPATCH_CPU_TIMEOUT_CHECK_PEER",
+  "primary_error": "[rank0]: RuntimeError: DeepEP error: timeout (dispatch CPU)",
+  "dmesg_scope": "unavailable_see_kernel_log",
+  "kernel_log": {
+    "source": "benchmark_journal_tail",
+    "scope": "overlapping_tail_added_lines",
+    "collection_errors": {
+      "dmesg_before": {
+        "command": [
+          "dmesg",
+          "--color=never"
+        ],
+        "executable": "/usr/bin/dmesg",
+        "rc": 1,
+        "stdout": "",
+        "stderr": "dmesg: read kernel buffer failed: Operation not permitted\n",
+        "truncated": false
+      },
+      "dmesg_after": {
+        "command": [
+          "dmesg",
+          "--color=never"
+        ],
+        "executable": "/usr/bin/dmesg",
+        "rc": 1,
+        "stdout": "",
+        "stderr": "dmesg: read kernel buffer failed: Operation not permitted\n",
+        "truncated": false
+      },
+      "journal_after": {
+        "error": "missing or unreadable log"
+      }
+    }
+  },
+  "evidence": {
+    "tp_exchange": [],
+    "mad_tx": [],
+    "device_activation": [],
+    "ummu": [],
+    "tp_events": [
+      "Nov 25 03:26:54 master kernel: udma_ae_tp_level_error: 62 callbacks suppressed",
+      "Nov 25 03:26:54 master kernel: ubase 00007: UDMA: trigger TP level AE, event type is 16, sub type is 0, queue_num is 160.",
+      "Nov 25 03:26:54 master kernel: ubase 00007: UDMA: trigger TP level AE, event type is 16, sub type is 0, queue_num is 162.",
+      "Nov 25 03:26:54 master kernel: ubase 00007: UDMA: trigger TP level AE, event type is 16, sub type is 0, queue_num is 163.",
+      "Nov 25 03:26:54 master kernel: ubase 00007: UDMA: trigger TP level AE, event type is 16, sub type is 0, queue_num is 164.",
+      "Nov 25 03:26:54 master kernel: ubase 00007: UDMA: trigger TP level AE, event type is 16, sub type is 0, queue_num is 165.",
+      "Nov 25 03:26:54 master kernel: ubase 00007: UDMA: trigger TP level AE, event type is 16, sub type is 0, queue_num is 166.",
+      "Nov 25 03:26:54 master kernel: ubase 00007: UDMA: trigger TP level AE, event type is 16, sub type is 0, queue_num is 167.",
+      "Nov 25 03:26:54 master kernel: ubase 00007: UDMA: trigger TP level AE, event type is 16, sub type is 0, queue_num is 168.",
+      "Nov 25 03:26:54 master kernel: ubase 00007: UDMA: trigger TP level AE, event type is 16, sub type is 0, queue_num is 169.",
+      "Nov 25 03:26:54 master kernel: ubase 00007: UDMA: trigger TP level AE, event type is 16, sub type is 0, queue_num is 170."
+    ]
+  },
+  "ummu_events": [],
+  "note": "The peer may have failed first. Compare its first URMA completion error before attributing this CPU wait to GPU performance."
+}
