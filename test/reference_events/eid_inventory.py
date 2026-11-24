@@ -64,6 +64,22 @@ def sha(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+def library_identity(requested, loaded):
+    """Accept SONAME copies in the selected directory, with byte identity."""
+    result = dict(requested_library=str(requested), requested_library_sha=sha(requested),
+                  library_matches_request=False, library_match_basis='different_library')
+    if loaded is None or not loaded.is_file():
+        return result
+    result['loaded_library_sha'] = sha(loaded)
+    same_file = loaded.resolve() == requested.resolve()
+    same_directory = loaded.resolve().parent == requested.resolve().parent
+    same_bytes = result['loaded_library_sha'] == result['requested_library_sha']
+    if same_bytes and (same_file or same_directory):
+        result.update(library_matches_request=True,
+                      library_match_basis='same_file' if same_file else 'identical_copy_in_requested_directory')
+    return result
+
+
 def parse_query(text):
     libraries = re.findall(r'^URMA_QUERY_LIBRARY path=(.+)$', text, re.M)
     eids = [dict(device=d, position=int(p), index=int(i), eid=e)
@@ -103,7 +119,7 @@ def run(args):
         (args.output/'query.log').write_bytes(query.stdout+query.stderr)
         result.update(parse_query(query.stdout.decode('utf-8', 'replace')), rc=query.returncode)
         loaded = Path(result['library']) if result['library'] else None
-        result['library_matches_request'] = bool(loaded and loaded.resolve()==library.resolve())
+        result.update(library_identity(library, loaded))
         result['library_sha'] = sha(library.resolve())
         result['loaded_library_hashes'] = {p:sha(Path(p)) for p in result['loaded_libraries'] if Path(p).is_file()}
         result['selected_first_eid'] = next((e for e in result['eids'] if e['position']==0), None)

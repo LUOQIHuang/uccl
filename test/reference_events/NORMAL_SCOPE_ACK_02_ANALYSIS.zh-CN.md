@@ -1,5 +1,7 @@
 # 第二次连通检查：UMMU事件与远端屏障地址对应
 
+更新：两端EID库存已收到，并找到202源码目录。请看 [EID库存复核及源码收集步骤](URMA_EID_INVENTORY_01_ANALYSIS.zh-CN.md)。不再重复本页的EID查询或源码搜索。
+
 输入提交：`7f1dd9d3`。原始数据：`results/normal_scope_20261124_recovery/normal_scope_urma_02_connect/`。复核结果保存在同级 `normal_scope_urma_02_analysis/`，不修改上传的原始诊断文件。
 
 ## 1. 这次得到的结论

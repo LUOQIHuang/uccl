@@ -14,6 +14,19 @@ import eid_inventory
 
 
 class EidInventoryTests(unittest.TestCase):
+    def test_same_directory_soname_copy_is_accepted_but_other_libraries_are_not(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp);private=root/'private';private.mkdir();outside=root/'other';outside.mkdir()
+            requested=private/'liburma.so';requested.write_bytes(b'private-urma')
+            loaded=private/'liburma.so.0';loaded.write_bytes(requested.read_bytes())
+            result=eid_inventory.library_identity(requested,loaded)
+            self.assertTrue(result['library_matches_request'])
+            self.assertEqual(result['library_match_basis'],'identical_copy_in_requested_directory')
+            loaded.write_bytes(b'different-urma')
+            self.assertFalse(eid_inventory.library_identity(requested,loaded)['library_matches_request'])
+            foreign=outside/'liburma.so.0';foreign.write_bytes(requested.read_bytes())
+            self.assertFalse(eid_inventory.library_identity(requested,foreign)['library_matches_request'])
+
     def test_preserves_list_position_instead_of_sorting_eid_index(self):
         result=eid_inventory.parse_query('URMA_QUERY_LIBRARY path=/private/liburma.so\n'
             'URMA_QUERY_DEVICE name=udmac0d1e2\n'
@@ -46,7 +59,8 @@ void urma_free_device_list(urma_device_t **p){}
 urma_eid_info_t *urma_get_eid_list(urma_device_t *p,uint32_t *n){*n=2;return eids;}
 void urma_free_eid_list(urma_eid_info_t *p){}
 ''')
-            subprocess.run(['cc','-shared','-fPIC','-I'+str(include),str(stub),'-o',str(lib/'liburma.so')],check=True)
+            subprocess.run(['cc','-shared','-fPIC','-Wl,-soname,liburma.so.0','-I'+str(include),str(stub),'-o',str(lib/'liburma.so')],check=True)
+            shutil.copyfile(lib/'liburma.so',lib/'liburma.so.0')
             manifest=root/'manifest.json'
             manifest.write_text(json.dumps(dict(sdk={'urma_api.h':hashlib.sha256(header.read_bytes()).hexdigest()})))
             args=SimpleNamespace(output=root/'out',include_dir=include,lib_dir=lib,
@@ -56,6 +70,7 @@ void urma_free_eid_list(urma_eid_info_t *p){}
                 ''.join(p.read_text() for p in args.output.glob('*.log')))
             result=json.loads((args.output/'eid_inventory.json').read_text())
             self.assertTrue(result['library_matches_request'])
+            self.assertEqual(result['library_match_basis'],'identical_copy_in_requested_directory')
             self.assertEqual(result['selected_first_eid']['index'],7)
             self.assertEqual(result['selected_first_eid']['eid'],'ab'+'00'*15)
             # Refuse another SDK before compiling or invoking the library.
