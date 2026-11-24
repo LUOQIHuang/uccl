@@ -1,5 +1,7 @@
 # 最新Normal大区间匹配对照运行步骤
 
+2026-11-24口径说明：Combine早期约7ms、近期约133ms的变化仍待解释，见[基线审计](COMBINE_BASELINE_AUDIT_20261124.zh-CN.md)。本主套继续定位Dispatch；Combine原始控制数据保留，但暂不用于计算“Dispatch＋Combine总性能差距”。硬件代码和以下运行五项不变，已开始的测试无需重做。
+
 目的和证据见[实验复盘](NORMAL_REVIEW_20261123.zh-CN.md)。先验证最新URMA tail-off与verbs的整体差距和慢端，再比较同点的GPU发布、CPU读取/提交/完成、接收可见与输出边界。不是继续细拆FADD的351 μs，不跑CQ_READY。
 
 本轮复用经过验证的boundaries稀疏打点，新增的是固定tail-off的参数传递和汇总校验。本地不能运行MetaX GPU，以下仍需真实服务器验证。每后端包含一次128门禁和4096的五个正式case；不存在旧版该组合的完整结果，已有历史全开边界不替代最新tail-off对照。
