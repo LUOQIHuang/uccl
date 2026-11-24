@@ -1,0 +1,118 @@
+{
+  "device": "udmac0d1e2",
+  "include_dir": "/home/h00918771/metax_dev/urma_sdk_private_include",
+  "lib_dir": "/home/h00918771/metax_dev/urma_after_kernel_20261029/diag/umdk_private_618957c3/lib",
+  "note": "Query only: urma_init/device list/EID list/uninit. No context, segment, jetty, WR or GPU allocation.",
+  "sdk": {
+    "urma_types.h": "42a8667b7f3c9677ebb5f8dea63768d45d6115dad435756c0f1414bba2f32e92",
+    "urma_provider.h": "54e8e8bff88a2503d59df544a5e81d99ed0435703f074701f0d18d7890a9110e",
+    "urma_api.h": "71490ac581a691d343a2763b17f4c97cdb6128b68fcb07477508794544b7b28f",
+    "urma_cmd.h": "e435756a1aff2580f18735c22511f6f71ea1b0c367a5039edc23efb534ec407b",
+    "urma_perf.h": "84f3fac58c354f0ba0d9b7047cc03e54f755de227d2a5f81dcc10691b73f829e",
+    "urma_opcode.h": "63bd16604efa0935a5f3415b8787d4863e50e012e7ec63620298be1ba30a4600",
+    "urma_types_str.h": "15f7cd9578fcd1503d9bc4afbd2f2c19f35add256ac5916cae8ce7c27ddc0795"
+  },
+  "source_sha": "faa6839f6d064a23e78c8f0a963d7b790bd0872f058af4473c0db85302bf4947",
+  "compile_command": [
+    "cc",
+    "-std=c11",
+    "-I/home/h00918771/metax_dev/urma_sdk_private_include",
+    "/home/h00918771/uccl-ep-xpu-integration-new/test/reference_events/results/urma_address_inventory_01/node1/eids/query.c",
+    "/home/h00918771/metax_dev/urma_after_kernel_20261029/diag/umdk_private_618957c3/lib/liburma.so",
+    "-Wl,-rpath,/home/h00918771/metax_dev/urma_after_kernel_20261029/diag/umdk_private_618957c3/lib",
+    "-ldl",
+    "-o",
+    "/home/h00918771/uccl-ep-xpu-integration-new/test/reference_events/results/urma_address_inventory_01/node1/eids/query"
+  ],
+  "library": "/home/h00918771/metax_dev/urma_after_kernel_20261029/diag/umdk_private_618957c3/lib/liburma.so.0",
+  "devices": [
+    "udmac0d1e3",
+    "udmac1d1e3",
+    "udmac0d1e4",
+    "udmac0d1e2",
+    "udmac1d1e4",
+    "udmac1d1e2"
+  ],
+  "eids": [
+    {
+      "device": "udmac0d1e2",
+      "position": 0,
+      "index": 0,
+      "eid": "000000000001020000100000df000200"
+    },
+    {
+      "device": "udmac0d1e2",
+      "position": 1,
+      "index": 1,
+      "eid": "00000000003f020000100000df000b00"
+    },
+    {
+      "device": "udmac0d1e2",
+      "position": 2,
+      "index": 2,
+      "eid": "000000000007020000100000df000800"
+    },
+    {
+      "device": "udmac0d1e2",
+      "position": 3,
+      "index": 3,
+      "eid": "000000000006020000100000df000700"
+    },
+    {
+      "device": "udmac0d1e2",
+      "position": 4,
+      "index": 4,
+      "eid": "000000000005020000100000df000600"
+    },
+    {
+      "device": "udmac0d1e2",
+      "position": 5,
+      "index": 5,
+      "eid": "000000000004020000100000df000500"
+    },
+    {
+      "device": "udmac0d1e2",
+      "position": 6,
+      "index": 6,
+      "eid": "000000000003020000100000df000400"
+    },
+    {
+      "device": "udmac0d1e2",
+      "position": 7,
+      "index": 7,
+      "eid": "000000000002020000100000df000300"
+    }
+  ],
+  "loaded_libraries": [
+    "/home/h00918771/metax_dev/urma_after_kernel_20261029/diag/umdk_private_618957c3/lib/libummu.so.1",
+    "/home/h00918771/metax_dev/urma_after_kernel_20261029/diag/umdk_private_618957c3/lib/liburma.so.0",
+    "/home/h00918771/metax_dev/urma_after_kernel_20261029/diag/umdk_private_618957c3/lib/liburma_common.so.0",
+    "/home/h00918771/metax_dev/urma_after_kernel_20261029/diag/umdk_private_618957c3/lib/urma/liburma-udma.so",
+    "/usr/lib/ld-linux-aarch64.so.1",
+    "/usr/lib64/libc.so.6",
+    "/usr/lib64/libgcc_s-12.so.1",
+    "/usr/lib64/libm.so.6",
+    "/usr/lib64/libstdc++.so.6.0.30"
+  ],
+  "rc": 0,
+  "library_matches_request": false,
+  "library_sha": "56d6374553c2843c13eb7f7bc98a5bb65fa2fa4eb5f3b4a331f56cf126fb1f22",
+  "loaded_library_hashes": {
+    "/home/h00918771/metax_dev/urma_after_kernel_20261029/diag/umdk_private_618957c3/lib/libummu.so.1": "ad8bb0e5153549f4b76f1a8eeffcab62f503a1114e2373ceed8784c45e88105a",
+    "/home/h00918771/metax_dev/urma_after_kernel_20261029/diag/umdk_private_618957c3/lib/liburma.so.0": "56d6374553c2843c13eb7f7bc98a5bb65fa2fa4eb5f3b4a331f56cf126fb1f22",
+    "/home/h00918771/metax_dev/urma_after_kernel_20261029/diag/umdk_private_618957c3/lib/liburma_common.so.0": "c159fffbce1c82944ceccc98555d8e181fe405414384ed671e9ce3fb0b437fad",
+    "/home/h00918771/metax_dev/urma_after_kernel_20261029/diag/umdk_private_618957c3/lib/urma/liburma-udma.so": "18ea061e598330ba56ac07d7f9b4691414884aaf805c7f7a1973b1bc5c028967",
+    "/usr/lib/ld-linux-aarch64.so.1": "0b98fef57b2abfbe930f38922c2b9175d40f11aaf88108051b951f3dc147ec9f",
+    "/usr/lib64/libc.so.6": "4aeee0edbc49a6fb1847f24a54563c39f60aa7a1b2b42e1792d4614aa4c7cbe8",
+    "/usr/lib64/libgcc_s-12.so.1": "e15111896dc356f8174920e0d928ebad9c27666a6381dc790aa29b2ab442b27a",
+    "/usr/lib64/libm.so.6": "3d71caabcd9e98a89b1cd77ec00ea1619004bcda482d0824e260781d06730f7e",
+    "/usr/lib64/libstdc++.so.6.0.30": "e1898d210495a12d903f9670faf7ab737dc0fecfb4b102daa0577498860c1855"
+  },
+  "selected_first_eid": {
+    "device": "udmac0d1e2",
+    "position": 0,
+    "index": 0,
+    "eid": "000000000001020000100000df000200"
+  },
+  "error": "EID_QUERY_INCOMPLETE_OR_WRONG_LIBRARY"
+}
