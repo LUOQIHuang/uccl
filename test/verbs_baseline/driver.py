@@ -66,7 +66,7 @@ def parser():
     profile.add_argument('--no-profile', action='store_true')
     profile.add_argument('--profile-only', action='store_true')
     p.add_argument('--hca', default='rocep40s0f0')
-    p.add_argument('--ifname', default='enp33s0')
+    p.add_argument('--ifname', default=os.environ.get('VERBS_DIAG_IFNAME',os.environ.get('UCCL_SOCKET_IFNAME','enp33s0')))
     p.add_argument('--gpu', default='0')
     p.add_argument('--expected-kernel', help='optional exact kernel check; never checks URMA hardware')
     p.add_argument('--case-timeout', type=int, default=1800)
@@ -92,7 +92,7 @@ def parser():
         if args.gpu_stages or args.gpu_stage_build or args.gpu_stage_roles_only or args.dispatch_compiled_off:p.error('reference events exclude old GPU tracing')
         if (args.reference_events=='build')!=(args.action=='build'):p.error('reference-events build is for build only; off/on require check/run')
         if args.action!='build' and (args.action not in ('check','run') or not args.dispatch_focus):p.error('reference events require Normal Dispatch focus check/run')
-    if args.reference_profile=='boundaries' and (args.reference_events not in ('build','paced','on') or args.normal_window_plan!='default'):p.error('boundary profile requires reference build/paced/on with default window')
+    if args.reference_profile=='boundaries' and (args.reference_events not in ('build','batch','paced','on') or args.normal_window_plan!='default'):p.error('boundary profile requires reference build/batch/paced/on with default window')
     if args.dispatch_compiled_off and (not args.dispatch_focus or args.gpu_stages or args.gpu_stage_build or args.action not in ('check','run')):p.error('compiled-off requires Dispatch focus check/run without GPU capture/build switches')
     if args.gpu_stage_roles_only and not ((args.action=='build' and args.gpu_stage_build) or args.dispatch_compiled_off):p.error('roles-only currently requires trace build or compiled-off; active capture is gated on the disabled-cost result')
     if args.gpu_stage_mode.startswith('dispatch') and not args.dispatch_focus:p.error('Dispatch GPU modes require --dispatch-focus')
@@ -114,7 +114,7 @@ def environment(args):
     env.update(UCCL_EP_TRANSPORT='verbs', UCCL_EP_VERBS_REG='dmabuf', UCCL_IB_HCA=args.hca,
                UCCL_EP_DISABLE_CPU_AFFINITY='1', UCCL_RDMA_ADAPTIVE_SLEEP='0',
                CUDA_VISIBLE_DEVICES=args.gpu, MCCL_IB_DISABLE='1', NCCL_IB_DISABLE='1',
-               MCCL_SOCKET_IFNAME=args.ifname, NCCL_SOCKET_IFNAME=args.ifname,
+               UCCL_SOCKET_IFNAME=args.ifname, MCCL_SOCKET_IFNAME=args.ifname, NCCL_SOCKET_IFNAME=args.ifname,
                MCCL_DEBUG='INFO', NCCL_DEBUG='INFO', PYTHONUNBUFFERED='1', PYTHONDONTWRITEBYTECODE='1')
     if args.variant == 'original':
         # The historical validated binary uses this switch for its verbs
@@ -289,10 +289,7 @@ def run_case(args, root, tag, mode, profile, module, module_sha):
             process = subprocess.Popen(command, cwd=root / 'benchmark', env=env, stdout=log,
                                        stderr=subprocess.STDOUT, start_new_session=True)
             try:
-                rc = process.wait(timeout=args.case_timeout)
-            except subprocess.TimeoutExpired:
-                legacy.terminate(process)
-                rc = 124
+                rc = legacy.wait_for_case(process, case / 'bench.log', args.case_timeout)
             except KeyboardInterrupt:
                 legacy.terminate(process)
                 raise
@@ -394,7 +391,7 @@ def run(args):
     (root / 'setup.json').write_text(json.dumps(dict(fingerprint=meta, error=error), indent=2))
     if error:
         print(f'VERBS_SETUP_ERROR {error}; details={root / "setup.json"}', flush=True)
-    legacy.pair(args, dict(stage='setup', meta_hash=common.digest(meta), rc=1 if error else 0))
+    legacy.pair(args, dict(stage='setup', meta_hash=common.digest(legacy.shared_fingerprint(meta)), rc=1 if error else 0))
     if error:
         raise RuntimeError(error)
     modes = ('normal', 'low_latency') if args.mode == 'both' else (args.mode,)

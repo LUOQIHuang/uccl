@@ -24,6 +24,12 @@ DEFAULT_SHA = '144f1fca126eb8971a5278c3baf0b44e1a29fb7b03ce51c928feb7abc19af798'
 def sha(path):
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
 
+
+def shared_fingerprint(meta):
+    # Interface names are local topology; preserve the actual name in setup.json.
+    # Source, libraries, workload and all experimental settings still must match.
+    return {key: value for key, value in meta.items() if key != 'ifname'}
+
 def pair(args, payload):
     end = time.monotonic() + 180
     if args.node_rank == 0:
@@ -119,6 +125,97 @@ def terminate(process):
     except subprocess.TimeoutExpired:
         os.killpg(process.pid, signal.SIGKILL)
         process.wait()
+
+
+def case_descendants(pid):
+    """Snapshot only this launch's descendants, including torchrun sessions."""
+    pending, found = [pid], {}
+    while pending:
+        current = pending.pop()
+        if current in found:
+            continue
+        try:
+            # A worker can create a fresh session. Track PID + birth time,
+            # rather than assuming all torchrun workers share the agent PGID.
+            stat = Path(f'/proc/{current}/stat').read_text().rsplit(')', 1)[1].split()
+            found[current] = stat[19]
+            for task in Path(f'/proc/{current}/task').iterdir():
+                try:
+                    pending.extend(int(p) for p in (task/'children').read_text().split())
+                except (OSError, ValueError):
+                    pass
+        except (OSError, ValueError, IndexError):
+            continue
+    return found
+
+
+def signal_case_process(pid, birth, signum):
+    try:
+        stat = Path(f'/proc/{pid}/stat').read_text().rsplit(')', 1)[1].split()
+        if stat[19] == birth and stat[0] != 'Z':
+            os.kill(pid, signum)
+            return True
+    except (OSError, ValueError, IndexError):
+        pass
+    return False
+
+
+def wait_for_case(process, log_path, timeout):
+    """Bound a private start_new_session process group, including failed teardown.
+
+    Read only newly appended logs, outside the measurement worker. Never search
+    for or kill another job's processes. Callers create a dedicated session.
+    """
+    group = os.getpgid(process.pid)
+    if group != process.pid:
+        raise RuntimeError('CASE_REQUIRES_PRIVATE_PROCESS_GROUP')
+    deadline = time.monotonic() + timeout
+    failure = None
+    fatal = re.compile(r'\[URMA_COMPLETION_ERROR\]|DeepEP error: timeout|Failed CR status|Traceback \(most recent call last\)')
+    with Path(log_path).open(errors='replace') as stream:
+        while True:
+            for line in stream.readlines():
+                if fatal.search(line):
+                    failure = dict(reason='fatal_benchmark_error', first_error=line.strip())
+                    break
+            if failure:
+                rc = 1
+                break
+            rc = process.poll()
+            if rc is not None:
+                break
+            if time.monotonic() >= deadline:
+                failure = dict(reason='case_timeout', timeout_seconds=timeout)
+                rc = 124
+                break
+            time.sleep(min(0.5, max(0, deadline-time.monotonic())))
+    if failure or rc != 0:
+        if not failure:
+            failure = dict(reason='process_exit', returncode=rc)
+        descendants = case_descendants(process.pid)
+        failure['owned_pids'] = sorted(descendants)
+        Path(log_path).with_name('case_failure.json').write_text(json.dumps(failure, indent=2))
+        # The group is owned by this launch. A leader may exit while a native
+        # worker remains stuck, so do not use leader.poll() as a cleanup gate.
+        try:
+            os.killpg(group, signal.SIGTERM)
+        except ProcessLookupError:
+            pass
+        for pid, birth in descendants.items():
+            signal_case_process(pid, birth, signal.SIGTERM)
+        try:
+            process.wait(timeout=3)
+        except subprocess.TimeoutExpired:
+            pass
+        finally:
+            for pid, birth in descendants.items():
+                signal_case_process(pid, birth, signal.SIGKILL)
+            try:
+                os.killpg(group, signal.SIGKILL)
+            except ProcessLookupError:
+                pass
+        process.wait()
+    return rc
 
 def main():
     task_root = Path(os.environ.get('VERBS_DIAG_HOME', str(Path.home()))).expanduser()

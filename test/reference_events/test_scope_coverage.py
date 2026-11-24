@@ -36,13 +36,13 @@ with open(os.environ['SCOPE_COLLECTS'],'a') as f:f.write(json.dumps(sys.argv[1:]
         self.env=dict(os.environ,URMA_DIAG_PYTHON=sys.executable,VERBS_DIAG_PYTHON=sys.executable,
             SCOPE_CALLS=str(self.root/'calls'),SCOPE_COLLECTS=str(self.root/'collects'))
 
-    def run_part(self, part, backend='urma', fail=''):
+    def run_part(self, part, backend='urma', fail='', extra=()):
         env=dict(self.env,SCOPE_FAIL=fail)
         return subprocess.run(['bash',str(self.root/'test/reference_events/run_boundaries.sh'),
             '--part',part,'--backend',backend,'--node-rank','1','--job','scope',
             '--build-dir',str(self.root/'build'),'--output',str(self.root/'results'),
             '--destination',str(self.root/'dest'),'--normal-fadd-fence-plan',
-            'peer-tail-off' if backend=='urma' else 'default'],env=env,
+            'peer-tail-off' if backend=='urma' else 'default']+list(extra),env=env,
             stdout=subprocess.PIPE,stderr=subprocess.STDOUT,universal_newlines=True)
 
     def calls(self):
@@ -77,6 +77,12 @@ with open(os.environ['SCOPE_COLLECTS'],'a') as f:f.write(json.dumps(sys.argv[1:]
             r=self.run_part(part);self.assertEqual(r.returncode,0,r.stdout)
         self.assertEqual([a['--job'] for a in self.calls()],
             ['scope_'+s for s in ('smoke128','paced','trace','post')])
+
+    def test_explicit_local_topology_and_timeout_are_forwarded(self):
+        extra=['--ifname','worker_oob','--gpu-pci','0000:21:00.0','--atomic-port','auto','--case-timeout','300']
+        r=self.run_part('smoke',extra=extra);self.assertEqual(r.returncode,0,r.stdout)
+        for key,value in zip(extra[::2],extra[1::2]):
+            self.assertEqual(self.calls()[0][key],value)
 
 
 if __name__ == '__main__':

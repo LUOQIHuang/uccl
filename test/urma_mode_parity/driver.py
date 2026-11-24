@@ -142,10 +142,10 @@ def parser():
     p.add_argument('--per-expert-batching',type=int,choices=(0,1),default=0)
     p.add_argument('--urma-include-dir',type=Path,default=os.environ.get('URMA_DIAG_INCLUDE_DIR'))
     p.add_argument('--urma-lib-dir',type=Path,default=Path(os.environ.get('VERBS_DIAG_LIBRARY_DIR',str(dev/'urma_after_kernel_20261029/diag/umdk_private_618957c3/lib'))))
-    p.add_argument('--ifname',default='enp33s0'); p.add_argument('--hca',default='rocep40s0f0')
+    p.add_argument('--ifname',default=os.environ.get('URMA_DIAG_IFNAME',os.environ.get('UCCL_SOCKET_IFNAME','enp33s0'))); p.add_argument('--hca',default='rocep40s0f0')
     p.add_argument('--gpu',default='0'); p.add_argument('--case-timeout',type=int,default=1800)
     p.add_argument('--expected-kernel',default='6.6.0-gdr_f00955680_diag')
-    p.add_argument('--urma-device',default='udmac0d1e2'); p.add_argument('--gpu-pci',default='0000:a1:00.0'); p.add_argument('--atomic-port',default='0000:a0:08.0')
+    p.add_argument('--urma-device',default='udmac0d1e2'); p.add_argument('--gpu-pci',default=os.environ.get('URMA_DIAG_GPU_PCI','0000:a1:00.0')); p.add_argument('--atomic-port',default=os.environ.get('URMA_DIAG_ATOMIC_PORT','auto'))
     p.add_argument('--ubctl-selector',default='0,1,1')
     args=p.parse_args()
     if not re.fullmatch(r'[a-zA-Z0-9_-]+',args.job): p.error('invalid job')
@@ -164,8 +164,8 @@ def parser():
         p.error('alternate submission requires URMA Normal Dispatch focus API-only completion=all and reference-events paced/on check/run')
     if args.normal_window_plan!='default' and (args.backend!='urma' or args.mode!='normal' or not args.dispatch_focus or args.reference_events not in ('paced','on') or args.normal_submit_schedule!='lane-mixed' or args.action not in ('check','run')):
         p.error('peer4 requires Normal Dispatch focus paced/on check/run with default submission schedule')
-    if args.normal_fadd_fence_plan!='default' and (args.backend!='urma' or args.mode!='normal' or not args.dispatch_focus or args.reference_events not in ('paced','on') or args.normal_submit_schedule!='lane-mixed' or args.normal_window_plan!='default' or args.normal_completion!='all' or args.action not in ('check','run')):
-        p.error('FADD fence experiment requires URMA Normal Dispatch focus paced/on check/run with default window/submission/completion')
+    if args.normal_fadd_fence_plan!='default' and (args.backend!='urma' or args.mode!='normal' or not args.dispatch_focus or args.reference_events not in ('batch','paced','on') or args.normal_submit_schedule!='lane-mixed' or args.normal_window_plan!='default' or args.normal_completion!='all' or args.action not in ('check','run')):
+        p.error('FADD fence experiment requires URMA Normal Dispatch focus batch/paced/on check/run with default window/submission/completion')
     if args.normal_retire_plan!='ordered' and (args.backend!='urma' or args.mode!='normal' or not args.dispatch_focus or args.reference_events!='paced' or args.reference_profile!='legacy' or args.normal_window_plan!='default' or args.normal_submit_schedule!='lane-mixed' or args.normal_completion!='all' or args.normal_fadd_fence_plan not in ('default','all-on') or args.action not in ('check','run')):
         p.error('peer-ready requires URMA Normal inactive paced default window/order/fence/completion check/run')
     if args.collect_suite and args.action!='collect': p.error('--collect-suite requires --action collect')
@@ -180,8 +180,8 @@ def parser():
         if args.gpu_stages or args.gpu_stage_build or args.gpu_stage_roles_only or args.dispatch_compiled_off:p.error('reference events exclude old GPU tracing')
         if (args.reference_events=='build')!=(args.action=='build'):p.error('reference-events build is for build only; off/on require check/run')
         if args.action!='build' and (args.action not in ('check','run') or not args.dispatch_focus):p.error('reference events require Normal Dispatch focus check/run')
-    if args.reference_profile=='boundaries' and (args.reference_events not in ('build','paced','on') or args.normal_window_plan!='default' or args.normal_submit_schedule!='lane-mixed'):
-        p.error('boundary profile requires reference build/paced/on and default window/submission')
+    if args.reference_profile=='boundaries' and (args.reference_events not in ('build','batch','paced','on') or args.normal_window_plan!='default' or args.normal_submit_schedule!='lane-mixed'):
+        p.error('boundary profile requires reference build/batch/paced/on and default window/submission')
     if args.reference_profile=='order' and (args.backend!='urma' or args.mode!='normal' or args.reference_events not in ('build','paced','on') or args.normal_submit_schedule not in ('lane-mixed','tail-interleaved')):
         p.error('order profile requires the URMA Normal reference order experiment')
     if args.normal_submit_schedule=='tail-interleaved' and args.reference_profile!='order':
@@ -198,6 +198,7 @@ def parser():
     if args.action=='probe' and (args.backend!='urma' or args.mode=='both' or args.probe_bytes<1):
         p.error('probe requires --backend urma --mode normal|low_latency and positive --probe-bytes')
     if not (1024<=args.port<65535) or not re.fullmatch(r'\d+,\d+,\d+',args.ubctl_selector): p.error('invalid port / UB selector')
+    if args.case_timeout<1: p.error('--case-timeout must be positive')
     if args.hidden<=0 or args.hidden%128 or args.normal_tokens<=0 or args.ll_tokens<=0 or args.ll_tokens>8191 or args.experts%2 or not 1<=args.topk<=min(args.experts,16) or args.build_jobs<1:
         p.error('invalid benchmark shape / build jobs')
     args.build_dir=(args.build_dir or dev/'urma_mode_parity_build'/args.job).resolve()
@@ -210,7 +211,7 @@ def environment(args):
         if key.startswith(('UCCL_','PARITY_','DIAG_')) and key!='UCCL_METAX_RUNTIME_LIB':env.pop(key,None)
     for key in ('LD_PRELOAD','PYTHONPATH','UCCL_PROJECT_DIAG','UCCL_METAX_URMA_HOST_ATOMICS','UMDK_HOME','UCCL_EP_DISPATCH_CONFIG','UCCL_EP_COMBINE_CONFIG'):
         env.pop(key,None)
-    env.update(UCCL_EP_TRANSPORT=args.backend,UCCL_URMA_TM='rc',UCCL_URMA_DEV_NAME=args.urma_device,URMA_DIAG_LIBRARY_DIR=str(args.urma_lib_dir),CUDA_VISIBLE_DEVICES=args.gpu,MCCL_IB_DISABLE='1',NCCL_IB_DISABLE='1',MCCL_SOCKET_IFNAME=args.ifname,NCCL_SOCKET_IFNAME=args.ifname,MCCL_DEBUG='INFO',NCCL_DEBUG='INFO',UCCL_RDMA_ADAPTIVE_SLEEP='0',UCCL_EP_DISABLE_CPU_AFFINITY='1',PYTHONUNBUFFERED='1',PYTHONDONTWRITEBYTECODE='1',UCCL_EP_VERBS_REG='dmabuf',UCCL_IB_HCA=args.hca)
+    env.update(UCCL_EP_TRANSPORT=args.backend,UCCL_URMA_TM='rc',UCCL_URMA_DEV_NAME=args.urma_device,URMA_DIAG_LIBRARY_DIR=str(args.urma_lib_dir),CUDA_VISIBLE_DEVICES=args.gpu,MCCL_IB_DISABLE='1',NCCL_IB_DISABLE='1',UCCL_SOCKET_IFNAME=args.ifname,MCCL_SOCKET_IFNAME=args.ifname,NCCL_SOCKET_IFNAME=args.ifname,MCCL_DEBUG='INFO',NCCL_DEBUG='INFO',UCCL_RDMA_ADAPTIVE_SLEEP='0',UCCL_EP_DISABLE_CPU_AFFINITY='1',PYTHONUNBUFFERED='1',PYTHONDONTWRITEBYTECODE='1',UCCL_EP_VERBS_REG='dmabuf',UCCL_IB_HCA=args.hca)
     if args.backend=='urma':
         env.pop('UCCL_EP_VERBS_REG',None); env.pop('UCCL_IB_HCA',None)
     env['UCCL_URMA_LL_WRITE_ORDER']=args.ll_write_order
@@ -357,7 +358,7 @@ def main():
             (root/(mode+'.py')).write_text(source)
     except Exception as exc: error=str(exc)
     (root/'setup.json').write_text(json.dumps(dict(fingerprint=fingerprint,error=error),indent=2))
-    legacy.pair(args,dict(stage='setup',meta=fingerprint,rc=1 if error else 0))
+    legacy.pair(args,dict(stage='setup',meta=legacy.shared_fingerprint(fingerprint),rc=1 if error else 0))
     if error: raise RuntimeError(error)
     modes=('normal','low_latency') if args.mode=='both' else (args.mode,)
     for mode in modes:
@@ -386,8 +387,7 @@ def main():
         print('CASE_BEGIN '+mode,flush=True)
         with (case/'bench.log').open('w') as log:
             process=subprocess.Popen(command,cwd=support.REPO/'ep/bench',env=env,stdout=log,stderr=subprocess.STDOUT,start_new_session=True)
-            try: rc=process.wait(timeout=args.case_timeout)
-            except subprocess.TimeoutExpired: legacy.terminate(process); rc=124
+            try: rc=legacy.wait_for_case(process,case/'bench.log',args.case_timeout)
             except KeyboardInterrupt: legacy.terminate(process); raise
         text=(case/'bench.log').read_text(errors='replace')
         kernel_snapshot(case,'kernel_after.txt')

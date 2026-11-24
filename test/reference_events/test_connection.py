@@ -1,6 +1,8 @@
 """Classify real uploaded failures and keep old boot errors out of run deltas."""
 from contextlib import redirect_stdout
 import io
+import hashlib
+import json
 from pathlib import Path
 import shutil
 import tempfile
@@ -13,6 +15,24 @@ HERE = Path(__file__).resolve().parent
 
 
 class ConnectionTests(unittest.TestCase):
+    def test_uploaded_scope_smoke_fails_in_internal_ack_not_fp8(self):
+        source = HERE / 'results/normal_scope_20261123/normal_scope_urma_01_smoke128'
+        sdk = HERE.parents[1] / 'test/fadd_path/results/urma_cqe_visibility_02/node1/sdk/urma_opcode.h'
+        manifest = json.loads((source/'node1/build_manifest.json').read_text())
+        raw = sdk.read_bytes().replace(b'\r\n', b'\n')
+        self.assertEqual(hashlib.sha256(raw).hexdigest(), manifest['sdk']['urma_opcode.h'])
+        self.assertIn(b'URMA_CR_ACK_TIMEOUT_ERR', raw)
+        for rank, classification in ((1, 'URMA_ACK_TIMEOUT'), (0, 'DISPATCH_CPU_TIMEOUT_CHECK_PEER')):
+            with tempfile.TemporaryDirectory() as tmp, redirect_stdout(io.StringIO()):
+                root = Path(tmp)
+                result = diagnose(root, source / ('node' + str(rank)))
+                self.assertEqual(result['classification'], classification)
+                if rank == 1:
+                    self.assertEqual(result['completion']['status'], '9')
+                    self.assertTrue(result['internal_control_atomic'])
+                    self.assertTrue(result['initial_barrier_candidate'])
+                    self.assertEqual(result['completion']['wr_id'], str(2**64-1))
+
     def test_real_uploaded_bind_failure_both_nodes(self):
         for rank, host in ((0, 'master'), (1, 'worker1')):
             source = HERE / 'results/urma_ref_smoke128_01' / ('node' + str(rank))

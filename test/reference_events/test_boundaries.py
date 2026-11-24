@@ -32,6 +32,23 @@ def boundary_window(label,index=0,tokens=4096):
 
 
 class BoundaryTests(unittest.TestCase):
+    def test_real_parsers_accept_all_coverage_cases_and_local_network(self):
+        for backend in ('urma','verbs'):
+            ns=driver_functions(backend)
+            for mode in ('batch','paced','on'):
+                argv=['driver','--node-rank','1','--job','scope','--mode','normal',
+                      '--dispatch-focus','--reference-events',mode,'--reference-profile','boundaries',
+                      '--ifname','worker_oob','--case-timeout','300']
+                argv+=['--phase-suite','--api-only','--normal-fadd-fence-plan','peer-tail-off',
+                       '--gpu-pci','0000:21:00.0','--atomic-port','auto'] if backend=='urma' else [
+                       '--variant','current','--no-profile','--repeats','1']
+                with patch.object(sys,'argv',argv), patch.dict(os.environ,{'UCCL_SOCKET_IFNAME':'stale'}):
+                    args=ns['parser'](); env=ns['environment'](args)
+                self.assertEqual([env[k] for k in ('UCCL_SOCKET_IFNAME','MCCL_SOCKET_IFNAME','NCCL_SOCKET_IFNAME')],['worker_oob']*3)
+                if backend=='urma':
+                    self.assertEqual(env['UCCL_URMA_NORMAL_FADD_FENCE'],'tail-off')
+                    self.assertEqual(args.gpu_pci,'0000:21:00.0')
+
     def test_abi_and_profile_coverage(self):
         self.assertEqual(ctypes.sizeof(Trace),1769504)
         self.assertEqual(ctypes.sizeof(BoundaryTrace),3539000)

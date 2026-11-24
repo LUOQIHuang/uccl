@@ -3,6 +3,7 @@
 set -euo pipefail
 HERE=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
 BACKEND=urma RANK= BUILD= JOB= PART=smoke MASTER=141.61.17.202 PORT=33180 GID=3 FENCE=default
+LOCAL_ARGS=()
 ROOT="${URMA_DIAG_HOME:-${VERBS_DIAG_HOME:-${HOME:?}}}/metax_dev/reference_event_results"
 DEST="$HERE/results"
 while [ "$#" -gt 0 ];do
@@ -12,6 +13,7 @@ while [ "$#" -gt 0 ];do
  --master-addr) MASTER=${2:?};shift 2;; --port) PORT=${2:?};shift 2;; --gid-index) GID=${2:?};shift 2;;
  --output) ROOT=${2:?};shift 2;; --destination) DEST=${2:?};shift 2;;
  --normal-fadd-fence-plan) FENCE=${2:?};shift 2;;
+ --ifname|--gpu-pci|--atomic-port|--case-timeout) LOCAL_ARGS+=("$1" "${2:?}");shift 2;;
  *) echo "unknown argument $1" >&2;exit 2;;
  esac
 done
@@ -25,7 +27,7 @@ run_one(){
  bash "$HERE/run.sh" --backend "$BACKEND" --action run --reference-profile boundaries \
    --step "$step" --tokens "$tokens" --node-rank "$RANK" --master-addr "$MASTER" \
    --build-dir "$BUILD" --job "$name" --output "$ROOT" --port "$PORT" --gid-index "$GID" \
-   --normal-fadd-fence-plan "$FENCE" || rc=$?
+   --normal-fadd-fence-plan "$FENCE" "${LOCAL_ARGS[@]}" || rc=$?
  "$PYTHON" "$HERE/../gpu_stage_recovery/collect.py" "$ROOT/$name" --node-rank "$RANK" --trace-build "$BUILD" --destination "$DEST/$name" || collected=$?
  [ "$rc" = 0 ] || return "$rc"
  return "$collected"

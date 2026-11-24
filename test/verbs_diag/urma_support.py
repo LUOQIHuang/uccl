@@ -33,6 +33,24 @@ def library_manifest(directory):
             result[path.name] = cache[actual]
     return result
 
+def pci_topology(gpu_pci, atomic_port):
+    """Check the selected endpoint and its actual ancestors without PCI writes."""
+    endpoint = Path('/sys/bus/pci/devices') / gpu_pci
+    if not endpoint.exists():
+        raise RuntimeError(f'GPU_PCI_MISSING: {gpu_pci}')
+    resolved = endpoint.resolve()
+    device_class = int((endpoint / 'class').read_text().strip(), 16)
+    if device_class >> 16 not in (0x03, 0x12):
+        raise RuntimeError(f'GPU_PCI_IS_NOT_DISPLAY_OR_ACCELERATOR: pci={gpu_pci} class={device_class:06x}')
+    ancestors = [part for part in reversed(resolved.parts[:-1])
+                 if re.fullmatch(r'[0-9a-fA-F]{4}:[0-9a-fA-F]{2}:[0-9a-fA-F]{2}\.[0-7]', part)]
+    selected = ancestors[0] if atomic_port == 'auto' and ancestors else atomic_port
+    if selected not in ancestors:
+        raise RuntimeError(f'ATOMIC_PORT_NOT_GPU_ANCESTOR: gpu={gpu_pci} port={selected} ancestors={ancestors}')
+    return dict(gpu_path=str(resolved), gpu_class=f'{device_class:06x}', gpu_ancestors=ancestors,
+                atomic_port=selected)
+
+
 def hardware_check(args):
     kernel = os.uname().release
     if kernel != args.expected_kernel:
@@ -45,13 +63,14 @@ def hardware_check(args):
     runpm = Path('/sys/module/metax/parameters/runpm_link').read_text().strip()
     if runpm != '0':
         raise RuntimeError(f'RUNPM_LINK_MUST_BE_ZERO: actual={runpm}')
+    topology = pci_topology(args.gpu_pci, args.atomic_port)
     runtime = (Path('/sys/bus/pci/devices')/args.gpu_pci/'power/runtime_status').read_text().strip()
     if runtime not in ('active', 'suspended'):
         raise RuntimeError(f'GPU_RUNTIME_PM_UNEXPECTED: {runtime}')
-    result = subprocess.run(['setpci', '-s', args.atomic_port, 'CAP_EXP+28.w'], capture_output=True, text=True, timeout=5)
+    result = subprocess.run(['setpci', '-s', topology['atomic_port'], 'CAP_EXP+28.w'], capture_output=True, text=True, timeout=5)
     value = result.stdout.strip()
     if result.returncode or not re.fullmatch('[0-9a-fA-F]{4}', value) or not (int(value, 16) & 0x40):
-        raise RuntimeError(f'PCIE_ATOMIC_REQUEST_NOT_ENABLED: port={args.atomic_port} value={value!r}')
+        raise RuntimeError(f"PCIE_ATOMIC_REQUEST_NOT_ENABLED: port={topology['atomic_port']} value={value!r}")
     journal = subprocess.run(['journalctl','-b','-k','-q','--no-pager'], capture_output=True, text=True, timeout=15)
     if journal.returncode:
         raise RuntimeError('KERNEL_JOURNAL_UNAVAILABLE')
@@ -71,7 +90,7 @@ def hardware_check(args):
                     raise RuntimeError(f'GPU_NONZERO_QUEUE_STATUS: {line}')
         except PermissionError:
             pass
-    return dict(kernel=kernel, device=args.urma_device, device_path=str(device.resolve()), runpm_link=runpm, gpu_pci=args.gpu_pci, runtime_status=runtime, atomic_port=args.atomic_port, atomic_control=value)
+    return dict(kernel=kernel, device=args.urma_device, device_path=str(device.resolve()), runpm_link=runpm, gpu_pci=args.gpu_pci, runtime_status=runtime, atomic_control=value, **topology)
 
 def counters(args):
     result = dict(device=args.urma_device, note='shared UB port, raw flit counts; not process-isolated')

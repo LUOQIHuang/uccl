@@ -1,6 +1,7 @@
 """CPU-only checks; never imports torch or touches real GPU/PCI devices."""
 import ast
 import importlib.util
+import os
 from pathlib import Path
 import sys
 import tempfile
@@ -103,13 +104,28 @@ class SupportTests(unittest.TestCase):
             if argv[0]=='setpci': return SimpleNamespace(returncode=0,stdout='0040\n')
             if argv[0]=='journalctl': return SimpleNamespace(returncode=0,stdout='')
             raise AssertionError(argv)
-        with patch.object(support.os,'uname',return_value=SimpleNamespace(release='test-kernel'),create=True), patch.object(support,'Path',side_effect=HardwarePath), patch.object(support.subprocess,'run',side_effect=command):
+        with patch.object(support.os,'uname',return_value=SimpleNamespace(release='test-kernel'),create=True), patch.object(support,'Path',side_effect=HardwarePath), patch.object(support,'pci_topology',return_value=dict(atomic_port=args.atomic_port)), patch.object(support.subprocess,'run',side_effect=command):
             self.assertEqual(support.hardware_check(args)['atomic_control'],'0040')
         self.assertEqual(calls[0],['setpci','-s','0000:a0:08.0','CAP_EXP+28.w'])
         self.assertTrue(all('=' not in arg for arg in calls[0]))
-        with patch.object(support.os,'uname',return_value=SimpleNamespace(release='test-kernel'),create=True), patch.object(support,'Path',side_effect=HardwarePath), patch.object(support.subprocess,'run',return_value=SimpleNamespace(returncode=0,stdout='0000\n')):
+        with patch.object(support.os,'uname',return_value=SimpleNamespace(release='test-kernel'),create=True), patch.object(support,'Path',side_effect=HardwarePath), patch.object(support,'pci_topology',return_value=dict(atomic_port=args.atomic_port)), patch.object(support.subprocess,'run',return_value=SimpleNamespace(returncode=0,stdout='0000\n')):
             with self.assertRaisesRegex(RuntimeError,'ATOMIC_REQUEST_NOT_ENABLED'):
                 support.hardware_check(args)
+
+    @unittest.skipUnless(os.name == 'posix', 'PCI names contain colons')
+    def test_topology_rejects_nic_and_wrong_atomic_bridge(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            bridge=Path(tmp)/'pci0000:20'/'0000:20:10.0'
+            gpu=bridge/'0000:21:00.0';gpu.mkdir(parents=True)
+            (gpu/'class').write_text('0x120000\n')
+            with patch.object(support,'Path',return_value=bridge):
+                result=support.pci_topology('0000:21:00.0','auto')
+                self.assertEqual(result['atomic_port'],'0000:20:10.0')
+                with self.assertRaisesRegex(RuntimeError,'NOT_GPU_ANCESTOR'):
+                    support.pci_topology('0000:21:00.0','0000:a0:08.0')
+                (gpu/'class').write_text('0x020000\n')
+                with self.assertRaisesRegex(RuntimeError,'NOT_DISPLAY_OR_ACCELERATOR'):
+                    support.pci_topology('0000:21:00.0','auto')
 
 if __name__=='__main__':
     unittest.main()
