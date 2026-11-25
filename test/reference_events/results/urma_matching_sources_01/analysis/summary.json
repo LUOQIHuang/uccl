@@ -1,0 +1,81 @@
+{
+  "input_revision": "e57d972b",
+  "modules": {
+    "ubcore": {
+      "srcversion": "53C2130D466B6E57BA01331",
+      "expected": "53C2130D466B6E57BA01331",
+      "files": 73,
+      "hash_mismatches": [],
+      "source": "/home/f00955680/metax_dev/urma_after_kernel_20261029/diag/gdr_build_753c812e/tree/urma/ubcore/ubcore.mod.c"
+    },
+    "uburma": {
+      "srcversion": "ACC682CB49B082B37E5EDE3",
+      "expected": "ACC682CB49B082B37E5EDE3",
+      "files": 17,
+      "hash_mismatches": [],
+      "source": "/home/f00955680/metax_dev/urma_after_kernel_20261029/diag/gdr_build_753c812e/tree/urma/uburma/uburma.mod.c"
+    },
+    "ummu_core": {
+      "srcversion": "3500E02ECE5F584E58AF27F",
+      "expected": "3500E02ECE5F584E58AF27F",
+      "files": 12,
+      "hash_mismatches": [],
+      "source": "/home/f00955680/metax_dev/urma_after_kernel_20261029/diag/kernel_build_5c8e613f/tree/drivers/iommu/hisilicon/ummu-core/ummu-core.mod.c"
+    }
+  },
+  "total_audited_files": 102,
+  "still_missing": [
+    "udma"
+  ],
+  "lookups": {
+    "node0": [
+      {
+        "command": [
+          "urma_admin",
+          "main_ue_eid",
+          "lookup",
+          "0000:0000:0001:0200:0010:0000:df00:0200"
+        ],
+        "rc": 0,
+        "stdout": "0000:0000:003f:0200:0010:0000:df00:0b00\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "urma_admin",
+          "main_ue_eid",
+          "lookup",
+          "0000:0000:0001:0200:0010:0000:df00:4200"
+        ],
+        "rc": 0,
+        "stdout": "0000:0000:003f:0200:0010:0000:df00:4b00\n",
+        "stderr": ""
+      }
+    ],
+    "node1": [
+      {
+        "command": [
+          "urma_admin",
+          "main_ue_eid",
+          "lookup",
+          "0000:0000:0001:0200:0010:0000:df00:0200"
+        ],
+        "rc": 0,
+        "stdout": "0000:0000:003f:0200:0010:0000:df00:0b00\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "urma_admin",
+          "main_ue_eid",
+          "lookup",
+          "0000:0000:0001:0200:0010:0000:df00:4200"
+        ],
+        "rc": 0,
+        "stdout": "0000:0000:003f:0200:0010:0000:df00:4b00\n",
+        "stderr": ""
+      }
+    ]
+  },
+  "note": "Generated version matches plus collected file hashes support candidate provenance; no binary reproduction or hardware recovery was performed."
+}

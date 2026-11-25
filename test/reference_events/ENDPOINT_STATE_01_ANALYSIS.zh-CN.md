@@ -1,5 +1,7 @@
 # 端点状态复核：解码依据匹配，四个模块的构建标识待匹配
 
+更新：已取得UMMU-core、ubcore、uburma的匹配候选源码，UDMA仍未找到。两端查询和已知路径尝试已经完成，下一步见 [匹配源码结果与UDMA来源清单](MATCHING_SOURCES_01_ANALYSIS.zh-CN.md)，不再执行本页第4节的收集命令。
+
 输入提交 `902f3d26`、`75b7d848`，结果为 `results/urma_endpoint_state_01/node0`、`node1`。这些是只读状态查询，不是新一轮benchmark。
 
 ## 1. 本次确认了什么
