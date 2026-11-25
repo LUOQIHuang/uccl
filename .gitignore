@@ -204,3 +204,10 @@ test/**/*.bin
 !test/urma_pair_load/results/**/*.jsonl
 !test/urma_pair_load/results/**/*.csv
 !test/urma_pair_load/results/**/*.png
+
+# Current Normal completion observations: retain selected evidence, not binaries.
+!test/normal_completion/results/**/build/
+!test/normal_completion/results/**/*.log
+!test/normal_completion/results/**/*.json
+!test/normal_completion/results/**/*.jsonl
+!test/normal_completion/results/**/*.csv

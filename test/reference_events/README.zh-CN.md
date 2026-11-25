@@ -2,7 +2,7 @@
 
 ## 2026-11-25 当前执行入口
 
-软件准入额度8→32对照已完成：BF16两配对慢1.659%/0.271%，[结果分析](results/urma_credit32_01/ANALYSIS.zh-CN.md)确认无净收益，保留8，停止扩窗。结合[实现与硬件差异审查](BACKEND_IMPLEMENTATION_AUDIT_20261125.zh-CN.md)，下一项只运行[WRITE/FADD完成可读性及CPU排空观察](../normal_completion/README.zh-CN.md)：新隔离构建，pre/probe/post三项，不改语义，不加GPU探针。已完成credit/coverage不重跑；下方其他任务均为历史说明，不并行补测。
+完成可读性三项已结束：[复算报告](../normal_completion/results/normal_completion_01/ANALYSIS.zh-CN.md)显示选中204慢WRITE提交至SDK交付约2794μs，而CQE可读后至交付的上界中位数仅4.44μs，QUIET的CPU处理同样很小。旧结果因.gitignore遗漏的元数据只需补交现有文件，不重跑。**下一项仅按[WRITE/FADD分阶段提交对照](WRITES_FIRST_BATCH.zh-CN.md)执行**：保留当前tail-off、窗口8及原GPU kernel，新构建后四项ABBA，用无采集完整Dispatch判断净收益。8→32已慢1.659%/0.271%，停止扩窗；不重跑credit、旧CQ探针或历史任务。
 
 ## 2026-11-23 当前优先级
 

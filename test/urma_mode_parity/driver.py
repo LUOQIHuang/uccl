@@ -113,6 +113,7 @@ def parser():
     p.add_argument('--ll-write-order',choices=('default','strong','relax'),default='default',help='diagnostic LL WRITE ordering; FADD fences unchanged')
     p.add_argument('--normal-write-order',choices=('default','strong','relax'),default='default',help='diagnostic Normal WRITE placement; FADD, fence and completion unchanged')
     p.add_argument('--normal-submit-schedule',choices=('lane-mixed','writes-first','tail-interleaved'),default='lane-mixed')
+    p.add_argument('--normal-submit-witness',action='store_true',help='one CPU-only BF16 submission capture AFTER timed batch samples')
     p.add_argument('--normal-window-plan',choices=('default','peer4','both32'),default='default',help='Normal pending-command limit: default=8; peer4=node1 4; both32=32 on both, inactive batch credit experiment only')
     p.add_argument('--normal-fadd-fence-plan',choices=('default','all-on','peer-off','peer-tail-off'),default='default',help='diagnostic: keep FADD STRONG; disable all data or tagged tail fence on node1 only')
     p.add_argument('--require-normal-atomic-roles',action='store_true',help='reject modules without explicit Normal tail/head role capability')
@@ -165,13 +166,16 @@ def parser():
         p.error('Normal WRITE order A/B requires URMA Normal API-only completion=all; excludes micro/probe')
     if args.normal_completion!='all' and (args.backend!='urma' or args.mode!='normal'):
         p.error('normal completion diagnostics require --backend urma --mode normal')
-    if args.normal_submit_schedule!='lane-mixed' and (args.backend!='urma' or args.mode!='normal' or args.normal_completion!='all' or not args.api_only or not args.dispatch_focus or args.reference_events not in ('paced','on') or args.action not in ('check','run')):
+    batch_submit=args.normal_submit_witness and args.reference_events=='batch'
+    if args.normal_submit_witness and (args.backend!='urma' or args.mode!='normal' or not args.api_only or not args.dispatch_focus or args.reference_events!='batch' or args.reference_profile!='boundaries' or args.normal_window_plan!='default' or args.normal_retire_plan!='ordered' or args.normal_fadd_fence_plan!='peer-tail-off' or args.normal_submit_schedule not in ('lane-mixed','writes-first') or args.normal_completion!='all' or (args.normal_tokens,args.hidden,args.experts,args.topk,args.warmups,args.samples)!=(4096,7168,256,8,5,10) or args.action not in ('check','run')):
+        p.error('submission witness requires fixed-shape batch Normal boundaries peer-tail-off default-window ordered check/run')
+    if args.normal_submit_schedule!='lane-mixed' and (args.backend!='urma' or args.mode!='normal' or args.normal_completion!='all' or not args.api_only or not args.dispatch_focus or (args.reference_events not in ('paced','on') and not batch_submit) or args.action not in ('check','run')):
         p.error('alternate submission requires URMA Normal Dispatch focus API-only completion=all and reference-events paced/on check/run')
     if args.normal_window_plan=='both32' and (args.backend!='urma' or args.mode!='normal' or not args.dispatch_focus or args.reference_events!='batch' or args.reference_profile!='boundaries' or args.normal_fadd_fence_plan!='peer-tail-off' or args.normal_retire_plan!='ordered' or (args.normal_tokens,args.hidden,args.experts,args.topk,args.warmups,args.samples)!=(4096,7168,256,8,5,10) or args.action not in ('check','run')):
         p.error('both32 requires fixed 4096/7168/256/8 5/10 URMA Normal inactive batch boundaries check/run with peer-tail-off and ordered retirement')
     if args.normal_window_plan=='peer4' and (args.backend!='urma' or args.mode!='normal' or not args.dispatch_focus or args.reference_events not in ('paced','on') or args.normal_submit_schedule!='lane-mixed' or args.action not in ('check','run')):
         p.error('peer4 requires Normal Dispatch focus paced/on check/run with default submission schedule')
-    if args.normal_fadd_fence_plan!='default' and (args.backend!='urma' or args.mode!='normal' or not args.dispatch_focus or args.reference_events not in ('batch','paced','on') or args.normal_submit_schedule!='lane-mixed' or args.normal_window_plan not in ('default','both32') or args.normal_completion!='all' or args.action not in ('check','run')):
+    if args.normal_fadd_fence_plan!='default' and (args.backend!='urma' or args.mode!='normal' or not args.dispatch_focus or args.reference_events not in ('batch','paced','on') or (args.normal_submit_schedule!='lane-mixed' and not batch_submit) or args.normal_window_plan not in ('default','both32') or args.normal_completion!='all' or args.action not in ('check','run')):
         p.error('FADD fence experiment requires URMA Normal Dispatch focus batch/paced/on check/run with default window/submission/completion')
     if args.normal_retire_plan!='ordered' and (args.backend!='urma' or args.mode!='normal' or not args.dispatch_focus or args.reference_events!='paced' or args.reference_profile!='legacy' or args.normal_window_plan!='default' or args.normal_submit_schedule!='lane-mixed' or args.normal_completion!='all' or args.normal_fadd_fence_plan not in ('default','all-on') or args.action not in ('check','run')):
         p.error('peer-ready requires URMA Normal inactive paced default window/order/fence/completion check/run')
@@ -187,7 +191,7 @@ def parser():
         if args.gpu_stages or args.gpu_stage_build or args.gpu_stage_roles_only or args.dispatch_compiled_off:p.error('reference events exclude old GPU tracing')
         if (args.reference_events=='build')!=(args.action=='build'):p.error('reference-events build is for build only; off/on require check/run')
         if args.action!='build' and (args.action not in ('check','run') or not args.dispatch_focus):p.error('reference events require Normal Dispatch focus check/run')
-    if args.reference_profile=='boundaries' and (args.reference_events not in ('build','batch','paced','on') or args.normal_window_plan not in ('default','both32') or args.normal_submit_schedule!='lane-mixed'):
+    if args.reference_profile=='boundaries' and (args.reference_events not in ('build','batch','paced','on') or args.normal_window_plan not in ('default','both32') or (args.normal_submit_schedule!='lane-mixed' and not batch_submit)):
         p.error('boundary profile requires reference build/batch/paced/on and default window/submission')
     if args.reference_profile=='order' and (args.backend!='urma' or args.mode!='normal' or args.reference_events not in ('build','paced','on') or args.normal_submit_schedule not in ('lane-mixed','tail-interleaved')):
         p.error('order profile requires the URMA Normal reference order experiment')
@@ -226,6 +230,7 @@ def environment(args):
     env['UCCL_URMA_NORMAL_SUBMIT_SCHEDULE']=getattr(args,'normal_submit_schedule','lane-mixed')
     env['UCCL_URMA_NORMAL_COMPLETION']=args.normal_completion
     env['UCCL_IB_MAX_INFLIGHT_NORMAL']=str(32 if args.normal_window_plan=='both32' else (4 if args.normal_window_plan=='peer4' and args.node_rank==1 else 8))
+    env['PARITY_NORMAL_SUBMIT_WITNESS']='1' if args.normal_submit_witness else '0'
     env['UCCL_REFERENCE_PROFILE']=getattr(args,'reference_profile','legacy')
     env['UCCL_URMA_NORMAL_RETIRE']='ready' if args.normal_retire_plan=='peer-ready' and args.node_rank==1 else 'ordered'
     env['UCCL_URMA_NORMAL_FADD_FENCE']=('tail-off' if args.normal_fadd_fence_plan=='peer-tail-off' else 'off') if args.normal_fadd_fence_plan in ('peer-off','peer-tail-off') and args.node_rank==1 else 'on'
@@ -347,6 +352,7 @@ def main():
         api_only=args.api_only,ll_write_order=args.ll_write_order,normal_write_order=args.normal_write_order,normal_submit_schedule=args.normal_submit_schedule,normal_window_plan=args.normal_window_plan,normal_completion=args.normal_completion,capture_layout=args.capture_layout,
         dispatch_trial=args.dispatch_trial,dispatch_delay_us=args.dispatch_delay_us,delay_node=1,timeline=getattr(args,'timeline',False),gpu_stages=getattr(args,'gpu_stages',False),gpu_stage_mode=args.gpu_stage_mode,device=args.urma_device,gpu=args.gpu,dispatch_focus=args.dispatch_focus,dispatch_compiled_off=args.dispatch_compiled_off,gpu_stage_roles_only=args.gpu_stage_roles_only)
     fingerprint['urma_device_plan']=args.urma_device_plan
+    fingerprint['normal_submit_witness']=args.normal_submit_witness
     try:
         module,manifest,info=preflight(args)
         fingerprint['reference_events']=args.reference_events
@@ -432,6 +438,16 @@ def main():
                 checks['dispatch_coverage']=False
                 (case/'dispatch_validation_error.txt').write_text(str(exc))
         if getattr(args,'timeline',False):checks['timeline']=(case/'urma_timeline.jsonl').is_file()
+        if args.normal_submit_witness:
+            try:
+                sys.path.insert(0,str(HERE.parent/'reference_events'))
+                from submit_witness import inspect as inspect_submit_witness
+                witness=inspect_submit_witness(case/'submit_witness.json',args.normal_submit_schedule)
+                (case/'submit_witness_summary.json').write_text(json.dumps(witness,indent=2))
+                checks['normal_submit_witness']=True
+            except Exception as exc:
+                checks['normal_submit_witness']=False
+                (case/'submit_witness_error.txt').write_text(str(exc))
         if args.dispatch_trial:checks['dispatch_trial_samples']=(case/'dispatch_trial_samples.jsonl').is_file()
         if args.backend=='urma':
             checks['native_mode']=f'[URMA] mode={mode} channels={8 if mode=="normal" else 1} endpoints={9 if mode=="normal" else 1} batch=linked' in text

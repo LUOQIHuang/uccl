@@ -782,8 +782,14 @@ int main() {
   }
   // Inspect real SDK WRs: only Normal data FADD changes; placement, LL,
   // barrier and CQE policy are retained. The environment freezes at configure.
+  for (auto const* schedule : {"lane-mixed","writes-first"})
   for (bool normal : {true,false}) for (auto const* setting : {"on","off","tail-off"}) {
+    setenv("UCCL_URMA_NORMAL_SUBMIT_SCHEDULE",schedule,1);
     setenv("UCCL_URMA_NORMAL_FADD_FENCE",setting,1);
+    if (std::string(schedule)=="writes-first" && (!normal || std::string(setting)=="off")) {
+      UrmaTransport rejected;rejects([&] {rejected.configure(normal,8);});
+      continue;
+    }
     UrmaTransport left,right;
     left.configure(normal,8);right.configure(normal,8);
     unsetenv("UCCL_URMA_NORMAL_FADD_FENCE");
@@ -817,6 +823,7 @@ int main() {
     assert(left.poll(out,4)==1);
     left.destroy();right.destroy();assert(resources==0 && init_count==0 && gpu_regs==0);
   }
+  unsetenv("UCCL_URMA_NORMAL_SUBMIT_SCHEDULE");
   setenv("UCCL_URMA_NORMAL_FADD_FENCE","off",1);
   setenv("UCCL_URMA_NORMAL_COMPLETION","paired",1);
   { UrmaTransport t;rejects([&] {t.configure(true,8);}); }

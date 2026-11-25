@@ -1,5 +1,7 @@
 # 下一项：区分WRITE/FADD完成前后的等待，附CPU排空观察
 
+**2026-11-25：本轮已运行，勿重跑。**[结果分析](results/normal_completion_01/ANALYSIS.zh-CN.md)：选中204慢WRITE约2794μs，CQE可读后至SDK交付上界中位数仅4.44μs；CPU QUIET也无毫秒级阻塞。由于本目录.gitignore遗漏，42条元数据必需路径未随结果上传，已修复，只需补交已有JSON/LOG，不重建或重跑。下一项见[分阶段提交操作文档](../reference_events/WRITES_FIRST_BATCH.zh-CN.md)。下文保留本轮历史操作，供核对。
+
 当前只需要URMA环境。此实验不改fence、STRONG、窗口、请求顺序、完成策略或QUIET语义；不添加GPU事件、GPU读取主机时钟或Kineto采集。以当前实现为基线，在隔离worktree中增加只读CPU探针；两端各构建一次，运行pre→probe→post三项。
 
 ## 1. 为什么测，以及能验证到哪里

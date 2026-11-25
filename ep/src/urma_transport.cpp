@@ -32,8 +32,13 @@ void UrmaTransport::configure(bool normal, size_t channels) {
   for(auto& logged:role_logged_)logged=false;
   if (normal_submit_schedule_!=UrmaSubmitSchedule::LaneMixed && (!normal || normal_completion_ != UrmaNormalCompletion::All))
     throw std::invalid_argument("alternate submission requires Normal completion=all");
-  if (normal && (!normal_fadd_fence_ || normal_tail_fence_off_) && (normal_completion_!=UrmaNormalCompletion::All || normal_submit_schedule_!=UrmaSubmitSchedule::LaneMixed))
-    throw std::invalid_argument("Normal FADD fence experiment requires completion=all and lane-mixed");
+  // Splitting WRITE and standalone-FADD SDK stages preserves per-lane order,
+  // placement and role fences. Permit this controlled tail-off comparison;
+  // retain the restrictions on paired completions, all-data-off and reordering.
+  bool tail_writes_first=normal_fadd_fence_ && normal_tail_fence_off_ &&
+      normal_submit_schedule_==UrmaSubmitSchedule::WritesFirst;
+  if (normal && (!normal_fadd_fence_ || normal_tail_fence_off_) && (normal_completion_!=UrmaNormalCompletion::All || (normal_submit_schedule_!=UrmaSubmitSchedule::LaneMixed && !tail_writes_first)))
+    throw std::invalid_argument("Normal FADD fence experiment requires completion=all and lane-mixed or tail-off writes-first");
   mode_ = requested;
 }
 #ifndef USE_URMA

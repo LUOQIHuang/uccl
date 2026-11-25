@@ -1,5 +1,6 @@
 """GPU measurement adapter; CPU counter snapshots are process-local."""
 import json
+import os
 import time
 import phase_support
 
@@ -92,7 +93,22 @@ class Measurements:
                      measured=self.samples,dropped=1,**phase_support.distribution(raw[1:]))
         self.append('sample_summary.jsonl',summary)
         print('MODE_PARITY_SAMPLES '+json.dumps(summary),flush=True)
+        if os.environ.get('PARITY_NORMAL_SUBMIT_WITNESS')=='1' and label=='dispatch_bf16_chunk32':
+            self.submission_witness(fn,label,post_fn)
         return summary['mean_us']/1e6,summary['min_us']/1e6,summary['max_us']/1e6
+
+    def submission_witness(self,fn,label,post_fn=None):
+        # All timed CUDA events and the summary are complete before this extra
+        # call. CPU capture is coverage evidence only, never latency evidence.
+        self.torch.cuda.synchronize();self.dist.barrier()
+        self.ep.urma_timeline_begin()
+        try:
+            fn();self.torch.cuda.synchronize();self.dist.barrier()
+        finally:
+            cpu=json.loads(self.ep.urma_timeline_end())
+            self.append('submit_witness.json',dict(version=1,label=label,cpu=cpu,
+                after_timed_samples=True,purpose='submission_coverage_only'))
+        if post_fn is not None:post_fn()
 
     def isolated_api(self,fn,label,post_fn=None):
         torch=self.torch;target=label.startswith('dispatch_');raw=[]
