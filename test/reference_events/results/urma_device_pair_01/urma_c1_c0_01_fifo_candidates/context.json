@@ -1,0 +1,37 @@
+{
+  "exploratory_only": true,
+  "performance_representative": false,
+  "permits_backend_gap_attribution": false,
+  "changes_control_acceptance": false,
+  "label": "dispatch_bf16_chunk32",
+  "sample_indices": {
+    "0": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "1": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ]
+  },
+  "sources_sha256": {
+    "test/reference_events/results/urma_device_pair_01/urma_c1_c0_01_trace/node0/normal/event_trace.jsonl": "98ba42c9bb8f649dc9b6bd0adc3f399303c2aeeb22496c2bfe15332ac8d606b1",
+    "test/reference_events/results/urma_device_pair_01/urma_c1_c0_01_trace/node1/normal/event_trace.jsonl": "7fd40b5135cd365a0dade3cb506dd607f6e8fab46ad94ebe3ff4fd2774a21df2",
+    "D:/Workspace/uccl-metax-urma-integration/tools/reference_events/review_fifo_candidates.py": "2fadad9501d3a00fb5074acade71cdcc8277ae437c40b454a6eb24c207e78fa2"
+  },
+  "notes": "No outlier exclusion: all matching indices >0 retained. Software FIFO membership must replay completely and in order at limit 8. Nonpositive GPU-publication/CPU-poll intervals remain censored. Pooled shares use overlapping channel observation durations, never Dispatch critical-path percentages. CQE means application-observed completion, not physical arrival. This tool does not run or override performance control gates; the separate control report remains authoritative."
+}
