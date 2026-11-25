@@ -1,5 +1,7 @@
 # EID库存复核与下一步源码收集
 
+更新：相关源码已收到，按所提供代码将UMMU 0x13解码为权限表异常。下一步见 [源码复核与一次只读元数据查询](UMMU_PERMISSION_01_ANALYSIS.zh-CN.md)，不再重复本页的源码收集。
+
 本次输入提交 `05b955ab`、`93b94fe8`，数据为 `results/urma_address_inventory_01/node0` 和 `node1`。上传的是查询结果与源码位置，尚不包含内核源码文件。无需重新运行EID查询或benchmark。
 
 ## 1. 当前最重要的变化：两端会选到同一首项EID

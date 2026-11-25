@@ -1,0 +1,106 @@
+{
+  "classification": "URMA_ACK_TIMEOUT",
+  "primary_error": "[URMA_COMPLETION_ERROR] rank=0 proxy=0 status=9 token=65536 wr_id=18446744073709551615 write=0 atomic=1",
+  "dmesg_scope": "unavailable_see_kernel_log",
+  "kernel_log": {
+    "source": "benchmark_journal_tail",
+    "scope": "overlapping_tail_added_lines",
+    "collection_errors": {
+      "dmesg_before": {
+        "command": [
+          "dmesg",
+          "--color=never"
+        ],
+        "executable": "/usr/bin/dmesg",
+        "rc": 1,
+        "stdout": "",
+        "stderr": "dmesg: \u8bfb\u53d6\u5185\u6838\u7f13\u51b2\u533a\u5931\u8d25: Operation not permitted\n",
+        "truncated": false
+      },
+      "dmesg_after": {
+        "command": [
+          "dmesg",
+          "--color=never"
+        ],
+        "executable": "/usr/bin/dmesg",
+        "rc": 1,
+        "stdout": "",
+        "stderr": "dmesg: \u8bfb\u53d6\u5185\u6838\u7f13\u51b2\u533a\u5931\u8d25: Operation not permitted\n",
+        "truncated": false
+      },
+      "journal_after": {
+        "error": "missing or unreadable log"
+      }
+    }
+  },
+  "evidence": {
+    "tp_exchange": [],
+    "mad_tx": [],
+    "device_activation": [],
+    "ummu": [
+      "11\u6708 25 03:25:12 worker1 kernel: ummu ummu.0: event 0x13 received:"
+    ],
+    "tp_events": []
+  },
+  "ummu_events": [
+    {
+      "header": "11\u6708 25 03:25:12 worker1 kernel: ummu ummu.0: event 0x13 received:",
+      "code": "0x13",
+      "raw_words": [
+        "0x000000bd00002013",
+        "0x0000000000010000",
+        "0x0000000000000000",
+        "0x0000fffb90bc7000",
+        "0x0000000000000000",
+        "0x0000000000000000",
+        "0x0000000000000000",
+        "0x0000000000000000"
+      ],
+      "matches": [
+        {
+          "word_index": 3,
+          "word": "0x0000fffb90bc7000",
+          "registration": {
+            "node": "node0",
+            "thread": 0,
+            "kind": "host",
+            "va": 281455930142720,
+            "size": 64,
+            "atomic": true,
+            "source": "test\\reference_events\\results\\normal_scope_20261124_recovery\\normal_scope_urma_02_connect\\node0\\normal\\bench.log"
+          },
+          "owner": "peer"
+        }
+      ],
+      "decoded": {
+        "code": 19,
+        "tid": 189,
+        "read": false,
+        "privileged": true,
+        "instruction": false,
+        "stage2": false,
+        "stall": false,
+        "iova": "0xfffb90bc7000",
+        "tect_tag": 0,
+        "source_hashes": {
+          "interrupt.c": "d1577de5e85942787167e1d4571dc024df47ebfa78bda1b611fb288b9b452a28",
+          "queue.h": "695dcf00d46a126f6043d251edf9e5ea430fa858b2528db6615e1e2dc1a6724d"
+        },
+        "event_name": "EVT_P_PERMISSION",
+        "note": "Source-based decoding; deployed-module provenance must be checked separately. TID is not a Proxy index. Raw fields do not identify which node/context should own this TID."
+      }
+    }
+  ],
+  "note": "SDK status=9 is ACK timeout (retry limit exceeded). The UINT64_MAX WR id denotes internal control, not a measured tail FADD. In the first Dispatch prepare, code submits a host-memory arrival-barrier FADD. Check both peers, URMA EID/TP and run-scoped driver errors; IP ping/NCCL bootstrap do not validate this path. GPU P2P or fence causality is not established.",
+  "completion": {
+    "rank": "0",
+    "proxy": "0",
+    "status": "9",
+    "token": "65536",
+    "wr_id": "18446744073709551615",
+    "write": "0",
+    "atomic": "1"
+  },
+  "internal_control_atomic": true,
+  "initial_barrier_candidate": true
+}

@@ -4,12 +4,37 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import re
 import subprocess
 
 SUBTREES = ('drivers/iommu/hisilicon', 'drivers/ub/urma/hw/udma',
             'drivers/ub/urma/ubcore', 'drivers/ub/urma/uburma',
             'include/urma', 'include/uapi/urma', 'include/ub', 'include/uapi/ub')
 MAX_BYTES = 128 * 1024 * 1024
+
+
+def module_source_metadata(source_root):
+    """Keep generated version evidence in JSON even when Git ignores *.mod.c."""
+    paths = dict(ummu='drivers/iommu/hisilicon/ummu.mod.c',
+        ummu_core='drivers/iommu/hisilicon/ummu-core/ummu-core.mod.c',
+        ubmem_vmmu='drivers/iommu/hisilicon/ubmem-mmu/ubmem_vmmu.mod.c',
+        udma='drivers/ub/urma/hw/udma/udma.mod.c',
+        ubcore='drivers/ub/urma/ubcore/ubcore.mod.c',
+        uburma='drivers/ub/urma/uburma/uburma.mod.c')
+    result = {}
+    for name, relative in paths.items():
+        path = source_root/relative
+        item = dict(path=str(path))
+        try:
+            data=path.read_bytes()
+            text=data.decode('utf-8','replace')
+            match=re.search(r'MODULE_INFO\(srcversion,\s*"([0-9a-fA-F]+)"\)',text)
+            item.update(sha256=hashlib.sha256(data).hexdigest(),
+                        srcversion=match.group(1).upper() if match else None)
+        except OSError as exc:
+            item['error']=str(exc)
+        result[name]=item
+    return result
 
 
 def collect_sources(source_root, output, extras=()):
@@ -92,7 +117,8 @@ def main():
         ['uname','-a'],['git','-C',str(a.source_root),'rev-parse','HEAD'],
         ['git','-C',str(a.source_root),'diff','--stat','--',*SUBTREES])]
     result['modules']={}
-    for name in ('ummu','udma','ubcore','uburma'):
+    result['source_module_metadata']=module_source_metadata(a.source_root)
+    for name in result['source_module_metadata']:
         info=command(['modinfo',name]);result['modules'][name]=info
         path=next((line.split(':',1)[1].strip() for line in info.get('stdout','').splitlines() if line.startswith('filename:')),None)
         if path:
