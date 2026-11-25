@@ -38,8 +38,12 @@ def snapshot(device, source_root=None):
             for name in ('eid_list','features','tid_bits','ias','oas','options'):
                 path=Path(directory)/name
                 result['ummu_attrs'][str(path)]=read(path)
-    result['commands']=[command(args) for args in (
-        ['urma_admin','main_ue_eid','--help'],['urma_admin','main_ue_eid','show'])]
+    result['commands']=[command(['urma_admin','main_ue_eid','--help'])]
+    current=result['device_attrs'].get('eids/eid0',{}).get('text','').strip()
+    historical_peer='0000:0000:0001:0200:0010:0000:df00:4200'
+    for eid in dict.fromkeys((current,historical_peer)):
+        if re.fullmatch(r'(?:[0-9a-fA-F]{4}:){7}[0-9a-fA-F]{4}',eid):
+            result['commands'].append(command(['urma_admin','main_ue_eid','lookup',eid]))
     built=module_source_metadata(source_root) if source_root else {}
     result['source_module_metadata']=built
     result['modules']={}

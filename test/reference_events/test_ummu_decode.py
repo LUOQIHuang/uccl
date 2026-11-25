@@ -36,6 +36,8 @@ class UmmuTests(unittest.TestCase):
         self.assertTrue(any(Path(p).as_posix().endswith('/udmac0d1e2/guid') for p in paths))
         self.assertTrue(result['modules']['ummu']['version_comparison']['built_equals_loaded'])
         self.assertTrue(all(c[0]=='modinfo' or c[:2]==['urma_admin','main_ue_eid'] for c in commands))
+        self.assertTrue(any(c[:3]==['urma_admin','main_ue_eid','lookup'] for c in commands))
+        self.assertFalse(any(c[:3]==['urma_admin','main_ue_eid','show'] for c in commands))
 
     def test_real_event_is_permission_fault_on_peer_barrier(self):
         source=HERE/'results/urma_kernel_sources_01/node0/sources/kernel'
