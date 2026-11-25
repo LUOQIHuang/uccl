@@ -35,6 +35,7 @@ class DevicePairTests(unittest.TestCase):
             root=Path(tmp)
             (root/'try_device_pair.sh').write_text(Path(__file__).with_name('try_device_pair.sh').read_text())
             (root/'recover.sh').write_text('exec "$URMA_DIAG_PYTHON" "$(dirname "$0")/capture.py" "$@"\n')
+            (root/'run_boundaries.sh').write_text('exec "$URMA_DIAG_PYTHON" "$(dirname "$0")/capture.py" "$@"\n')
             (root/'capture.py').write_text('import json,sys;print(json.dumps(dict(zip(sys.argv[1::2],sys.argv[2::2]))))\n')
             for rank,device in ((0,'udmac1d1e2'),(1,'udmac0d1e2')):
                 env=dict(os.environ,URMA_DIAG_PYTHON=sys.executable)
@@ -46,6 +47,13 @@ class DevicePairTests(unittest.TestCase):
                 self.assertEqual(args['--step'],'paced')
                 self.assertEqual(args['--case-timeout'],'300')
                 self.assertEqual(args['--normal-fadd-fence-plan'],'peer-tail-off')
+                for part in ('smoke','coverage'):
+                    r=subprocess.run(['bash',str(root/'try_device_pair.sh'),'--node-rank',str(rank),'--part',part],env=env,stdout=subprocess.PIPE,stderr=subprocess.PIPE,universal_newlines=True)
+                    self.assertEqual(r.returncode,0,r.stderr)
+                    args=json.loads(r.stdout.splitlines()[-1])
+                    self.assertEqual(args['--part'],part)
+                    self.assertEqual(args['--urma-device'],device)
+                    self.assertEqual(args['--urma-device-plan'],'202c1-204c0')
 
 
 if __name__=='__main__':unittest.main()
