@@ -1,5 +1,7 @@
 # 指定设备组合已通过，恢复Normal阶段定位
 
+更新：smoke与五项coverage均已完成，见 [完整结果分析](C1_C0_COVERAGE_RESULTS.zh-CN.md)。不要重复执行本页测试命令；当前先使用已取得的稳定连续基线和离线分析结果。
+
 输入提交 `a0a2e10b`，结果 `results/urma_device_pair_01/urma_c1_c0_01/`。
 
 ## 1. 本次结果
