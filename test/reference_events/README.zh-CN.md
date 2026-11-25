@@ -2,7 +2,7 @@
 
 ## 2026-11-25 当前执行入口
 
-当前URMA环境只运行[软件准入额度8→32单项ABBA对照](CREDIT_AB.zh-CN.md)：两端各一条`run_credit_ab.sh --node-rank 0/1`，复用已有构建、关闭阶段采集、固定202c1/204c0及204 tail-off。目的检验已有FIFO背压能否通过放宽准入获得完整BF16 Dispatch净收益。已完成coverage不重跑；下方其他任务均为历史说明，不并行补测。
+软件准入额度8→32对照已完成：BF16两配对慢1.659%/0.271%，[结果分析](results/urma_credit32_01/ANALYSIS.zh-CN.md)确认无净收益，保留8，停止扩窗。下一步先看[后端实现与硬件差异审查](BACKEND_IMPLEMENTATION_AUDIT_20261125.zh-CN.md)，没有新增必跑硬件矩阵。已完成credit/coverage不重跑；下方其他任务均为历史说明，不并行补测。
 
 ## 2026-11-23 当前优先级
 
