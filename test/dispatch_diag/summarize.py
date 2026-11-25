@@ -98,8 +98,10 @@ def case_data(root,rank,trace,compiled_off=False,reference_events=None,token_swe
     if profile=='order' and (runtime.get('reference_order_version')!=1 or runtime.get('reference_profile')!=profile):raise ValueError('order runtime capability mismatch')
     identity['reference_profile']=profile
     window_plan=c.get('normal_window_plan','default')
-    if window_plan not in ('default','peer4'):raise ValueError('unknown Normal window plan')
-    expected_window=4 if window_plan=='peer4' and rank==1 else 8
+    if window_plan not in ('default','peer4','both32'):raise ValueError('unknown Normal window plan')
+    if window_plan=='both32' and (backend!='urma' or reference_events!='batch' or profile!='boundaries' or c.get('normal_fadd_fence_plan')!='peer-tail-off' or c.get('normal_retire_plan','ordered')!='ordered'):
+        raise ValueError('both32 requires the inactive batch credit experiment')
+    expected_window=32 if window_plan=='both32' else (4 if window_plan=='peer4' and rank==1 else 8)
     actual_window=runtime.get('normal_max_inflight')
     if (window_plan!='default' or actual_window is not None) and actual_window!=expected_window:raise ValueError('Normal window runtime mismatch')
     identity.update(normal_window_plan=window_plan,normal_max_inflight=expected_window)

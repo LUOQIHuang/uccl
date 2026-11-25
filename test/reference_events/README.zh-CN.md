@@ -1,5 +1,9 @@
 # 参考版本移植：Normal Dispatch 事件打点
 
+## 2026-11-25 当前执行入口
+
+当前URMA环境只运行[软件准入额度8→32单项ABBA对照](CREDIT_AB.zh-CN.md)：两端各一条`run_credit_ab.sh --node-rank 0/1`，复用已有构建、关闭阶段采集、固定202c1/204c0及204 tail-off。目的检验已有FIFO背压能否通过放宽准入获得完整BF16 Dispatch净收益。已完成coverage不重跑；下方其他任务均为历史说明，不并行补测。
+
 ## 2026-11-23 当前优先级
 
 先看[Normal实验复盘及下一步判定方案](NORMAL_REVIEW_20261123.zh-CN.md)，下一轮按[优化后大区间匹配对照](NORMAL_REVIEW_RUN.zh-CN.md)执行。复用现有稀疏边界，URMA固定仅204 tail-off，verbs保持原语义；先确定剩余整体差距积累在哪个大区间，不先重复CQE专项或fence矩阵。下文保留历次参考事件的操作说明。

@@ -113,7 +113,7 @@ def parser():
     p.add_argument('--ll-write-order',choices=('default','strong','relax'),default='default',help='diagnostic LL WRITE ordering; FADD fences unchanged')
     p.add_argument('--normal-write-order',choices=('default','strong','relax'),default='default',help='diagnostic Normal WRITE placement; FADD, fence and completion unchanged')
     p.add_argument('--normal-submit-schedule',choices=('lane-mixed','writes-first','tail-interleaved'),default='lane-mixed')
-    p.add_argument('--normal-window-plan',choices=('default','peer4'),default='default',help='Normal pending-command limit: default=8 on both; peer4=8 on node0 and 4 on node1')
+    p.add_argument('--normal-window-plan',choices=('default','peer4','both32'),default='default',help='Normal pending-command limit: default=8; peer4=node1 4; both32=32 on both, inactive batch credit experiment only')
     p.add_argument('--normal-fadd-fence-plan',choices=('default','all-on','peer-off','peer-tail-off'),default='default',help='diagnostic: keep FADD STRONG; disable all data or tagged tail fence on node1 only')
     p.add_argument('--require-normal-atomic-roles',action='store_true',help='reject modules without explicit Normal tail/head role capability')
     p.add_argument('--normal-retire-plan',choices=('ordered','peer-ready'),default='ordered',help='Normal-only: node1 reaps completed ordinary credits without crossing quiet/barrier')
@@ -167,9 +167,11 @@ def parser():
         p.error('normal completion diagnostics require --backend urma --mode normal')
     if args.normal_submit_schedule!='lane-mixed' and (args.backend!='urma' or args.mode!='normal' or args.normal_completion!='all' or not args.api_only or not args.dispatch_focus or args.reference_events not in ('paced','on') or args.action not in ('check','run')):
         p.error('alternate submission requires URMA Normal Dispatch focus API-only completion=all and reference-events paced/on check/run')
-    if args.normal_window_plan!='default' and (args.backend!='urma' or args.mode!='normal' or not args.dispatch_focus or args.reference_events not in ('paced','on') or args.normal_submit_schedule!='lane-mixed' or args.action not in ('check','run')):
+    if args.normal_window_plan=='both32' and (args.backend!='urma' or args.mode!='normal' or not args.dispatch_focus or args.reference_events!='batch' or args.reference_profile!='boundaries' or args.normal_fadd_fence_plan!='peer-tail-off' or args.normal_retire_plan!='ordered' or (args.normal_tokens,args.hidden,args.experts,args.topk,args.warmups,args.samples)!=(4096,7168,256,8,5,10) or args.action not in ('check','run')):
+        p.error('both32 requires fixed 4096/7168/256/8 5/10 URMA Normal inactive batch boundaries check/run with peer-tail-off and ordered retirement')
+    if args.normal_window_plan=='peer4' and (args.backend!='urma' or args.mode!='normal' or not args.dispatch_focus or args.reference_events not in ('paced','on') or args.normal_submit_schedule!='lane-mixed' or args.action not in ('check','run')):
         p.error('peer4 requires Normal Dispatch focus paced/on check/run with default submission schedule')
-    if args.normal_fadd_fence_plan!='default' and (args.backend!='urma' or args.mode!='normal' or not args.dispatch_focus or args.reference_events not in ('batch','paced','on') or args.normal_submit_schedule!='lane-mixed' or args.normal_window_plan!='default' or args.normal_completion!='all' or args.action not in ('check','run')):
+    if args.normal_fadd_fence_plan!='default' and (args.backend!='urma' or args.mode!='normal' or not args.dispatch_focus or args.reference_events not in ('batch','paced','on') or args.normal_submit_schedule!='lane-mixed' or args.normal_window_plan not in ('default','both32') or args.normal_completion!='all' or args.action not in ('check','run')):
         p.error('FADD fence experiment requires URMA Normal Dispatch focus batch/paced/on check/run with default window/submission/completion')
     if args.normal_retire_plan!='ordered' and (args.backend!='urma' or args.mode!='normal' or not args.dispatch_focus or args.reference_events!='paced' or args.reference_profile!='legacy' or args.normal_window_plan!='default' or args.normal_submit_schedule!='lane-mixed' or args.normal_completion!='all' or args.normal_fadd_fence_plan not in ('default','all-on') or args.action not in ('check','run')):
         p.error('peer-ready requires URMA Normal inactive paced default window/order/fence/completion check/run')
@@ -185,7 +187,7 @@ def parser():
         if args.gpu_stages or args.gpu_stage_build or args.gpu_stage_roles_only or args.dispatch_compiled_off:p.error('reference events exclude old GPU tracing')
         if (args.reference_events=='build')!=(args.action=='build'):p.error('reference-events build is for build only; off/on require check/run')
         if args.action!='build' and (args.action not in ('check','run') or not args.dispatch_focus):p.error('reference events require Normal Dispatch focus check/run')
-    if args.reference_profile=='boundaries' and (args.reference_events not in ('build','batch','paced','on') or args.normal_window_plan!='default' or args.normal_submit_schedule!='lane-mixed'):
+    if args.reference_profile=='boundaries' and (args.reference_events not in ('build','batch','paced','on') or args.normal_window_plan not in ('default','both32') or args.normal_submit_schedule!='lane-mixed'):
         p.error('boundary profile requires reference build/batch/paced/on and default window/submission')
     if args.reference_profile=='order' and (args.backend!='urma' or args.mode!='normal' or args.reference_events not in ('build','paced','on') or args.normal_submit_schedule not in ('lane-mixed','tail-interleaved')):
         p.error('order profile requires the URMA Normal reference order experiment')
@@ -223,7 +225,7 @@ def environment(args):
     env['UCCL_URMA_NORMAL_WRITE_ORDER']=getattr(args,'normal_write_order','default')
     env['UCCL_URMA_NORMAL_SUBMIT_SCHEDULE']=getattr(args,'normal_submit_schedule','lane-mixed')
     env['UCCL_URMA_NORMAL_COMPLETION']=args.normal_completion
-    env['UCCL_IB_MAX_INFLIGHT_NORMAL']=str(4 if getattr(args,'normal_window_plan','default')=='peer4' and args.node_rank==1 else 8)
+    env['UCCL_IB_MAX_INFLIGHT_NORMAL']=str(32 if args.normal_window_plan=='both32' else (4 if args.normal_window_plan=='peer4' and args.node_rank==1 else 8))
     env['UCCL_REFERENCE_PROFILE']=getattr(args,'reference_profile','legacy')
     env['UCCL_URMA_NORMAL_RETIRE']='ready' if args.normal_retire_plan=='peer-ready' and args.node_rank==1 else 'ordered'
     env['UCCL_URMA_NORMAL_FADD_FENCE']=('tail-off' if args.normal_fadd_fence_plan=='peer-tail-off' else 'off') if args.normal_fadd_fence_plan in ('peer-off','peer-tail-off') and args.node_rank==1 else 'on'
@@ -250,7 +252,7 @@ def preflight(args):
         raise RuntimeError('NORMAL_WRITE_ORDER_DIAGNOSTICS_REQUIRES_REBUILD')
     if getattr(args,'normal_submit_schedule','lane-mixed')!='lane-mixed' and metadata.get('normal_submit_schedule')!=args.normal_submit_schedule:
         raise RuntimeError('NORMAL_SUBMIT_SCHEDULE_REQUIRES_REBUILD')
-    expected_window=4 if getattr(args,'normal_window_plan','default')=='peer4' and args.node_rank==1 else 8
+    expected_window=32 if args.normal_window_plan=='both32' else (4 if args.normal_window_plan=='peer4' and args.node_rank==1 else 8)
     expected_retire='ready' if args.normal_retire_plan=='peer-ready' and args.node_rank==1 else 'ordered'
     if (args.normal_retire_plan!='ordered' or args.require_normal_retire) and (metadata.get('normal_fifo_retire_version')!=1 or metadata.get('normal_fifo_retire')!=expected_retire or metadata.get('queue_backend')!='fifo'):raise RuntimeError('NORMAL_FIFO_RETIRE_REBUILD_OR_RUNTIME_MISMATCH')
     if metadata.get('normal_fifo_retire') not in (None,expected_retire):raise RuntimeError('NORMAL_FIFO_RETIRE_ENVIRONMENT_LEAK')
@@ -450,7 +452,8 @@ def main():
                     observed_roles={r for r,_ in roles};checks['normal_atomic_roles']=all({f for r,f in roles if r==role}=={('off' if expected_fence=='off' or (expected_fence=='tail-off' and role=='tail') else 'on')} for role in observed_roles if role in ('tail','head')) and not any(r=='unknown' for r,f in roles)
             if mode=='normal' and info['runtime'].get('normal_fifo_retire_version')==1:
                 expected='ready' if args.normal_retire_plan=='peer-ready' and args.node_rank==1 else 'ordered'
-                observed=re.findall(r'\[NORMAL_FIFO_RETIRE\] policy=(ready|ordered) limit=8\b',text)
+                expected_limit=32 if args.normal_window_plan=='both32' else (4 if args.normal_window_plan=='peer4' and args.node_rank==1 else 8)
+                observed=re.findall(r'\[NORMAL_FIFO_RETIRE\] policy=(ready|ordered) limit='+str(expected_limit)+r'\b',text)
                 checks['normal_fifo_retire']=bool(observed) and set(observed)=={expected}
         if args.phase_suite:
             checks.update(phase_files=(case/'phases.jsonl').is_file() and (case/'api_samples.jsonl').is_file(),
