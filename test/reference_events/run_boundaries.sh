@@ -13,7 +13,7 @@ while [ "$#" -gt 0 ];do
  --master-addr) MASTER=${2:?};shift 2;; --port) PORT=${2:?};shift 2;; --gid-index) GID=${2:?};shift 2;;
  --output) ROOT=${2:?};shift 2;; --destination) DEST=${2:?};shift 2;;
  --normal-fadd-fence-plan) FENCE=${2:?};shift 2;;
- --ifname|--gpu-pci|--atomic-port|--case-timeout) LOCAL_ARGS+=("$1" "${2:?}");shift 2;;
+ --ifname|--gpu-pci|--atomic-port|--case-timeout|--urma-device|--urma-device-plan) LOCAL_ARGS+=("$1" "${2:?}");shift 2;;
  *) echo "unknown argument $1" >&2;exit 2;;
  esac
 done

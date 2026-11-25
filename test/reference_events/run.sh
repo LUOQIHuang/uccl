@@ -13,7 +13,7 @@ while [ "$#" -gt 0 ];do
  --reference-profile) PROFILE=${2:?};shift 2;;
  --normal-fadd-fence-plan) FENCE=${2:?};shift 2;;
  --ifname|--case-timeout) LOCAL_ARGS+=("$1" "${2:?}");shift 2;;
- --gpu-pci|--atomic-port) URMA_ARGS+=("$1" "${2:?}");shift 2;;
+ --gpu-pci|--atomic-port|--urma-device|--urma-device-plan) URMA_ARGS+=("$1" "${2:?}");shift 2;;
  *) echo "unknown reference-event argument $1" >&2;exit 2;;
  esac
 done

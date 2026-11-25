@@ -146,8 +146,13 @@ def parser():
     p.add_argument('--gpu',default='0'); p.add_argument('--case-timeout',type=int,default=1800)
     p.add_argument('--expected-kernel',default='6.6.0-gdr_f00955680_diag')
     p.add_argument('--urma-device',default='udmac0d1e2'); p.add_argument('--gpu-pci',default=os.environ.get('URMA_DIAG_GPU_PCI','0000:a1:00.0')); p.add_argument('--atomic-port',default=os.environ.get('URMA_DIAG_ATOMIC_PORT','auto'))
+    p.add_argument('--urma-device-plan',choices=('same','202c1-204c0'),default='same')
     p.add_argument('--ubctl-selector',default='0,1,1')
     args=p.parse_args()
+    if args.urma_device_plan!='same':
+        expected='udmac1d1e2' if args.node_rank==0 else 'udmac0d1e2'
+        if args.backend!='urma' or args.mode!='normal' or args.action not in ('check','run') or args.urma_device!=expected:
+            p.error('202c1-204c0 requires URMA Normal check/run with node0=udmac1d1e2 and node1=udmac0d1e2')
     if not re.fullmatch(r'[a-zA-Z0-9_-]+',args.job): p.error('invalid job')
     if args.action=='run' and not args.master_addr: p.error('--master-addr is required to run')
     if args.warmups<1 or args.samples<3: p.error('warmups >= 1 and samples >= 3 required')
@@ -339,6 +344,7 @@ def main():
         warmups=args.warmups,samples=args.samples,ll_hook_workload=args.ll_hook_workload,
         api_only=args.api_only,ll_write_order=args.ll_write_order,normal_write_order=args.normal_write_order,normal_submit_schedule=args.normal_submit_schedule,normal_window_plan=args.normal_window_plan,normal_completion=args.normal_completion,capture_layout=args.capture_layout,
         dispatch_trial=args.dispatch_trial,dispatch_delay_us=args.dispatch_delay_us,delay_node=1,timeline=getattr(args,'timeline',False),gpu_stages=getattr(args,'gpu_stages',False),gpu_stage_mode=args.gpu_stage_mode,device=args.urma_device,gpu=args.gpu,dispatch_focus=args.dispatch_focus,dispatch_compiled_off=args.dispatch_compiled_off,gpu_stage_roles_only=args.gpu_stage_roles_only)
+    fingerprint['urma_device_plan']=args.urma_device_plan
     try:
         module,manifest,info=preflight(args)
         fingerprint['reference_events']=args.reference_events
