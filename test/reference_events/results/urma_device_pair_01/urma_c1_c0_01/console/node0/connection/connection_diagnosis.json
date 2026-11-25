@@ -1,0 +1,54 @@
+{
+  "classification": "INSPECT_RUN_STATUS",
+  "primary_error": null,
+  "dmesg_scope": "unavailable_see_kernel_log",
+  "kernel_log": {
+    "source": "journal",
+    "scope": "full_snapshot_no_exact_delta",
+    "collection_errors": {
+      "dmesg_before": {
+        "command": [
+          "dmesg",
+          "--color=never"
+        ],
+        "executable": "/usr/bin/dmesg",
+        "rc": 1,
+        "stdout": "",
+        "stderr": "dmesg: read kernel buffer failed: Operation not permitted\n",
+        "truncated": false
+      },
+      "dmesg_after": {
+        "command": [
+          "dmesg",
+          "--color=never"
+        ],
+        "executable": "/usr/bin/dmesg",
+        "rc": 1,
+        "stdout": "",
+        "stderr": "dmesg: read kernel buffer failed: Operation not permitted\n",
+        "truncated": false
+      }
+    }
+  },
+  "evidence": {
+    "tp_exchange": [],
+    "mad_tx": [],
+    "device_activation": [],
+    "ummu": [],
+    "tp_events": [
+      "[334430.226778] master kernel: udma_ae_tp_level_error: 61 callbacks suppressed",
+      "[334430.226783] master kernel: ubase 0000a: UDMA: trigger TP level AE, event type is 16, sub type is 0, queue_num is 160.",
+      "[334430.226790] master kernel: ubase 0000a: UDMA: trigger TP level AE, event type is 16, sub type is 0, queue_num is 161.",
+      "[334430.226935] master kernel: ubase 0000a: UDMA: trigger TP level AE, event type is 16, sub type is 0, queue_num is 162.",
+      "[334430.226941] master kernel: ubase 0000a: UDMA: trigger TP level AE, event type is 16, sub type is 0, queue_num is 163.",
+      "[334430.226943] master kernel: ubase 0000a: UDMA: trigger TP level AE, event type is 16, sub type is 0, queue_num is 164.",
+      "[334430.226944] master kernel: ubase 0000a: UDMA: trigger TP level AE, event type is 16, sub type is 0, queue_num is 165.",
+      "[334430.226946] master kernel: ubase 0000a: UDMA: trigger TP level AE, event type is 16, sub type is 0, queue_num is 166.",
+      "[334430.226947] master kernel: ubase 0000a: UDMA: trigger TP level AE, event type is 16, sub type is 0, queue_num is 167.",
+      "[334430.226948] master kernel: ubase 0000a: UDMA: trigger TP level AE, event type is 16, sub type is 0, queue_num is 168.",
+      "[334430.226950] master kernel: ubase 0000a: UDMA: trigger TP level AE, event type is 16, sub type is 0, queue_num is 169."
+    ]
+  },
+  "ummu_events": [],
+  "note": "TP/MAD evidence narrows the failure to connection setup. It does not prove reboot age, firmware failure, a specific port, or that trace activation is unrelated. Compare the no-trace baseline first."
+}
