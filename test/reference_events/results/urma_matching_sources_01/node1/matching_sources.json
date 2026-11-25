@@ -1,0 +1,786 @@
+{
+  "targets": {
+    "ummu_core": "3500E02ECE5F584E58AF27F",
+    "udma": "A3473D20CABD75A33EAD171",
+    "ubcore": "53C2130D466B6E57BA01331",
+    "uburma": "ACC682CB49B082B37E5EDE3"
+  },
+  "candidates": [
+    {
+      "module": "ummu_core",
+      "path": "/home/f00955680/metax_dev/urma_after_kernel_20261029/diag/gdr_build_753c812e/tree/drivers/iommu/hisilicon/ummu-core/ummu-core.mod.c",
+      "expected": "3500E02ECE5F584E58AF27F",
+      "matched": false,
+      "error": "[Errno 2] No such file or directory: '/home/f00955680/metax_dev/urma_after_kernel_20261029/diag/gdr_build_753c812e/tree/drivers/iommu/hisilicon/ummu-core/ummu-core.mod.c'"
+    },
+    {
+      "module": "udma",
+      "path": "/home/f00955680/metax_dev/urma_after_kernel_20261029/diag/gdr_build_753c812e/tree/drivers/ub/urma/hw/udma/udma.mod.c",
+      "expected": "A3473D20CABD75A33EAD171",
+      "matched": false,
+      "error": "[Errno 2] No such file or directory: '/home/f00955680/metax_dev/urma_after_kernel_20261029/diag/gdr_build_753c812e/tree/drivers/ub/urma/hw/udma/udma.mod.c'"
+    },
+    {
+      "module": "udma",
+      "path": "/home/f00955680/metax_dev/urma_after_kernel_20261029/diag/gdr_build_753c812e/tree/urma/hw/udma/udma.mod.c",
+      "expected": "A3473D20CABD75A33EAD171",
+      "matched": false,
+      "srcversion": "C11377C8E8CF3A66C7DBE85",
+      "sha256": "b8fd5659494d853f6c3e57790f8d40b192721b78b6dade4dd0ed723a63dfd03a"
+    },
+    {
+      "module": "ubcore",
+      "path": "/home/f00955680/metax_dev/urma_after_kernel_20261029/diag/gdr_build_753c812e/tree/drivers/ub/urma/ubcore/ubcore.mod.c",
+      "expected": "53C2130D466B6E57BA01331",
+      "matched": false,
+      "error": "[Errno 2] No such file or directory: '/home/f00955680/metax_dev/urma_after_kernel_20261029/diag/gdr_build_753c812e/tree/drivers/ub/urma/ubcore/ubcore.mod.c'"
+    },
+    {
+      "module": "ubcore",
+      "path": "/home/f00955680/metax_dev/urma_after_kernel_20261029/diag/gdr_build_753c812e/tree/urma/ubcore/ubcore.mod.c",
+      "expected": "53C2130D466B6E57BA01331",
+      "matched": true,
+      "srcversion": "53C2130D466B6E57BA01331",
+      "sha256": "3c8db7bb794dfb4fd30bcbe4e17791b757b1745f6e9313e3b43270cb456255e9"
+    },
+    {
+      "module": "uburma",
+      "path": "/home/f00955680/metax_dev/urma_after_kernel_20261029/diag/gdr_build_753c812e/tree/drivers/ub/urma/uburma/uburma.mod.c",
+      "expected": "ACC682CB49B082B37E5EDE3",
+      "matched": false,
+      "error": "[Errno 2] No such file or directory: '/home/f00955680/metax_dev/urma_after_kernel_20261029/diag/gdr_build_753c812e/tree/drivers/ub/urma/uburma/uburma.mod.c'"
+    },
+    {
+      "module": "uburma",
+      "path": "/home/f00955680/metax_dev/urma_after_kernel_20261029/diag/gdr_build_753c812e/tree/urma/uburma/uburma.mod.c",
+      "expected": "ACC682CB49B082B37E5EDE3",
+      "matched": true,
+      "srcversion": "ACC682CB49B082B37E5EDE3",
+      "sha256": "de26d18b964b7f62a0409932e26d42a663b7c20e8ad862e213bcc852bf1f22a1"
+    },
+    {
+      "module": "ummu_core",
+      "path": "/home/f00955680/metax_dev/urma_after_kernel_20261029/diag/kernel_build_5c8e613f/tree/drivers/iommu/hisilicon/ummu-core/ummu-core.mod.c",
+      "expected": "3500E02ECE5F584E58AF27F",
+      "matched": true,
+      "srcversion": "3500E02ECE5F584E58AF27F",
+      "sha256": "31b0a4f74f47150a943c892fa148637207053ed0ca7d8a56a60f629d73754ac6"
+    },
+    {
+      "module": "udma",
+      "path": "/home/f00955680/metax_dev/urma_after_kernel_20261029/diag/kernel_build_5c8e613f/tree/drivers/ub/urma/hw/udma/udma.mod.c",
+      "expected": "A3473D20CABD75A33EAD171",
+      "matched": false,
+      "srcversion": "8E42E2310A9B00770B88DFD",
+      "sha256": "e06ce4c16ff1477f684f9fd5b1102f4e07bf0b1e8cc098b17f082bd49ad18c5f"
+    },
+    {
+      "module": "udma",
+      "path": "/home/f00955680/metax_dev/urma_after_kernel_20261029/diag/kernel_build_5c8e613f/tree/urma/hw/udma/udma.mod.c",
+      "expected": "A3473D20CABD75A33EAD171",
+      "matched": false,
+      "error": "[Errno 2] No such file or directory: '/home/f00955680/metax_dev/urma_after_kernel_20261029/diag/kernel_build_5c8e613f/tree/urma/hw/udma/udma.mod.c'"
+    },
+    {
+      "module": "ubcore",
+      "path": "/home/f00955680/metax_dev/urma_after_kernel_20261029/diag/kernel_build_5c8e613f/tree/drivers/ub/urma/ubcore/ubcore.mod.c",
+      "expected": "53C2130D466B6E57BA01331",
+      "matched": false,
+      "srcversion": "21A93C6028077D17580EB48",
+      "sha256": "73494a82ab53575128564d82115f30d991495f870321ae7b0725d8ef9502ecd8"
+    },
+    {
+      "module": "ubcore",
+      "path": "/home/f00955680/metax_dev/urma_after_kernel_20261029/diag/kernel_build_5c8e613f/tree/urma/ubcore/ubcore.mod.c",
+      "expected": "53C2130D466B6E57BA01331",
+      "matched": false,
+      "error": "[Errno 2] No such file or directory: '/home/f00955680/metax_dev/urma_after_kernel_20261029/diag/kernel_build_5c8e613f/tree/urma/ubcore/ubcore.mod.c'"
+    },
+    {
+      "module": "uburma",
+      "path": "/home/f00955680/metax_dev/urma_after_kernel_20261029/diag/kernel_build_5c8e613f/tree/drivers/ub/urma/uburma/uburma.mod.c",
+      "expected": "ACC682CB49B082B37E5EDE3",
+      "matched": false,
+      "srcversion": "6AA3EA07484C00C1E5E7E7C",
+      "sha256": "deded5e8c113b310c99e61b22f6aa480c926b006c98bdacf23e67a60a000c8de"
+    },
+    {
+      "module": "uburma",
+      "path": "/home/f00955680/metax_dev/urma_after_kernel_20261029/diag/kernel_build_5c8e613f/tree/urma/uburma/uburma.mod.c",
+      "expected": "ACC682CB49B082B37E5EDE3",
+      "matched": false,
+      "error": "[Errno 2] No such file or directory: '/home/f00955680/metax_dev/urma_after_kernel_20261029/diag/kernel_build_5c8e613f/tree/urma/uburma/uburma.mod.c'"
+    },
+    {
+      "module": "ummu_core",
+      "path": "/home/f00955680/metax_dev/urma_after_kernel_20261029/diag/kernel_candidate_e747a3b1/tree/drivers/iommu/hisilicon/ummu-core/ummu-core.mod.c",
+      "expected": "3500E02ECE5F584E58AF27F",
+      "matched": false,
+      "error": "[Errno 2] No such file or directory: '/home/f00955680/metax_dev/urma_after_kernel_20261029/diag/kernel_candidate_e747a3b1/tree/drivers/iommu/hisilicon/ummu-core/ummu-core.mod.c'"
+    },
+    {
+      "module": "udma",
+      "path": "/home/f00955680/metax_dev/urma_after_kernel_20261029/diag/kernel_candidate_e747a3b1/tree/drivers/ub/urma/hw/udma/udma.mod.c",
+      "expected": "A3473D20CABD75A33EAD171",
+      "matched": false,
+      "error": "[Errno 2] No such file or directory: '/home/f00955680/metax_dev/urma_after_kernel_20261029/diag/kernel_candidate_e747a3b1/tree/drivers/ub/urma/hw/udma/udma.mod.c'"
+    },
+    {
+      "module": "udma",
+      "path": "/home/f00955680/metax_dev/urma_after_kernel_20261029/diag/kernel_candidate_e747a3b1/tree/urma/hw/udma/udma.mod.c",
+      "expected": "A3473D20CABD75A33EAD171",
+      "matched": false,
+      "error": "[Errno 2] No such file or directory: '/home/f00955680/metax_dev/urma_after_kernel_20261029/diag/kernel_candidate_e747a3b1/tree/urma/hw/udma/udma.mod.c'"
+    },
+    {
+      "module": "ubcore",
+      "path": "/home/f00955680/metax_dev/urma_after_kernel_20261029/diag/kernel_candidate_e747a3b1/tree/drivers/ub/urma/ubcore/ubcore.mod.c",
+      "expected": "53C2130D466B6E57BA01331",
+      "matched": false,
+      "error": "[Errno 2] No such file or directory: '/home/f00955680/metax_dev/urma_after_kernel_20261029/diag/kernel_candidate_e747a3b1/tree/drivers/ub/urma/ubcore/ubcore.mod.c'"
+    },
+    {
+      "module": "ubcore",
+      "path": "/home/f00955680/metax_dev/urma_after_kernel_20261029/diag/kernel_candidate_e747a3b1/tree/urma/ubcore/ubcore.mod.c",
+      "expected": "53C2130D466B6E57BA01331",
+      "matched": false,
+      "error": "[Errno 2] No such file or directory: '/home/f00955680/metax_dev/urma_after_kernel_20261029/diag/kernel_candidate_e747a3b1/tree/urma/ubcore/ubcore.mod.c'"
+    },
+    {
+      "module": "uburma",
+      "path": "/home/f00955680/metax_dev/urma_after_kernel_20261029/diag/kernel_candidate_e747a3b1/tree/drivers/ub/urma/uburma/uburma.mod.c",
+      "expected": "ACC682CB49B082B37E5EDE3",
+      "matched": false,
+      "error": "[Errno 2] No such file or directory: '/home/f00955680/metax_dev/urma_after_kernel_20261029/diag/kernel_candidate_e747a3b1/tree/drivers/ub/urma/uburma/uburma.mod.c'"
+    },
+    {
+      "module": "uburma",
+      "path": "/home/f00955680/metax_dev/urma_after_kernel_20261029/diag/kernel_candidate_e747a3b1/tree/urma/uburma/uburma.mod.c",
+      "expected": "ACC682CB49B082B37E5EDE3",
+      "matched": false,
+      "error": "[Errno 2] No such file or directory: '/home/f00955680/metax_dev/urma_after_kernel_20261029/diag/kernel_candidate_e747a3b1/tree/urma/uburma/uburma.mod.c'"
+    },
+    {
+      "module": "ummu_core",
+      "path": "/home/h00918771/metax_dev/urma_after_kernel_20261029/diag/gdr_build_753c812e/tree/drivers/iommu/hisilicon/ummu-core/ummu-core.mod.c",
+      "expected": "3500E02ECE5F584E58AF27F",
+      "matched": false,
+      "error": "[Errno 2] No such file or directory: '/home/h00918771/metax_dev/urma_after_kernel_20261029/diag/gdr_build_753c812e/tree/drivers/iommu/hisilicon/ummu-core/ummu-core.mod.c'"
+    },
+    {
+      "module": "udma",
+      "path": "/home/h00918771/metax_dev/urma_after_kernel_20261029/diag/gdr_build_753c812e/tree/drivers/ub/urma/hw/udma/udma.mod.c",
+      "expected": "A3473D20CABD75A33EAD171",
+      "matched": false,
+      "error": "[Errno 2] No such file or directory: '/home/h00918771/metax_dev/urma_after_kernel_20261029/diag/gdr_build_753c812e/tree/drivers/ub/urma/hw/udma/udma.mod.c'"
+    },
+    {
+      "module": "udma",
+      "path": "/home/h00918771/metax_dev/urma_after_kernel_20261029/diag/gdr_build_753c812e/tree/urma/hw/udma/udma.mod.c",
+      "expected": "A3473D20CABD75A33EAD171",
+      "matched": false,
+      "error": "[Errno 2] No such file or directory: '/home/h00918771/metax_dev/urma_after_kernel_20261029/diag/gdr_build_753c812e/tree/urma/hw/udma/udma.mod.c'"
+    },
+    {
+      "module": "ubcore",
+      "path": "/home/h00918771/metax_dev/urma_after_kernel_20261029/diag/gdr_build_753c812e/tree/drivers/ub/urma/ubcore/ubcore.mod.c",
+      "expected": "53C2130D466B6E57BA01331",
+      "matched": false,
+      "error": "[Errno 2] No such file or directory: '/home/h00918771/metax_dev/urma_after_kernel_20261029/diag/gdr_build_753c812e/tree/drivers/ub/urma/ubcore/ubcore.mod.c'"
+    },
+    {
+      "module": "ubcore",
+      "path": "/home/h00918771/metax_dev/urma_after_kernel_20261029/diag/gdr_build_753c812e/tree/urma/ubcore/ubcore.mod.c",
+      "expected": "53C2130D466B6E57BA01331",
+      "matched": false,
+      "error": "[Errno 2] No such file or directory: '/home/h00918771/metax_dev/urma_after_kernel_20261029/diag/gdr_build_753c812e/tree/urma/ubcore/ubcore.mod.c'"
+    },
+    {
+      "module": "uburma",
+      "path": "/home/h00918771/metax_dev/urma_after_kernel_20261029/diag/gdr_build_753c812e/tree/drivers/ub/urma/uburma/uburma.mod.c",
+      "expected": "ACC682CB49B082B37E5EDE3",
+      "matched": false,
+      "error": "[Errno 2] No such file or directory: '/home/h00918771/metax_dev/urma_after_kernel_20261029/diag/gdr_build_753c812e/tree/drivers/ub/urma/uburma/uburma.mod.c'"
+    },
+    {
+      "module": "uburma",
+      "path": "/home/h00918771/metax_dev/urma_after_kernel_20261029/diag/gdr_build_753c812e/tree/urma/uburma/uburma.mod.c",
+      "expected": "ACC682CB49B082B37E5EDE3",
+      "matched": false,
+      "error": "[Errno 2] No such file or directory: '/home/h00918771/metax_dev/urma_after_kernel_20261029/diag/gdr_build_753c812e/tree/urma/uburma/uburma.mod.c'"
+    },
+    {
+      "module": "ummu_core",
+      "path": "/home/h00918771/metax_dev/urma_after_kernel_20261029/diag/kernel_build_5c8e613f/tree/drivers/iommu/hisilicon/ummu-core/ummu-core.mod.c",
+      "expected": "3500E02ECE5F584E58AF27F",
+      "matched": false,
+      "error": "[Errno 2] No such file or directory: '/home/h00918771/metax_dev/urma_after_kernel_20261029/diag/kernel_build_5c8e613f/tree/drivers/iommu/hisilicon/ummu-core/ummu-core.mod.c'"
+    },
+    {
+      "module": "udma",
+      "path": "/home/h00918771/metax_dev/urma_after_kernel_20261029/diag/kernel_build_5c8e613f/tree/drivers/ub/urma/hw/udma/udma.mod.c",
+      "expected": "A3473D20CABD75A33EAD171",
+      "matched": false,
+      "error": "[Errno 2] No such file or directory: '/home/h00918771/metax_dev/urma_after_kernel_20261029/diag/kernel_build_5c8e613f/tree/drivers/ub/urma/hw/udma/udma.mod.c'"
+    },
+    {
+      "module": "udma",
+      "path": "/home/h00918771/metax_dev/urma_after_kernel_20261029/diag/kernel_build_5c8e613f/tree/urma/hw/udma/udma.mod.c",
+      "expected": "A3473D20CABD75A33EAD171",
+      "matched": false,
+      "error": "[Errno 2] No such file or directory: '/home/h00918771/metax_dev/urma_after_kernel_20261029/diag/kernel_build_5c8e613f/tree/urma/hw/udma/udma.mod.c'"
+    },
+    {
+      "module": "ubcore",
+      "path": "/home/h00918771/metax_dev/urma_after_kernel_20261029/diag/kernel_build_5c8e613f/tree/drivers/ub/urma/ubcore/ubcore.mod.c",
+      "expected": "53C2130D466B6E57BA01331",
+      "matched": false,
+      "error": "[Errno 2] No such file or directory: '/home/h00918771/metax_dev/urma_after_kernel_20261029/diag/kernel_build_5c8e613f/tree/drivers/ub/urma/ubcore/ubcore.mod.c'"
+    },
+    {
+      "module": "ubcore",
+      "path": "/home/h00918771/metax_dev/urma_after_kernel_20261029/diag/kernel_build_5c8e613f/tree/urma/ubcore/ubcore.mod.c",
+      "expected": "53C2130D466B6E57BA01331",
+      "matched": false,
+      "error": "[Errno 2] No such file or directory: '/home/h00918771/metax_dev/urma_after_kernel_20261029/diag/kernel_build_5c8e613f/tree/urma/ubcore/ubcore.mod.c'"
+    },
+    {
+      "module": "uburma",
+      "path": "/home/h00918771/metax_dev/urma_after_kernel_20261029/diag/kernel_build_5c8e613f/tree/drivers/ub/urma/uburma/uburma.mod.c",
+      "expected": "ACC682CB49B082B37E5EDE3",
+      "matched": false,
+      "error": "[Errno 2] No such file or directory: '/home/h00918771/metax_dev/urma_after_kernel_20261029/diag/kernel_build_5c8e613f/tree/drivers/ub/urma/uburma/uburma.mod.c'"
+    },
+    {
+      "module": "uburma",
+      "path": "/home/h00918771/metax_dev/urma_after_kernel_20261029/diag/kernel_build_5c8e613f/tree/urma/uburma/uburma.mod.c",
+      "expected": "ACC682CB49B082B37E5EDE3",
+      "matched": false,
+      "error": "[Errno 2] No such file or directory: '/home/h00918771/metax_dev/urma_after_kernel_20261029/diag/kernel_build_5c8e613f/tree/urma/uburma/uburma.mod.c'"
+    },
+    {
+      "module": "ummu_core",
+      "path": "/home/h00918771/metax_dev/urma_after_kernel_20261029/diag/kernel_candidate_e747a3b1/tree/drivers/iommu/hisilicon/ummu-core/ummu-core.mod.c",
+      "expected": "3500E02ECE5F584E58AF27F",
+      "matched": false,
+      "error": "[Errno 2] No such file or directory: '/home/h00918771/metax_dev/urma_after_kernel_20261029/diag/kernel_candidate_e747a3b1/tree/drivers/iommu/hisilicon/ummu-core/ummu-core.mod.c'"
+    },
+    {
+      "module": "udma",
+      "path": "/home/h00918771/metax_dev/urma_after_kernel_20261029/diag/kernel_candidate_e747a3b1/tree/drivers/ub/urma/hw/udma/udma.mod.c",
+      "expected": "A3473D20CABD75A33EAD171",
+      "matched": false,
+      "error": "[Errno 2] No such file or directory: '/home/h00918771/metax_dev/urma_after_kernel_20261029/diag/kernel_candidate_e747a3b1/tree/drivers/ub/urma/hw/udma/udma.mod.c'"
+    },
+    {
+      "module": "udma",
+      "path": "/home/h00918771/metax_dev/urma_after_kernel_20261029/diag/kernel_candidate_e747a3b1/tree/urma/hw/udma/udma.mod.c",
+      "expected": "A3473D20CABD75A33EAD171",
+      "matched": false,
+      "error": "[Errno 2] No such file or directory: '/home/h00918771/metax_dev/urma_after_kernel_20261029/diag/kernel_candidate_e747a3b1/tree/urma/hw/udma/udma.mod.c'"
+    },
+    {
+      "module": "ubcore",
+      "path": "/home/h00918771/metax_dev/urma_after_kernel_20261029/diag/kernel_candidate_e747a3b1/tree/drivers/ub/urma/ubcore/ubcore.mod.c",
+      "expected": "53C2130D466B6E57BA01331",
+      "matched": false,
+      "error": "[Errno 2] No such file or directory: '/home/h00918771/metax_dev/urma_after_kernel_20261029/diag/kernel_candidate_e747a3b1/tree/drivers/ub/urma/ubcore/ubcore.mod.c'"
+    },
+    {
+      "module": "ubcore",
+      "path": "/home/h00918771/metax_dev/urma_after_kernel_20261029/diag/kernel_candidate_e747a3b1/tree/urma/ubcore/ubcore.mod.c",
+      "expected": "53C2130D466B6E57BA01331",
+      "matched": false,
+      "error": "[Errno 2] No such file or directory: '/home/h00918771/metax_dev/urma_after_kernel_20261029/diag/kernel_candidate_e747a3b1/tree/urma/ubcore/ubcore.mod.c'"
+    },
+    {
+      "module": "uburma",
+      "path": "/home/h00918771/metax_dev/urma_after_kernel_20261029/diag/kernel_candidate_e747a3b1/tree/drivers/ub/urma/uburma/uburma.mod.c",
+      "expected": "ACC682CB49B082B37E5EDE3",
+      "matched": false,
+      "error": "[Errno 2] No such file or directory: '/home/h00918771/metax_dev/urma_after_kernel_20261029/diag/kernel_candidate_e747a3b1/tree/drivers/ub/urma/uburma/uburma.mod.c'"
+    },
+    {
+      "module": "uburma",
+      "path": "/home/h00918771/metax_dev/urma_after_kernel_20261029/diag/kernel_candidate_e747a3b1/tree/urma/uburma/uburma.mod.c",
+      "expected": "ACC682CB49B082B37E5EDE3",
+      "matched": false,
+      "error": "[Errno 2] No such file or directory: '/home/h00918771/metax_dev/urma_after_kernel_20261029/diag/kernel_candidate_e747a3b1/tree/urma/uburma/uburma.mod.c'"
+    }
+  ],
+  "copied": {
+    "ubcore": {
+      "generated_module": {
+        "module": "ubcore",
+        "path": "/home/f00955680/metax_dev/urma_after_kernel_20261029/diag/gdr_build_753c812e/tree/urma/ubcore/ubcore.mod.c",
+        "expected": "53C2130D466B6E57BA01331",
+        "matched": true,
+        "srcversion": "53C2130D466B6E57BA01331",
+        "sha256": "3c8db7bb794dfb4fd30bcbe4e17791b757b1745f6e9313e3b43270cb456255e9"
+      },
+      "files": {
+        "ubcore_uvs_cmd.h": {
+          "bytes": 4199,
+          "sha256": "78fedc0d24abacc9a41739dce618fdb3dce465ae7734a03a6cfa22f2a968aa12"
+        },
+        "ubcore_log.c": {
+          "bytes": 349,
+          "sha256": "a92ece623d574187530759766d0f4dd394ae11ec53a7bad36e221242d4ab12e0"
+        },
+        "ubcore_tpid_table.h": {
+          "bytes": 2632,
+          "sha256": "d0c7097a545482b4b4a0f912e3b963610811197c4548c4f955f3cec2a89c4bf2"
+        },
+        "ubcore_uvs_cmd.c": {
+          "bytes": 11337,
+          "sha256": "5f204edf9e45c6dbeec7fc09bdd5ab60e62ae4cd7198b5c59824445c9d1e5324"
+        },
+        "ubcore_connect_adapter.h": {
+          "bytes": 3067,
+          "sha256": "25843a04e9f769dc503b2517ce7a8ee01a3d491b96da7b59c2b3dba30f59b7ce"
+        },
+        "ubcore_dmac.h": {
+          "bytes": 460,
+          "sha256": "7bbce3717534d8cc067411efb7a5944a0069c697af9c6638a5c599eeed268b0c"
+        },
+        "ubcore_dp.c": {
+          "bytes": 3619,
+          "sha256": "a138fa859a2996d94f7a09ad93d81492fe259b3cf55c633b6294a1a150e42617"
+        },
+        "ubcore_hash_table.h": {
+          "bytes": 2302,
+          "sha256": "e0c78dc2ee7e62622068cdb274634de1ae0cf2d5bb6da3b67f48ebfc9dfef15a"
+        },
+        "ubcore_main_ue_eid.c": {
+          "bytes": 8629,
+          "sha256": "b899273d4f394f1eff4df347a4cf39e7a1cc2dba641f4ed431344b6699a430ac"
+        },
+        "ubcore_log.h": {
+          "bytes": 5536,
+          "sha256": "feb91a10049a794beac6c353de982e151e07e9cb291810528dc4f81db4125213"
+        },
+        "ubcore_vtp.h": {
+          "bytes": 6961,
+          "sha256": "13d113873b0263dd70db0b9b56f214b9cf058a2154df7e1b9b21a4fb1f26ba78"
+        },
+        "ubcore_eid_trie.c": {
+          "bytes": 7151,
+          "sha256": "d3df5bfb5bfaeda92f49457ac286aa4ddae7db7ef17d4f649bfad97fde294c3a"
+        },
+        "ubcore_segment.c": {
+          "bytes": 11598,
+          "sha256": "489cdb8a16ab48a5f98da151101d3798b53da22f40989ed2ff685ec76e1b4f98"
+        },
+        "ubcore_tp_table.c": {
+          "bytes": 5191,
+          "sha256": "4d2c0aa5104f055cd30d2b791ad2777f1421c261c51e1d795e19a30071fb1809"
+        },
+        "ubcore_host_trie.h": {
+          "bytes": 1558,
+          "sha256": "fe82545d55122b970793da9aae62255329d99ddfddd33d6507d73c6a499fb20c"
+        },
+        "ubcore_genl.h": {
+          "bytes": 426,
+          "sha256": "408296210fb5d9ddaaf5fbfb61413b0cacb3154fccdcded2b4065053777ebf90"
+        },
+        "ubcore_cgroup.c": {
+          "bytes": 2531,
+          "sha256": "0f21a149b059b1917a605ecd6ebf67dbe881fd7a546b69a90609e293b481a821"
+        },
+        "ubcore_cmd.h": {
+          "bytes": 5997,
+          "sha256": "8b5af9400fc11185080bf32391b4e32b21d1253ba2def49cc30a919b39847d24"
+        },
+        "ubcore_msg.h": {
+          "bytes": 4100,
+          "sha256": "1eeab24402caff0000da57e2af9020edbef15c593ff2f24d7adf35129898b998"
+        },
+        "ubcore_cmd_tlv.c": {
+          "bytes": 12298,
+          "sha256": "15357c1c1ab331654a068d9cfa784caef671d7cc4bc694f3ccab6d60f22a2058"
+        },
+        "ubcore_topo_info.c": {
+          "bytes": 15678,
+          "sha256": "023d524682247e263147865e4b5518582d801345c73b09f1037fba236afa963e"
+        },
+        "ubcore_netlink.h": {
+          "bytes": 5769,
+          "sha256": "b02b6f3086d25f119734c7f096ff7a75a8146ce13a8ab132760763e13577c635"
+        },
+        "ubcore_tp.c": {
+          "bytes": 30541,
+          "sha256": "a4a3c41036d2bca01dffb21f8eca5c2fb4e71ca6d07028f5ba33e2c78ed36461"
+        },
+        "ubcore_main.c": {
+          "bytes": 3341,
+          "sha256": "665257c81f3003e5df8d61ce405a559bfcfc0b5142722905bf449fbe5b792ffd"
+        },
+        "ubcore_cmd_tlv.h": {
+          "bytes": 31366,
+          "sha256": "0fa28a1d2dde278a84f272a02dcac84718170c69be1c935b373dee8d1839545e"
+        },
+        "ubcore_hash_table.c": {
+          "bytes": 5385,
+          "sha256": "ef375f0cfbdf8421412ddf5a1d7b182cdaf973b197d215a75a0d8fb6b900ab1c"
+        },
+        "ubcore_jetty.c": {
+          "bytes": 132032,
+          "sha256": "b25bd232fde18f197e56d559212678c327f62d8bb4c166640976afbcf8b4cd8a"
+        },
+        "ubcore_perf.c": {
+          "bytes": 9123,
+          "sha256": "08e0aef72eef5c9e9034a906899953d786b1efa11533707afce8a1a875c6bf32"
+        },
+        "ubcore_genl_admin.c": {
+          "bytes": 48421,
+          "sha256": "bd37cc10a7d109a3835584913af0e96cc86aea81ff370a5347f24934b78c127d"
+        },
+        "ubcore_vtp.c": {
+          "bytes": 64312,
+          "sha256": "2a0deab3fcd438c2d28bdf082866c1e11aec6c9cb9bda5b98dd34d698d862828"
+        },
+        "ubcore_priv.h": {
+          "bytes": 7062,
+          "sha256": "22ec4fe6081f309f13e37c999013428aefc54ab9b9537f255f2ba5a9670b7476"
+        },
+        "ubcore_topo_info.h": {
+          "bytes": 2206,
+          "sha256": "c070b72e465320554437407abf91e89edcf4aa3b38a8b891b66bea3dd8df1621"
+        },
+        "ubcore_cdev_file.h": {
+          "bytes": 1527,
+          "sha256": "e57297f50e2218a3ecdcda6532c97ac549a7ce17944c79fd57adddf63ed600f2"
+        },
+        "ubcore_msg.c": {
+          "bytes": 7909,
+          "sha256": "3a206335dfab4b23c9381559b89abf5d232ae34f42a39bdef31f2a774a47a80f"
+        },
+        "ubcore_host_info.h": {
+          "bytes": 618,
+          "sha256": "54de3fce61bef2500d18268a383647c1a9f087b0bed369146fc46f9a5071ba76"
+        },
+        "ubcore_dmac.c": {
+          "bytes": 4929,
+          "sha256": "42628b164cfd2c9b414046fb79053e55d7870d040530e4e495cf0d2c3e9c37bc"
+        },
+        "ubcore_genl_define.h": {
+          "bytes": 1353,
+          "sha256": "b3abdbccd0d1c790f48b5232eb4ddfc4e4d15d08d7eb925413d431315254189d"
+        },
+        "ubcore_tp.h": {
+          "bytes": 3062,
+          "sha256": "8d7851a22b938c954b08236180911f08407eb8339475ea530f414297fde39891"
+        },
+        "ubcore_netlink.c": {
+          "bytes": 16462,
+          "sha256": "906dfb78d5639446cc93de0a4d23c35a3600922315b81901b4fcfa4b8eb309d6"
+        },
+        "ubcore_main.h": {
+          "bytes": 424,
+          "sha256": "d0b9e3728e63fa44d611c2e4ad5be908674ba0edd11eca4821e2082a506871b8"
+        },
+        "ubcore_tp_table.h": {
+          "bytes": 2078,
+          "sha256": "66a66a3089134865f583e2756f48760aea6265f113b63de693dd9d6770a5a2d2"
+        },
+        "ubcore_device.c": {
+          "bytes": 68581,
+          "sha256": "768cfb6f7bd44ab8990fd6030c6e3d7688c971e7e10ce74249672fc56b62713d"
+        },
+        "ubcore_host_info.c": {
+          "bytes": 1851,
+          "sha256": "d3533f01a341308033c3d6554cab21a18899b5d67378cd3cd77de4a6342f55b6"
+        },
+        "ubcore_connect_adapter.c": {
+          "bytes": 69618,
+          "sha256": "462665b3ca89ed78346041c6f1fa187237cf862cf6e82810937d54704104fec6"
+        },
+        "ubcore_genl_admin.h": {
+          "bytes": 2900,
+          "sha256": "ac16e69707112420ebb5f5a227ad3cf0a7b31d54a769ee411e96c3501e1c2f61"
+        },
+        "ubcore_opt.h": {
+          "bytes": 2887,
+          "sha256": "33e09f559a4a701d8093892eabcd7e6d3086145de72b4e59c5d8f7a3008b21ef"
+        },
+        "ubcore_device.h": {
+          "bytes": 2163,
+          "sha256": "bee1253d471491b389a3105b53fda7cdaf6fdfb03d1ccb56f93729b0ca44162b"
+        },
+        "ubcore_host_trie.c": {
+          "bytes": 7214,
+          "sha256": "63bbc6f118bee180c5739ba55bb7e41ae466c829c40caecb909b8a2da7d0d55f"
+        },
+        "ubcore_workqueue.h": {
+          "bytes": 1399,
+          "sha256": "b7160727becb1c3103ba098d6dccbdc49dc01328e4e175b70eae2f8a2b4cac32"
+        },
+        "ubcore_workqueue.c": {
+          "bytes": 3556,
+          "sha256": "3edf461d5cd89b09b167d39fc4819cfe9ab5d1e65742048e938ed7e67957070b"
+        },
+        "ubcore_eid_trie.h": {
+          "bytes": 1485,
+          "sha256": "527263ee19f34b495bd7120a039b3c24b18986761228ba466ba6ede5a4a12fcd"
+        },
+        "Makefile": {
+          "bytes": 837,
+          "sha256": "e1bdf373c1275668185786c318a8fa4f7b04149b35c42519b4a0cbcbb6a60c9e"
+        },
+        "ubcore_main_ue_eid.h": {
+          "bytes": 1023,
+          "sha256": "22fa7798faab7225dc8edd76c4d5a59c7c0e7516c4f5f46f886e86d8ff4eb349"
+        },
+        "ubcore_cdev_file.c": {
+          "bytes": 38313,
+          "sha256": "51cce3fc9a046de428c7b62f5da93e1840b13bfdbf808987088e0f2612dd31bc"
+        },
+        "ubcore_genl.c": {
+          "bytes": 7880,
+          "sha256": "761ef9a83548e6201c829f44b2887bcd558f6d3f9fe70ca0e621fb75b52a2df0"
+        },
+        "ubcore_umem.c": {
+          "bytes": 8186,
+          "sha256": "d0afed727a4ac1b531b7177a4e555f783ad9dd27d7e722a285553066040c39e5"
+        },
+        "ubcm/ub_mad_priv.h": {
+          "bytes": 8316,
+          "sha256": "0f130e851e88a8dbe17f20a46a81256b43ebe9ba1c089299f919b7a69c8e6932"
+        },
+        "ubcm/ub_cm.h": {
+          "bytes": 935,
+          "sha256": "42332f2e2da1d986c6899933e322a1d7bcc298541d7437a933d73eaf09fc5253"
+        },
+        "ubcm/ub_cm.c": {
+          "bytes": 8614,
+          "sha256": "112096ba3df6a57d0b08090c226985bbe63035e0dff3c10f8117383433789d42"
+        },
+        "ubcm/ub_mad.c": {
+          "bytes": 38102,
+          "sha256": "9851ec3e3519c6ca97ad2e7abfbcac7af78cbdec3052deaf623a89baabcb5528"
+        },
+        "ubcm/ubmad_datapath.c": {
+          "bytes": 55986,
+          "sha256": "e67b3b9d0467e3a205169b5e008f8e9ab7adff03f65fcc1c7c42dc411df49533"
+        },
+        "ubcm/ub_mad.h": {
+          "bytes": 2201,
+          "sha256": "3b689981ec3a57cece952ab514d5884ac5c78beeb5a97ebe627e62506e7b0c8e"
+        },
+        "net/ubcore_comm.h": {
+          "bytes": 2926,
+          "sha256": "71617b6e99163b4245d78296141bcbd6020c8658145c64e8f546a3e84aa6ed46"
+        },
+        "net/ubcore_comm.c": {
+          "bytes": 13619,
+          "sha256": "a6f7f5add095685bd455a778376fa6303ca0f90ded013a25a470c99e99309d61"
+        },
+        "net/ubcore_session.c": {
+          "bytes": 5894,
+          "sha256": "eac36cd6432bea8d1b35339ae380603a3a06466b051d5a57f686b0eb0de93196"
+        },
+        "net/ubcore_cm.c": {
+          "bytes": 7778,
+          "sha256": "26b0e17ffb3a992a582c16cf16a6bd8a8e8da621b818bb708502e214d7b66f50"
+        },
+        "net/ubcore_session.h": {
+          "bytes": 2939,
+          "sha256": "156cba0e155745201da5a2d914387ca9ab79ff86eb92715a09acd15b821fb895"
+        },
+        "net/ubcore_protocol.h": {
+          "bytes": 1511,
+          "sha256": "e35712a47b2d9c9f21ded7c8822b31c47bf0383fdbaca589b82f5b55b3a15759"
+        },
+        "net/ubcore_cm.h": {
+          "bytes": 2653,
+          "sha256": "5a63752f20ff9c69566ab75e3f36bea200a6a5e563b98dd6809b9c7cf316553f"
+        },
+        "ubmgr/ubmgr.c": {
+          "bytes": 499,
+          "sha256": "fa6cc33909adcbfb269eb4da5a43d4f59bbcb70d60541f46d435e87e585359c5"
+        },
+        "ubmgr/ubmgr.h": {
+          "bytes": 330,
+          "sha256": "9b5403d403c1ea3636fa6bf8e6407963566d8e2d81afb1c0ec151cd64751deb8"
+        },
+        "ubmgr/ubmgr_ping.c": {
+          "bytes": 20832,
+          "sha256": "132f425efaa09e39ad0ff2f2330de836c4e83b49ae56decba6643c05434ec8f3"
+        },
+        "ubmgr/ubmgr_ping.h": {
+          "bytes": 349,
+          "sha256": "301fd44b2258d79fea62bfa85cd72453fcb0a1d89a1809574dc93109d8837691"
+        }
+      }
+    },
+    "uburma": {
+      "generated_module": {
+        "module": "uburma",
+        "path": "/home/f00955680/metax_dev/urma_after_kernel_20261029/diag/gdr_build_753c812e/tree/urma/uburma/uburma.mod.c",
+        "expected": "ACC682CB49B082B37E5EDE3",
+        "matched": true,
+        "srcversion": "ACC682CB49B082B37E5EDE3",
+        "sha256": "de26d18b964b7f62a0409932e26d42a663b7c20e8ad862e213bcc852bf1f22a1"
+      },
+      "files": {
+        "uburma_file_ops.h": {
+          "bytes": 717,
+          "sha256": "daac0a6257e26e8e02f3f5070fddccdd6e80401f07131977455ae51989fc975d"
+        },
+        "uburma_cmd.c": {
+          "bytes": 147679,
+          "sha256": "b5d8f6cc0ca52a92354851542b8a87148437caf7152a7a80a75e66bf894460ed"
+        },
+        "uburma_main.c": {
+          "bytes": 10960,
+          "sha256": "c775bc63f6cfba47543375e48a4720b119fcce15a0327686cb255df3d58ac009"
+        },
+        "uburma_log.c": {
+          "bytes": 349,
+          "sha256": "1cc8264c22b254367755a6401c1920db6445d2074f24645e98120a94b950d2cf"
+        },
+        "uburma_uobj.h": {
+          "bytes": 9748,
+          "sha256": "a9a6ce45d97236c0fd7daeec2e3a8e1fb48b833492b5075ba8d6d7a847d1354f"
+        },
+        "uburma_mmap.c": {
+          "bytes": 3535,
+          "sha256": "bedc3e8c9032157239c79f4d3dd0c088aea624d0ea98fd71376e615f3dd579ed"
+        },
+        "uburma_cmd_tlv.c": {
+          "bytes": 91416,
+          "sha256": "88d82ae866842651882bf54c42860a51cc2ba8f090a0147e9157022e0ac05be7"
+        },
+        "uburma_dev_ops.c": {
+          "bytes": 8098,
+          "sha256": "f15a2522a5047465e5585602c4d919260fca9186fdfb1b1614f7dd16f2745281"
+        },
+        "uburma_uobj.c": {
+          "bytes": 37625,
+          "sha256": "22dc0d06067e96b54a2a96f5afc7c1663082fb76145259078afcfbc775df6dbd"
+        },
+        "uburma_cmd_tlv.h": {
+          "bytes": 45975,
+          "sha256": "8bc0b44ff390308e74b8e6dfbc0cfa34774c411933fe192e3a5630a147c7ef6f"
+        },
+        "uburma_event.h": {
+          "bytes": 1696,
+          "sha256": "10615eff7282912dc3b1f39be9c9985fc102250386c8de92f904baea59d08bbb"
+        },
+        "uburma_event.c": {
+          "bytes": 22837,
+          "sha256": "dda9028478fc141ed7a4ab7ad8a86882c41abf89c56697037f0112203eccc12f"
+        },
+        "uburma_log.h": {
+          "bytes": 4940,
+          "sha256": "37df519a0e2911d0b6a42bf6fbb46cbd5013c657d51665df99f834de57e8e107"
+        },
+        "uburma_cmd.h": {
+          "bytes": 33430,
+          "sha256": "1f0625a3b756083aaa848f431a437ee59cb40f4dc7df1b873d6fec1d49d2ba08"
+        },
+        "uburma_mmap.h": {
+          "bytes": 594,
+          "sha256": "41ee91bcf1eed78519da7f379c861c5cd8ab5bb05d1afe9bcfec499ff1038bde"
+        },
+        "Makefile": {
+          "bytes": 293,
+          "sha256": "2f365ca7ef5aa1888ddcc3444d7e778d3f909144a29fcf13dca530a7bc636313"
+        },
+        "uburma_types.h": {
+          "bytes": 2614,
+          "sha256": "de3b5f3184b3371c8a54e98390bbe172ddeaca1636297a09ca2c0ab0b03f0a46"
+        }
+      }
+    },
+    "ummu_core": {
+      "generated_module": {
+        "module": "ummu_core",
+        "path": "/home/f00955680/metax_dev/urma_after_kernel_20261029/diag/kernel_build_5c8e613f/tree/drivers/iommu/hisilicon/ummu-core/ummu-core.mod.c",
+        "expected": "3500E02ECE5F584E58AF27F",
+        "matched": true,
+        "srcversion": "3500E02ECE5F584E58AF27F",
+        "sha256": "31b0a4f74f47150a943c892fa148637207053ed0ca7d8a56a60f629d73754ac6"
+      },
+      "files": {
+        "ummu_core_priv.h": {
+          "bytes": 1552,
+          "sha256": "0d8e68796f36d269828eda4afb8e9fb78359fcccf08006235a9d5fd4218a51fa"
+        },
+        "Kconfig": {
+          "bytes": 1217,
+          "sha256": "942bcc68d926eb6db2361db39f01aff26ca1e6c9b71c1e1114e7c5e34a7f374c"
+        },
+        "ummu_trace.h": {
+          "bytes": 1478,
+          "sha256": "d4efb1618546ae435f912dd38bd662f49c08d477c2df7db094ba955be46cf827"
+        },
+        "core.c": {
+          "bytes": 11888,
+          "sha256": "0304c3327d1fd20375c3f4c7a721ab440f3fbf074be97962c8bfd920b7413827"
+        },
+        "core_iova.c": {
+          "bytes": 8936,
+          "sha256": "bef23131a8502d8c1213c6f27a9c79631fadee14af859befda992c6844e527f8"
+        },
+        "core_matt.c": {
+          "bytes": 9942,
+          "sha256": "dbd158f1db9bb86221cbbe33b94bed105a2443f9d882878d0f4085f55ef8c7af"
+        },
+        "core_common.c": {
+          "bytes": 739,
+          "sha256": "89e9ed172294b3b4b1dcfce5d34e4bd7644fb90b8fd30bd0c8ecf61a74993caf"
+        },
+        "core_ioctl.c": {
+          "bytes": 20280,
+          "sha256": "7ffed226b9ef9b0a04b803f88d595d8bc153712bf721d7106d28424bc4ddfb3b"
+        },
+        "core_tid.c": {
+          "bytes": 8160,
+          "sha256": "80de612264b6bcf85a72804ad29366217ecd7755de096f0f9dfac895a51c823a"
+        },
+        "core_tdev.c": {
+          "bytes": 8153,
+          "sha256": "b863d781bc5d87d152d32a15bc13680ab7d373cd156b7ee1447497abcdfda2cb"
+        },
+        "core_eid.c": {
+          "bytes": 2398,
+          "sha256": "a77031267707105384b70f43ae830212447f1ed56585a1a8356bbc81e8ea5669"
+        },
+        "Makefile": {
+          "bytes": 364,
+          "sha256": "29bc7694cec2643eb6bae35558c28726c1065801771356c66b139b7fc0c1bd3a"
+        }
+      }
+    }
+  },
+  "errors": [],
+  "note": "Matching generated srcversion is a source candidate, not a reproducible-binary proof. No compile, module load, device changes or benchmark.",
+  "not_found": [
+    "udma"
+  ],
+  "lookups": [
+    {
+      "command": [
+        "urma_admin",
+        "main_ue_eid",
+        "lookup",
+        "0000:0000:0001:0200:0010:0000:df00:0200"
+      ],
+      "rc": 0,
+      "stdout": "0000:0000:003f:0200:0010:0000:df00:0b00\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "urma_admin",
+        "main_ue_eid",
+        "lookup",
+        "0000:0000:0001:0200:0010:0000:df00:4200"
+      ],
+      "rc": 0,
+      "stdout": "0000:0000:003f:0200:0010:0000:df00:4b00\n",
+      "stderr": ""
+    }
+  ]
+}
