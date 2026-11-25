@@ -2,7 +2,7 @@
 
 ## 2026-11-25 当前执行入口
 
-软件准入额度8→32对照已完成：BF16两配对慢1.659%/0.271%，[结果分析](results/urma_credit32_01/ANALYSIS.zh-CN.md)确认无净收益，保留8，停止扩窗。下一步先看[后端实现与硬件差异审查](BACKEND_IMPLEMENTATION_AUDIT_20261125.zh-CN.md)，没有新增必跑硬件矩阵。已完成credit/coverage不重跑；下方其他任务均为历史说明，不并行补测。
+软件准入额度8→32对照已完成：BF16两配对慢1.659%/0.271%，[结果分析](results/urma_credit32_01/ANALYSIS.zh-CN.md)确认无净收益，保留8，停止扩窗。结合[实现与硬件差异审查](BACKEND_IMPLEMENTATION_AUDIT_20261125.zh-CN.md)，下一项只运行[WRITE/FADD完成可读性及CPU排空观察](../normal_completion/README.zh-CN.md)：新隔离构建，pre/probe/post三项，不改语义，不加GPU探针。已完成credit/coverage不重跑；下方其他任务均为历史说明，不并行补测。
 
 ## 2026-11-23 当前优先级
 
