@@ -58,6 +58,9 @@ def transform(name, source):
         source = legacy.tail_changes(name, source)
     if name in ('ep/src/urma_transport.cpp', 'ep/setup.py', 'ep/tests/run_urma_tests.py'):
         source = legacy.cq_changes(name, source)
+    if name == 'ep/tests/run_urma_tests.py':
+        source = replace(source, "str(ep/'tests/urma_proxy_plan_test.cpp'),'-o',str(proxy_test)]",
+            "'-include',str(ep/'include/fadd_path_probe.hpp'),str(ep/'tests/urma_proxy_plan_test.cpp'),'-o',str(proxy_test)]")
     if name == 'ep/src/proxy.cpp':
         source = '#include "fadd_path_probe.hpp"\n' + source
         source = replace(source, '      ensure_urma_capacity(limit);',
@@ -92,6 +95,10 @@ def compose():
         ['git', '-C', str(REPO), 'show', BASE + ':' + name]).decode('utf-8')) for name in TARGETS}
     sources['ep/include/fadd_path_probe.hpp'] = header()
     sources['ep/include/cq_ready_probe.hpp'] = (FADD / 'native/cq_ready.hpp').read_text(encoding='utf-8')
+    plan_test = subprocess.check_output(['git', '-C', str(REPO), 'show', BASE + ':ep/tests/urma_proxy_plan_test.cpp']).decode('utf-8')
+    plan_test = replace(plan_test, 'struct { bool use_normal_mode; } cfg_;',
+        'struct { bool use_normal_mode; int thread_idx=0; } cfg_;')
+    sources['ep/tests/urma_proxy_plan_test.cpp'] = plan_test
     return sources
 
 
