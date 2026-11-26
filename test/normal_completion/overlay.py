@@ -145,6 +145,18 @@ def compose(study='completion'):
         'struct { bool use_normal_mode; int thread_idx=0; } cfg_;')
     sources['ep/tests/urma_proxy_plan_test.cpp'] = plan_test
     if study == 'blockers':
+        # fifo_stage_test.cpp also extracts from proxy.cpp (fifo_notify.inc) which
+        # now contains fifo_observe calls referencing uccl::fadd_path and cfg_.thread_idx.
+        # Add -include fadd_path_probe.hpp to the fifo_stage compile command and
+        # add thread_idx=0 to the mock cfg_ struct.
+        sources['ep/tests/run_urma_tests.py'] = replace(
+            sources['ep/tests/run_urma_tests.py'],
+            "str(ep/'tests/fifo_stage_test.cpp'),'-o',str(fifo_test)]",
+            "'-include',str(ep/'include/fadd_path_probe.hpp'),str(ep/'tests/fifo_stage_test.cpp'),'-o',str(fifo_test)]")
+        fifo_test_src = subprocess.check_output(['git', '-C', str(REPO), 'show', BASE + ':ep/tests/fifo_stage_test.cpp']).decode('utf-8')
+        fifo_test_src = replace(fifo_test_src, 'struct {std::vector<Handle> d2h_queues;} cfg_;',
+            'struct {std::vector<Handle> d2h_queues; int thread_idx=0;} cfg_;')
+        sources['ep/tests/fifo_stage_test.cpp'] = fifo_test_src
         sources['ep/include/fadd_path_probe.hpp'] = blocker_header(sources['ep/include/fadd_path_probe.hpp'])
         sources['ep/src/uccl_ep.cc'] = replace(sources['ep/src/uccl_ep.cc'], 'uccl::fadd_path::begin(6)', 'uccl::fadd_path::begin(7)')
         sources['ep/src/uccl_ep.cc'] = replace(sources['ep/src/uccl_ep.cc'], 'get_normal_completion_probe_version", [](){return 1;}', 'get_normal_completion_probe_version", [](){return 2;}')

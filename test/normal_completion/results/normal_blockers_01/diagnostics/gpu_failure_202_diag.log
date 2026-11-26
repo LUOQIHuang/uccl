@@ -1,0 +1,159 @@
+=== TIMESTAMP ===
+Thu Nov 26 07:11:04 PM CST 2026
+=== HOSTNAME ===
+master
+=== GPU LSPCI ===
+21:00.0 Display controller: Device 9999:4001 (rev 01)
+	Subsystem: Device 9999:4001
+	Control: I/O- Mem+ BusMaster+ SpecCycle- MemWINV- VGASnoop- ParErr- Stepping- SERR- FastB2B- DisINTx+
+	Status: Cap+ 66MHz- UDF- FastB2B- ParErr- DEVSEL=fast >TAbort- <TAbort- <MAbort- >SERR- <PERR- INTx-
+	Latency: 0, Cache Line Size: 32 bytes
+	Interrupt: pin A routed to IRQ 322
+	NUMA node: 0
+	Region 0: Memory at 800000000000 (64-bit, prefetchable) [size=64G]
+	Region 2: Memory at 801000000000 (64-bit, prefetchable) [size=8M]
+	Region 5: Memory at 82a00000 (32-bit, non-prefetchable) [size=1M]
+	Expansion ROM at 82800000 [disabled] [size=2M]
+	Capabilities: <access denied>
+	Kernel driver in use: METAX
+	Kernel modules: metax
+
+=== MPS REGISTERS ===
+GPU device 0000:21:00.0:
+0040
+GPU bridge 0000:20:00.0:
+0060
+NIC bridge a0:08.0:
+0060
+=== MX-SMI FULL ===
+mx-smi  version: 2.3.4
+
+=================== MetaX System Management Interface Log ===================
+Timestamp                                         : Thu Nov 26 19:11:04 2026
+
+Attached GPUs                                     : 1
++---------------------------------------------------------------------------------+
+| MX-SMI 2.3.4                       Kernel Mode Driver Version: 3.10.14          |
+| MACA Version: 3.9.0.29             BIOS Version: 1.30.0.0                       |
+|------------------+-----------------+---------------------+----------------------|
+| Board       Name | GPU   Persist-M | Bus-id              | GPU-Util      sGPU-M |
+| Pwr:Usage/Cap    | Temp       Perf | Memory-Usage        | GPU-State            |
+|==================+=================+=====================+======================|
+| 0     MetaX C500 | 0           Off | 0000:21:00.0        | 0%          Disabled |
+| 44W / 350W       | 58C          P0 | 860/65536 MiB       | Available            |
++------------------+-----------------+---------------------+----------------------+
+
++---------------------------------------------------------------------------------+
+| Process:                                                                        |
+|  GPU                    PID         Process Name                 GPU Memory     |
+|                                                                  Usage(MiB)     |
+|=================================================================================|
+|  no process found                                                               |
++---------------------------------------------------------------------------------+
+
+End of Log
+=== MX-SI PERSISTENCE ===
+mx-smi  version: 2.3.4
+
+=================== MetaX System Management Interface Log ===================
+Timestamp                                         : Thu Nov 26 19:11:04 2026
+
+Attached GPUs                                     : 1
+GPU#0  MXC500  0000:21:00.0
+    Persistent Mode
+        state                                     : Disable 
+
+End of Log
+=== LOADED MODULES ===
+udma_metax_p2p_bridge    12288  0
+udma                  278528  1 udma_metax_p2p_bridge
+metax                2007040  1 udma_metax_p2p_bridge
+hibmc_drm              45056  0
+drm_vram_helper        24576  1 hibmc_drm
+drm_ttm_helper         12288  2 hibmc_drm,drm_vram_helper
+drm_display_helper    196608  1 hibmc_drm
+drm_kms_helper        245760  5 hibmc_drm,drm_vram_helper,drm_display_helper
+ummu_pmu               28672  0
+ubcore                638976  5 ubagg,ipourma,uburma,sentry_urma_comm,udma
+ubase                 286720  5 cis,ub_fwctl,unic,udma,cdma
+ubus                  217088  18 hisi_ubus,sentry_reporter,ubase,obmm
+ummu                  188416  12
+ttm                    94208  3 drm_vram_helper,metax,drm_ttm_helper
+ubfi                   32768  3 hisi_ubus,ummu,ubus
+drm                   712704  8 drm_kms_helper,hibmc_drm,drm_vram_helper,drm_display_helper,metax,drm_ttm_helper,ttm
+ummu_core              65536  9 ummu,udma,obmm,cdma
+=== DMESG METAX/GPU (last 30) ===
+[ 4183.607324] METAX.B2100.D0.INT.INFO ringbuf gpu pa 0x80389480000
+[ 4183.614385] METAX.B2100.D0.INT.INFO ring-wptr addr gpu va 0x4000200000 gpu pa 0x801065e5000
+[ 4183.624081] METAX.B2100.D0.BASE.INFO IP block <mxc500_int> init done!
+[ 4183.644022] METAX.B2100.D0.BASE.INFO IP block <mxc500_sdma> init done!
+[ 4183.652703] METAX.B2100.D0.FW.INFO load /lib/firmware/metax/mxc500/vpud0_fw.bin firmware
+[ 4183.662904] METAX.B2100.D0.FW.INFO load /lib/firmware/metax/mxc500/vpue_fw.bin firmware
+[ 4183.673012] METAX.B2100.D0.FW.INFO load /lib/firmware/metax/mxc500/vpud1_fw.bin firmware
+[ 4183.683195] METAX.B2100.D0.BASE.INFO IP block <mxc500_ccx> init done!
+[ 4183.691990] METAX.B2100.D0.SMP.INFO SMP0, log_pa:c400000
+[ 4183.712899] METAX.B2100.D0.SMP.INFO SMP1, log_pa:c800000
+[ 4183.839367] METAX.B2100.D0.BASE.INFO IP block <mxc500_smp> init done!
+[ 4183.846849] METAX.B2100.D0.SMP.INFO wait XSC change to be idle start 221811 wait 10 secs
+[ 4183.964395] METAX.B2100.D0.SMP.INFO XSC idle now
+[ 4183.976726] METAX.B2100.D0.BASE.INFO IP block <mxc500_xcore> init done!
+[ 4183.985359] METAX.B2100.D0.RAS.INFO RAS CE Monitor is on
+[ 4183.993040] METAX.B2100.D0.SMI.INFO smi init ok
+[ 4184.043647] METAX.B2100.D0.MC.INFO aper: base 800000000000 limit 801000000000 pub size 1000000000 pri size 0 addr mask ffff000000000000
+[ 4184.056829] MXCD.TOPO.INFO Adding GPU node 4(ID: 29721) to layout
+[ 4184.176393] MXCD.B2100.D0.TOPO.INFO Added [157] GPU cache entries
+[ 4185.636395] MXCD.B2100.D0.RINGBUF.INFO alloc GPU reserved memory, size=0x1000000
+[ 4185.644960] METAX.B2100.D0.MC.INFO reserved utc memory index 23: offset 0xff0000000
+[ 4185.691550] METAX.XCORE.INFO set xcore page size to 2MB.
+[ 4185.707074] METAX.BASE.INFO metax pro feature device page support 0
+[ 4185.715787] METAX.B2100.D0.BASE.INFO pcba sn: AENA2502001153, gpuid 29721, socket_id 0, topo_id 0
+[ 4185.725545] METAX.B2100.D0.BASE.INFO native device init ok
+[ 4185.731913] METAX.B2100.D0.BASE.INFO device pm enabled.
+[ 4185.739523] [drm] Initialized METAX 3.10.14 2026-11-05 02:05:33 for 0000:21:00.0 on minor 0
+[ 4185.748934] METAX.BASE.INFO MetaX driver startup! built by root, git commit unknown
+[ 4187.916630] UDMA: GPU P2P ops registered by metax (gpu_vendor=auto)
+[ 4187.932304] udma_metax_p2p_bridge: loaded, registered MetaX GPU P2P ops with udma.ko
+=== DMESG LAST 20 ===
+[ 4222.325764] URMA|ubcore|44111|44111|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0x0, cfg->len = 65536, cfg->token_value.token = 0, udate = 1 
+[ 4222.325781] ubase 0000c: UDMA: MAPT END:kernel_mode = 1
+[ 4222.347730] ipourma5: ipourma create jetty set priority : 6, ty_type : ctp
+[ 4222.355764] ipourma5: create redundant jetty id: 6 by eid: 0!
+[ 4222.363041] URMA|ubcore|44111|44111|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0x0, cfg->len = 65536, cfg->token_value.token = 0, udate = 1 
+[ 4222.363090] ubase 0000c: UDMA: MAPT END:kernel_mode = 1
+[ 4222.386053] URMA|ubcore|44111|44111|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0x0, cfg->len = 65536, cfg->token_value.token = 0, udate = 1 
+[ 4222.386072] ubase 0000c: UDMA: MAPT END:kernel_mode = 1
+[ 4222.407948] URMA|ubcore|44111|44111|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0x0, cfg->len = 65536, cfg->token_value.token = 0, udate = 1 
+[ 4222.407965] ubase 0000c: UDMA: MAPT END:kernel_mode = 1
+[ 4222.429939] ipourma5: ipourma create jetty set priority : 6, ty_type : ctp
+[ 4222.437968] ipourma5: create redundant jetty id: 7 by eid: 0!
+[ 4222.445491] URMA|ubcore|44111|44111|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0x0, cfg->len = 65536, cfg->token_value.token = 0, udate = 1 
+[ 4222.445511] ubase 0000c: UDMA: MAPT END:kernel_mode = 1
+[ 4222.467426] URMA|ubcore|44111|44111|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0x0, cfg->len = 65536, cfg->token_value.token = 0, udate = 1 
+[ 4222.467443] ubase 0000c: UDMA: MAPT END:kernel_mode = 1
+[ 4222.489268] URMA|ubcore|44111|44111|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0x0, cfg->len = 65536, cfg->token_value.token = 0, udate = 1 
+[ 4222.489283] ubase 0000c: UDMA: MAPT END:kernel_mode = 1
+[ 4222.511498] ipourma5: ipourma create jetty set priority : 6, ty_type : ctp
+[ 4222.519447] ipourma5: create redundant jetty id: 8 by eid: 0!
+=== TORCH CUDA TEST ===
+<string>:2: UserWarning: Could not find flash_attn package installed. Please try to install flash_attn whl pacakge using pip command and make sure it can be imported properly
+/home/h00918771/metax_dev/venv-maca-py312/lib/python3.12/site-packages/torch/cuda/__init__.py:133: UserWarning: CUDA initialization: CUDA driver initialization failed, you might not have a CUDA gpu. (Triggered internally at /workspace/framework/mcPytorch/c10/cuda/CUDAFunctions.cpp:109.)
+  return torch._C._cuda_getDeviceCount() > 0
+torch version: 2.6.0+metax3.7.0.7
+cuda available: False
+device count: 1
+CUDA ERROR: RuntimeError('CUDA driver initialization failed, you might not have a CUDA gpu.')
+=== GPU DEVICE FILES ===
+total 0
+drwxr-xr-x  3 root root       120 Nov 26 19:09 .
+drwxr-xr-x 21 root root      3840 Nov 26 19:09 ..
+drwxr-xr-x  2 root root       100 Nov 26 19:09 by-path
+crw-rw----  1 root video 226,   0 Nov 26 19:09 card0
+crw-rw----  1 root video 226,   1 Nov 26 18:00 card1
+crw-rw----  1 root video 226, 128 Nov 26 19:09 renderD128
+=== BUILD MODULE SHA ===
+2a99c7f6912edb32f989fedde28e7a74c8a69f88ea7efa4960e40846e9cdca10  /home/h00918771/metax_dev/normal_blockers_build/urma_v1/lib/ep.abi3.so
+=== KERNEL ===
+6.6.0-gdr_f00955680_diag
+=== BOOT ID ===
+b3a99bc0-bf1f-45b3-aa23-c1ef52496efb
+=== END DIAG ===

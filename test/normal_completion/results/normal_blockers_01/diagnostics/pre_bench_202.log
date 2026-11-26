@@ -1,0 +1,63 @@
+/home/h00918771/metax_dev/normal_blockers_src_v1/test/verbs_diag/exit_guard.py:8: UserWarning: Could not find flash_attn package installed. Please try to install flash_attn whl pacakge using pip command and make sure it can be imported properly
+  from torch.distributed import run
+/home/h00918771/metax_dev/normal_blockers_src_v1/test/urma_mode_parity/support.py:36: UserWarning: Could not find flash_attn package installed. Please try to install flash_attn whl pacakge using pip command and make sure it can be imported properly
+  import torch
+PHASE_CONFIGURATION {"suite": true, "instrumented": false, "warmups": 5, "samples": 10, "ll_hook_workload": "gemm"}
+Traceback (most recent call last):
+  File "/home/h00918771/metax_dev/normal_blockers_src_v1/test/urma_mode_parity/worker.py", line 140, in <module>
+    runpy.run_path(sys.argv[0],run_name='__main__')
+  File "<frozen runpy>", line 287, in run_path
+  File "<frozen runpy>", line 98, in _run_module_code
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/h00918771/metax_dev/normal_completion_results/normal_blockers_01/cases/normal_blockers_01_pre/node0/normal.py", line 682, in <module>
+    test_loop(local_rank, num_local_ranks, num_nodes, args)
+  File "/home/h00918771/metax_dev/normal_completion_results/normal_blockers_01/cases/normal_blockers_01_pre/node0/normal.py", line 536, in test_loop
+    rank, num_ranks, group = init_dist_under_torchrun(local_rank, num_local_ranks)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/h00918771/metax_dev/normal_blockers_src_v1/test/urma_mode_parity/worker.py", line 56, in lazy_init
+    torch.cuda.set_device(local_rank)
+  File "/home/h00918771/metax_dev/venv-maca-py312/lib/python3.12/site-packages/torch/cuda/__init__.py", line 483, in set_device
+    torch._C._cuda_setDevice(device)
+  File "/home/h00918771/metax_dev/venv-maca-py312/lib/python3.12/site-packages/torch/cuda/__init__.py", line 326, in _lazy_init
+    torch._C._cuda_init()
+RuntimeError: CUDA driver initialization failed, you might not have a CUDA gpu.
+W1126 18:39:03.284000 51592 torch/distributed/elastic/multiprocessing/api.py:897] Sending process 51679 closing signal SIGTERM
+Traceback (most recent call last):
+  File "/home/h00918771/metax_dev/venv-maca-py312/lib/python3.12/site-packages/torch/distributed/elastic/agent/server/api.py", line 711, in run
+    result = self._invoke_run(role)
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/h00918771/metax_dev/venv-maca-py312/lib/python3.12/site-packages/torch/distributed/elastic/agent/server/api.py", line 870, in _invoke_run
+    time.sleep(monitor_interval)
+  File "/home/h00918771/metax_dev/venv-maca-py312/lib/python3.12/site-packages/torch/distributed/elastic/multiprocessing/api.py", line 84, in _terminate_process_handler
+    raise SignalException(f"Process {os.getpid()} got signal: {sigval}", sigval=sigval)
+torch.distributed.elastic.multiprocessing.api.SignalException: Process 51592 got signal: 15
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/h00918771/metax_dev/normal_blockers_src_v1/test/verbs_diag/exit_guard.py", line 49, in <module>
+    run.main()
+  File "/home/h00918771/metax_dev/venv-maca-py312/lib/python3.12/site-packages/torch/distributed/elastic/multiprocessing/errors/__init__.py", line 355, in wrapper
+    return f(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/h00918771/metax_dev/venv-maca-py312/lib/python3.12/site-packages/torch/distributed/run.py", line 918, in main
+    run(args)
+  File "/home/h00918771/metax_dev/venv-maca-py312/lib/python3.12/site-packages/torch/distributed/run.py", line 909, in run
+    elastic_launch(
+  File "/home/h00918771/metax_dev/venv-maca-py312/lib/python3.12/site-packages/torch/distributed/launcher/api.py", line 138, in __call__
+    return launch_agent(self._config, self._entrypoint, list(args))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/h00918771/metax_dev/venv-maca-py312/lib/python3.12/site-packages/torch/distributed/launcher/api.py", line 260, in launch_agent
+    result = agent.run()
+             ^^^^^^^^^^^
+  File "/home/h00918771/metax_dev/venv-maca-py312/lib/python3.12/site-packages/torch/distributed/elastic/metrics/api.py", line 137, in wrapper
+    result = f(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^
+  File "/home/h00918771/metax_dev/venv-maca-py312/lib/python3.12/site-packages/torch/distributed/elastic/agent/server/api.py", line 719, in run
+    logger.warning("Received %s death signal, shutting down workers", e.sigval)
+  File "/home/h00918771/metax_dev/python/cpython-3.12.15-linux-aarch64-gnu/lib/python3.12/logging/__init__.py", line 1541, in warning
+    def warning(self, msg, *args, **kwargs):
+
+  File "/home/h00918771/metax_dev/venv-maca-py312/lib/python3.12/site-packages/torch/distributed/elastic/multiprocessing/api.py", line 84, in _terminate_process_handler
+    raise SignalException(f"Process {os.getpid()} got signal: {sigval}", sigval=sigval)
+torch.distributed.elastic.multiprocessing.api.SignalException: Process 51592 got signal: 15
