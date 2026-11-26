@@ -1,0 +1,25 @@
+{
+  "stable": true,
+  "max_cv_pct": 0.9558787632403986,
+  "max_repeat_drift_pct": 0.2567388378236517,
+  "pairs": [
+    {
+      "pair": 1,
+      "node202_us": 5.489879184298843,
+      "node204_us": 14.39301172892283,
+      "paired_max_us": 5.489879184298843
+    },
+    {
+      "pair": 2,
+      "node202_us": -18.090565999348655,
+      "node204_us": -10.410573747423769,
+      "paired_max_us": -18.090565999348655
+    }
+  ],
+  "mean_delta_us": {
+    "node202_us": -6.300343407524906,
+    "node204_us": 1.9912189907495303,
+    "paired_max_us": -6.300343407524906
+  },
+  "note": "B adds a non-consuming wait before collecting the sixth payload on each 204 data FIFO. Deltas are observed sensitivity to the intervention under URMA tail-off, not time recovered or a backend root cause."
+}
