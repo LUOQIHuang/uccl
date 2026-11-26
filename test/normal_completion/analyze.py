@@ -13,17 +13,17 @@ base = legacy.base
 LABEL = legacy.LABEL
 
 
-def operation_rows(window, rank):
+def operation_rows(window, rank, write_only=False):
     sources = {s['proxy']: s for s in window['streams']}
     snapshots = {s['proxy']: s for s in window['cq_ready']}
     if set(sources) != set(range(4)) or set(snapshots) != set(sources):
         raise ValueError('missing Proxy/CQ stream')
     output, controls = [], []
     for proxy, stream in sources.items():
-        if stream['errors'] or stream['dropped'] or len(stream['pairs']) != 1:
+        if stream['errors'] or stream['dropped'] or len(stream['pairs']) != (7 if write_only else 1):
             raise ValueError('incomplete target stream')
-        pair = stream['pairs'][0]
-        legacy.pair_metrics(pair, stream['polls'], 'urma', 1, expected_fence=1 if rank == 0 else 0)
+        if not write_only:
+            legacy.pair_metrics(stream['pairs'][0], stream['polls'], 'urma', 1, expected_fence=1 if rank == 0 else 0)
         snap = snapshots[proxy]
         if snap['dropped'] or snap['lookahead'] != 16 or snap['depth'] < 16 or snap['stride'] not in (64, 128, 256):
             raise ValueError('wrong/truncated CQ layout')
@@ -47,8 +47,14 @@ def operation_rows(window, rank):
                 if item['position'] != poll['ci'] + i:
                     raise ValueError('wrong completion position')
                 positions.setdefault(item['wr_id'], []).append((poll, item))
-        for operation in ('write', 'atomic'):
+        targets = [(p, 'write') for p in stream['pairs']]
+        if not write_only:
+            targets.append((stream['pairs'][0], 'atomic'))
+        for pair, operation in targets:
             target = pair[operation + '_id']
+            if write_only and (target >> 32 or not pair['finished'] or pair['status'] or pair['bytes'] < 4096 or
+                               not 0 < pair['write_post_begin'] <= pair['write_post_end'] <= pair['write_sdk_return'] <= pair['write_handled']):
+                raise ValueError('invalid sampled payload WRITE')
             matches = positions.get(target, [])
             if len(matches) != 1:
                 raise ValueError('ambiguous target CQ position')
@@ -81,6 +87,9 @@ def operation_rows(window, rank):
                 max_between_poll_us=max([0] + [(b['begin'] - a['sdk_return']) / 1000 for a, b in zip(relevant, relevant[1:])]),
                 result_to_sdk_lower_us=(returned - pair['result_upper']) / 1000
                     if operation == 'atomic' and pair['result_upper'] and pair['result_upper'] <= returned else None))
+            if write_only:
+                output[-1].update(post_begin_ns=pair['write_post_begin'], post_end_ns=posted, sdk_return_ns=returned,
+                                  payload_bytes=pair['bytes'])
         for item in stream.get('controls', []):
             if item['kind'] not in (3, 4) or not 0 < item['begin'] <= item['end']:
                 raise ValueError('invalid CPU control interval')
@@ -95,9 +104,10 @@ def operation_rows(window, rank):
     return output, controls
 
 
-def summarize(root, output):
+def summarize(root, output, study='completion'):
+    write_only = study == 'blockers'
     overlays = [base.read(root / ('overlay_node%d.json' % rank)) for rank in (0, 1)]
-    if overlays[0] != overlays[1]:
+    if overlays[0] != overlays[1] or (overlays[0].get('study') == 'blockers') != write_only:
         raise ValueError('different source overlays')
     data, identities, controls, paired = {}, {}, [], []
     for stage in ('pre', 'probe', 'post'):
@@ -106,7 +116,7 @@ def summarize(root, output):
                                reference_events='paced', bf16_only=True)
             c, runtime = d['c'], d['runtime']
             expected_device = 'udmac1d1e2' if rank == 0 else 'udmac0d1e2'
-            if (c['job'] != root.name + '_' + stage or runtime.get('normal_completion_probe_version') != 1 or
+            if (c['job'] != root.name + '_' + stage or runtime.get('normal_completion_probe_version') != (2 if write_only else 1) or
                     c.get('normal_fadd_fence_plan') != 'peer-tail-off' or c.get('device') != expected_device or
                     c.get('urma_device_plan') != '202c1-204c0' or c.get('normal_window_plan') != 'default' or
                     c.get('normal_retire_plan') != 'ordered' or c.get('reference_profile') != 'boundaries'):
@@ -136,22 +146,28 @@ def summarize(root, output):
         controls.append(dict(node=who, pre_us=a['mean_us'], probe_us=p['mean_us'], post_us=b['mean_us'],
             drift_pct=drift, probe_change_pct=effect, max_cv_pct=max(s['cv_pct'] for s in stats),
             representative=abs(drift) <= 5 and abs(effect) <= 5 and max(s['cv_pct'] for s in stats) <= 5))
-    operations, drains = [], []
+    operations, drains, fifo_waits, fifo_parts = [], [], [], []
     for rank in (0, 1):
         windows = base.rows(data['probe', rank]['case'] / 'fadd_path.jsonl')
         if [w['index'] for w in windows] != list(range(10)):
             raise ValueError('expected ten CPU probe windows')
         api = {r['index']: r['us'] for r in base.rows(data['probe', rank]['case'] / 'api_samples.jsonl')}
         for window in windows:
-            if (window['version'], window['target_payload'], window['ring'], window['poll_stride'], window['label'], window['clock']) != (1, 6, 0, 1, LABEL, 'CLOCK_MONOTONIC_RAW') or window['us'] != api[window['index']]:
+            if (window['version'], window['target_payload'], window['ring'], window['poll_stride'], window['label'], window['clock']) != (1, 7 if write_only else 6, 0, 1, LABEL, 'CLOCK_MONOTONIC_RAW') or window['us'] != api[window['index']]:
                 raise ValueError('wrong probe recipe/API association')
-            op, drain = operation_rows(window, rank)
+            op, drain = operation_rows(window, rank, write_only=write_only)
+            if write_only:
+                from fifo_blockers import analyze_window
+                waits, parts = analyze_window(window, rank, op)
             if window['index']:
                 operations.extend(op)
                 drains.extend(drain)
+                if write_only:
+                    fifo_waits.extend(waits)
+                    fifo_parts.extend(parts)
     summary = []
     for rank in (0, 1):
-        for kind in ('write', 'atomic'):
+        for kind in (('write',) if write_only else ('write', 'atomic')):
             rows = [r for r in operations if r['node'] == rank and r['operation'] == kind]
             values = [r['valid_to_sdk_lower_us'] for r in rows if r['observed_valid']]
             summary.append(dict(node=rank, operation=kind, targets=len(rows), observed_valid=len(values),
@@ -177,6 +193,15 @@ def summarize(root, output):
     for name, rows in (('controls', controls), ('paired_calls', paired), ('operations', operations),
                        ('operation_summary', summary), ('cpu_control_intervals', drains), ('cpu_control_summary', control_summary)):
         base.write(output / (name + '.csv'), rows)
+    if write_only:
+        from fifo_blockers import summarize_waits
+        base.write(output / 'fifo_waits.csv', fifo_waits)
+        base.write(output / 'fifo_head_intervals.csv', fifo_parts)
+        base.write(output / 'fifo_wait_summary.csv', summarize_waits(fifo_waits))
+        latest = [max((r for r in fifo_waits if r['node'] == rank and r['index'] == index and
+                       r['waiting_payload'] == position), key=lambda r: r['read_ns'])
+                  for rank in (0, 1) for index in range(1, 10) for position in (6, 11)]
+        base.write(output / 'latest_collected_channel.csv', latest)
     (output / 'decision.json').write_text(json.dumps(decision, indent=2), encoding='utf-8')
     (output / 'context.json').write_text(json.dumps(dict(overlay=overlays[0], nodes=identities), indent=2), encoding='utf-8')
     report = ['# WRITE/FADD完成路径与CPU排空观察', '',
@@ -188,6 +213,10 @@ def summarize(root, output):
     report += ['', 'None表示未观测到有效瞬间，不是零等待。门槛失败时仅保留带探针现象，不作正常执行时延归因。',
                'CPU控制处理不是完整GPU quiet等待；不同请求、Proxy之间存在重叠，不相加为Dispatch关键路径。',
                '首次/最后有效性观测是软件读取界限，不是硬件精确发布时间。', '']
+    if write_only:
+        report += ['本轮观察前7条WRITE及第6块/末块等待。同窗完整FIFO及CQ关联见fifo_head_intervals.csv。',
+                   'fifo_wait_summary.csv区分首次观测时命令已在满窗口前等候的覆盖数及各阶段下界。',
+                   'latest_collected_channel.csv给出每端每窗最晚收走命令的通道，便于识别慢通道是否落在CQ探针覆盖范围内。', '']
     (output / 'REPORT.zh-CN.md').write_text('\n'.join(report), encoding='utf-8')
     print('NORMAL_COMPLETION_ANALYSIS_PASSED mechanism_usable=' + str(decision['mechanism_usable']))
     return decision
@@ -197,5 +226,6 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--root', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--study', choices=('completion','blockers'), default='completion')
     args = parser.parse_args()
-    summarize(args.root, args.output)
+    summarize(args.root, args.output, args.study)

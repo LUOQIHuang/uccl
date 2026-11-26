@@ -1,5 +1,7 @@
 # 参考版本移植：Normal Dispatch 事件打点
 
+**下一轮URMA实机使用[实际阻塞WRITE采集](../normal_completion/BLOCKERS.zh-CN.md)。** 同一次调用关联FIFO里已等候的第6块/末块、实际挡住名额的前序WR及其CQ状态。
+
 **当前优先细拆204发送侧。** [复算结果](NORMAL_BLOCKER_REVIEW.zh-CN.md)识别了第6块被第1～2条WRITE挡住、末块被第2～7条WRITE挡住。已有CQ记录还可把第6条FADD的返回值可读至CQE可读约束在约482～490 μs。上一版粗分阶段运行计划暂缓。后续实机采集应以实际阻塞WRITE为对象，并先确认存在可关联到该WR的新增设备事件。
 
 ## 2026-11-26 下一项仅补缺失阶段对照

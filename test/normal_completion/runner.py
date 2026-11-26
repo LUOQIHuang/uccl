@@ -77,11 +77,12 @@ def run_one(a, suffix, action, capture=False):
 def main(argv=None):
     home = Path(os.environ.get('URMA_DIAG_HOME', str(Path.home())))
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--study', choices=('completion','blockers'), default='completion')
     parser.add_argument('--action', choices=('setup', 'run', 'collect'), required=True)
     parser.add_argument('--node-rank', choices=(0, 1), type=int, required=True)
-    parser.add_argument('--job', default='normal_completion_01')
-    parser.add_argument('--tree', type=Path, default=home / 'metax_dev/normal_completion_src_v1')
-    parser.add_argument('--build-dir', type=Path, default=home / 'metax_dev/normal_completion_build/urma_v1')
+    parser.add_argument('--job')
+    parser.add_argument('--tree', type=Path)
+    parser.add_argument('--build-dir', type=Path)
     parser.add_argument('--output', type=Path, default=home / 'metax_dev/normal_completion_results')
     parser.add_argument('--destination', type=Path, default=HERE / 'results')
     parser.add_argument('--build-jobs', type=int, default=1)
@@ -90,6 +91,10 @@ def main(argv=None):
     parser.add_argument('--ifname')
     parser.add_argument('--gpu-pci', default=os.environ.get('URMA_DIAG_GPU_PCI', '0000:21:00.0'))
     a = parser.parse_args(argv)
+    study_tag = 'normal_blockers' if a.study == 'blockers' else 'normal_completion'
+    a.job = a.job or study_tag + '_01'
+    a.tree = a.tree or home / ('metax_dev/' + study_tag + '_src_v1')
+    a.build_dir = a.build_dir or home / ('metax_dev/' + study_tag + '_build/urma_v1')
     if not re.fullmatch(r'[A-Za-z0-9_-]+', a.job) or not 1024 <= a.port <= 65533 or not 1 <= a.build_jobs <= 8:
         parser.error('invalid job/port/build-jobs')
     a.ifname = a.ifname or os.environ.get('URMA_DIAG_IFNAME') or ('enp40s0' if a.node_rank == 0 else 'enp34s0f5u1u4')
@@ -110,7 +115,7 @@ def main(argv=None):
     provider = Path(os.environ.get('URMA_DIAG_LIBRARY_DIR', '/missing')) / 'urma/liburma-udma.so'
     if not provider.is_file() or overlay.sha(provider) != PROVIDER_SHA:
         raise ValueError('COMPLETION_PROVIDER_MISMATCH: expected recorded private provider, ' + str(provider))
-    provenance = overlay.prepare(a.tree)
+    provenance = overlay.prepare(a.tree, a.study) if a.study == 'blockers' else overlay.prepare(a.tree)
     (dest / ('overlay_node%d.json' % a.node_rank)).write_text(json.dumps(provenance, indent=2))
     marker = result / ('setup_node%d.json' % a.node_rank)
     if a.action == 'setup':

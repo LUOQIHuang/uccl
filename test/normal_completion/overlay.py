@@ -90,7 +90,52 @@ def transform(name, source):
     return source
 
 
-def compose():
+def blocker_header(source):
+    source = replace(source, '  std::vector<Control> controls;', '''  struct FifoObservation {uint64_t id, ns; unsigned kind; uint32_t bytes;};
+  std::vector<FifoObservation> fifo;
+  uint64_t peeked[3]={UINT64_MAX,UINT64_MAX,UINT64_MAX};
+  unsigned visits[3]={};
+  std::vector<Control> controls;''')
+    source = replace(source, 'Stream(){controls.reserve(128);', 'Stream(){fifo.reserve(768);controls.reserve(128);')
+    source = replace(source, 's->controls.clear();', '''s->fifo.clear();
+      for(unsigned ring=0;ring<3;++ring){s->peeked[ring]=UINT64_MAX;s->visits[ring]=0;}
+      s->controls.clear();''')
+    source = replace(source, 'struct PostStamp {', '''// kind: 1 = collected, 2 = credit retired, 3 = ready while full.
+inline void fifo_observe(uint64_t id,unsigned kind,uint32_t bytes,int proxy){
+  if((id>>32)>=3 || !active.load(std::memory_order_relaxed))return;
+  Guard guard(proxy);
+  if(!guard.s)return;
+  auto& s=*guard.s;
+  if(s.fifo.size()>=768){++s.dropped;return;}
+  s.fifo.push_back({id,now(),kind,bytes});
+  if(kind==3)s.peeked[id>>32]=id;
+}
+inline bool should_peek(uint64_t id){
+  auto ring=id>>32;
+  if(ring>=3 || !active.load(std::memory_order_relaxed) || !local ||
+     local->frame!=epoch.load(std::memory_order_relaxed))return false;
+  return local->peeked[ring]!=id && (local->visits[ring]++ & 31u)==0;
+}
+struct PostStamp {''')
+    source = replace(source, 'if(++it->writes==target){', 'if(++it->writes<=target){')
+    source = replace(source, 'p.atomic_id=id+1;', 'p.atomic_id=UINT64_MAX;')
+    source = replace(source, '(id==p.write_id || id==p.atomic_id)', 'id==p.write_id')
+    source = replace(source, 'p.finished=p.a_cqe!=0;', 'p.finished=true;')
+    # Keep observing the JFC after an early WRITE completes and before the
+    # next target is posted so that consumer indices remain contiguous.
+    source = replace(source, 'if(q==s.queues.end() || std::none_of(s.pairs.begin(),s.pairs.end(),[&](Pair const& p){return p.cq==cq && !p.finished;}))return {};',
+                     'if(q==s.queues.end() || (s.pairs.size()>=target && std::all_of(s.pairs.begin(),s.pairs.end(),[](Pair const& p){return p.finished;})))return {};')
+    source = replace(source, 'ordinal!=6', 'ordinal!=7')
+    source = replace(source, 'nonoverlapping sixth-payload capture', 'nonoverlapping first-seven-WRITE capture')
+    source = replace(source, r'\"target_payload\":6', r'\"target_payload\":7')
+    source = replace(source, '    out<<"],\\"controls\\":[";pc=false;', '''    out<<"],\\"fifo\\":[";pc=false;
+    for(auto const& e:s->fifo){if(pc)out<<',';pc=true;
+      out<<"{\\"wr_id\\":"<<e.id<<",\\"ns\\":"<<e.ns<<",\\"kind\\":"<<e.kind<<",\\"bytes\\":"<<e.bytes<<'}';}
+    out<<"],\\"controls\\":[";pc=false;''')
+    return source
+
+
+def compose(study='completion'):
     sources = {name: transform(name, subprocess.check_output(
         ['git', '-C', str(REPO), 'show', BASE + ':' + name]).decode('utf-8')) for name in TARGETS}
     sources['ep/include/fadd_path_probe.hpp'] = header()
@@ -99,19 +144,38 @@ def compose():
     plan_test = replace(plan_test, 'struct { bool use_normal_mode; } cfg_;',
         'struct { bool use_normal_mode; int thread_idx=0; } cfg_;')
     sources['ep/tests/urma_proxy_plan_test.cpp'] = plan_test
+    if study == 'blockers':
+        sources['ep/include/fadd_path_probe.hpp'] = blocker_header(sources['ep/include/fadd_path_probe.hpp'])
+        sources['ep/src/uccl_ep.cc'] = replace(sources['ep/src/uccl_ep.cc'], 'uccl::fadd_path::begin(6)', 'uccl::fadd_path::begin(7)')
+        sources['ep/src/uccl_ep.cc'] = replace(sources['ep/src/uccl_ep.cc'], 'get_normal_completion_probe_version", [](){return 1;}', 'get_normal_completion_probe_version", [](){return 2;}')
+        runtime = 'test/reference_events/event_runtime.py'
+        sources[runtime] = replace(sources[runtime], 'ep.get_normal_completion_probe_version()!=1', 'ep.get_normal_completion_probe_version()!=2')
+        source = replace(sources['ep/src/proxy.cpp'], '      uccl::transport_timeline::record("ack_slot",front_wr);',
+            '      uccl::fadd_path::fifo_observe(front_wr,2,0,cfg_.thread_idx);\n      uccl::transport_timeline::record("ack_slot",front_wr);')
+        source = replace(source, '    // Pop commands from the FIFO until the budget is reached', '''    if (!budget && rb_idx < 3 && !ctx_.quiet_inflight && !ctx_.barrier_inflight) {
+      auto next_wr=(uint64_t(rb_idx)<<32)|(fifo_seq_[rb_idx]&0xffffffffULL);
+      // Fifo::poll is a read-only load. No pop or command decoding here.
+      if(uccl::fadd_path::should_peek(next_wr) && fifo->poll().fst)
+        uccl::fadd_path::fifo_observe(next_wr,3,0,cfg_.thread_idx);
+    }
+    // Pop commands from the FIFO until the budget is reached''')
+        sources['ep/src/proxy.cpp'] = replace(source, '      fifo_pending_[rb_idx].push_back(', '''      uccl::fadd_path::fifo_observe(unique_wr_id,1,
+          get_base_cmd(cmd.cmd_type)==CmdType::WRITE ? static_cast<uint32_t>(cmd.bytes) : 0,cfg_.thread_idx);
+      fifo_pending_[rb_idx].push_back(''')
     return sources
 
 
-def prepare(tree):
+def prepare(tree, study='completion'):
     tree = tree.resolve()
     if tree == REPO or REPO in tree.parents:
         raise ValueError('completion worktree must be outside active checkout')
-    sources = compose()  # Check every anchor before creating a worktree.
+    sources = compose(study)  # Check every anchor before creating a worktree.
     bundle = {p.relative_to(HERE).as_posix(): sha(p) for p in HERE.rglob('*')
               if p.is_file() and p.suffix in ('.py', '.sh', '.hpp', '.cpp')
               and not any(part in ('results', '__pycache__') for part in p.relative_to(HERE).parts)}
     expected = dict(version=1, base=subprocess.check_output(['git', '-C', str(REPO), 'rev-parse', BASE]).decode().strip(),
                     bundle=bundle, sources={n: hashlib.sha256(s.encode()).hexdigest() for n, s in sources.items()})
+    if study == 'blockers':expected['study'] = study
     marker = tree / MARKER
     if marker.exists():
         saved = json.loads(marker.read_text())
