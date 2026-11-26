@@ -1,0 +1,15 @@
+{
+  "archive_csv_equal_with_rounding": true,
+  "sources_sha256": {
+    "test/normal_completion/results/normal_blockers_04/cases/normal_blockers_04_probe/node0/normal/fadd_path.jsonl": "69947fc4c4dba289a51a05af395ab5249c511447e91b220bfcceffeccf43859d",
+    "test/normal_completion/results/normal_blockers_04/cases/normal_blockers_04_probe/node1/normal/fadd_path.jsonl": "35a0e2a72288ea43674285fb40a0d93032cb8364112a090039d497da84b03775"
+  },
+  "decision": {
+    "mechanism_usable": true,
+    "physical_timestamp": false,
+    "target_observations": 504,
+    "independent_retained_api_calls_per_node": 9,
+    "note": "CQ readability bounds, not device execution timestamps. Missing early valid snapshots remain censored. A target valid behind an invalid head directly shows CQ consumption blocking, not its Dispatch contribution. CPU control intervals exclude GPU publication/wait and time before CPU processing. Overlapping request/proxy waits cannot be added into API latency. Paced controls do not establish continuous-batch performance or a new RDMA gap."
+  },
+  "note": "CQ snapshots cover all completions delivered in each observed shared JFC poll. The target position is recovered from WR identity and consumer position. Missing snapshots remain unclassified. Latest refers to local CPU collection time, not the final token on the remote GPU. No URMA-to-verbs attribution."
+}

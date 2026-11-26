@@ -1,5 +1,7 @@
 # 下一轮URMA实验：实际挡住第6块和末块的请求在等什么
 
+**`normal_blockers_04` 已完成并通过采集扰动检查。** 204最晚第6块9/9次均由第2条WRITE挡在队首。共享CQ原始快照复算显示，满额且CQE不可读的等待下界中位数为671.90 μs。  [实测分析](results/normal_blockers_04/ANALYSIS.zh-CN.md)
+
 **`normal_blockers_01` 已在 pre 阶段停止。** 两端构建和导入检查均通过，202 在 `torch.cuda.set_device(0)` 初始化时报错。202同一次开机内绕开Torch复测，原生MACA `mcGetDeviceCount` 返回3。204正常分配了GPU张量，双机报连接拒绝发生在202退出后。本轮没有有效Dispatch或探针样本。先按恢复步骤检查202的设备访问，再用新JOB复用已构建模块。首次构建修复已包含在`f141df5e`。 [失败日志](results/normal_blockers_01/diagnostics/BLOCKERS_FAILURE_REPORT.md) · [202原生MACA检查](results/normal_blockers_01/diagnostics/gpu_check_202_retry.log) · [恢复步骤](#202-gpu恢复与本次续跑)
 
 先前的FIFO记录显示，204第6块被第1～2条WRITE挡住，末块被第2～7条WRITE挡住。但那轮采集扰动过大，CQ探针又只看了第6条WRITE。当前要验证的具体问题是 **命令已经在FIFO等待时，前序WRITE的哪个阶段占住了名额，以及这个现象是否出现在最晚被Proxy收走的通道**。本实验只需当前URMA环境。 [旧数据复算](../reference_events/NORMAL_BLOCKER_REVIEW.zh-CN.md)
