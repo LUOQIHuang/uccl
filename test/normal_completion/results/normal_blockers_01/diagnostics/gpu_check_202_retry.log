@@ -1,0 +1,35 @@
+DIAG_ROOT=/home/h00918771
+DIAG_PYTHON=/home/h00918771/metax_dev/venv-maca-py312/bin/python
+HOST=master KERNEL=6.6.0-gdr_f00955680_diag UID=1210
+BOOT_ID=b3a99bc0-bf1f-45b3-aa23-c1ef52496efb
+MACA_RUNTIME=/opt/maca-3.9.0/lib/libmcruntime.so
+/home/h00918771/uccl-ep-xpu-integration-new/test/reference_events/check_blockers_gpu.py:19: UserWarning: Could not find flash_attn package installed. Please try to install flash_attn whl pacakge using pip command and make sure it can be imported properly
+  import torch
+TORCH=2.6.0+metax3.7.0.7 PATH=/home/h00918771/metax_dev/venv-maca-py312/lib/python3.12/site-packages/torch/__init__.py
+Traceback (most recent call last):
+  File "/home/h00918771/uccl-ep-xpu-integration-new/test/reference_events/check_blockers_gpu.py", line 83, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/home/h00918771/uccl-ep-xpu-integration-new/test/reference_events/check_blockers_gpu.py", line 64, in main
+    torch_smoke()
+  File "/home/h00918771/uccl-ep-xpu-integration-new/test/reference_events/check_blockers_gpu.py", line 22, in torch_smoke
+    torch.cuda.set_device(0)
+  File "/home/h00918771/metax_dev/venv-maca-py312/lib/python3.12/site-packages/torch/cuda/__init__.py", line 483, in set_device
+    torch._C._cuda_setDevice(device)
+  File "/home/h00918771/metax_dev/venv-maca-py312/lib/python3.12/site-packages/torch/cuda/__init__.py", line 326, in _lazy_init
+    torch._C._cuda_init()
+RuntimeError: CUDA driver initialization failed, you might not have a CUDA gpu.
+MACA_RUNTIME=/opt/maca-3.9.0/lib/libmcruntime.so
+mcGetDeviceCount rc=3
+Traceback (most recent call last):
+  File "/home/h00918771/uccl-ep-xpu-integration-new/test/reference_events/check_blockers_gpu.py", line 83, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/home/h00918771/uccl-ep-xpu-integration-new/test/reference_events/check_blockers_gpu.py", line 67, in main
+    native_smoke()
+  File "/home/h00918771/uccl-ep-xpu-integration-new/test/reference_events/check_blockers_gpu.py", line 44, in native_smoke
+    call('mcGetDeviceCount', [ctypes.POINTER(ctypes.c_int)], ctypes.byref(count))
+  File "/home/h00918771/uccl-ep-xpu-integration-new/test/reference_events/check_blockers_gpu.py", line 40, in call
+    raise RuntimeError(f'{name} failed rc={rc}')
+RuntimeError: mcGetDeviceCount failed rc=3
+BLOCKERS_GPU_NOT_READY torch=failed native=failed
