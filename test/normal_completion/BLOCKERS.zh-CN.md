@@ -1,5 +1,7 @@
 # 下一轮URMA实验：实际挡住第6块和末块的请求在等什么
 
+**`normal_blockers_01` 已在 pre 阶段停止。** 两端构建和导入检查均通过，202 在 `torch.cuda.set_device(0)` 初始化时报错，单机 Torch 也复现。204正常分配了GPU张量，双机报连接拒绝发生在202退出后。本轮没有有效Dispatch或探针样本。先按[恢复步骤](#202-gpu恢复与本次续跑)检查两端GPU，之后用新JOB复用已经构建好的模块。首次构建修复已包含在`f141df5e`。[失败日志](results/normal_blockers_01/diagnostics/BLOCKERS_FAILURE_REPORT.md)
+
 先前的FIFO记录显示，204第6块被第1～2条WRITE挡住，末块被第2～7条WRITE挡住。但那轮采集扰动过大，CQ探针又只看了第6条WRITE。当前要验证的具体问题是 **命令已经在FIFO等待时，前序WRITE的哪个阶段占住了名额，以及这个现象是否出现在最晚被Proxy收走的通道**。本实验只需当前URMA环境。 [旧数据复算](../reference_events/NORMAL_BLOCKER_REVIEW.zh-CN.md)
 
 ## 实际采集和判定
@@ -67,3 +69,29 @@ python3 test/normal_completion/analyze.py --study blockers \
 ```
 
 `fifo_head_intervals.csv`包含每个已观测区间的队首WR及互斥时间段，`fifo_wait_summary.csv`列覆盖和数值，`latest_collected_channel.csv`列每窗最晚收取的位置。`controls.csv`和`decision.json`是归因前的控制检查。
+
+## 202 GPU恢复与本次续跑
+
+1. 两端均用平时运行benchmark的账号，在GPU空闲时各执行一次单机检查。它使用benchmark的MetaX运行库和Python，检查GPU0的设备初始化、分配、一个小算子以及同步。Torch失败时使用独立子进程直接检查MACA的设备枚举、设备设置和小块显存分配。
+
+   ```bash
+   set -o pipefail
+   bash test/reference_events/check_blockers_gpu.sh 2>&1 | tee /tmp/normal_blockers_gpu_check.log
+   ```
+
+   两端都出现`BLOCKERS_GPU_READY`再启动双机任务。若202显示`torch=failed native=passed`，优先核对两端Torch版本、库路径和加载的运行时。若两者均失败，日志会给出第一个失败的MACA调用及返回码，可直接交给设备维护同事。已上传的202日志记录了FLR和驱动重载之后故障仍在。若需要重启，由共享机器的维护窗口协调，恢复后重新执行上面的单机检查。`mx-smi Available`仅用于读取管理状态，实际初始化以单机检查为准。
+
+2. 两端分别设置`RANK=0`（202）及`RANK=1`（204），用未使用的新任务名刷新本次启动的预检记录。旧`_01`保留失败日志。下面的`setup`会检查已有源码、SDK、构建标志和模块SHA，匹配时输出`BUILD_ALREADY_PASSED`并复用模块。成功后再执行双机`run`。重启时此步骤会记录新的boot ID。
+
+   ```bash
+   JOB=normal_blockers_02
+   bash test/normal_completion/run.sh --study blockers --action setup --node-rank "$RANK" --job "$JOB"
+   ```
+
+   两端均看到`NORMAL_COMPLETION_SETUP_PASSED`后，分别执行：
+
+   ```bash
+   bash test/normal_completion/run.sh --study blockers --action run --node-rank "$RANK" --job "$JOB"
+   ```
+
+3. 交回两端完整的`test/normal_completion/results/normal_blockers_02/`。如果单机GPU检查失败，提供当端`/tmp/normal_blockers_gpu_check.log`即可，双机采集等GPU恢复后再启动。离线汇总时将原命令输入和输出中的`normal_blockers_01`替换为实际的新JOB。
