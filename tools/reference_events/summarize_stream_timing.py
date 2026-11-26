@@ -11,6 +11,9 @@ from summarize_same_kernel_gap import KERNEL, LABEL, base, shared_signature
 
 STREAM_FIELDS = ('cached_notify_us', 'notify_to_dispatch_us', 'dispatch_comm_us')
 FIELDS = (*STREAM_FIELDS, 'outside_marked_signed_us', 'outside_dispatch_us', 'api_us')
+WAIT_CYCLES = ('remote_tail_cycles', 'mixed_tail_cycles', 'remote_epoch_cycles', 'local_space_cycles')
+WAIT_FIELDS = (*WAIT_CYCLES, 'other_forwarder_cycles', 'forwarder_cycles')
+PRODUCTION_GAP_US = 660.70752673679
 
 
 def windows(case, raw):
@@ -30,12 +33,31 @@ def windows(case, raw):
                 outside_dispatch_us=duration-intervals['dispatch_comm_us'], api_us=duration)
 
 
-def summarize(root, output):
+def receiver_windows(case):
+    for window in base.rows(case/'stream_timing.jsonl'):
+        clock = window['nominal_clock_khz']
+        channels = window['receiver_waits']
+        if (not isinstance(clock,int) or clock<=0 or len(channels)!=12 or
+                {r['channel'] for r in channels}!=set(range(12)) or
+                {r['done_order'] for r in channels}!=set(range(1,13))):
+            raise ValueError('missing receiver wait channel/ordering/clock')
+        for row in channels:
+            values = [row[field] for field in (*WAIT_CYCLES,'forwarder_cycles')]
+            if not all(isinstance(v,int) and v>=0 for v in values) or values[-1]<=0 or sum(values[:-1])>values[-1]:
+                raise ValueError('receiver wait cycles do not fit the same-warp forwarding span')
+            if window['index']:
+                row = dict(row, other_forwarder_cycles=values[-1]-sum(values[:-1]))
+                yield dict(index=window['index'], nominal_clock_khz=clock, **row,
+                           **{field.replace('_cycles','_estimate_us'):row[field]*1000/clock for field in WAIT_FIELDS})
+
+
+def summarize(root, output, receiver_waits=False):
     overlay = base.read(root/'overlay_node0.json')
     if overlay!=base.read(root/'overlay_node1.json'):
         raise ValueError('different stream marker source trees')
     expected_sources = {key:value for key,value in overlay['sources'].items() if key.startswith('ep/')}
     context, samples, controls = [], [], []
+    wait_samples = []
     shared = {}
     rank0_last = True
     for prefix,backend in BACKENDS.items():
@@ -69,6 +91,8 @@ def summarize(root, output):
                 raw_us[rank,phase] = {r['index']:r['us'] for r in raw if r['used'] and r['label']==LABEL}
                 if probe:
                     samples.extend(dict(backend=backend,**row) for row in windows(data['case'],raw))
+                    if receiver_waits:
+                        wait_samples.extend(dict(backend=backend,**row) for row in receiver_windows(data['case']))
                 context.append(dict(case=name,rank=rank,module_sha=local[1],**identity))
             controls.append(control_row(backend,rank,{p:list(raw_us[rank,p].values()) for p in PHASES}))
         calls = {p: [(raw_us[0,p][i],raw_us[1,p][i]) for i in range(1,10)] for p in PHASES}
@@ -88,6 +112,10 @@ def summarize(root, output):
         usable=controls_ok and rank0_last and old_gap>0 and probe_gap>0 and abs(gap_shift)<=100,
         note='Events bracket the actual cached_notify and main Dispatch launch calls on one communication stream. '
              'Outer API timing uses the caller stream and residuals remain signed.')
+    if receiver_waits:
+        decision['historical_control_gap_us'] = PRODUCTION_GAP_US
+        decision['compiled_control_gap_shift_us'] = old_gap-PRODUCTION_GAP_US
+        decision['usable'] = decision['usable'] and abs(old_gap-PRODUCTION_GAP_US)<=100
     comparisons = []
     for field in FIELDS:
         r,u = ([x[field] for x in samples if x['backend']==backend] for backend in ('verbs','urma'))
@@ -96,6 +124,15 @@ def summarize(root, output):
     output.mkdir(parents=True,exist_ok=False)
     for name,rows in [('controls',controls),('stream_windows',samples),('comparison',comparisons)]:
         base.write(output/f'{name}.csv',rows)
+    if receiver_waits:
+        last = [r for r in wait_samples if r['done_order']==12]
+        wait_compare = []
+        for cycles in WAIT_FIELDS:
+            field = cycles.replace('_cycles','_estimate_us')
+            r,u = ([x[field] for x in last if x['backend']==backend] for backend in ('verbs','urma'))
+            wait_compare.append(dict(wait=field,verbs_mean_us=mean(r),urma_mean_us=mean(u),delta_us=mean(u)-mean(r)))
+        for name,rows in [('receiver_channels',wait_samples),('latest_receiver',last),('receiver_comparison',wait_compare)]:
+            base.write(output/f'{name}.csv',rows)
     for name, data in [('decision',decision),('context',context)]:
         (output/f'{name}.json').write_text(json.dumps(data,indent=2)+'\n',encoding='utf-8')
     print(json.dumps(decision,indent=2))
@@ -105,5 +142,6 @@ if __name__=='__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--root',type=Path,required=True)
     parser.add_argument('--output',type=Path,required=True)
+    parser.add_argument('--receiver-waits',action='store_true')
     args = parser.parse_args()
-    summarize(args.root,args.output)
+    summarize(args.root,args.output,args.receiver_waits)

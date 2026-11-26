@@ -95,13 +95,13 @@ def measure(torch,dist,ep,case,fn,label,warmups,samples,post_fn=None,capture_fac
         if capture is not None:capture.begin()
         cpu_active=False;gpu=None;cpu=None
         try:
+            if stream_probe:ep.normal_stream_timing_begin()
             dist.barrier();torch.cuda.synchronize() # both clocks/reset copies ready before timing
             if capture is not None and cpu_events:
                 if selected_profile()=='boundaries':ep.urma_timeline_begin_boundaries()
                 else:ep.urma_timeline_begin()
                 cpu_active=True
             begin=torch.cuda.Event(enable_timing=True);end=torch.cuda.Event(enable_timing=True)
-            if stream_probe:ep.normal_stream_timing_begin()
             begin.record();fn();end.record();torch.cuda.synchronize()
             dist.barrier() # retain late local completions until both peers finish
             if cpu_active:cpu=json.loads(ep.urma_timeline_end());cpu_active=False

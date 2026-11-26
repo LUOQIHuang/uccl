@@ -43,18 +43,19 @@ case "$STUDY" in
         cases=(rdma_pre rdma_probe rdma_post urma_pre urma_probe urma_post)
         profile=(--reference-profile boundaries --reference-gpu-only)
         ;;
-    stream)
-        JOB=${JOB:-normal_same_kernel_stream_01}; PORT=${PORT:-34320}
+    stream|waits)
+        if [ "$STUDY" = waits ]; then PORT=${PORT:-34340}; else PORT=${PORT:-34320}; fi
+        JOB=${JOB:-normal_same_kernel_${STUDY}_01}
         cases=(rdma_pre rdma_probe rdma_post urma_pre urma_probe urma_post)
         profile=(--reference-profile legacy)
-        STREAM_TREE=${STREAM_TREE:-"$URMA_DIAG_HOME/metax_dev/normal_stream_src_v1"}
-        VERBS_BUILD=${VERBS_BUILD:-"$URMA_DIAG_HOME/metax_dev/normal_stream_build/verbs_v1"}
-        URMA_BUILD=${URMA_BUILD:-"$URMA_DIAG_HOME/metax_dev/normal_stream_build/urma_v1"}
+        STREAM_TREE=${STREAM_TREE:-"$URMA_DIAG_HOME/metax_dev/normal_${STUDY}_src_v1"}
+        VERBS_BUILD=${VERBS_BUILD:-"$URMA_DIAG_HOME/metax_dev/normal_${STUDY}_build/verbs_v1"}
+        URMA_BUILD=${URMA_BUILD:-"$URMA_DIAG_HOME/metax_dev/normal_${STUDY}_build/urma_v1"}
         ;;
-    *) echo 'study must be gap, receive or stream' >&2; exit 2;;
+    *) echo 'study must be gap, receive, stream or waits' >&2; exit 2;;
 esac
 [[ ( "$RANK" == 0 || "$RANK" == 1 ) && "$JOB" =~ ^[a-zA-Z0-9_-]+$ ]] || exit 2
-[[ "$ACTION" == check || "$ACTION" == run || ( "$ACTION" == setup && "$STUDY" == stream ) ]] || exit 2
+[[ "$ACTION" == check || "$ACTION" == run || ( "$ACTION" == setup && ( "$STUDY" == stream || "$STUDY" == waits ) ) ]] || exit 2
 [[ "$PORT" =~ ^[1-9][0-9]{3,4}$ ]] && (( PORT >= 1024 && PORT + 11 <= 65535 )) || exit 2
 [[ "$GID" =~ ^[0-9]+$ ]] || exit 2
 [[ $(uname -r) == "$KERNEL" ]] || { echo "expected $KERNEL; running $(uname -r)" >&2; exit 2; }
@@ -80,11 +81,13 @@ if [ "$ACTION" = run ]; then
     done
 fi
 
-if [ "$STUDY" = stream ]; then
+if [[ "$STUDY" == stream || "$STUDY" == waits ]]; then
     console="$ROOT/setup/console/node$RANK"; mkdir -p "$console"
     prep_log=$(mktemp "$console/prepare.XXXXXX.log")
     rc=0
-    "$URMA_DIAG_PYTHON" "$HERE/prepare_stream_timing.py" "$STREAM_TREE" 2>&1 | tee "$prep_log" || rc=$?
+    overlay_args=("$STREAM_TREE")
+    if [ "$STUDY" = waits ]; then overlay_args+=(--receiver-waits); fi
+    "$URMA_DIAG_PYTHON" "$HERE/prepare_stream_timing.py" "${overlay_args[@]}" 2>&1 | tee "$prep_log" || rc=$?
     "$URMA_DIAG_PYTHON" "$HERE/../gpu_stage_recovery/collect.py" "$ROOT/setup" \
         --node-rank "$RANK" --destination "$DEST/setup"
     [ "$rc" = 0 ] || exit "$rc"
@@ -121,7 +124,7 @@ run_one() {
         fi
     fi
     if [ "$action" != check ]; then build_record=(--trace-build "$build"); fi
-    if [[ "$STUDY" == stream && "$action" == run && "$RANK" == 0 && "$name" == *_probe ]]; then
+    if [[ ( "$STUDY" == stream || "$STUDY" == waits ) && "$action" == run && "$RANK" == 0 && "$name" == *_probe ]]; then
         launch=(env NORMAL_STREAM_TIMING=1 bash)
     fi
     "${launch[@]}" "$entry" "${args[@]}" --build-dir "$build" 2>&1 | tee "$console/$action.log" || rc=$?
