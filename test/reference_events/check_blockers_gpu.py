@@ -1,9 +1,11 @@
 """Isolate a local MetaX initialization failure before starting a paired run."""
 
 import ctypes
+import grp
 import os
 from pathlib import Path
 import socket
+import stat
 import subprocess
 import sys
 
@@ -37,6 +39,13 @@ def native_smoke():
         rc = fn(*args)
         print(f'{name} rc={rc}', flush=True)
         if rc:
+            message = getattr(maca, 'mcGetErrorString', None)
+            if message is not None:
+                message.argtypes = [ctypes.c_int]
+                message.restype = ctypes.c_char_p
+                description = message(rc)
+                if description:
+                    print('MACA_ERROR=' + description.decode(errors='replace'), flush=True)
             raise RuntimeError(f'{name} failed rc={rc}')
 
     count = ctypes.c_int()
@@ -59,6 +68,29 @@ def run_probe(name):
         return False
 
 
+def group_name(gid):
+    try:
+        return grp.getgrgid(gid).gr_name
+    except KeyError:
+        return str(gid)
+
+
+def print_device_access(dev=Path('/dev')):
+    gids = {os.getegid(), *os.getgroups()}
+    print('GROUPS=' + ','.join(group_name(gid) for gid in sorted(gids)), flush=True)
+    nodes = [dev / 'mxcd', *sorted((dev / 'dri').glob('card*')),
+             *sorted((dev / 'dri').glob('renderD*'))]
+    for node in nodes:
+        try:
+            info = node.stat()
+        except OSError as exc:
+            print(f'GPU_DEVICE={node} stat_error={exc.errno}', flush=True)
+            continue
+        have_access = os.access(node, os.R_OK | os.W_OK, effective_ids=True)
+        print(f'GPU_DEVICE={node} mode={stat.S_IMODE(info.st_mode):04o} '
+              f'owner={info.st_uid}:{group_name(info.st_gid)} rw_access={have_access}', flush=True)
+
+
 def main():
     if sys.argv[1:] == ['torch']:
         torch_smoke()
@@ -71,6 +103,7 @@ def main():
 
     print(f'HOST={socket.gethostname()} KERNEL={os.uname().release} UID={os.geteuid()}', flush=True)
     print('BOOT_ID=' + Path('/proc/sys/kernel/random/boot_id').read_text().strip(), flush=True)
+    print_device_access()
     if run_probe('torch'):
         print('BLOCKERS_GPU_READY', flush=True)
         return 0

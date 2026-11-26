@@ -1,6 +1,6 @@
 # 下一轮URMA实验：实际挡住第6块和末块的请求在等什么
 
-**`normal_blockers_01` 已在 pre 阶段停止。** 两端构建和导入检查均通过，202 在 `torch.cuda.set_device(0)` 初始化时报错，单机 Torch 也复现。204正常分配了GPU张量，双机报连接拒绝发生在202退出后。本轮没有有效Dispatch或探针样本。先按[恢复步骤](#202-gpu恢复与本次续跑)检查两端GPU，之后用新JOB复用已经构建好的模块。首次构建修复已包含在`f141df5e`。[失败日志](results/normal_blockers_01/diagnostics/BLOCKERS_FAILURE_REPORT.md)
+**`normal_blockers_01` 已在 pre 阶段停止。** 两端构建和导入检查均通过，202 在 `torch.cuda.set_device(0)` 初始化时报错。202同一次开机内绕开Torch复测，原生MACA `mcGetDeviceCount` 返回3。204正常分配了GPU张量，双机报连接拒绝发生在202退出后。本轮没有有效Dispatch或探针样本。先按恢复步骤检查202的设备访问，再用新JOB复用已构建模块。首次构建修复已包含在`f141df5e`。 [失败日志](results/normal_blockers_01/diagnostics/BLOCKERS_FAILURE_REPORT.md) · [202原生MACA检查](results/normal_blockers_01/diagnostics/gpu_check_202_retry.log) · [恢复步骤](#202-gpu恢复与本次续跑)
 
 先前的FIFO记录显示，204第6块被第1～2条WRITE挡住，末块被第2～7条WRITE挡住。但那轮采集扰动过大，CQ探针又只看了第6条WRITE。当前要验证的具体问题是 **命令已经在FIFO等待时，前序WRITE的哪个阶段占住了名额，以及这个现象是否出现在最晚被Proxy收走的通道**。本实验只需当前URMA环境。 [旧数据复算](../reference_events/NORMAL_BLOCKER_REVIEW.zh-CN.md)
 
@@ -79,7 +79,11 @@ python3 test/normal_completion/analyze.py --study blockers \
    bash test/reference_events/check_blockers_gpu.sh 2>&1 | tee /tmp/normal_blockers_gpu_check.log
    ```
 
-   两端都出现`BLOCKERS_GPU_READY`再启动双机任务。若202显示`torch=failed native=passed`，优先核对两端Torch版本、库路径和加载的运行时。若两者均失败，日志会给出第一个失败的MACA调用及返回码，可直接交给设备维护同事。已上传的202日志记录了FLR和驱动重载之后故障仍在。若需要重启，由共享机器的维护窗口协调，恢复后重新执行上面的单机检查。`mx-smi Available`仅用于读取管理状态，实际初始化以单机检查为准。
+   两端都出现`BLOCKERS_GPU_READY`再启动双机任务。202的最新失败记录使用UID 1210，`BOOT_ID=b3a99bc0-bf1f-45b3-aa23-c1ef52496efb`，与首次失败的快照相同。旧快照中的DRM节点为`root:video 0660`。这还不能判断权限是否为原因。新输出包含实际组、`/dev/mxcd`和DRM节点的读写访问状态，以及MACA可提供的错误描述。
+
+   - 若202普通账号显示节点访问失败，或设备维护账号能用同一套MACA和Python通过同一条检查，优先由管理员核对账号组、设备ACL和运行环境，再用正式账号验收。
+   - 若设备维护账号也在同一套运行时下遇到`mcGetDeviceCount`失败，交回日志并由共享机器的管理员安排恢复。记录显示FLR和驱动重载之后故障仍在，维护窗口可考虑在相同URMA内核下重启202。重启后核对boot ID变化并重新执行单机检查。
+   - 若出现`torch=failed native=passed`，优先对比Torch版本、库路径和加载的运行时。
 
 2. 两端分别设置`RANK=0`（202）及`RANK=1`（204），用未使用的新任务名刷新本次启动的预检记录。旧`_01`保留失败日志。下面的`setup`会检查已有源码、SDK、构建标志和模块SHA，匹配时输出`BUILD_ALREADY_PASSED`并复用模块。成功后再执行双机`run`。重启时此步骤会记录新的boot ID。
 
