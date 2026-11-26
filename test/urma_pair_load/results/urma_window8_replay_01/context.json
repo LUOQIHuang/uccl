@@ -1,0 +1,11 @@
+{
+  "backend": "urma",
+  "sources_sha256": {
+    "test/urma_pair_load/results/urma_pair_load_01/urma/cases/urma_pair_load_01_urma_run/node0/samples.jsonl": "181e05b0addcdb39a09d5ad9a94a17e6e2901e739aae433b4293b8a00f5b0bc7",
+    "test/urma_pair_load/results/urma_pair_load_01/urma/cases/urma_pair_load_01_urma_run/node1/samples.jsonl": "750033cf76598fcd5fe8f4028fe733cc665e83da72d0a656bdf5511018c1afe1",
+    "test/urma_pair_load/results/urma_pair_depth12_01/urma/cases/urma_pair_depth12_01_urma_run/node0/samples.jsonl": "f1a2b010d4b64ef384fba526275f76466377b25e0548d5cfd419464742fb26f3",
+    "test/urma_pair_load/results/urma_pair_depth12_01/urma/cases/urma_pair_depth12_01_urma_run/node1/samples.jsonl": "5124f54bcbff135e391992cb79fa9743e86c4dc81d065b827c703826fd9060d1"
+  },
+  "lane_observations": 2400,
+  "note": "Both microbenchmarks send one direction at a time. Per lane: last submit return to observed head CQE. Ninth command is hypothetical; no real Normal FIFO, credit-retirement timestamp or CQE visibility. Lane observations in the same iteration are correlated. Baselines come from separate campaigns."
+}
