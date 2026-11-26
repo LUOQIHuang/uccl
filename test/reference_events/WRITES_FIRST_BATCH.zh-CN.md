@@ -1,5 +1,7 @@
 # Normal下一轮：验证WRITE/FADD分阶段提交是否有整体收益
 
+**2026-11-26：本轮已完成，不再运行。**[独立复算分析](results/urma_writes_first_batch_01/ANALYSIS.zh-CN.md)：BF16两配对变化+0.033%/−0.124%，提交覆盖通过、整体无收益，保留lane-mixed。下文保留操作和预先判据以便核对，不追加同组重测。
+
 当前仅需要URMA环境。入口：[run_writes_first_batch.sh](run_writes_first_batch.sh)。本轮只做四项A→B→B→A，聚焦4096-token BF16 Dispatch；不重跑扩窗、旧CQ探针、LL、tokens扫描或fence矩阵。
 
 ## 1. 测什么、为什么现在测

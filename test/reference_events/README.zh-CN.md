@@ -1,5 +1,9 @@
 # 参考版本移植：Normal Dispatch 事件打点
 
+## 2026-11-26 最新结果：分阶段提交无净收益
+
+[writes-first四项ABBA已完成](results/urma_writes_first_batch_01/ANALYSIS.zh-CN.md)：BF16两配对+0.033%/−0.124%，覆盖记录确认混合payload从56%～63%降至0，实际改动生效。保留lane-mixed，关闭当前拆链方向，不重跑这组或追加提交参数扫描。下方11月25日的“下一项”已执行，作为历史说明保留。上一轮normal_completion缺失的元数据只需补交已有文件，不重跑。
+
 ## 2026-11-25 当前执行入口
 
 完成可读性三项已结束：[复算报告](../normal_completion/results/normal_completion_01/ANALYSIS.zh-CN.md)显示选中204慢WRITE提交至SDK交付约2794μs，而CQE可读后至交付的上界中位数仅4.44μs，QUIET的CPU处理同样很小。旧结果因.gitignore遗漏的元数据只需补交现有文件，不重跑。**下一项仅按[WRITE/FADD分阶段提交对照](WRITES_FIRST_BATCH.zh-CN.md)执行**：保留当前tail-off、窗口8及原GPU kernel，新构建后四项ABBA，用无采集完整Dispatch判断净收益。8→32已慢1.659%/0.271%，停止扩窗；不重跑credit、旧CQ探针或历史任务。
