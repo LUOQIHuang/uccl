@@ -1,6 +1,6 @@
 #pragma once
 
-#include <sstream>
+#include <string>
 
 namespace uccl::normal_receiver_waits {
 constexpr unsigned channels = 12;
@@ -18,5 +18,5 @@ extern __device__ State state;
 #endif
 
 void begin();
-void append_json(std::ostringstream& out);
+std::string end();
 }

@@ -44,13 +44,14 @@ case "$STUDY" in
         profile=(--reference-profile boundaries --reference-gpu-only)
         ;;
     stream|waits)
-        if [ "$STUDY" = waits ]; then PORT=${PORT:-34340}; else PORT=${PORT:-34320}; fi
-        JOB=${JOB:-normal_same_kernel_${STUDY}_01}
+        if [ "$STUDY" = waits ]; then
+            PORT=${PORT:-34340}; JOB=${JOB:-normal_same_kernel_waits_02}; variant=waits_v2
+        else PORT=${PORT:-34320}; JOB=${JOB:-normal_same_kernel_stream_01}; variant=stream; fi
         cases=(rdma_pre rdma_probe rdma_post urma_pre urma_probe urma_post)
         profile=(--reference-profile legacy)
-        STREAM_TREE=${STREAM_TREE:-"$URMA_DIAG_HOME/metax_dev/normal_${STUDY}_src_v1"}
-        VERBS_BUILD=${VERBS_BUILD:-"$URMA_DIAG_HOME/metax_dev/normal_${STUDY}_build/verbs_v1"}
-        URMA_BUILD=${URMA_BUILD:-"$URMA_DIAG_HOME/metax_dev/normal_${STUDY}_build/urma_v1"}
+        STREAM_TREE=${STREAM_TREE:-"$URMA_DIAG_HOME/metax_dev/normal_${variant}_src_v1"}
+        VERBS_BUILD=${VERBS_BUILD:-"$URMA_DIAG_HOME/metax_dev/normal_${variant}_build/verbs_v1"}
+        URMA_BUILD=${URMA_BUILD:-"$URMA_DIAG_HOME/metax_dev/normal_${variant}_build/urma_v1"}
         ;;
     *) echo 'study must be gap, receive, stream or waits' >&2; exit 2;;
 esac
@@ -71,7 +72,7 @@ ROOT="$ROOT/$JOB"
 SOURCE="$HERE/.."
 VERBS_BUILD=${VERBS_BUILD:-"$URMA_DIAG_HOME/metax_dev/verbs_same_kernel_build/current_v1"}
 URMA_BUILD=${URMA_BUILD:-"$URMA_DIAG_HOME/metax_dev/writes_first_batch_build/urma_v1"}
-unset UCCL_IB_MAX_INFLIGHT_BYTES NORMAL_STREAM_TIMING
+unset UCCL_IB_MAX_INFLIGHT_BYTES NORMAL_STREAM_TIMING NORMAL_RECEIVER_WAITS
 
 if [ "$ACTION" = run ]; then
     for name in "${cases[@]}"; do
@@ -125,7 +126,8 @@ run_one() {
     fi
     if [ "$action" != check ]; then build_record=(--trace-build "$build"); fi
     if [[ ( "$STUDY" == stream || "$STUDY" == waits ) && "$action" == run && "$RANK" == 0 && "$name" == *_probe ]]; then
-        launch=(env NORMAL_STREAM_TIMING=1 bash)
+        if [ "$STUDY" = waits ]; then launch=(env NORMAL_RECEIVER_WAITS=1 bash)
+        else launch=(env NORMAL_STREAM_TIMING=1 bash); fi
     fi
     "${launch[@]}" "$entry" "${args[@]}" --build-dir "$build" 2>&1 | tee "$console/$action.log" || rc=$?
     "$URMA_DIAG_PYTHON" "$HERE/../gpu_stage_recovery/collect.py" "$ROOT/$name" \

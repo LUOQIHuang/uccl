@@ -1,6 +1,6 @@
 # 用通信流计时定位 202 的剩余 Dispatch 差距
 
-本页的四事件计时属于粗粒度复核，归档中尚无实机结果。已经启动的任务保留现有结果。新的双机窗口使用 [202 全程等待对照](SAME_KERNEL_WAITS.zh-CN.md)，其中已经包含本页的四事件计时。
+本轮已完成。四个事件将后端差额从 588.67 μs 移到 448.48 μs，变化 140.19 μs，超过 100 μs 门槛。采集中的 `cached_notify` 差 150.33 μs、主 Dispatch 差 301.71 μs，作为候选方向保留。下一轮 [202 全程等待对照](SAME_KERNEL_WAITS.zh-CN.md) 已去掉这四个事件。 [实测验收](results/normal_same_kernel_stream_01/summary/decision.json) · [分段数据](results/normal_same_kernel_stream_01/summary/comparison.csv)
 
 下一项细分对照需要在同一次调用中，对 202 的接收通道分开记录全程累计的三种等待：远端 tail 未推进、tail 已推进但 token epoch 尚未匹配、本地转发缓冲空间不足。按同一通道查看等待和完成顺序，保留通道未覆盖或仍无法解释的时间。现有 `forwarder_incoming_tail_wait` 计时范围包括查找可消费来源的轮询，细分时应明确区分远端条件。启用记录后需同时复现无记录的后端差额，才能用这些时间定位剩余差距。 [源代码](../../ep/src/internode.cu) · [旧全范围计时的代表性失败](../dispatch_diag/results/urma_summary_01/ANALYSIS.zh-CN.md)
 

@@ -75,6 +75,19 @@ def compose(receiver_waits=False):
     ep = 'ep/src/uccl_ep.cc'
     runtime = 'test/reference_events/event_runtime.py'
     src = source_at_base(ep)
+    anchor = '  m.def("urma_dispatch_trial_end",[](){return uccl::dispatch_trial::end();});'
+    sources = {runtime:(REPO/runtime).read_text(encoding='utf-8').encode('utf-8')}
+    if receiver_waits:
+        src = '#include "normal_receiver_waits.cuh"\n'+replace(src,anchor,anchor+'''
+  m.def("normal_receiver_waits_begin", &uccl::normal_receiver_waits::begin);
+  m.def("normal_receiver_waits_end", &uccl::normal_receiver_waits::end);''')
+        sources[ep] = src.encode()
+        sources['ep/include/normal_receiver_waits.cuh'] = (HERE/'receiver_waits.cuh').read_text(encoding='utf-8').encode()
+        sources['ep/src/internode.cu'] = with_receiver_waits(source_at_base('ep/src/internode.cu')).encode()
+        trace = source_at_base('ep/src/reference_event_trace.cu')
+        trace += (HERE/'receiver_waits.cu.inc').read_text(encoding='utf-8')
+        sources['ep/src/reference_event_trace.cu'] = trace.encode()
+        return sources
     first = src.index('  std::optional<EventHandle> internode_dispatch(')
     last = src.index('  std::optional<EventHandle> internode_combine(', first)
     dispatch = src[first:last]
@@ -87,28 +100,13 @@ def compose(receiver_waits=False):
     dispatch = replace(dispatch, '    std::optional<EventHandle> event;',
         '    if (cached_mode) uccl::normal_stream_timing::mark(3, comm_stream);\n\n    std::optional<EventHandle> event;')
     src = '#include "normal_stream_timing.hpp"\n' + src[:first] + dispatch + src[last:]
-    anchor = '  m.def("urma_dispatch_trial_end",[](){return uccl::dispatch_trial::end();});'
     src = replace(src, anchor, anchor+'''
   m.def("normal_stream_timing_prepare", &uccl::normal_stream_timing::prepare);
   m.def("normal_stream_timing_begin", &uccl::normal_stream_timing::begin);
   m.def("normal_stream_timing_end", &uccl::normal_stream_timing::end);
   m.def("normal_stream_timing_close", &uccl::normal_stream_timing::close);''')
-    timing = (HERE/'stream_timing.hpp').read_text(encoding='utf-8')
-    sources = {
-        ep:src.encode('utf-8'),
-        runtime:(REPO/runtime).read_text(encoding='utf-8').encode('utf-8'),
-    }
-    if receiver_waits:
-        timing = '#include "normal_receiver_waits.cuh"\n'+timing
-        timing = replace(timing, '  window.active = true;',
-            '  uccl::normal_receiver_waits::begin();\n  window.active = true;')
-        timing = replace(timing, "  out << '}';", "  uccl::normal_receiver_waits::append_json(out);\n  out << '}';")
-        sources['ep/include/normal_receiver_waits.cuh'] = (HERE/'receiver_waits.cuh').read_text(encoding='utf-8').encode()
-        sources['ep/src/internode.cu'] = with_receiver_waits(source_at_base('ep/src/internode.cu')).encode()
-        trace = source_at_base('ep/src/reference_event_trace.cu')
-        trace += '\n#include "normal_stream_timing.hpp"\n'+(HERE/'receiver_waits.cu.inc').read_text(encoding='utf-8')
-        sources['ep/src/reference_event_trace.cu'] = trace.encode()
-    sources['ep/include/normal_stream_timing.hpp'] = timing.encode()
+    sources[ep] = src.encode('utf-8')
+    sources['ep/include/normal_stream_timing.hpp'] = (HERE/'stream_timing.hpp').read_text(encoding='utf-8').encode()
     return sources
 
 

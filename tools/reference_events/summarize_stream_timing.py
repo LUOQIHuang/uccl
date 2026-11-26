@@ -13,7 +13,7 @@ STREAM_FIELDS = ('cached_notify_us', 'notify_to_dispatch_us', 'dispatch_comm_us'
 FIELDS = (*STREAM_FIELDS, 'outside_marked_signed_us', 'outside_dispatch_us', 'api_us')
 WAIT_CYCLES = ('remote_tail_cycles', 'mixed_tail_cycles', 'remote_epoch_cycles', 'local_space_cycles')
 WAIT_FIELDS = (*WAIT_CYCLES, 'other_forwarder_cycles', 'forwarder_cycles')
-PRODUCTION_GAP_US = 660.70752673679
+LATEST_CONTROL_GAP_US = 588.6720816294346
 
 
 def windows(case, raw):
@@ -33,8 +33,13 @@ def windows(case, raw):
                 outside_dispatch_us=duration-intervals['dispatch_comm_us'], api_us=duration)
 
 
-def receiver_windows(case):
-    for window in base.rows(case/'stream_timing.jsonl'):
+def receiver_windows(case, raw):
+    windows = base.rows(case/'receiver_waits.jsonl')
+    api = {r['index']:r['us'] for r in raw if r['label']==LABEL}
+    if ([w['index'] for w in windows]!=sorted(api) or
+            any(w['label']!=LABEL or w['us']!=api[w['index']] for w in windows)):
+        raise ValueError('receiver waits and API samples disagree')
+    for window in windows:
         clock = window['nominal_clock_khz']
         channels = window['receiver_waits']
         if (not isinstance(clock,int) or clock<=0 or len(channels)!=12 or
@@ -67,7 +72,8 @@ def summarize(root, output, receiver_waits=False):
             for phase in PHASES:
                 name = f'{prefix}_{phase}'
                 probe = rank==0 and phase=='probe'
-                data = base.case_data(root/name,rank,False,reference_events='paced',stream_probe=probe)
+                data = base.case_data(root/name,rank,False,reference_events='paced',
+                    stream_probe=probe and not receiver_waits,receiver_probe=probe and receiver_waits)
                 identity = data['identity']
                 if any(identity['sources'].get(key)!=value for key,value in expected_sources.items()):
                     raise ValueError('wrong stream marker module source')
@@ -90,9 +96,10 @@ def summarize(root, output, receiver_waits=False):
                 raw = base.rows(data['case']/'api_samples.jsonl')
                 raw_us[rank,phase] = {r['index']:r['us'] for r in raw if r['used'] and r['label']==LABEL}
                 if probe:
-                    samples.extend(dict(backend=backend,**row) for row in windows(data['case'],raw))
                     if receiver_waits:
-                        wait_samples.extend(dict(backend=backend,**row) for row in receiver_windows(data['case']))
+                        wait_samples.extend(dict(backend=backend,**row) for row in receiver_windows(data['case'],raw))
+                    else:
+                        samples.extend(dict(backend=backend,**row) for row in windows(data['case'],raw))
                 context.append(dict(case=name,rank=rank,module_sha=local[1],**identity))
             controls.append(control_row(backend,rank,{p:list(raw_us[rank,p].values()) for p in PHASES}))
         calls = {p: [(raw_us[0,p][i],raw_us[1,p][i]) for i in range(1,10)] for p in PHASES}
@@ -113,17 +120,13 @@ def summarize(root, output, receiver_waits=False):
         note='Events bracket the actual cached_notify and main Dispatch launch calls on one communication stream. '
              'Outer API timing uses the caller stream and residuals remain signed.')
     if receiver_waits:
-        decision['historical_control_gap_us'] = PRODUCTION_GAP_US
-        decision['compiled_control_gap_shift_us'] = old_gap-PRODUCTION_GAP_US
-        decision['usable'] = decision['usable'] and abs(old_gap-PRODUCTION_GAP_US)<=100
-    comparisons = []
-    for field in FIELDS:
-        r,u = ([x[field] for x in samples if x['backend']==backend] for backend in ('verbs','urma'))
-        comparisons.append(dict(boundary=field,verbs_mean_us=mean(r),urma_mean_us=mean(u),delta_us=mean(u)-mean(r),
-            verbs_median_us=median(r),urma_median_us=median(u)))
+        decision['historical_control_gap_us'] = LATEST_CONTROL_GAP_US
+        decision['compiled_control_gap_shift_us'] = old_gap-LATEST_CONTROL_GAP_US
+        decision['usable'] = decision['usable'] and abs(old_gap-LATEST_CONTROL_GAP_US)<=100
+        decision['note'] = ('Receiver-only counters, without stream events. Completion order selects one receiver channel per call. '
+                            'Time estimates use nominal GPU clock; they are not a partition of API time.')
     output.mkdir(parents=True,exist_ok=False)
-    for name,rows in [('controls',controls),('stream_windows',samples),('comparison',comparisons)]:
-        base.write(output/f'{name}.csv',rows)
+    base.write(output/'controls.csv',controls)
     if receiver_waits:
         last = [r for r in wait_samples if r['done_order']==12]
         wait_compare = []
@@ -133,6 +136,14 @@ def summarize(root, output, receiver_waits=False):
             wait_compare.append(dict(wait=field,verbs_mean_us=mean(r),urma_mean_us=mean(u),delta_us=mean(u)-mean(r)))
         for name,rows in [('receiver_channels',wait_samples),('latest_receiver',last),('receiver_comparison',wait_compare)]:
             base.write(output/f'{name}.csv',rows)
+    else:
+        comparisons = []
+        for field in FIELDS:
+            r,u = ([x[field] for x in samples if x['backend']==backend] for backend in ('verbs','urma'))
+            comparisons.append(dict(boundary=field,verbs_mean_us=mean(r),urma_mean_us=mean(u),delta_us=mean(u)-mean(r),
+                verbs_median_us=median(r),urma_median_us=median(u)))
+        base.write(output/'stream_windows.csv',samples)
+        base.write(output/'comparison.csv',comparisons)
     for name, data in [('decision',decision),('context',context)]:
         (output/f'{name}.json').write_text(json.dumps(data,indent=2)+'\n',encoding='utf-8')
     print(json.dumps(decision,indent=2))

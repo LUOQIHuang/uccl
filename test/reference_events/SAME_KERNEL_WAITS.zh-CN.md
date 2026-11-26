@@ -1,6 +1,6 @@
 # 202 最晚完成通道的全程等待对照
 
-本轮回答剩余约 **620–660 μs** 是否集中在接收通道的一类等待。前次较粗的通信流计时并入本轮，用来确认差额是不是落在主 Dispatch。旧 GPU 时间线和 204 第 6 块干预的结果已经归档。 [正式差额](results/normal_same_kernel_receive_01/summary/decision.json) · [204 干预](../normal_chunk_gate/results/normal_chunk6_gate_01/summary/decision.json)
+本轮回答剩余差距中，202 接收通道是否有一类等待明显更长。最新无采集基线差 **588.67 μs**，四个通信流 CUDA Event 让差额缩小 **140.19 μs**，超过验收门槛。此次使用独立的接收等待计数，去掉这四个事件。上一轮记录的 `cached_notify` 差 150.33 μs、主 Dispatch 差 301.71 μs，只作候选线索。 [最新对照](results/normal_same_kernel_stream_01/summary/decision.json) · [粗分数据](results/normal_same_kernel_stream_01/summary/comparison.csv) · [204 干预](../normal_chunk_gate/results/normal_chunk6_gate_01/summary/decision.json)
 
 只在 **202** 启用采集。对每个接收通道，用同一 Forwarder warp 的 `clock64` 累计全程等待，用接收输出结束的登记顺序选择每次最后完成的通道。完成顺序每通道登记一次。计数在 Forwarder 结束时一次写入显存，计时结束后由主机读取。没有 CPU 时钟更新线程、主机映射时间戳或 CPU 逐请求时间线。
 
@@ -26,18 +26,18 @@ bash test/reference_events/run_same_kernel_gap.sh --study waits --action setup -
 bash test/reference_events/run_same_kernel_gap.sh --study waits --action run --node-rank "$RANK"
 ```
 
-按 RDMA 无采集 → 采集 → 无采集、URMA 同样三轮运行。固定 Normal BF16、4096 tokens/节点、chunk 32、URMA 仅 204 tail-off，每轮 5 预热和 10 采样，汇总用后 9 条。保持原有正确性检查。任务名 `normal_same_kernel_waits_01`，master `141.61.17.202`，端口 `34340–34351`。两端看到 `SAME_KERNEL_WAITS_RUN_PASSED` 即可。构建默认在 `/home/h00918771/metax_dev/normal_waits_build/`，源码树为 `/home/h00918771/metax_dev/normal_waits_src_v1`。`--stream-tree`、`--verbs-build`、`--urma-build` 可以覆盖默认路径。已有基线模块及旧诊断模块继续可用。
+按 RDMA 无采集 → 采集 → 无采集、URMA 同样三轮运行。固定 Normal BF16、4096 tokens/节点、chunk 32、URMA 仅 204 tail-off，每轮 5 预热和 10 采样，汇总用后 9 条。保持原有正确性检查。新版任务名 `normal_same_kernel_waits_02`，master `141.61.17.202`，端口 `34340–34351`。两端看到 `SAME_KERNEL_WAITS_RUN_PASSED` 即可。构建默认在 `/home/h00918771/metax_dev/normal_waits_v2_build/`，源码树为 `/home/h00918771/metax_dev/normal_waits_v2_src_v1`。`--stream-tree`、`--verbs-build`、`--urma-build` 可以覆盖默认路径。两个版次使用独立构建和日志目录。
 
 ## 上传和验收
 
-上传两端 `test/reference_events/results/normal_same_kernel_waits_01/` 的六轮原始日志和预检记录。重点保留两个 202 probe 下的 `stream_timing.jsonl`、所有 `api_samples.jsonl`、`status.json`、`overlay_node*.json`、模块与主机身份，以及 GPU 快照和 `console`。日志齐全后复算如下。
+上传两端 `test/reference_events/results/normal_same_kernel_waits_02/` 的六轮原始日志和预检记录。重点保留两个 202 probe 下的 `receiver_waits.jsonl`、所有 `api_samples.jsonl`、`status.json`、`overlay_node*.json`、模块与主机身份，以及 GPU 快照和 `console`。日志齐全后复算如下。
 
 ```bash
 python3 tools/reference_events/summarize_stream_timing.py --receiver-waits \
-  --root test/reference_events/results/normal_same_kernel_waits_01 \
-  --output test/reference_events/results/normal_same_kernel_waits_01/summary
+  --root test/reference_events/results/normal_same_kernel_waits_02 \
+  --output test/reference_events/results/normal_same_kernel_waits_02/summary
 ```
 
-1. 先看 `decision.json`。对照轮必须仍为 202 最晚，CV、漂移与扰动在 5% 内。还要确认新构建的无采集后端差额与此前约 661 μs 的差距，以及启用采集前后的差额，变动都不超过 100 μs。这样能同时检查编译加入计数代码和实际启用计数的影响。
-2. 先用 `comparison.csv` 检查主 Dispatch 是否承担主要额外时间。再看 `receiver_comparison.csv` 和 `latest_receiver.csv`，核对最晚通道哪一类等待在多个样本持续偏长。查到远端 tail 则聚焦发送与通知到达，查到 epoch 则聚焦 tail 后的数据写入可见性，查到本地空间则聚焦 202 的输出消费。
+1. 先看 `decision.json`。对照轮必须仍为 202 最晚，CV、漂移与扰动在 5% 内。还要确认新构建的无采集后端差额与最近约 589 μs 的差距，以及启用采集前后的差额，变动都不超过 100 μs。这样能同时检查编译加入计数代码和实际启用计数的影响。
+2. 看 `receiver_comparison.csv` 和 `latest_receiver.csv`，核对最晚通道哪一类等待在多个样本持续偏长。查到远端 tail 则聚焦发送与通知到达，查到 epoch 则聚焦 tail 后的数据写入可见性，查到本地空间则聚焦 202 的输出消费。
 3. 若主要差额落在 `mixed_tail` 或其他残余，保留该范围和未解释时间。若验收失败，保留日志并停止原样复跑。

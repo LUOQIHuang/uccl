@@ -1,28 +1,35 @@
 
 #include "normal_receiver_waits.cuh"
+#include <sstream>
+#include <stdexcept>
 
 namespace uccl::normal_receiver_waits {
 __device__ State state;
 
+inline void check(cudaError_t result) {
+  if (result != cudaSuccess) throw std::runtime_error(cudaGetErrorString(result));
+}
+
 void begin() {
   State empty{};
   empty.enabled = 1;
-  uccl::normal_stream_timing::check(cudaMemcpyToSymbol(state, &empty, sizeof(empty)));
+  check(cudaMemcpyToSymbol(state, &empty, sizeof(empty)));
 }
 
-void append_json(std::ostringstream& out) {
+std::string end() {
   State recorded{};
   auto result = cudaMemcpyFromSymbol(&recorded, state, sizeof(recorded));
   unsigned off = 0;
   auto disable = cudaMemcpyToSymbol(state, &off, sizeof(off));
-  uccl::normal_stream_timing::check(result);
-  uccl::normal_stream_timing::check(disable);
+  check(result);
+  check(disable);
   if (recorded.next_done != channels) throw std::runtime_error("wrong receiver completion coverage");
   int device = 0;
   cudaDeviceProp props{};
-  uccl::normal_stream_timing::check(cudaGetDevice(&device));
-  uccl::normal_stream_timing::check(cudaGetDeviceProperties(&props, device));
-  out << ",\"nominal_clock_khz\":" << props.clockRate << ",\"receiver_waits\":[";
+  check(cudaGetDevice(&device));
+  check(cudaGetDeviceProperties(&props, device));
+  std::ostringstream out;
+  out << "{\"nominal_clock_khz\":" << props.clockRate << ",\"receiver_waits\":[";
   for (unsigned i = 0; i < channels; ++i) {
     const auto& c = recorded.counters[i];
     if (i) out << ',';
@@ -31,6 +38,7 @@ void append_json(std::ostringstream& out) {
         << ",\"remote_epoch_cycles\":" << c.remote_epoch << ",\"local_space_cycles\":" << c.local_space
         << ",\"forwarder_cycles\":" << c.forwarder << '}';
   }
-  out << ']';
+  out << "]}";
+  return out.str();
 }
 }

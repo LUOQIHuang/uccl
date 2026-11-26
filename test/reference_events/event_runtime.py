@@ -79,8 +79,10 @@ def measure(torch,dist,ep,case,fn,label,warmups,samples,post_fn=None,capture_fac
     """Capture only fixed Normal points, keeping layouts on the existing timer."""
     capture=(capture_factory or Capture)(ep.__file__) if record_events else None
     stream_probe=os.environ.get('NORMAL_STREAM_TIMING')=='1' and label=='dispatch_bf16_chunk32'
+    receiver_probe=os.environ.get('NORMAL_RECEIVER_WAITS')=='1' and label=='dispatch_bf16_chunk32'
+    if (stream_probe or receiver_probe) and (record_events or selected_profile()!='legacy' or (stream_probe and receiver_probe)):
+        raise ValueError('diagnostic requires a single probe type with inactive paced reference events')
     if stream_probe:
-        if record_events or selected_profile()!='legacy':raise ValueError('stream timing requires inactive paced reference events')
         ep.normal_stream_timing_prepare()
     cpu_events=os.environ.get('UCCL_REFERENCE_GPU_ONLY')!='1'
     if not cpu_events and selected_profile()!='boundaries':raise ValueError('GPU-only capture requires boundaries')
@@ -96,6 +98,7 @@ def measure(torch,dist,ep,case,fn,label,warmups,samples,post_fn=None,capture_fac
         cpu_active=False;gpu=None;cpu=None
         try:
             if stream_probe:ep.normal_stream_timing_begin()
+            if receiver_probe:ep.normal_receiver_waits_begin()
             dist.barrier();torch.cuda.synchronize() # both clocks/reset copies ready before timing
             if capture is not None and cpu_events:
                 if selected_profile()=='boundaries':ep.urma_timeline_begin_boundaries()
@@ -115,6 +118,8 @@ def measure(torch,dist,ep,case,fn,label,warmups,samples,post_fn=None,capture_fac
         raw.append(value)
         if stream_probe:
             append(case/'stream_timing.jsonl',dict(label=label,index=i,us=value,**json.loads(ep.normal_stream_timing_end())))
+        if receiver_probe:
+            append(case/'receiver_waits.jsonl',dict(label=label,index=i,us=value,**json.loads(ep.normal_receiver_waits_end())))
         if capture is not None:append(case/'event_trace.jsonl',dict(label=label,index=i,us=value,gpu=gpu,cpu=cpu,cpu_events=cpu_events))
         append(case/'api_samples.jsonl',dict(label=label,index=i,us=value,used=i>0,mode='normal'))
         dist.barrier()
@@ -126,7 +131,7 @@ def measure(torch,dist,ep,case,fn,label,warmups,samples,post_fn=None,capture_fac
     print('MODE_PARITY_SAMPLES '+json.dumps(summary),flush=True)
     # URMA phase-suite acceptance requires a phase file; no CPU counters active.
     append(case/'phases.jsonl',dict(label=label,enabled=False,records=[],note='reference events' if record_events else 'paced control without events/clock'))
-    if not record_events:control_marker(case,label,'paced',warmups,samples,stream_probe=stream_probe)
+    if not record_events:control_marker(case,label,'paced',warmups,samples,stream_probe=stream_probe,receiver_probe=receiver_probe)
     return mean/1e6,min(values)/1e6,max(values)/1e6
 
 
@@ -134,14 +139,15 @@ def append(path,data):
     with path.open('a') as stream:stream.write(json.dumps(data)+'\n')
 
 
-def control_marker(case,label,mode,warmups,samples,*,stream_probe=False):
+def control_marker(case,label,mode,warmups,samples,*,stream_probe=False,receiver_probe=False):
     marker=dict(label=label,mode=mode,warmups=warmups,samples=samples,gpu_events=False,cpu_events=False,host_clock=False)
     if PROFILE_NAMES[selected_profile()]:marker['profile']=PROFILE_NAMES[selected_profile()]
     if stream_probe:marker['stream_events']=4
+    if receiver_probe:marker['receiver_waits']=True
     append(case/'reference_control.jsonl',marker)
 
 
-def validate_control(case,mode,warmups,samples,profile='legacy',labels=None,*,fifo_cpu=False,stream_probe=False):
+def validate_control(case,mode,warmups,samples,profile='legacy',labels=None,*,fifo_cpu=False,stream_probe=False,receiver_probe=False):
     case=Path(case)
     if profile not in PROFILE_NAMES:raise ValueError('unknown reference profile')
     if mode not in ('batch','paced'):raise ValueError('unknown reference control')
@@ -149,11 +155,15 @@ def validate_control(case,mode,warmups,samples,profile='legacy',labels=None,*,fi
     if PROFILE_NAMES[profile]:
         for row in expected:row['profile']=PROFILE_NAMES[profile]
     stream_probe=stream_probe or os.environ.get('NORMAL_STREAM_TIMING')=='1'
-    if stream_probe:
-        if fifo_cpu or mode!='paced' or profile!='legacy' or labels is not None:
-            raise ValueError('wrong stream timing probe configuration')
-        next(row for row in expected if row['label']=='dispatch_bf16_chunk32')['stream_events']=4
+    receiver_probe=receiver_probe or os.environ.get('NORMAL_RECEIVER_WAITS')=='1'
+    if stream_probe or receiver_probe:
+        if fifo_cpu or (stream_probe and receiver_probe) or mode!='paced' or profile!='legacy' or labels is not None:
+            raise ValueError('wrong diagnostic probe configuration')
+        row=next(row for row in expected if row['label']=='dispatch_bf16_chunk32')
+        if stream_probe:row['stream_events']=4
+        else:row['receiver_waits']=True
     if (case/'stream_timing.jsonl').is_file()!=stream_probe:raise ValueError('wrong stream timing capture mode')
+    if (case/'receiver_waits.jsonl').is_file()!=receiver_probe:raise ValueError('wrong receiver wait capture mode')
     if fifo_cpu:
         if mode!='paced' or profile!='boundaries' or labels is not None:
             raise ValueError('FIFO CPU capture requires paced boundary Dispatch')
