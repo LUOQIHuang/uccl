@@ -1,0 +1,400 @@
+Nov 26 23:31:43 master kernel: platform ummu_vdev.21.auto: Adding to iommu group 19
+Nov 26 23:31:43 master kernel: URMA|ubcore|208100|208100|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xfffb9409f000, cfg->len = 64, cfg->token_value.token = 0, udate = 0 
+Nov 26 23:31:43 master kernel: ubase 0000a: UDMA: MATT START:kernel_mode=0
+Nov 26 23:31:43 master kernel: platform ummu_vdev.22.auto: Adding to iommu group 20
+Nov 26 23:31:43 master kernel: URMA|ubcore|208097|208097|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xa23e00000, cfg->len = 81960, cfg->token_value.token = 0, udate = 0 
+Nov 26 23:31:43 master kernel: ubase 0000a: UDMA: MATT START:kernel_mode=0
+Nov 26 23:31:43 master kernel: udma_metax_p2p_bridge: pin OK va=0xa23e00000->0xa23e00000 len=0x14028->0x15000 page=0x1000 bus_off=0x0 apply_off=0 nents=1 first_pa=0x800001600000
+Nov 26 23:31:43 master kernel: ubase 0000a: UDMA: [GPU-TRACE] pin OK provider=metax gpu_va=0xa23e00000 mapped=0x15000 page_size=0x1000 bus_off=0x0 nents=1 first_pa=0x800001600000
+Nov 26 23:31:43 master kernel: UDMA GPU map: l_tid=1048575 r_tid=195 mm=ffff0800d5afc780 current_mm=ffff0800d5afc780 iova=0xa23e00000 first_pa=0x800001600000 nents=1
+Nov 26 23:31:43 master kernel: UDMA GPU map: l_tid=187 r_tid=1048575 mm=ffff0800d5afc780 current_mm=ffff0800d5afc780 iova=0xa23e00000 first_pa=0x800001600000 nents=1
+Nov 26 23:31:43 master kernel: platform ummu_vdev.23.auto: Adding to iommu group 21
+Nov 26 23:31:43 master kernel: URMA|ubcore|208099|208099|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xfffb9009f000, cfg->len = 64, cfg->token_value.token = 0, udate = 0 
+Nov 26 23:31:43 master kernel: ubase 0000a: UDMA: MATT START:kernel_mode=0
+Nov 26 23:31:43 master kernel: platform ummu_vdev.24.auto: Adding to iommu group 22
+Nov 26 23:31:43 master kernel: URMA|ubcore|208098|208098|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xfffb9809f000, cfg->len = 64, cfg->token_value.token = 0, udate = 0 
+Nov 26 23:31:43 master kernel: ubase 0000a: UDMA: MATT START:kernel_mode=0
+Nov 26 23:33:32 master kernel: UDMA GPU unmap: l_tid=1048575 r_tid=191 mm=ffff0800d5afc780 current_mm=ffff0800d5afc780 iova=0xa04400000 size=0x1cd7a000
+Nov 26 23:33:32 master kernel: UDMA GPU unmap: l_tid=187 r_tid=1048575 mm=ffff0800d5afc780 current_mm=ffff0800d5afc780 iova=0xa04400000 size=0x1cd7a000
+Nov 26 23:33:32 master kernel: UDMA GPU unmap: l_tid=1048575 r_tid=195 mm=ffff0800d5afc780 current_mm=ffff0800d5afc780 iova=0xa23e00000 size=0x15000
+Nov 26 23:33:32 master kernel: UDMA GPU unmap: l_tid=187 r_tid=1048575 mm=ffff0800d5afc780 current_mm=ffff0800d5afc780 iova=0xa23e00000 size=0x15000
+Nov 26 23:33:32 master kernel: ubase 0000a: UDMA: trigger TP level AE, event type is 16, sub type is 0, queue_num is 160.
+Nov 26 23:33:32 master kernel: ubase 0000a: UDMA: trigger TP level AE, event type is 16, sub type is 0, queue_num is 161.
+Nov 26 23:33:32 master kernel: ubase 0000a: UDMA: trigger TP level AE, event type is 16, sub type is 0, queue_num is 162.
+Nov 26 23:33:32 master kernel: ubase 0000a: UDMA: trigger TP level AE, event type is 16, sub type is 0, queue_num is 163.
+Nov 26 23:33:32 master kernel: ubase 0000a: UDMA: trigger TP level AE, event type is 16, sub type is 0, queue_num is 164.
+Nov 26 23:33:32 master kernel: ubase 0000a: UDMA: trigger TP level AE, event type is 16, sub type is 0, queue_num is 165.
+Nov 26 23:33:32 master kernel: ubase 0000a: UDMA: trigger TP level AE, event type is 16, sub type is 0, queue_num is 166.
+Nov 26 23:33:32 master kernel: ubase 0000a: UDMA: trigger TP level AE, event type is 16, sub type is 0, queue_num is 167.
+Nov 26 23:33:32 master kernel: ubase 0000a: UDMA: trigger TP level AE, event type is 16, sub type is 0, queue_num is 168.
+Nov 26 23:33:32 master kernel: ubase 0000a: UDMA: trigger TP level AE, event type is 16, sub type is 0, queue_num is 169.
+Nov 26 23:33:32 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32776, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:33:32 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32777, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:33:32 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32778, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:33:32 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32779, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:33:32 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32780, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:33:32 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32781, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:33:32 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32782, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:33:32 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32783, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:33:32 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32784, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:33:32 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32785, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:33:32 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32786, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:33:32 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32787, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:33:32 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32788, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:33:32 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32789, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:33:32 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32790, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:33:32 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32791, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:33:32 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32792, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:33:32 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32793, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:33:32 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32794, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:33:32 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32795, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:33:32 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32796, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:33:32 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32797, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:33:32 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32798, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:33:32 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32799, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:33:32 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32800, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:33:32 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32801, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:33:32 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32802, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:33:32 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32803, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:33:32 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32804, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:33:32 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32805, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:33:32 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32806, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:33:32 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32807, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:33:32 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32808, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:33:32 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32809, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:33:32 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32810, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:33:32 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32811, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:33:54 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 26 23:33:54 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 26 23:33:54 master kernel: URMA|ubcore|259740|259740|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xfffb900a3000, cfg->len = 8192, cfg->token_value.token = 0, udate = 0 
+Nov 26 23:33:54 master kernel: ubase 0000a: UDMA: MATT START:kernel_mode=0
+Nov 26 23:33:54 master kernel: platform ummu_vdev.16.auto: Adding to iommu group 14
+Nov 26 23:33:54 master kernel: URMA|ubcore|259739|259739|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xfffba0bbf000, cfg->len = 8192, cfg->token_value.token = 0, udate = 0 
+Nov 26 23:33:54 master kernel: ubase 0000a: UDMA: MATT START:kernel_mode=0
+Nov 26 23:33:54 master kernel: platform ummu_vdev.17.auto: Adding to iommu group 15
+Nov 26 23:33:54 master kernel: URMA|ubcore|259739|259739|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xfffba0bc2000, cfg->len = 64, cfg->token_value.token = 0, udate = 0 
+Nov 26 23:33:54 master kernel: ubase 0000a: UDMA: MATT START:kernel_mode=0
+Nov 26 23:33:54 master kernel: platform ummu_vdev.18.auto: Adding to iommu group 16
+Nov 26 23:33:54 master kernel: URMA|ubcore|259740|259740|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xfffb900a7000, cfg->len = 64, cfg->token_value.token = 0, udate = 0 
+Nov 26 23:33:54 master kernel: ubase 0000a: UDMA: MATT START:kernel_mode=0
+Nov 26 23:33:54 master kernel: platform ummu_vdev.19.auto: Adding to iommu group 17
+Nov 26 23:33:54 master kernel: URMA|ubcore|259739|259739|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xa04400000, cfg->len = 483892608, cfg->token_value.token = 0, udate = 0 
+Nov 26 23:33:54 master kernel: ubase 0000a: UDMA: MATT START:kernel_mode=0
+Nov 26 23:33:54 master kernel: udma_metax_p2p_bridge: pin OK va=0xa04400000->0xa04400000 len=0x1cd79d80->0x1cd7a000 page=0x2000 bus_off=0x0 apply_off=0 nents=1 first_pa=0x80000ce00000
+Nov 26 23:33:54 master kernel: ubase 0000a: UDMA: [GPU-TRACE] pin OK provider=metax gpu_va=0xa04400000 mapped=0x1cd7a000 page_size=0x2000 bus_off=0x0 nents=1 first_pa=0x80000ce00000
+Nov 26 23:33:54 master kernel: UDMA GPU map: l_tid=1048575 r_tid=192 mm=ffff0b00274bac00 current_mm=ffff0b00274bac00 iova=0xa04400000 first_pa=0x80000ce00000 nents=1
+Nov 26 23:33:54 master kernel: UDMA GPU map: l_tid=187 r_tid=1048575 mm=ffff0b00274bac00 current_mm=ffff0b00274bac00 iova=0xa04400000 first_pa=0x80000ce00000 nents=1
+Nov 26 23:33:54 master kernel: platform ummu_vdev.20.auto: Adding to iommu group 18
+Nov 26 23:33:54 master kernel: URMA|ubcore|259739|259739|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xa23e00000, cfg->len = 81960, cfg->token_value.token = 0, udate = 0 
+Nov 26 23:33:54 master kernel: ubase 0000a: UDMA: MATT START:kernel_mode=0
+Nov 26 23:33:54 master kernel: udma_metax_p2p_bridge: pin OK va=0xa23e00000->0xa23e00000 len=0x14028->0x15000 page=0x1000 bus_off=0x0 apply_off=0 nents=1 first_pa=0x80000c600000
+Nov 26 23:33:54 master kernel: ubase 0000a: UDMA: [GPU-TRACE] pin OK provider=metax gpu_va=0xa23e00000 mapped=0x15000 page_size=0x1000 bus_off=0x0 nents=1 first_pa=0x80000c600000
+Nov 26 23:33:54 master kernel: UDMA GPU map: l_tid=1048575 r_tid=193 mm=ffff0b00274bac00 current_mm=ffff0b00274bac00 iova=0xa23e00000 first_pa=0x80000c600000 nents=1
+Nov 26 23:33:54 master kernel: UDMA GPU map: l_tid=187 r_tid=1048575 mm=ffff0b00274bac00 current_mm=ffff0b00274bac00 iova=0xa23e00000 first_pa=0x80000c600000 nents=1
+Nov 26 23:33:54 master kernel: platform ummu_vdev.21.auto: Adding to iommu group 19
+Nov 26 23:33:54 master kernel: URMA|ubcore|259742|259742|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xfffb8c09b000, cfg->len = 8192, cfg->token_value.token = 0, udate = 0 
+Nov 26 23:33:54 master kernel: ubase 0000a: UDMA: MATT START:kernel_mode=0
+Nov 26 23:33:55 master kernel: platform ummu_vdev.22.auto: Adding to iommu group 20
+Nov 26 23:33:55 master kernel: URMA|ubcore|259741|259741|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xfffb8809b000, cfg->len = 8192, cfg->token_value.token = 0, udate = 0 
+Nov 26 23:33:55 master kernel: ubase 0000a: UDMA: MATT START:kernel_mode=0
+Nov 26 23:33:55 master kernel: platform ummu_vdev.23.auto: Adding to iommu group 21
+Nov 26 23:33:55 master kernel: URMA|ubcore|259742|259742|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xfffb8c09f000, cfg->len = 64, cfg->token_value.token = 0, udate = 0 
+Nov 26 23:33:55 master kernel: ubase 0000a: UDMA: MATT START:kernel_mode=0
+Nov 26 23:33:55 master kernel: platform ummu_vdev.24.auto: Adding to iommu group 22
+Nov 26 23:33:55 master kernel: URMA|ubcore|259741|259741|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xfffb8809f000, cfg->len = 64, cfg->token_value.token = 0, udate = 0 
+Nov 26 23:33:55 master kernel: ubase 0000a: UDMA: MATT START:kernel_mode=0
+Nov 26 23:34:06 master kernel: UDMA GPU unmap: l_tid=1048575 r_tid=192 mm=ffff0b00274bac00 current_mm=ffff0b00274bac00 iova=0xa04400000 size=0x1cd7a000
+Nov 26 23:34:06 master kernel: UDMA GPU unmap: l_tid=187 r_tid=1048575 mm=ffff0b00274bac00 current_mm=ffff0b00274bac00 iova=0xa04400000 size=0x1cd7a000
+Nov 26 23:34:06 master kernel: UDMA GPU unmap: l_tid=1048575 r_tid=193 mm=ffff0b00274bac00 current_mm=ffff0b00274bac00 iova=0xa23e00000 size=0x15000
+Nov 26 23:34:06 master kernel: UDMA GPU unmap: l_tid=187 r_tid=1048575 mm=ffff0b00274bac00 current_mm=ffff0b00274bac00 iova=0xa23e00000 size=0x15000
+Nov 26 23:34:07 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 26 23:34:07 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 26 23:34:07 master kernel: URMA|ubcore|266370|266370|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xffef84000000, cfg->len = 0, cfg->token_value.token = 0, udate = 0 
+Nov 26 23:34:07 master kernel: ubase 00007: UDMA: MATT START:kernel_mode=0
+Nov 26 23:34:07 master kernel: udma_ae_tp_level_error: 62 callbacks suppressed
+Nov 26 23:34:07 master kernel: ubase 0000a: UDMA: trigger TP level AE, event type is 16, sub type is 0, queue_num is 160.
+Nov 26 23:34:07 master kernel: ubase 0000a: UDMA: trigger TP level AE, event type is 16, sub type is 0, queue_num is 161.
+Nov 26 23:34:07 master kernel: ubase 0000a: UDMA: trigger TP level AE, event type is 16, sub type is 0, queue_num is 162.
+Nov 26 23:34:07 master kernel: ubase 0000a: UDMA: trigger TP level AE, event type is 16, sub type is 0, queue_num is 163.
+Nov 26 23:34:07 master kernel: ubase 0000a: UDMA: trigger TP level AE, event type is 16, sub type is 0, queue_num is 164.
+Nov 26 23:34:07 master kernel: ubase 0000a: UDMA: trigger TP level AE, event type is 16, sub type is 0, queue_num is 165.
+Nov 26 23:34:07 master kernel: ubase 0000a: UDMA: trigger TP level AE, event type is 16, sub type is 0, queue_num is 166.
+Nov 26 23:34:07 master kernel: ubase 0000a: UDMA: trigger TP level AE, event type is 16, sub type is 0, queue_num is 167.
+Nov 26 23:34:07 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32812, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:34:07 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32813, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:34:07 master kernel: ubase 0000a: UDMA: trigger TP level AE, event type is 16, sub type is 0, queue_num is 168.
+Nov 26 23:34:07 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32814, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:34:07 master kernel: ubase 0000a: UDMA: trigger TP level AE, event type is 16, sub type is 0, queue_num is 169.
+Nov 26 23:34:07 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32815, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:34:07 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32816, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:34:07 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32817, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:34:07 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32818, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:34:07 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32819, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:34:07 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32820, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:34:07 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32821, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:34:07 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32822, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:34:07 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32823, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:34:07 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32824, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:34:07 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32825, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:34:07 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32826, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:34:07 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32827, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:34:07 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32828, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:34:07 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32829, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:34:07 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32830, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:34:07 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32831, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:34:07 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32832, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:34:07 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32833, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:34:07 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32834, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:34:07 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32835, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:34:07 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32836, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:34:07 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32837, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:34:07 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32838, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:34:07 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32839, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:34:07 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32840, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:34:07 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32841, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:34:07 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32842, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:34:07 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32843, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:34:07 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32844, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:34:07 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32845, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:34:07 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32846, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:34:07 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32847, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:34:29 master kernel: platform ummu_vdev.16.auto: Adding to iommu group 14
+Nov 26 23:34:29 master kernel: platform ummu_vdev.17.auto: Adding to iommu group 15
+Nov 26 23:34:29 master kernel: URMA|ubcore|281567|281567|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xfffba0bc7000, cfg->len = 8192, cfg->token_value.token = 0, udate = 0 
+Nov 26 23:34:29 master kernel: ubase 0000a: UDMA: MATT START:kernel_mode=0
+Nov 26 23:34:29 master kernel: platform ummu_vdev.18.auto: Adding to iommu group 16
+Nov 26 23:34:29 master kernel: URMA|ubcore|281567|281567|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xfffba0bca000, cfg->len = 64, cfg->token_value.token = 0, udate = 0 
+Nov 26 23:34:29 master kernel: ubase 0000a: UDMA: MATT START:kernel_mode=0
+Nov 26 23:34:29 master kernel: platform ummu_vdev.19.auto: Adding to iommu group 17
+Nov 26 23:34:29 master kernel: URMA|ubcore|281569|281569|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xfffb9009b000, cfg->len = 8192, cfg->token_value.token = 0, udate = 0 
+Nov 26 23:34:29 master kernel: ubase 0000a: UDMA: MATT START:kernel_mode=0
+Nov 26 23:34:29 master kernel: platform ummu_vdev.20.auto: Adding to iommu group 18
+Nov 26 23:34:29 master kernel: URMA|ubcore|281568|281568|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xfffb9c09b000, cfg->len = 8192, cfg->token_value.token = 0, udate = 0 
+Nov 26 23:34:29 master kernel: ubase 0000a: UDMA: MATT START:kernel_mode=0
+Nov 26 23:34:29 master kernel: platform ummu_vdev.21.auto: Adding to iommu group 19
+Nov 26 23:34:29 master kernel: URMA|ubcore|281570|281570|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xfffb9409b000, cfg->len = 8192, cfg->token_value.token = 0, udate = 0 
+Nov 26 23:34:29 master kernel: ubase 0000a: UDMA: MATT START:kernel_mode=0
+Nov 26 23:34:29 master kernel: platform ummu_vdev.22.auto: Adding to iommu group 20
+Nov 26 23:34:29 master kernel: URMA|ubcore|281567|281567|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xa04400000, cfg->len = 483892608, cfg->token_value.token = 0, udate = 0 
+Nov 26 23:34:29 master kernel: ubase 0000a: UDMA: MATT START:kernel_mode=0
+Nov 26 23:34:29 master kernel: udma_metax_p2p_bridge: pin OK va=0xa04400000->0xa04400000 len=0x1cd79d80->0x1cd7a000 page=0x2000 bus_off=0x0 apply_off=0 nents=1 first_pa=0x80000ce00000
+Nov 26 23:34:29 master kernel: ubase 0000a: UDMA: [GPU-TRACE] pin OK provider=metax gpu_va=0xa04400000 mapped=0x1cd7a000 page_size=0x2000 bus_off=0x0 nents=1 first_pa=0x80000ce00000
+Nov 26 23:34:29 master kernel: UDMA GPU map: l_tid=1048575 r_tid=195 mm=ffff0b00175db700 current_mm=ffff0b00175db700 iova=0xa04400000 first_pa=0x80000ce00000 nents=1
+Nov 26 23:34:29 master kernel: UDMA GPU map: l_tid=189 r_tid=1048575 mm=ffff0b00175db700 current_mm=ffff0b00175db700 iova=0xa04400000 first_pa=0x80000ce00000 nents=1
+Nov 26 23:34:29 master kernel: platform ummu_vdev.23.auto: Adding to iommu group 21
+Nov 26 23:34:29 master kernel: URMA|ubcore|281567|281567|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xa23e00000, cfg->len = 81960, cfg->token_value.token = 0, udate = 0 
+Nov 26 23:34:29 master kernel: ubase 0000a: UDMA: MATT START:kernel_mode=0
+Nov 26 23:34:29 master kernel: udma_metax_p2p_bridge: pin OK va=0xa23e00000->0xa23e00000 len=0x14028->0x15000 page=0x1000 bus_off=0x0 apply_off=0 nents=1 first_pa=0x800001a00000
+Nov 26 23:34:29 master kernel: ubase 0000a: UDMA: [GPU-TRACE] pin OK provider=metax gpu_va=0xa23e00000 mapped=0x15000 page_size=0x1000 bus_off=0x0 nents=1 first_pa=0x800001a00000
+Nov 26 23:34:29 master kernel: UDMA GPU map: l_tid=1048575 r_tid=196 mm=ffff0b00175db700 current_mm=ffff0b00175db700 iova=0xa23e00000 first_pa=0x800001a00000 nents=1
+Nov 26 23:34:29 master kernel: UDMA GPU map: l_tid=189 r_tid=1048575 mm=ffff0b00175db700 current_mm=ffff0b00175db700 iova=0xa23e00000 first_pa=0x800001a00000 nents=1
+Nov 26 23:34:29 master kernel: platform ummu_vdev.24.auto: Adding to iommu group 22
+Nov 26 23:34:29 master kernel: URMA|ubcore|281568|281568|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xfffb9c09f000, cfg->len = 64, cfg->token_value.token = 0, udate = 0 
+Nov 26 23:34:29 master kernel: ubase 0000a: UDMA: MATT START:kernel_mode=0
+Nov 26 23:34:29 master kernel: platform ummu_vdev.25.auto: Adding to iommu group 23
+Nov 26 23:34:29 master kernel: URMA|ubcore|281570|281570|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xfffb9409f000, cfg->len = 64, cfg->token_value.token = 0, udate = 0 
+Nov 26 23:34:29 master kernel: ubase 0000a: UDMA: MATT START:kernel_mode=0
+Nov 26 23:34:29 master kernel: platform ummu_vdev.26.auto: Adding to iommu group 24
+Nov 26 23:34:29 master kernel: URMA|ubcore|281569|281569|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xfffb9009f000, cfg->len = 64, cfg->token_value.token = 0, udate = 0 
+Nov 26 23:34:29 master kernel: ubase 0000a: UDMA: MATT START:kernel_mode=0
+Nov 26 23:34:41 master kernel: UDMA GPU unmap: l_tid=1048575 r_tid=195 mm=ffff0b00175db700 current_mm=ffff0b00175db700 iova=0xa04400000 size=0x1cd7a000
+Nov 26 23:34:41 master kernel: UDMA GPU unmap: l_tid=189 r_tid=1048575 mm=ffff0b00175db700 current_mm=ffff0b00175db700 iova=0xa04400000 size=0x1cd7a000
+Nov 26 23:34:41 master kernel: UDMA GPU unmap: l_tid=1048575 r_tid=196 mm=ffff0b00175db700 current_mm=ffff0b00175db700 iova=0xa23e00000 size=0x15000
+Nov 26 23:34:41 master kernel: UDMA GPU unmap: l_tid=189 r_tid=1048575 mm=ffff0b00175db700 current_mm=ffff0b00175db700 iova=0xa23e00000 size=0x15000
+Nov 26 23:34:41 master kernel: udma_ae_tp_level_error: 62 callbacks suppressed
+Nov 26 23:34:41 master kernel: ubase 0000a: UDMA: trigger TP level AE, event type is 16, sub type is 0, queue_num is 160.
+Nov 26 23:34:41 master kernel: ubase 0000a: UDMA: trigger TP level AE, event type is 16, sub type is 0, queue_num is 161.
+Nov 26 23:34:41 master kernel: ubase 0000a: UDMA: trigger TP level AE, event type is 16, sub type is 0, queue_num is 162.
+Nov 26 23:34:41 master kernel: ubase 0000a: UDMA: trigger TP level AE, event type is 16, sub type is 0, queue_num is 163.
+Nov 26 23:34:41 master kernel: ubase 0000a: UDMA: trigger TP level AE, event type is 16, sub type is 0, queue_num is 164.
+Nov 26 23:34:41 master kernel: ubase 0000a: UDMA: trigger TP level AE, event type is 16, sub type is 0, queue_num is 165.
+Nov 26 23:34:41 master kernel: ubase 0000a: UDMA: trigger TP level AE, event type is 16, sub type is 0, queue_num is 166.
+Nov 26 23:34:41 master kernel: ubase 0000a: UDMA: trigger TP level AE, event type is 16, sub type is 0, queue_num is 167.
+Nov 26 23:34:41 master kernel: ubase 0000a: UDMA: trigger TP level AE, event type is 16, sub type is 0, queue_num is 168.
+Nov 26 23:34:41 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32848, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:34:41 master kernel: ubase 0000a: UDMA: trigger TP level AE, event type is 16, sub type is 0, queue_num is 169.
+Nov 26 23:34:41 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32849, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:34:41 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32850, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:34:41 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32851, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:34:41 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32852, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:34:41 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32853, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:34:41 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32854, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:34:41 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32855, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:34:41 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32856, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:34:41 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32857, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:34:41 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32858, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:34:41 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32859, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:34:41 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32860, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:34:41 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32861, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:34:41 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32862, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:34:41 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32863, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:34:41 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32864, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:34:41 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32865, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:34:41 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32866, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:34:41 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32867, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:34:41 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32868, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:34:41 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32869, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:34:41 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32870, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:34:41 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32871, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:34:41 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32872, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:34:41 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32873, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:34:41 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32874, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:34:41 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32875, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:34:41 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32876, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:34:41 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32877, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:34:41 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32878, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:34:41 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32879, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:34:41 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32880, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:34:41 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32881, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:34:41 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32882, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:34:41 master kernel: ubase 0000a: (pid 1804) ctrlq recv notice req: seq=32883, ser_type=1, ser_ver=1, opc=0x28.
+Nov 26 23:37:28 master kernel: platform ummu_vdev.16.auto: Adding to iommu group 14
+Nov 26 23:37:28 master kernel: platform ummu_vdev.17.auto: Adding to iommu group 15
+Nov 26 23:37:28 master kernel: URMA|ubcore|424716|424716|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xa04400000, cfg->len = 2097152, cfg->token_value.token = 11259375, udate = 0 
+Nov 26 23:37:28 master kernel: ubase 0000a: UDMA: MATT START:kernel_mode=0
+Nov 26 23:37:28 master kernel: udma_metax_p2p_bridge: pin OK va=0xa04400000->0xa04400000 len=0x200000->0x200000 page=0x200000 bus_off=0x0 apply_off=0 nents=1 first_pa=0x800001600000
+Nov 26 23:37:28 master kernel: ubase 0000a: UDMA: [GPU-TRACE] pin OK provider=metax gpu_va=0xa04400000 mapped=0x200000 page_size=0x200000 bus_off=0x0 nents=1 first_pa=0x800001600000
+Nov 26 23:37:28 master kernel: UDMA GPU map: l_tid=1048575 r_tid=190 mm=ffff0a002706ee00 current_mm=ffff0a002706ee00 iova=0xa04400000 first_pa=0x800001600000 nents=1
+Nov 26 23:37:28 master kernel: UDMA GPU map: l_tid=189 r_tid=1048575 mm=ffff0a002706ee00 current_mm=ffff0a002706ee00 iova=0xa04400000 first_pa=0x800001600000 nents=1
+Nov 26 23:37:33 master kernel: UDMA GPU unmap: l_tid=1048575 r_tid=190 mm=ffff0a002706ee00 current_mm=ffff0a002706ee00 iova=0xa04400000 size=0x200000
+Nov 26 23:37:33 master kernel: UDMA GPU unmap: l_tid=189 r_tid=1048575 mm=ffff0a002706ee00 current_mm=ffff0a002706ee00 iova=0xa04400000 size=0x200000
+Nov 26 23:38:11 master kernel: platform ummu_vdev.16.auto: Adding to iommu group 14
+Nov 26 23:38:11 master kernel: platform ummu_vdev.17.auto: Adding to iommu group 15
+Nov 26 23:38:11 master kernel: URMA|ubcore|463534|463534|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xa04400000, cfg->len = 2097152, cfg->token_value.token = 11259375, udate = 0 
+Nov 26 23:38:11 master kernel: ubase 0000a: UDMA: MATT START:kernel_mode=0
+Nov 26 23:38:11 master kernel: udma_metax_p2p_bridge: pin OK va=0xa04400000->0xa04400000 len=0x200000->0x200000 page=0x200000 bus_off=0x0 apply_off=0 nents=1 first_pa=0x800001600000
+Nov 26 23:38:11 master kernel: ubase 0000a: UDMA: [GPU-TRACE] pin OK provider=metax gpu_va=0xa04400000 mapped=0x200000 page_size=0x200000 bus_off=0x0 nents=1 first_pa=0x800001600000
+Nov 26 23:38:11 master kernel: UDMA GPU map: l_tid=1048575 r_tid=190 mm=ffff0a001c4a9b80 current_mm=ffff0a001c4a9b80 iova=0xa04400000 first_pa=0x800001600000 nents=1
+Nov 26 23:38:11 master kernel: UDMA GPU map: l_tid=189 r_tid=1048575 mm=ffff0a001c4a9b80 current_mm=ffff0a001c4a9b80 iova=0xa04400000 first_pa=0x800001600000 nents=1
+Nov 26 23:38:15 master kernel: UDMA GPU unmap: l_tid=1048575 r_tid=190 mm=ffff0a001c4a9b80 current_mm=ffff0a001c4a9b80 iova=0xa04400000 size=0x200000
+Nov 26 23:38:15 master kernel: UDMA GPU unmap: l_tid=189 r_tid=1048575 mm=ffff0a001c4a9b80 current_mm=ffff0a001c4a9b80 iova=0xa04400000 size=0x200000
+Nov 26 23:38:57 master kernel: platform ummu_vdev.16.auto: Adding to iommu group 14
+Nov 26 23:38:57 master kernel: platform ummu_vdev.17.auto: Adding to iommu group 15
+Nov 26 23:38:57 master kernel: URMA|ubcore|513073|513073|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xa04400000, cfg->len = 2097152, cfg->token_value.token = 11259375, udate = 0 
+Nov 26 23:38:57 master kernel: ubase 0000a: UDMA: MATT START:kernel_mode=0
+Nov 26 23:38:57 master kernel: udma_metax_p2p_bridge: pin OK va=0xa04400000->0xa04400000 len=0x200000->0x200000 page=0x200000 bus_off=0x0 apply_off=0 nents=1 first_pa=0x800001600000
+Nov 26 23:38:57 master kernel: ubase 0000a: UDMA: [GPU-TRACE] pin OK provider=metax gpu_va=0xa04400000 mapped=0x200000 page_size=0x200000 bus_off=0x0 nents=1 first_pa=0x800001600000
+Nov 26 23:38:57 master kernel: UDMA GPU map: l_tid=1048575 r_tid=190 mm=ffff0a004c002680 current_mm=ffff0a004c002680 iova=0xa04400000 first_pa=0x800001600000 nents=1
+Nov 26 23:38:57 master kernel: UDMA GPU map: l_tid=189 r_tid=1048575 mm=ffff0a004c002680 current_mm=ffff0a004c002680 iova=0xa04400000 first_pa=0x800001600000 nents=1
+Nov 26 23:39:01 master kernel: UDMA GPU unmap: l_tid=1048575 r_tid=190 mm=ffff0a004c002680 current_mm=ffff0a004c002680 iova=0xa04400000 size=0x200000
+Nov 26 23:39:01 master kernel: UDMA GPU unmap: l_tid=189 r_tid=1048575 mm=ffff0a004c002680 current_mm=ffff0a004c002680 iova=0xa04400000 size=0x200000
+Nov 26 23:40:39 master kernel: ubase 00007: UDMA: JFR sleep time = 1000 us.
+Nov 26 23:40:39 master kernel: ubase 00007: UDMA: current mm released.
+Nov 26 23:40:39 master kernel: ubase 00007: UDMA: current mm released.
+Nov 26 23:40:39 master kernel: ubase 00007: UDMA: current mm released.
+Nov 26 23:40:39 master kernel: ubase 00007: UDMA: current mm released.
+Nov 26 23:40:39 master kernel: ubase 00007: UDMA: current mm released.
+Nov 26 23:40:39 master kernel: ubase 00007: UDMA: current mm released.
+Nov 26 23:40:39 master kernel: ubase 00007: UDMA: current mm released.
+Nov 26 23:40:39 master kernel: ubase 00007: UDMA: current mm released.
+Nov 26 23:40:39 master kernel: ubase 00007: UDMA: current mm released.
+Nov 26 23:40:39 master kernel: ubase 00007: UDMA: current mm released.
+Nov 26 23:40:39 master kernel: ubase 00007: UDMA: current mm released.
+Nov 26 23:40:39 master kernel: ubase 00007: UDMA: current mm released.
+Nov 26 23:40:39 master kernel: ubase 00007: UDMA: current mm released.
+Nov 26 23:40:39 master kernel: ubase 00007: UDMA: current mm released.
+Nov 26 23:40:39 master kernel: ubase 00007: UDMA: current mm released.
+Nov 26 23:40:39 master kernel: ubase 00007: UDMA: current mm released.
+Nov 26 23:41:43 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 26 23:41:43 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 26 23:41:43 master kernel: URMA|ubcore|607636|607636|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xffef78000000, cfg->len = 0, cfg->token_value.token = 0, udate = 0 
+Nov 26 23:41:43 master kernel: ubase 0000a: UDMA: MATT START:kernel_mode=0
+Nov 26 23:53:31 master kernel: ubase 0000a: UDMA: JFR sleep time = 1000 us.
+Nov 26 23:53:31 master kernel: ubase 0000a: UDMA: current mm released.
+Nov 26 23:53:31 master kernel: ubase 0000a: UDMA: current mm released.
+Nov 26 23:53:31 master kernel: ubase 0000a: UDMA: current mm released.
+Nov 26 23:53:31 master kernel: ubase 0000a: UDMA: current mm released.
+Nov 26 23:53:31 master kernel: ubase 0000a: UDMA: current mm released.
+Nov 26 23:53:31 master kernel: ubase 0000a: UDMA: current mm released.
+Nov 26 23:53:31 master kernel: ubase 0000a: UDMA: current mm released.
+Nov 26 23:53:31 master kernel: ubase 0000a: UDMA: current mm released.
+Nov 26 23:53:31 master kernel: ubase 0000a: UDMA: current mm released.
+Nov 26 23:53:31 master kernel: ubase 0000a: UDMA: current mm released.
+Nov 26 23:53:31 master kernel: ubase 0000a: UDMA: current mm released.
+Nov 26 23:53:31 master kernel: ubase 0000a: UDMA: current mm released.
+Nov 26 23:53:31 master kernel: ubase 0000a: UDMA: current mm released.
+Nov 26 23:53:31 master kernel: ubase 0000a: UDMA: current mm released.
+Nov 26 23:53:31 master kernel: ubase 0000a: UDMA: current mm released.
+Nov 26 23:53:31 master kernel: ubase 0000a: UDMA: current mm released.
+Nov 26 23:53:31 master kernel: ubase 0000a: UDMA: current mm released.
+Nov 26 23:54:37 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 26 23:54:37 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 26 23:54:37 master kernel: URMA|ubcore|1020531|1020531|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xa04400000, cfg->len = 2097152, cfg->token_value.token = 11259375, udate = 0 
+Nov 26 23:54:37 master kernel: ubase 0000a: UDMA: MATT START:kernel_mode=0
+Nov 26 23:54:37 master kernel: udma_metax_p2p_bridge: pin OK va=0xa04400000->0xa04400000 len=0x200000->0x200000 page=0x200000 bus_off=0x0 apply_off=0 nents=1 first_pa=0x800001600000
+Nov 26 23:54:37 master kernel: ubase 0000a: UDMA: [GPU-TRACE] pin OK provider=metax gpu_va=0xa04400000 mapped=0x200000 page_size=0x200000 bus_off=0x0 nents=1 first_pa=0x800001600000
+Nov 26 23:54:37 master kernel: UDMA GPU map: l_tid=1048575 r_tid=188 mm=ffff0b0016f0c200 current_mm=ffff0b0016f0c200 iova=0xa04400000 first_pa=0x800001600000 nents=1
+Nov 26 23:54:37 master kernel: UDMA GPU map: l_tid=187 r_tid=1048575 mm=ffff0b0016f0c200 current_mm=ffff0b0016f0c200 iova=0xa04400000 first_pa=0x800001600000 nents=1
+Nov 26 23:55:19 master kernel: UDMA GPU unmap: l_tid=1048575 r_tid=188 mm=ffff0b0016f0c200 current_mm=ffff0b0016f0c200 iova=0xa04400000 size=0x200000
+Nov 26 23:55:19 master kernel: UDMA GPU unmap: l_tid=187 r_tid=1048575 mm=ffff0b0016f0c200 current_mm=ffff0b0016f0c200 iova=0xa04400000 size=0x200000
+Nov 26 23:56:03 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 26 23:56:03 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 26 23:56:03 master kernel: URMA|ubcore|1091046|1091046|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xa04400000, cfg->len = 2097152, cfg->token_value.token = 11259375, udate = 0 
+Nov 26 23:56:03 master kernel: ubase 0000a: UDMA: MATT START:kernel_mode=0
+Nov 26 23:56:03 master kernel: udma_metax_p2p_bridge: pin OK va=0xa04400000->0xa04400000 len=0x200000->0x200000 page=0x200000 bus_off=0x0 apply_off=0 nents=1 first_pa=0x800001600000
+Nov 26 23:56:03 master kernel: ubase 0000a: UDMA: [GPU-TRACE] pin OK provider=metax gpu_va=0xa04400000 mapped=0x200000 page_size=0x200000 bus_off=0x0 nents=1 first_pa=0x800001600000
+Nov 26 23:56:03 master kernel: UDMA GPU map: l_tid=1048575 r_tid=188 mm=ffff0b00162d4d00 current_mm=ffff0b00162d4d00 iova=0xa04400000 first_pa=0x800001600000 nents=1
+Nov 26 23:56:03 master kernel: UDMA GPU map: l_tid=187 r_tid=1048575 mm=ffff0b00162d4d00 current_mm=ffff0b00162d4d00 iova=0xa04400000 first_pa=0x800001600000 nents=1
+Nov 26 23:56:33 master kernel: UDMA GPU unmap: l_tid=1048575 r_tid=188 mm=ffff0b00162d4d00 current_mm=ffff0b00162d4d00 iova=0xa04400000 size=0x200000
+Nov 26 23:56:33 master kernel: UDMA GPU unmap: l_tid=187 r_tid=1048575 mm=ffff0b00162d4d00 current_mm=ffff0b00162d4d00 iova=0xa04400000 size=0x200000
+Nov 26 23:56:53 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 26 23:56:53 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 26 23:56:53 master kernel: URMA|ubcore|1140747|1140747|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xa04400000, cfg->len = 2097152, cfg->token_value.token = 11259375, udate = 0 
+Nov 26 23:56:53 master kernel: ubase 0000a: UDMA: MATT START:kernel_mode=0
+Nov 26 23:56:53 master kernel: udma_metax_p2p_bridge: pin OK va=0xa04400000->0xa04400000 len=0x200000->0x200000 page=0x200000 bus_off=0x0 apply_off=0 nents=1 first_pa=0x800001600000
+Nov 26 23:56:53 master kernel: ubase 0000a: UDMA: [GPU-TRACE] pin OK provider=metax gpu_va=0xa04400000 mapped=0x200000 page_size=0x200000 bus_off=0x0 nents=1 first_pa=0x800001600000
+Nov 26 23:56:53 master kernel: UDMA GPU map: l_tid=1048575 r_tid=188 mm=ffff0b0016f0ee00 current_mm=ffff0b0016f0ee00 iova=0xa04400000 first_pa=0x800001600000 nents=1
+Nov 26 23:56:53 master kernel: UDMA GPU map: l_tid=187 r_tid=1048575 mm=ffff0b0016f0ee00 current_mm=ffff0b0016f0ee00 iova=0xa04400000 first_pa=0x800001600000 nents=1
+Nov 26 23:57:35 master kernel: UDMA GPU unmap: l_tid=1048575 r_tid=188 mm=ffff0b0016f0ee00 current_mm=ffff0b0016f0ee00 iova=0xa04400000 size=0x200000
+Nov 26 23:57:35 master kernel: UDMA GPU unmap: l_tid=187 r_tid=1048575 mm=ffff0b0016f0ee00 current_mm=ffff0b0016f0ee00 iova=0xa04400000 size=0x200000
+Nov 26 23:57:52 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 26 23:57:52 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 26 23:57:52 master kernel: URMA|ubcore|1198496|1198496|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xa04400000, cfg->len = 2097152, cfg->token_value.token = 11259375, udate = 0 
+Nov 26 23:57:52 master kernel: ubase 0000a: UDMA: MATT START:kernel_mode=0
+Nov 26 23:57:52 master kernel: udma_metax_p2p_bridge: pin OK va=0xa04400000->0xa04400000 len=0x200000->0x200000 page=0x200000 bus_off=0x0 apply_off=0 nents=1 first_pa=0x800001600000
+Nov 26 23:57:52 master kernel: ubase 0000a: UDMA: [GPU-TRACE] pin OK provider=metax gpu_va=0xa04400000 mapped=0x200000 page_size=0x200000 bus_off=0x0 nents=1 first_pa=0x800001600000
+Nov 26 23:57:52 master kernel: UDMA GPU map: l_tid=1048575 r_tid=188 mm=ffff0b00175ddd80 current_mm=ffff0b00175ddd80 iova=0xa04400000 first_pa=0x800001600000 nents=1
+Nov 26 23:57:52 master kernel: UDMA GPU map: l_tid=187 r_tid=1048575 mm=ffff0b00175ddd80 current_mm=ffff0b00175ddd80 iova=0xa04400000 first_pa=0x800001600000 nents=1
+Nov 26 23:58:21 master kernel: UDMA GPU unmap: l_tid=1048575 r_tid=188 mm=ffff0b00175ddd80 current_mm=ffff0b00175ddd80 iova=0xa04400000 size=0x200000
+Nov 26 23:58:21 master kernel: UDMA GPU unmap: l_tid=187 r_tid=1048575 mm=ffff0b00175ddd80 current_mm=ffff0b00175ddd80 iova=0xa04400000 size=0x200000
+Nov 27 00:09:52 master kernel: platform ummu_vdev.14.auto: Adding to iommu group 12
+Nov 27 00:09:52 master kernel: platform ummu_vdev.15.auto: Adding to iommu group 13
+Nov 27 00:09:52 master kernel: URMA|ubcore|1668907|1668907|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xffef78000000, cfg->len = 0, cfg->token_value.token = 0, udate = 0 
+Nov 27 00:09:52 master kernel: ubase 0000a: UDMA: MATT START:kernel_mode=0
+Nov 27 00:14:59 master kernel: platform ummu_vdev.16.auto: Adding to iommu group 14
+Nov 27 00:14:59 master kernel: platform ummu_vdev.17.auto: Adding to iommu group 15
+Nov 27 00:14:59 master kernel: URMA|ubcore|1939441|1939441|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xffef8c000000, cfg->len = 0, cfg->token_value.token = 0, udate = 0 
+Nov 27 00:14:59 master kernel: ubase 0000a: UDMA: MATT START:kernel_mode=0
+Nov 27 00:16:52 master kernel: platform ummu_vdev.16.auto: Adding to iommu group 14
+Nov 27 00:16:52 master kernel: platform ummu_vdev.17.auto: Adding to iommu group 15
+Nov 27 00:16:52 master kernel: URMA|ubcore|1991252|1991252|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xffef70000000, cfg->len = 0, cfg->token_value.token = 0, udate = 0 
+Nov 27 00:16:52 master kernel: ubase 0000a: UDMA: MATT START:kernel_mode=0
+Nov 27 00:18:24 master kernel: platform ummu_vdev.16.auto: Adding to iommu group 14
+Nov 27 00:18:24 master kernel: platform ummu_vdev.17.auto: Adding to iommu group 15
+Nov 27 00:18:24 master kernel: URMA|ubcore|2034003|2034003|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xffef88000000, cfg->len = 0, cfg->token_value.token = 0, udate = 0 
+Nov 27 00:18:24 master kernel: ubase 0000a: UDMA: MATT START:kernel_mode=0
+Nov 27 00:19:57 master kernel: platform ummu_vdev.16.auto: Adding to iommu group 14
+Nov 27 00:19:57 master kernel: platform ummu_vdev.17.auto: Adding to iommu group 15
+Nov 27 00:19:57 master kernel: URMA|ubcore|2077438|2077438|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xffef8c000000, cfg->len = 0, cfg->token_value.token = 0, udate = 0 
+Nov 27 00:19:57 master kernel: ubase 0000a: UDMA: MATT START:kernel_mode=0
+Nov 27 00:21:32 master kernel: platform ummu_vdev.16.auto: Adding to iommu group 14
+Nov 27 00:21:32 master kernel: platform ummu_vdev.17.auto: Adding to iommu group 15
+Nov 27 00:21:32 master kernel: URMA|ubcore|2121556|2121556|ubcore_register_seg[182]|start ubcore_register_seg,cfg->iova = 0xffef70000000, cfg->len = 0, cfg->token_value.token = 0, udate = 0 
+Nov 27 00:21:32 master kernel: ubase 0000a: UDMA: MATT START:kernel_mode=0
+Nov 27 00:24:28 master kernel: ubase 0000a: UDMA: JFR sleep time = 1000 us.
+Nov 27 00:24:28 master kernel: ubase 0000a: UDMA: current mm released.
+Nov 27 00:24:28 master kernel: ubase 0000a: UDMA: current mm released.
+Nov 27 00:24:28 master kernel: ubase 0000a: UDMA: current mm released.
+Nov 27 00:24:28 master kernel: ubase 0000a: UDMA: current mm released.
+Nov 27 00:24:28 master kernel: ubase 0000a: UDMA: current mm released.
+Nov 27 00:24:28 master kernel: ubase 0000a: UDMA: current mm released.
+Nov 27 00:24:28 master kernel: ubase 0000a: UDMA: current mm released.
+Nov 27 00:24:28 master kernel: ubase 0000a: UDMA: current mm released.
+Nov 27 00:24:28 master kernel: ubase 0000a: UDMA: current mm released.
+Nov 27 00:24:28 master kernel: ubase 0000a: UDMA: current mm released.
+Nov 27 00:24:28 master kernel: ubase 0000a: UDMA: current mm released.
+Nov 27 00:24:28 master kernel: ubase 0000a: UDMA: current mm released.
+Nov 27 00:24:28 master kernel: ubase 0000a: UDMA: current mm released.
+Nov 27 00:24:28 master kernel: ubase 0000a: UDMA: current mm released.
+Nov 27 00:24:28 master kernel: ubase 0000a: UDMA: current mm released.
+Nov 27 00:24:28 master kernel: ubase 0000a: UDMA: current mm released.

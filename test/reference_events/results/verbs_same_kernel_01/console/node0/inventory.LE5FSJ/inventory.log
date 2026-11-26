@@ -1,0 +1,15 @@
+6.6.0-gdr_f00955680_diag
+189b6520-b540-49bf-aec7-64c09ef375e2
+Traceback (most recent call last):
+  File "/home/h00918771/uccl-ep-xpu-integration-new/test/verbs_baseline/on_diag_check.py", line 83, in <module>
+    inventory(args.hca, args.gid_index)
+  File "/home/h00918771/uccl-ep-xpu-integration-new/test/verbs_baseline/on_diag_check.py", line 17, in inventory
+    info = {key: (port/key).read_text().strip() for key in fields}
+                 ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/h00918771/metax_dev/python/cpython-3.12.15-linux-aarch64-gnu/lib/python3.12/pathlib.py", line 1027, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/h00918771/metax_dev/python/cpython-3.12.15-linux-aarch64-gnu/lib/python3.12/pathlib.py", line 1013, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/sys/class/infiniband/rocep161s0f0/ports/1/active_mtu'

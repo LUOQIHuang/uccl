@@ -1,0 +1,15 @@
+DIAG_ROOT=/home/h00918771
+DIAG_PYTHON=/home/h00918771/metax_dev/venv-maca-py312/bin/python
+HOST=master KERNEL=6.6.0-gdr_f00955680_diag UID=1210
+BOOT_ID=189b6520-b540-49bf-aec7-64c09ef375e2
+GROUPS=wheel,h00918771
+GPU_DEVICE=/dev/mxcd mode=0666 owner=0:video rw_access=True
+GPU_DEVICE=/dev/dri/card0 mode=0666 owner=0:video rw_access=True
+GPU_DEVICE=/dev/dri/card1 mode=0666 owner=0:video rw_access=True
+GPU_DEVICE=/dev/dri/renderD128 mode=0666 owner=0:video rw_access=True
+MACA_RUNTIME=/opt/maca-3.9.0/lib/libmcruntime.so
+/home/h00918771/uccl-ep-xpu-integration-new/test/reference_events/check_blockers_gpu.py:21: UserWarning: Could not find flash_attn package installed. Please try to install flash_attn whl pacakge using pip command and make sure it can be imported properly
+  import torch
+TORCH=2.6.0+metax3.7.0.7 PATH=/home/h00918771/metax_dev/venv-maca-py312/lib/python3.12/site-packages/torch/__init__.py
+TORCH_GPU_OK device=MetaX C500
+BLOCKERS_GPU_READY

@@ -28,7 +28,7 @@ def sha(path):
 def shared_fingerprint(meta):
     # Interface names are local topology; preserve the actual name in setup.json.
     # Source, libraries, workload and all experimental settings still must match.
-    result={key: value for key, value in meta.items() if key != 'ifname'}
+    result={key: value for key, value in meta.items() if key not in ('ifname', 'hca')}
     if meta.get('urma_device_plan')=='202c1-204c0':
         result.pop('device',None)
         result['device_pair']={'node0':'udmac1d1e2','node1':'udmac0d1e2'}

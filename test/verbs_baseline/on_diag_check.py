@@ -14,7 +14,12 @@ def inventory(hca, gid):
     port = device / 'ports/1'
     fields = ('state', 'phys_state', 'link_layer', 'active_mtu', f'gids/{gid}',
               f'gid_attrs/types/{gid}', f'gid_attrs/ndevs/{gid}')
-    info = {key: (port/key).read_text().strip() for key in fields}
+    info = {}
+    for key in fields:
+        try:
+            info[key] = (port/key).read_text().strip()
+        except FileNotFoundError:
+            info[key] = 'unavailable'
     info.update(hca=hca, port=1, gid_index=gid, pci=str((device/'device').resolve()),
                 driver=str((device/'device/driver').resolve()))
     print(json.dumps(info, indent=2), flush=True)
