@@ -70,7 +70,10 @@ def parser():
     p.add_argument('--gpu', default='0')
     p.add_argument('--expected-kernel', help='optional exact kernel check; never checks URMA hardware')
     p.add_argument('--case-timeout', type=int, default=1800)
+    p.add_argument('--reference-gpu-only',action='store_true',help='omit CPU per-request capture in the fixed boundaries campaign')
     args = p.parse_args()
+    if args.reference_gpu_only and (args.variant!='current' or args.mode!='normal' or not args.dispatch_focus or not args.no_profile or args.repeats!=1 or args.reference_events not in ('batch','paced','on') or args.reference_profile!='boundaries' or args.normal_window_plan!='default' or args.action not in ('check','run') or (args.normal_tokens,args.warmups,args.samples)!=(4096,5,10)):
+        p.error('GPU-only reference requires fixed current Normal Dispatch boundaries batch/paced/on check/run, 5/10 and no profiling/window changes')
     if not re.fullmatch(r'[a-zA-Z0-9_-]+', args.job):
         p.error('invalid --job')
     if not 1 <= args.repeats <= 10 or args.warmups < 1 or args.samples < 3 or not 1024 <= args.port <= 65533 or args.build_jobs < 1 or args.case_timeout < 1:
@@ -123,6 +126,7 @@ def environment(args):
     if getattr(args,'gid_index',None) is not None:env['UCCL_IB_GID_INDEX']=str(getattr(args,'gid_index',None))
     env['UCCL_IB_MAX_INFLIGHT_NORMAL']=str(4 if getattr(args,'normal_window_plan','default')=='peer4' and args.node_rank==1 else 8)
     env['UCCL_REFERENCE_PROFILE']=getattr(args,'reference_profile','legacy')
+    env['UCCL_REFERENCE_GPU_ONLY']=str(int(getattr(args,'reference_gpu_only',False)))
     return env
 
 
@@ -316,7 +320,7 @@ def run_case(args, root, tag, mode, profile, module, module_sha):
             sys.path.insert(0,str(HERE.parent/'reference_events'))
             from event_runtime import validate,correctness_passed
             checks['reference_correctness']='REFERENCE_CORRECTNESS_EVENTS_PASSED' in text and correctness_passed(case,args.reference_profile,args.normal_tokens)
-            try:checks['reference_events']=validate(case,args.samples,args.reference_profile,args.normal_tokens)
+            try:checks['reference_events']=validate(case,args.samples,args.reference_profile,args.normal_tokens,cpu_events=not args.reference_gpu_only)
             except Exception as exc:
                 checks['reference_events']=False
                 (case/'reference_validation_error.txt').write_text(str(exc))
@@ -382,6 +386,7 @@ def run(args):
         meta.update(normal_tokens=getattr(args,'normal_tokens',4096),stage_suite=getattr(args,'stage_suite',False),gpu_stages=getattr(args,'gpu_stages',False),gpu_stage_mode=getattr(args,'gpu_stage_mode','all'))
         meta['dispatch_focus']=getattr(args,'dispatch_focus',False)
         meta['reference_events']=getattr(args,'reference_events',None)
+        meta['reference_gpu_only']=args.reference_gpu_only
         meta['reference_profile']=getattr(args,'reference_profile','legacy')
         meta['normal_window_plan']=getattr(args,'normal_window_plan','default')
         meta['dispatch_compiled_off']=getattr(args,'dispatch_compiled_off',False)

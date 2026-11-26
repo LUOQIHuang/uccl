@@ -21,7 +21,7 @@ def write(p,data):
         if data:
             w=csv.DictWriter(f,fieldnames=list(data[0]));w.writeheader();w.writerows(data)
 
-def case_data(root,rank,trace,compiled_off=False,reference_events=None,token_sweep=None,bf16_only=False):
+def case_data(root,rank,trace,compiled_off=False,reference_events=None,token_sweep=None,bf16_only=False,reference_gpu_only=False):
     # Explicit opt-in for the inactive tokens experiment; historical callers
     # retain their fixed 4096-token and sampling acceptance rules.
     tokens=4096
@@ -35,6 +35,7 @@ def case_data(root,rank,trace,compiled_off=False,reference_events=None,token_swe
     node=root/f'node{rank}';c=read(node/'setup.json')
     if c['error']:raise ValueError('failed setup '+str(node))
     c=c['fingerprint'];backend=c.get('backend','verbs')
+    if bool(c.get('reference_gpu_only',False))!=reference_gpu_only:raise ValueError('GPU-only reference needs its explicit analyzer')
     if bool(c.get('fadd_tail_scope'))!=bf16_only or bf16_only and (backend!='urma' or reference_events!='paced' or trace or compiled_off or token_sweep is not None):
         raise ValueError('wrong BF16-only campaign configuration')
     labels={'dispatch_bf16_chunk32'} if bf16_only else ALL_LABELS
@@ -69,7 +70,7 @@ def case_data(root,rank,trace,compiled_off=False,reference_events=None,token_swe
         sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'reference_events'))
         from event_runtime import validate,correctness_passed
         profile=c.get('reference_profile','legacy')
-        if not status['checks'].get('reference_events') or not status['checks'].get('reference_correctness') or not correctness_passed(case,profile) or not validate(case,10,profile):raise ValueError('unvalidated reference events/correctness')
+        if not status['checks'].get('reference_events') or not status['checks'].get('reference_correctness') or not correctness_passed(case,profile) or not validate(case,10,profile,cpu_events=not reference_gpu_only):raise ValueError('unvalidated reference events/correctness')
     elif (case/'event_trace.jsonl').exists():raise ValueError('unexpected reference events')
     if reference_events in ('batch','paced'):
         import sys
@@ -97,6 +98,7 @@ def case_data(root,rank,trace,compiled_off=False,reference_events=None,token_swe
     if profile=='boundaries' and (runtime.get('reference_boundary_version')!=1 or runtime.get('reference_profile')!=profile):raise ValueError('boundary runtime capability mismatch')
     if profile=='order' and (runtime.get('reference_order_version')!=1 or runtime.get('reference_profile')!=profile):raise ValueError('order runtime capability mismatch')
     identity['reference_profile']=profile
+    if reference_gpu_only:identity['reference_gpu_only']=True
     window_plan=c.get('normal_window_plan','default')
     if window_plan not in ('default','peer4','both32'):raise ValueError('unknown Normal window plan')
     if window_plan=='both32' and (backend!='urma' or reference_events!='batch' or profile!='boundaries' or c.get('normal_fadd_fence_plan')!='peer-tail-off' or c.get('normal_retire_plan','ordered')!='ordered'):

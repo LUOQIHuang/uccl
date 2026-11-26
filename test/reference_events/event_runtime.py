@@ -78,6 +78,8 @@ class Capture:
 def measure(torch,dist,ep,case,fn,label,warmups,samples,post_fn=None,capture_factory=None,record_events=True):
     """Capture only fixed Normal points, keeping layouts on the existing timer."""
     capture=(capture_factory or Capture)(ep.__file__) if record_events else None
+    cpu_events=os.environ.get('UCCL_REFERENCE_GPU_ONLY')!='1'
+    if not cpu_events and selected_profile()!='boundaries':raise ValueError('GPU-only capture requires boundaries')
     torch.cuda.synchronize()
     cache=torch.empty(int(256e6//4),dtype=torch.int,device='cuda:'+str(torch.cuda.current_device()))
     for _ in range(warmups):
@@ -87,10 +89,10 @@ def measure(torch,dist,ep,case,fn,label,warmups,samples,post_fn=None,capture_fac
     for i in range(samples):
         torch.cuda.synchronize();dist.barrier()
         if capture is not None:capture.begin()
-        cpu_active=False;gpu=None
+        cpu_active=False;gpu=None;cpu=None
         try:
             dist.barrier();torch.cuda.synchronize() # both clocks/reset copies ready before timing
-            if capture is not None:
+            if capture is not None and cpu_events:
                 if selected_profile()=='boundaries':ep.urma_timeline_begin_boundaries()
                 else:ep.urma_timeline_begin()
                 cpu_active=True
@@ -106,7 +108,7 @@ def measure(torch,dist,ep,case,fn,label,warmups,samples,post_fn=None,capture_fac
         value=begin.elapsed_time(end)*1000
         if post_fn is not None:post_fn()
         raw.append(value)
-        if capture is not None:append(case/'event_trace.jsonl',dict(label=label,index=i,us=value,gpu=gpu,cpu=cpu))
+        if capture is not None:append(case/'event_trace.jsonl',dict(label=label,index=i,us=value,gpu=gpu,cpu=cpu,cpu_events=cpu_events))
         append(case/'api_samples.jsonl',dict(label=label,index=i,us=value,used=i>0,mode='normal'))
         dist.barrier()
     values=raw[1:];mean=statistics.mean(values)
@@ -151,9 +153,10 @@ def correctness_passed(case,profile='legacy',tokens=4096):
     except (OSError,ValueError,KeyError,TypeError,IndexError):return False
 
 
-def validate(case,samples,profile='legacy',tokens=4096):
+def validate(case,samples,profile='legacy',tokens=4096,cpu_events=True):
     case=Path(case)
     if profile not in PROFILE_NAMES:raise ValueError('unknown reference profile')
+    if not cpu_events and profile!='boundaries':raise ValueError('GPU-only capture requires boundaries')
     data=[json.loads(s) for s in (case/'event_trace.jsonl').read_text().splitlines()]
     if len(data)!=len(LABELS)*samples or {(r['label'],r['index']) for r in data}!={(l,i) for l in LABELS for i in range(samples)}:raise ValueError('missing reference event windows')
     sample_file=case/'api_samples.jsonl'
@@ -161,11 +164,12 @@ def validate(case,samples,profile='legacy',tokens=4096):
     for row in data:
         if api is not None and api.get((row['label'],row['index']))!=row['us']:raise ValueError('reference event/API sample mismatch')
         gpu=row['gpu'];cpu=row['cpu'];required=set(range(12 if tokens==4096 else 10)) if profile=='boundaries' else ({0,1,2} if row['label'].startswith('dispatch') else {3,4,5})
+        if row.get('cpu_events',True)!=cpu_events or (not cpu_events and cpu is not None):raise ValueError('CPU capture mode mismatch')
         names=BOUNDARY_NAMES if profile=='boundaries' else NAMES
         if profile=='order':required={0,1,2,3};names=ORDER_NAMES
         if gpu.get('profile')!=PROFILE_NAMES[profile] or len(gpu['counts'])!=len(names):raise ValueError('reference profile/ABI mismatch')
-        if profile=='boundaries' and cpu.get('heartbeat_stride')!=128:raise ValueError('boundary CPU heartbeat configuration missing')
-        if gpu['version']!=1 or gpu['clock']!='CLOCK_MONOTONIC_RAW' or cpu.get('clock')!='CLOCK_MONOTONIC_RAW' or gpu['dropped'] or cpu['dropped']:raise ValueError('wrong/truncated reference events')
+        if profile=='boundaries' and cpu_events and cpu.get('heartbeat_stride')!=128:raise ValueError('boundary CPU heartbeat configuration missing')
+        if gpu['version']!=1 or gpu['clock']!='CLOCK_MONOTONIC_RAW' or gpu['dropped'] or (cpu_events and (cpu.get('clock')!='CLOCK_MONOTONIC_RAW' or cpu['dropped'])):raise ValueError('wrong/truncated reference events')
         if not math.isfinite(row['us']) or row['us']<=0 or not gpu['clock_stats']['updates']:raise ValueError('invalid reference measurement/clock')
         seen=set();slots=set();counts=collections.Counter()
         for r in gpu['records']:
@@ -191,6 +195,7 @@ def validate(case,samples,profile='legacy',tokens=4096):
                     count=by[channel,event]
                     valid=1<=count<=64 if event==5 else count==1
                     if not valid:raise ValueError('incomplete/duplicate boundary channel coverage')
+        if not cpu_events:continue
         stages={r['stage'] for r in cpu['events']}
         if not {'collect','prepare','post_begin','post_end','cqe','ack_slot'}.issubset(stages):raise ValueError('missing CPU request stages')
         groups=collections.defaultdict(set)

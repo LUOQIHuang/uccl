@@ -92,6 +92,7 @@ def parser():
     p.add_argument('--gpu-stages',action='store_true')
     p.add_argument('--reference-events',choices=('build','off','on','batch','paced'),help='reference events or inactive batch/paced controls')
     p.add_argument('--reference-profile',choices=('legacy','boundaries','order'),default='legacy')
+    p.add_argument('--reference-gpu-only',action='store_true',help='fixed boundaries campaign: omit CPU per-request capture, keep all GPU boundary events')
     p.add_argument('--dispatch-focus',action='store_true')
     p.add_argument('--dispatch-compiled-off',action='store_true',help='Dispatch trace build with capture completely disabled; same API timing boundary as baseline')
     p.add_argument('--gpu-stage-roles-only',action='store_true',help='sparse compile-time role probes; currently only build or compiled-off validation')
@@ -150,6 +151,8 @@ def parser():
     p.add_argument('--urma-device-plan',choices=('same','202c1-204c0'),default='same')
     p.add_argument('--ubctl-selector',default='0,1,1')
     args=p.parse_args()
+    if args.reference_gpu_only and (args.backend!='urma' or args.mode!='normal' or not args.dispatch_focus or not args.api_only or args.reference_events not in ('batch','paced','on') or args.reference_profile!='boundaries' or args.normal_submit_schedule!='lane-mixed' or args.normal_window_plan!='default' or args.normal_retire_plan!='ordered' or args.normal_completion!='all' or args.normal_submit_witness or args.action not in ('check','run') or (args.normal_tokens,args.warmups,args.samples)!=(4096,5,10)):
+        p.error('GPU-only reference requires fixed 4096 Normal Dispatch boundaries batch/paced/on check/run, 5/10 samples and default submission/window/retirement/completion')
     if args.urma_device_plan!='same':
         expected='udmac1d1e2' if args.node_rank==0 else 'udmac0d1e2'
         if args.backend!='urma' or args.mode!='normal' or args.action not in ('check','run') or args.urma_device!=expected:
@@ -232,6 +235,7 @@ def environment(args):
     env['UCCL_IB_MAX_INFLIGHT_NORMAL']=str(32 if args.normal_window_plan=='both32' else (4 if args.normal_window_plan=='peer4' and args.node_rank==1 else 8))
     env['PARITY_NORMAL_SUBMIT_WITNESS']='1' if args.normal_submit_witness else '0'
     env['UCCL_REFERENCE_PROFILE']=getattr(args,'reference_profile','legacy')
+    env['UCCL_REFERENCE_GPU_ONLY']=str(int(getattr(args,'reference_gpu_only',False)))
     env['UCCL_URMA_NORMAL_RETIRE']='ready' if args.normal_retire_plan=='peer-ready' and args.node_rank==1 else 'ordered'
     env['UCCL_URMA_NORMAL_FADD_FENCE']=('tail-off' if args.normal_fadd_fence_plan=='peer-tail-off' else 'off') if args.normal_fadd_fence_plan in ('peer-off','peer-tail-off') and args.node_rank==1 else 'on'
     env['LD_LIBRARY_PATH']=str(args.urma_lib_dir)+':'+env.get('LD_LIBRARY_PATH','')
@@ -353,6 +357,7 @@ def main():
         dispatch_trial=args.dispatch_trial,dispatch_delay_us=args.dispatch_delay_us,delay_node=1,timeline=getattr(args,'timeline',False),gpu_stages=getattr(args,'gpu_stages',False),gpu_stage_mode=args.gpu_stage_mode,device=args.urma_device,gpu=args.gpu,dispatch_focus=args.dispatch_focus,dispatch_compiled_off=args.dispatch_compiled_off,gpu_stage_roles_only=args.gpu_stage_roles_only)
     fingerprint['urma_device_plan']=args.urma_device_plan
     fingerprint['normal_submit_witness']=args.normal_submit_witness
+    fingerprint['reference_gpu_only']=args.reference_gpu_only
     try:
         module,manifest,info=preflight(args)
         fingerprint['reference_events']=args.reference_events
@@ -419,7 +424,7 @@ def main():
             sys.path.insert(0,str(HERE.parent/'reference_events'))
             from event_runtime import validate,correctness_passed
             checks['reference_correctness']='REFERENCE_CORRECTNESS_EVENTS_PASSED' in text and correctness_passed(case,args.reference_profile,args.normal_tokens)
-            try:checks['reference_events']=validate(case,args.samples,args.reference_profile,args.normal_tokens)
+            try:checks['reference_events']=validate(case,args.samples,args.reference_profile,args.normal_tokens,cpu_events=not args.reference_gpu_only)
             except Exception as exc:
                 checks['reference_events']=False
                 (case/'reference_validation_error.txt').write_text(str(exc))
