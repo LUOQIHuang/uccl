@@ -1,6 +1,6 @@
 # 定位同内核 URMA Normal 剩余差距的 202 接收阶段
 
-本轮已完成。无打点差距复现为 660.71 μs，GPU 打点使差额移动 872.08 μs。继续验证关键路径时使用 [204 第 6 块定点干预](../normal_chunk_gate/README.zh-CN.md)。 [本轮验收](results/normal_same_kernel_receive_01/summary/decision.json)
+本轮已完成。无打点差距复现为 660.71 μs，GPU 打点使差额移动 872.08 μs。这批分段记录保留为观察，现有采集方式不继续复测。随后的 [204 第 6 块定点干预](../normal_chunk_gate/README.zh-CN.md) 已完成，额外等待约 302 μs 未显著改变整体时延。 [本轮验收](results/normal_same_kernel_receive_01/summary/decision.json)
 
 在同内核正式对照中，仅关闭 204 的 tail FADD fence 后，URMA 仍比 RDMA 慢 **619.42 μs（8.25%）**。54/54 个有效样本里，202 的 Dispatch 调用更慢。204 的第 6 块在 URMA 下，窗口满且前序第 2 条 WRITE 的 CQE 未可读的下界中位数为 **671.90 μs**。RDMA 分段里的同位置等待比 URMA 短，但 202 的探针扰动高于验收门槛，另外 RDMA 在末块的 FIFO 等待更长。关键问题是这些并行等待有没有推迟 202 的最终输出，以及晚在收到通知、数据确认还是转发输出。 [正式对照](results/normal_same_kernel_gap_01/summary/gap.json) · [URMA 完成记录分析](../normal_completion/results/normal_blockers_04/ANALYSIS.zh-CN.md) · [RDMA FIFO 控制组](../verbs_fifo/results/verbs_same_kernel_fifo_01/summary/controls.csv)
 

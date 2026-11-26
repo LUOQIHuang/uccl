@@ -1,5 +1,7 @@
 # 验证 204 第 6 块是否拖慢 202 的 Dispatch
 
+**本轮已完成。** 两对配对中，204 第 6 个 WRITE 的实际额外等待中位数为 302.05 和 302.25 μs，202 Dispatch 分别变化 +5.49 和 −18.09 μs。同配置重复漂移最高 0.26%。本次干预没有观察到延迟传到整体结束时间，因此降低该位置的排查优先级。此前观测到的 204 局部 CQE 等待仍成立。下列步骤用于复现，当前无需重复执行。 [四轮数据](results/normal_chunk6_gate_01/summary/rounds.csv) · [配对结果](results/normal_chunk6_gate_01/summary/decision.json)
+
 目前定位到了 204 局部阻塞的边界。第 6 块已经在 FIFO，前序第 2 条 WRITE 占着最后一个可用名额，窗口满且 CQE 未可读的时间下界中位数是 **671.90 μs**。同内核无打点对照中，优化后 URMA 仍慢 **619–661 μs**，202 每次都更晚结束。上一轮 GPU 接收打点把两后端的差额移动了 872 μs，不能据此量化关键路径。 [204 逐请求证据](../normal_completion/results/normal_blockers_04/ANALYSIS.zh-CN.md) · [无打点和打点结果](../reference_events/results/normal_same_kernel_receive_01/summary/decision.json)
 
 本轮同时检查 **204 的第 6 块确实晚交付了多久** 和 **202 的完整 Dispatch 是否跟着变慢**。在 204，Proxy 发现第 6 个大 WRITE 已经可收取时，在对应通道上再等 300 μs。这个等待只延后该通道当前命令和排在它后面的命令。Proxy 继续轮询完成队列、回收名额、服务其它通道。12 个数据通道各触发一次。202 只记录原有端到端时延。两端均不启动 GPU 时间线或 CPU 逐请求采集。
