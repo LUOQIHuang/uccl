@@ -1,0 +1,57 @@
+=== TIMESTAMP ===
+Thu Nov 26 09:26:30 PM CST 2026
+=== ROOT CAUSE: urma_bind_jetty rc=4096 ===
+Kernel error: ubcore_bind_jetty_reuse_compat: Failed to exchange tp info, ret: -1
+
+=== URMA DEVICE SHOW ===
+num  ubep_dev            tp_type     eid                                             link
+---  ----------------    --------    --------------------------------------------    --------
+0    bonding_dev_0       UB          eid0 4245:4944:0000:0000:0000:0000:0100:0000    ACTIVE  
+
+=== BONDING DEVICE ===
+num  ubep_dev            tp_type     eid                                             link        sub_udma_devs
+---  ----------------    --------    --------------------------------------------    --------    ------------------------
+0    bonding_dev_0       UB          eid0 4245:4944:0000:0000:0000:0000:0100:0000    ACTIVE      udmac0d1e2,udmac1d1e2   
+1    udmac0d1e2          UB          eid0 0000:0000:0001:0200:0010:0000:df00:0200    ACTIVE      -                       
+2    udmac0d1e2          UB          eid1 0000:0000:003f:0200:0010:0000:df00:0b00    ACTIVE      -                       
+
+=== DMESG BIND ERRORS ===
+[10251.170933] URMA|ubcore|161468|161468|ubcore_bind_jetty_reuse_compat[2268]|Failed to exchange tp info, ret: -1.
+[10251.171279] URMA|uburma|161471|161471|uburma_cmd_bind_jetty_ex:[3756]|bind jetty failed, ret: -1.
+[10251.171626] URMA|uburma|161468|161468|uburma_cmd_bind_jetty_ex:[3756]|bind jetty failed, ret: -1.
+[10948.561237] URMA|ubcore|173163|173163|ubcore_bind_jetty_reuse_compat[2268]|Failed to exchange tp info, ret: -1.
+[10948.561239] URMA|uburma|173163|173163|uburma_cmd_bind_jetty_ex:[3756]|bind jetty failed, ret: -1.
+[10948.577737] URMA|ubcore|173160|173160|ubcore_bind_jetty_reuse_compat[2268]|Failed to exchange tp info, ret: -1.
+[10948.578452] URMA|uburma|173160|173160|uburma_cmd_bind_jetty_ex:[3756]|bind jetty failed, ret: -1.
+[10948.763862] URMA|ubcore|173161|173161|ubcore_bind_jetty_reuse_compat[2268]|Failed to exchange tp info, ret: -1.
+[10948.775043] URMA|uburma|173161|173161|uburma_cmd_bind_jetty_ex:[3756]|bind jetty failed, ret: -1.
+[11759.226650] URMA|ubcore|188506|188506|ubcore_clients_add[1065]|ubcore device: bonding_dev_0 add client:ipourma context failed.
+[11759.239391] URMA|ubcore|188506|188506|ubcore_register_device:[1341]|ubcore device: bonding_dev_0 register success.
+[11759.250790] URMA|ubagg|188506|188506|ubagg_create_dev:[1611]|Finish to create ubagg device: bonding_dev_0.
+[12014.605295] URMA|ubcore|191009|191009|ubcore_bind_jetty_reuse_compat[2268]|Failed to exchange tp info, ret: -1.
+[12014.606239] URMA|ubcore|191007|191007|ubcore_bind_jetty_reuse_compat[2268]|Failed to exchange tp info, ret: -1.
+[12014.606243] URMA|uburma|191007|191007|uburma_cmd_bind_jetty_ex:[3756]|bind jetty failed, ret: -1.
+[12014.606587] URMA|uburma|191009|191009|uburma_cmd_bind_jetty_ex:[3756]|bind jetty failed, ret: -1.
+[12014.607599] URMA|ubcore|191010|191010|ubcore_bind_jetty_reuse_compat[2268]|Failed to exchange tp info, ret: -1.
+[12014.607605] URMA|uburma|191010|191010|uburma_cmd_bind_jetty_ex:[3756]|bind jetty failed, ret: -1.
+[12014.739781] URMA|ubcore|191008|191008|ubcore_bind_jetty_reuse_compat[2268]|Failed to exchange tp info, ret: -1.
+[12014.751003] URMA|uburma|191008|191008|uburma_cmd_bind_jetty_ex:[3756]|bind jetty failed, ret: -1.
+
+=== MPS ===
+GPU_BRIDGE=0060
+NIC_BRIDGE=0060
+
+=== GPU ===
+cuda=True
+
+=== FIX ATTEMPTS ===
+1. FLR reset (mx-smi --flr) — GPU OK but bind_jetty still fails
+2. Partial URMA reload (udma only) — bind_jetty still fails
+3. Full URMA reload on 202 (ubcore+uburma+udma+all) — bind_jetty still fails
+4. Full URMA reload on BOTH nodes — bind_jetty still fails
+5. ubse.service restart (recreate bonding_dev_0) — bonding_dev_0 restored but bind_jetty still fails
+6. MPS verification — MPS correct (0060) on both nodes
+
+=== CONCLUSION ===
+Cross-node URMA fabric link (tp exchange) is broken after driver reloads.
+All non-reboot fixes exhausted. Requires machine reboot to restore URMA fabric.
