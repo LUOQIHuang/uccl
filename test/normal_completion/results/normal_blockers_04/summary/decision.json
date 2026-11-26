@@ -1,0 +1,7 @@
+{
+  "mechanism_usable": true,
+  "physical_timestamp": false,
+  "target_observations": 504,
+  "independent_retained_api_calls_per_node": 9,
+  "note": "CQ readability bounds, not device execution timestamps. Missing early valid snapshots remain censored. A target valid behind an invalid head directly shows CQ consumption blocking, not its Dispatch contribution. CPU control intervals exclude GPU publication/wait and time before CPU processing. Overlapping request/proxy waits cannot be added into API latency. Paced controls do not establish continuous-batch performance or a new RDMA gap."
+}
