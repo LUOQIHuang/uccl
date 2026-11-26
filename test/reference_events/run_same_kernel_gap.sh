@@ -11,8 +11,7 @@ export URMA_DIAG_INCLUDE_DIR=${URMA_DIAG_INCLUDE_DIR:-"$URMA_DIAG_HOME/metax_dev
 
 KERNEL=6.6.0-gdr_f00955680_diag
 RANK= ACTION=check STUDY=gap JOB= MASTER=141.61.17.202 PORT= GID=3 HCA= IFACE=
-VERBS_BUILD="$URMA_DIAG_HOME/metax_dev/verbs_same_kernel_build/current_v1"
-URMA_BUILD="$URMA_DIAG_HOME/metax_dev/writes_first_batch_build/urma_v1"
+VERBS_BUILD= URMA_BUILD= STREAM_TREE=
 ROOT="$URMA_DIAG_HOME/metax_dev/same_kernel_gap_results"
 while [ "$#" -gt 0 ]; do
     case "$1" in
@@ -27,6 +26,7 @@ while [ "$#" -gt 0 ]; do
         --ifname) IFACE=${2:?};;
         --verbs-build) VERBS_BUILD=${2:?};;
         --urma-build) URMA_BUILD=${2:?};;
+        --stream-tree) STREAM_TREE=${2:?};;
         --output) ROOT=${2:?};;
         *) echo "unknown argument: $1" >&2; exit 2;;
     esac
@@ -43,10 +43,18 @@ case "$STUDY" in
         cases=(rdma_pre rdma_probe rdma_post urma_pre urma_probe urma_post)
         profile=(--reference-profile boundaries --reference-gpu-only)
         ;;
-    *) echo 'study must be gap or receive' >&2; exit 2;;
+    stream)
+        JOB=${JOB:-normal_same_kernel_stream_01}; PORT=${PORT:-34320}
+        cases=(rdma_pre rdma_probe rdma_post urma_pre urma_probe urma_post)
+        profile=(--reference-profile legacy)
+        STREAM_TREE=${STREAM_TREE:-"$URMA_DIAG_HOME/metax_dev/normal_stream_src_v1"}
+        VERBS_BUILD=${VERBS_BUILD:-"$URMA_DIAG_HOME/metax_dev/normal_stream_build/verbs_v1"}
+        URMA_BUILD=${URMA_BUILD:-"$URMA_DIAG_HOME/metax_dev/normal_stream_build/urma_v1"}
+        ;;
+    *) echo 'study must be gap, receive or stream' >&2; exit 2;;
 esac
 [[ ( "$RANK" == 0 || "$RANK" == 1 ) && "$JOB" =~ ^[a-zA-Z0-9_-]+$ ]] || exit 2
-[[ "$ACTION" == check || "$ACTION" == run ]] || exit 2
+[[ "$ACTION" == check || "$ACTION" == run || ( "$ACTION" == setup && "$STUDY" == stream ) ]] || exit 2
 [[ "$PORT" =~ ^[1-9][0-9]{3,4}$ ]] && (( PORT >= 1024 && PORT + 11 <= 65535 )) || exit 2
 [[ "$GID" =~ ^[0-9]+$ ]] || exit 2
 [[ $(uname -r) == "$KERNEL" ]] || { echo "expected $KERNEL; running $(uname -r)" >&2; exit 2; }
@@ -59,7 +67,10 @@ HCA=${HCA:-$DEFAULT_HCA}
 IFACE=${IFACE:-${URMA_DIAG_IFNAME:-$DEFAULT_IFACE}}
 DEST="$HERE/results/$JOB"
 ROOT="$ROOT/$JOB"
-unset UCCL_IB_MAX_INFLIGHT_BYTES
+SOURCE="$HERE/.."
+VERBS_BUILD=${VERBS_BUILD:-"$URMA_DIAG_HOME/metax_dev/verbs_same_kernel_build/current_v1"}
+URMA_BUILD=${URMA_BUILD:-"$URMA_DIAG_HOME/metax_dev/writes_first_batch_build/urma_v1"}
+unset UCCL_IB_MAX_INFLIGHT_BYTES NORMAL_STREAM_TIMING
 
 if [ "$ACTION" = run ]; then
     for name in "${cases[@]}"; do
@@ -69,52 +80,78 @@ if [ "$ACTION" = run ]; then
     done
 fi
 
+if [ "$STUDY" = stream ]; then
+    console="$ROOT/setup/console/node$RANK"; mkdir -p "$console"
+    prep_log=$(mktemp "$console/prepare.XXXXXX.log")
+    rc=0
+    "$URMA_DIAG_PYTHON" "$HERE/prepare_stream_timing.py" "$STREAM_TREE" 2>&1 | tee "$prep_log" || rc=$?
+    "$URMA_DIAG_PYTHON" "$HERE/../gpu_stage_recovery/collect.py" "$ROOT/setup" \
+        --node-rank "$RANK" --destination "$DEST/setup"
+    [ "$rc" = 0 ] || exit "$rc"
+    cp -- "$STREAM_TREE/.normal_stream_timing.json" "$DEST/overlay_node$RANK.json"
+    SOURCE="$STREAM_TREE/test"
+fi
+
 run_one() {
     local action=$1 name=$2 backend=$3 plan=$4 port=$5 cadence=${6:-paced} rc=0 collected=0
     local console="$ROOT/$name/console/node$RANK" entry build
-    local build_record=()
+    local build_record=() launch=(bash)
     mkdir -p -- "$console"
     if [ "$action" = check ]; then console=$(mktemp -d "$console/check.XXXXXX"); fi
     local args=(--action "$action" --job "$name" --node-rank "$RANK" --master-addr "$MASTER"
         --port "$port" --ifname "$IFACE" --output "$ROOT" --expected-kernel "$KERNEL"
-        --mode normal --normal-tokens 4096 --warmups 5 --samples 10 --case-timeout 600
-        --dispatch-focus --reference-events "$cadence" "${profile[@]}")
+        --mode normal --normal-tokens 4096 --warmups 5 --samples 10 --case-timeout 600 "${profile[@]}")
     if [ "$backend" = verbs ]; then
-        entry="$HERE/../verbs_baseline/run.sh"; build=$VERBS_BUILD
-        args+=(--variant current --no-profile --repeats 1 --hca "$HCA" --gid-index "$GID")
+        entry="$SOURCE/verbs_baseline/run.sh"; build=$VERBS_BUILD
+        args+=(--variant current --hca "$HCA" --gid-index "$GID")
     else
-        entry="$HERE/../urma_mode_parity/run.sh"; build=$URMA_BUILD
-        args+=(--backend urma --phase-suite --api-only --urma-device "$DEVICE" --urma-device-plan 202c1-204c0
+        entry="$SOURCE/urma_mode_parity/run.sh"; build=$URMA_BUILD
+        args+=(--backend urma)
+    fi
+    if [ "$action" = build ]; then
+        args+=(--reference-events build --build-jobs 1)
+    else
+        args+=(--dispatch-focus --reference-events "$cadence")
+        if [ "$backend" = verbs ]; then args+=(--no-profile --repeats 1)
+        else args+=(--phase-suite --api-only --urma-device "$DEVICE" --urma-device-plan 202c1-204c0
             --gpu-pci "${URMA_DIAG_GPU_PCI:-0000:21:00.0}" --atomic-port auto
             --normal-fadd-fence-plan "$plan" --require-normal-atomic-roles --require-normal-retire
             --normal-window-plan default --normal-retire-plan ordered --normal-completion all
             --normal-submit-schedule lane-mixed)
+        fi
     fi
-    if [ "$action" = run ]; then build_record=(--trace-build "$build"); fi
-    bash "$entry" "${args[@]}" --build-dir "$build" 2>&1 | tee "$console/$action.log" || rc=$?
+    if [ "$action" != check ]; then build_record=(--trace-build "$build"); fi
+    if [[ "$STUDY" == stream && "$action" == run && "$RANK" == 0 && "$name" == *_probe ]]; then
+        launch=(env NORMAL_STREAM_TIMING=1 bash)
+    fi
+    "${launch[@]}" "$entry" "${args[@]}" --build-dir "$build" 2>&1 | tee "$console/$action.log" || rc=$?
     "$URMA_DIAG_PYTHON" "$HERE/../gpu_stage_recovery/collect.py" "$ROOT/$name" \
         --node-rank "$RANK" "${build_record[@]}" --destination "$DEST/$name" || collected=$?
     [ "$rc" = 0 ] || return "$rc"
     return "$collected"
 }
 
+if [ "$ACTION" = setup ]; then
+    run_one build build_verbs verbs default "$PORT"
+    run_one build build_urma urma default "$PORT"
+fi
 run_one check check_verbs verbs default "$PORT"
 if [ "$STUDY" = gap ]; then run_one check check_urma_all_on urma all-on "$PORT"; fi
 run_one check check_urma_tail_off urma peer-tail-off "$PORT"
-if [ "$ACTION" = check ]; then
-    echo "SAME_KERNEL_GAP_CHECK_PASSED rank=$RANK job=$JOB"
+if [ "$ACTION" != run ]; then
+    echo "SAME_KERNEL_${STUDY^^}_${ACTION^^}_PASSED rank=$RANK job=$JOB"
     exit 0
 fi
 
-if [ "$STUDY" = receive ]; then
+if [ "$STUDY" != gap ]; then
     for i in "${!cases[@]}"; do
         name=${cases[i]}
         backend=verbs; plan=default; cadence=paced
         if [[ "$name" == urma_* ]]; then backend=urma; plan=peer-tail-off; fi
-        if [[ "$name" == *_probe ]]; then cadence=on; fi
+        if [[ "$STUDY" == receive && "$name" == *_probe ]]; then cadence=on; fi
         run_one run "$name" "$backend" "$plan" "$((PORT + 2*i))" "$cadence"
     done
-    echo "SAME_KERNEL_RECEIVE_RUN_PASSED rank=$RANK destination=$DEST"
+    echo "SAME_KERNEL_${STUDY^^}_RUN_PASSED rank=$RANK destination=$DEST"
     exit 0
 fi
 

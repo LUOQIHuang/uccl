@@ -8,6 +8,7 @@ import subprocess
 
 REPO = Path(__file__).resolve().parents[2]
 BASE = 'e01a6f32d0f8a4b8aa547ec9c53c35d279e113ba'
+RUNTIME_REF = '50a35a352292392e05a2f95e18d35d89b56cc44a'
 MARKER = '.verbs_fifo_probe.json'
 PROXY = 'ep/src/proxy.cpp'
 RUNTIME = 'test/reference_events/event_runtime.py'
@@ -44,7 +45,7 @@ def compose():
     }
 #endif
     // Pop commands from the FIFO until the budget is reached''')
-    runtime = (REPO / RUNTIME).read_text(encoding='utf-8')
+    runtime = subprocess.check_output(['git', '-C', str(REPO), 'show', f'{RUNTIME_REF}:{RUNTIME}']).decode('utf-8')
     runtime = replace(runtime, '    cpu_events=os.environ.get(', '''    fifo_cpu=os.environ.get('VERBS_FIFO_CAPTURE')=='1' and label=='dispatch_bf16_chunk32'
     if fifo_cpu and (record_events or selected_profile()!='boundaries'):
         raise ValueError('FIFO capture requires inactive paced reference events')
