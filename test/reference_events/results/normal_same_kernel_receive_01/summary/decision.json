@@ -1,0 +1,9 @@
+{
+  "controls_passed": false,
+  "rank0_output_order_and_clock_passed": true,
+  "control_gap_us": 660.70752673679,
+  "probe_gap_us": -211.37046813964844,
+  "probe_gap_change_us": -872.0779948764384,
+  "all_calls_limited_by_rank0": true,
+  "note": "The rank0 local output timeline is partitioned on the last finished receiver channel. Cross-host joins use channel and sample identity, never a timestamp subtraction. GPU publication is not CPU collection, and these observations do not measure FIFO or network causality."
+}
