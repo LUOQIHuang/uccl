@@ -21,7 +21,7 @@ def write(p,data):
         if data:
             w=csv.DictWriter(f,fieldnames=list(data[0]));w.writeheader();w.writerows(data)
 
-def case_data(root,rank,trace,compiled_off=False,reference_events=None,token_sweep=None,bf16_only=False,reference_gpu_only=False):
+def case_data(root,rank,trace,compiled_off=False,reference_events=None,token_sweep=None,bf16_only=False,reference_gpu_only=False,*,fifo_cpu=False):
     # Explicit opt-in for the inactive tokens experiment; historical callers
     # retain their fixed 4096-token and sampling acceptance rules.
     tokens=4096
@@ -76,7 +76,7 @@ def case_data(root,rank,trace,compiled_off=False,reference_events=None,token_swe
         import sys
         sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'reference_events'))
         from event_runtime import validate_control
-        if not status['checks'].get('reference_control') or not validate_control(case,reference_events,*sampling,c.get('reference_profile','legacy'),labels=labels if bf16_only else None):raise ValueError('unvalidated sampling control')
+        if not status['checks'].get('reference_control') or not validate_control(case,reference_events,*sampling,c.get('reference_profile','legacy'),labels=labels if bf16_only else None,fifo_cpu=fifo_cpu):raise ValueError('unvalidated sampling control')
     raw=rows(case/'api_samples.jsonl');saved=rows(case/'sample_summary.jsonl');means={}
     if len(raw)!=len(labels)*c['samples'] or {r['label'] for r in raw}!=labels or len(saved)!=len(labels) or {r['label'] for r in saved}!=labels:raise ValueError('incomplete Normal samples')
     for label in labels:

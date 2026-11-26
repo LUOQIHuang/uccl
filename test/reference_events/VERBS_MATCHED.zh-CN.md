@@ -1,5 +1,7 @@
 # 下一后端：verbs同口径Normal阶段采集
 
+当前两端已在 URMA 内核完成纯 verbs 功能验证。对照 204 发送窗口背压时，使用 [同内核 RDMA FIFO 补测](../verbs_fifo/README.zh-CN.md)。下文保留旧版全阶段采集的运行条件和归档入口。
+
 2026-11-12：本流程已完成，smoke128_02、4096 paced/on两端均通过，已有[后端对照报告](results/BACKEND_MATCHED_ANALYSIS.zh-CN.md)。无需重复本套实验；以下保留完整操作步骤供复现。verbs GPU采集入口已在这轮服务器结果中验证。
 
 URMA匹配paced/on已通过，见[结果报告](results/MATCHED_TRACE_ANALYSIS.zh-CN.md)。不再追加URMA开关扫描。以下只在已协调好的verbs内核窗口执行，不要求现在主动切核。

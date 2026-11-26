@@ -59,3 +59,5 @@ python3 tools/reference_events/summarize_same_kernel_gap.py \
 ```
 
 以首尾两轮 verbs 的均值为 `R`，两轮全开为 `A`，两轮 tail-off 为 `B`。优化前差 `A−R`、优化后差 `B−R`、追回 `A−B`。剩余慢百分比是 `(B−R)/R`，追回占原差距的比例是 `(A−B)/(A−R)`。`gap.json` 同时给出两组配对各自的节省、轮内 CV 和同配置两轮漂移。两组配对同向、CV 不超过 5%、各配置两轮漂移不超过 3% 时，使用该窗口的均值汇报；超出时同时列出每轮结果和漂移。
+
+定位剩余差距时，继续使用 [同内核 RDMA FIFO 补测](../verbs_fifo/README.zh-CN.md)。探针可以提前构建，正式采样放在本轮端到端计时完成之后。
