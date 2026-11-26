@@ -1,5 +1,9 @@
 # 用通信流计时定位 202 的剩余 Dispatch 差距
 
+本页的四事件计时属于粗粒度复核，归档中尚无实机结果。已经启动的任务保留现有结果。新的双机窗口优先留给能区分主 Dispatch 内部等待位置的实验，粗粒度计时可作为同一轮的校验。
+
+下一项细分对照需要在同一次调用中，对 202 的接收通道分开记录全程累计的三种等待：远端 tail 未推进、tail 已推进但 token epoch 尚未匹配、本地转发缓冲空间不足。按同一通道查看等待和完成顺序，保留通道未覆盖或仍无法解释的时间。现有 `forwarder_incoming_tail_wait` 计时范围包括查找可消费来源的轮询，细分时应明确区分远端条件。启用记录后需同时复现无记录的后端差额，才能用这些时间定位剩余差距。 [源代码](../../ep/src/internode.cu) · [旧全范围计时的代表性失败](../dispatch_diag/results/urma_summary_01/ANALYSIS.zh-CN.md)
+
 当前同内核的无打点对照中，URMA 仅 204 tail-off 比 RDMA 慢 **619–661 μs**，每次由 202 最晚结束。204 第 6 块额外等待约 302 μs 未显著拖慢 202。旧 GPU 时间线把后端差额移动了 872 μs。先在当前配置下确定余下时间主要落在主 Dispatch 通信流区间，还是准备、分配及调用交接区间。 [第 6 块结果](../normal_chunk_gate/results/normal_chunk6_gate_01/summary/decision.json) · [时间线扰动](results/normal_same_kernel_receive_01/summary/decision.json)
 
 正式 BF16 计时使用已缓存的路由 handle，`cached_notify` 和主 Dispatch 都由同一次原生调用提交。只在每个后端的中间一轮、仅 **202** 的 BF16 采样，向现有通信流记录四个 CUDA Event。
