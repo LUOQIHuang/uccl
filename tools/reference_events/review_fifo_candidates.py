@@ -16,6 +16,7 @@ import audit_boundary_fifo as fifo
 
 def review(trace, output, label='dispatch_bf16_chunk32'):
     observations, segments, heads, sources = [], [], [], {}
+    blocked_by_payload = collections.Counter()
     seen_windows = collections.defaultdict(list)
     for rank in (0, 1):
         path = trace / ('node%d' % rank) / 'normal/event_trace.jsonl'
@@ -35,6 +36,7 @@ def review(trace, output, label='dispatch_bf16_chunk32'):
                     if p == proxy and wid >> 32 == ring and fifo.kind(stages) == 'payload')
                 if len(payloads) != 11:
                     raise ValueError('expected 11 payload requests per channel')
+                issue_ordinal = {wid: i for i, (_, wid) in enumerate(payloads, 1)}
                 for ordinal, event in ((6, 11), (11, 4)):
                     end, wid = payloads[ordinal - 1]
                     start = gpu[channel][event][0]['host_ns']
@@ -52,6 +54,9 @@ def review(trace, output, label='dispatch_bf16_chunk32'):
                     for part in parts:
                         if part['state'].startswith('full_'):
                             by_head[part['head_wr_id']] += part['duration_ns']
+                        if part['state'] == 'full_payload_wait_cqe':
+                            earlier_write = issue_ordinal[part['head_wr_id']]
+                            blocked_by_payload[rank, ordinal, earlier_write] += part['duration_ns']
                     for head, duration in sorted(by_head.items()):
                         events = groups[proxy, head]
                         row = dict(identity, proxy=proxy, head_wr_id=head,
@@ -83,6 +88,13 @@ def review(trace, output, label='dispatch_bf16_chunk32'):
     write(output / 'blocking_state_summary.csv', summary)
     write(output / 'interval_summary.csv', intervals)
     write(output / 'blocking_heads.csv', heads)
+    totals = collections.Counter()
+    for (rank, waiting, _), duration in blocked_by_payload.items():
+        totals[rank, waiting] += duration
+    write(output / 'payload_blocker_ordinals.csv', [
+        dict(node=rank, waiting_payload_ordinal=waiting, blocking_payload_ordinal=earlier,
+             pooled_wait_us=duration / 1000, share_of_full_payload_wait_pct=100 * duration / totals[rank, waiting])
+        for (rank, waiting, earlier), duration in sorted(blocked_by_payload.items())])
     sources[Path(__file__).as_posix()] = hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
     (output / 'context.json').write_text(json.dumps(dict(
         exploratory_only=True, performance_representative=False,

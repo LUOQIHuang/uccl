@@ -1,5 +1,7 @@
 # 下一项主实验：补齐可信的优化后URMA/verbs阶段差额
 
+**当前暂停本页的运行计划。** 已有大区间证据足够选定下一处细拆。先看用原始记录得到的[具体FIFO阻塞请求与FADD完成小阶段](NORMAL_BLOCKER_REVIEW.zh-CN.md)。以下保留原计划供查阅。
+
 本轮不是优化参数扫描。目标是先回答“完整Normal Dispatch的额外时间主要落在哪个时间区间”，再安排那个区间内的干预。单纯观察某条WRITE/FADD很慢，不能替代这份对照。入口为[run_gap_profile.sh](run_gap_profile.sh)，分析为[summarize_gpu_gap.py](../../tools/reference_events/summarize_gpu_gap.py)。
 
 ## 1. 现在确实缺什么

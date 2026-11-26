@@ -1,5 +1,7 @@
 # Normal完成可读性：等待主要在CQE可读之前
 
+**后续离线细拆。** 204同一FADD的提交结束→返回值可读为2320.40～2324.61 μs，返回值可读→CQE可读为481.52～490.14 μs，均为逐请求界限的中位数。另从旧FIFO记录查到了实际挡住204后续命令的前序WRITE。见[细拆与下一项证据要求](../../../reference_events/NORMAL_BLOCKER_REVIEW.zh-CN.md)。下文保留本轮最初复算及当时安排的提交组织对照。
+
 结果提交e35c66c9；本次从上传的api_samples和fadd_path原始记录独立复算，计算过程见[离线工具](../../../../tools/reference_events/review_completion_raw.py)，逐请求结果见[operations.csv](raw_review/operations.csv)。所有数值单位均为μs。当前可以缩小等待边界，但不能宣布已经量出剩余URMA/RDMA差距的各项贡献。
 
 ## 1. 先检查采集对整体的影响
