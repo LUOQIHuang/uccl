@@ -1,5 +1,7 @@
 # 202 最晚完成通道的全程等待对照
 
+**本轮已完成，验收未通过。** 采集使同一构建的后端差额只移动 25.98 μs。采集关闭时，含计数代码的构建已将 RDMA 从 7.538 ms 拉长到 13.595 ms、URMA 从 8.127 ms 拉长到 13.751 ms，差额从 588.67 μs 变为 156.03 μs。同一启动、构建标志一致，FP8 Dispatch 也变慢。结果强烈指向诊断构建改变了 Dispatch。现有记录未细分寄存器、spill 或占用率的影响。下面的命令保留作复现，当前不再原样复跑。 [本轮验收](results/normal_same_kernel_waits_02/summary/decision.json) · [对照轮](results/normal_same_kernel_waits_02/summary/controls.csv)
+
 本轮回答剩余差距中，202 接收通道是否有一类等待明显更长。最新无采集基线差 **588.67 μs**，四个通信流 CUDA Event 让差额缩小 **140.19 μs**，超过验收门槛。此次使用独立的接收等待计数，去掉这四个事件。上一轮记录的 `cached_notify` 差 150.33 μs、主 Dispatch 差 301.71 μs，只作候选线索。 [最新对照](results/normal_same_kernel_stream_01/summary/decision.json) · [粗分数据](results/normal_same_kernel_stream_01/summary/comparison.csv) · [204 干预](../normal_chunk_gate/results/normal_chunk6_gate_01/summary/decision.json)
 
 只在 **202** 启用采集。对每个接收通道，用同一 Forwarder warp 的 `clock64` 累计全程等待，用接收输出结束的登记顺序选择每次最后完成的通道。完成顺序每通道登记一次。计数在 Forwarder 结束时一次写入显存，计时结束后由主机读取。没有 CPU 时钟更新线程、主机映射时间戳或 CPU 逐请求时间线。
