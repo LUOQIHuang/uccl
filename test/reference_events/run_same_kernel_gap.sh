@@ -44,7 +44,7 @@ case "$STUDY" in
         profile=(--reference-profile boundaries --reference-gpu-only)
         ;;
     reverse)
-        JOB=${JOB:-normal_reverse_load_01}; PORT=${PORT:-34360}
+        JOB=${JOB:-normal_reverse_load_02}; PORT=${PORT:-34360}
         cases=(rdma_pre rdma_half rdma_post urma_pre urma_half urma_post)
         profile=(--reference-profile legacy)
         ;;

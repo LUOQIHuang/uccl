@@ -33,8 +33,18 @@ def prepare_benchmark(source, suite):
 
 def prepare_reverse_load(source):
     anchor = '    topk_weights = (\n'
-    if source.count(anchor)!=1:
+    reference = '''                        ref_topk_weights = (
+                            topk_weights_pure_rand
+                            if current_x is x_pure_rand
+                            else topk_weights
+                        )'''
+    if source.count(anchor)!=1 or source.count(reference)!=1:
         raise ValueError('unexpected Normal route generation')
+    # Dispatch contributes zero weight for a masked expert on every receiver.
+    # The constant-weight path fills invalid receive slots before Combine and
+    # still uses its existing rank-normalized reference.
+    source = source.replace(reference, reference.replace(
+        'topk_weights_pure_rand', 'topk_weights_pure_rand.masked_fill(topk_idx.eq(-1), 0.0)'))
     return source.replace(anchor, '''    # Change only the routing input. No timing or tracing in the dispatch path.
     import hashlib as route_hashlib
     import json as route_json
