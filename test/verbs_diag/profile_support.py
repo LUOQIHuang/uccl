@@ -1,5 +1,6 @@
 """Focused configuration and optional CPU-only perf sampling helpers."""
 import json
+import os
 from pathlib import Path
 import re
 import shutil
@@ -25,7 +26,45 @@ def prepare_benchmark(source, suite):
         if source.count(old)!=1:
             raise ValueError(f'unexpected tuning loop: {old}')
         source=source.replace(old,new)
+    if os.environ.get('NORMAL_REVERSE_LOAD'):
+        source=prepare_reverse_load(source)
     return source
+
+
+def prepare_reverse_load(source):
+    anchor = '    topk_weights = (\n'
+    if source.count(anchor)!=1:
+        raise ValueError('unexpected Normal route generation')
+    return source.replace(anchor, '''    # Change only the routing input. No timing or tracing in the dispatch path.
+    import hashlib as route_hashlib
+    import json as route_json
+    import os as route_os
+
+    load = route_os.environ['NORMAL_REVERSE_LOAD']
+    if load not in ('both', 'half_reverse') or (num_ranks, num_nodes, num_tokens) != (2, 2, 4096):
+        raise ValueError('reverse-load test requires the fixed two-node Normal workload')
+    experts_per_node = num_experts // num_nodes
+    owners = topk_idx // experts_per_node
+    local = (owners == rank).any(dim=1)
+    remote = (owners == 1-rank).any(dim=1)
+    eligible = local & remote
+    before = int(remote.sum().item())
+    original_sha = route_hashlib.sha256(topk_idx.cpu().contiguous().numpy().tobytes()).hexdigest()
+    dropped = 0
+    if load == 'half_reverse' and rank == 0:
+        remove = eligible & (eligible.to(torch.int64).cumsum(dim=0) % 2 == 0)
+        dropped = int(remove.sum().item())
+        topk_idx = topk_idx.masked_fill(remove.unsqueeze(1) & (owners == 1), -1)
+    after_owners = topk_idx // experts_per_node
+    after = int((after_owners == 1-rank).any(dim=1).sum().item())
+    assert torch.equal(local, (after_owners == rank).any(dim=1)) and before-after == dropped
+    if load == 'half_reverse' and rank == 0:
+        assert before > 0 and 0.40 <= after/before <= 0.60
+    print('NORMAL_REVERSE_LOAD '+route_json.dumps(dict(load=load, rank=rank, local=int(local.sum().item()),
+          remote_before=before, remote_after=after, eligible=int(eligible.sum().item()),
+          original_sha=original_sha, active_sha=route_hashlib.sha256(topk_idx.cpu().contiguous().numpy().tobytes()).hexdigest())), flush=True)
+    topk_weights = (
+''')
 
 def callgraph_args(mode):
     return [] if mode=='none' else ['--call-graph', 'dwarf,8192' if mode=='dwarf' else 'fp']

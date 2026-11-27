@@ -43,6 +43,11 @@ case "$STUDY" in
         cases=(rdma_pre rdma_probe rdma_post urma_pre urma_probe urma_post)
         profile=(--reference-profile boundaries --reference-gpu-only)
         ;;
+    reverse)
+        JOB=${JOB:-normal_reverse_load_01}; PORT=${PORT:-34360}
+        cases=(rdma_pre rdma_half rdma_post urma_pre urma_half urma_post)
+        profile=(--reference-profile legacy)
+        ;;
     stream|waits)
         if [ "$STUDY" = waits ]; then
             PORT=${PORT:-34340}; JOB=${JOB:-normal_same_kernel_waits_02}; variant=waits_v2
@@ -53,7 +58,7 @@ case "$STUDY" in
         VERBS_BUILD=${VERBS_BUILD:-"$URMA_DIAG_HOME/metax_dev/normal_${variant}_build/verbs_v1"}
         URMA_BUILD=${URMA_BUILD:-"$URMA_DIAG_HOME/metax_dev/normal_${variant}_build/urma_v1"}
         ;;
-    *) echo 'study must be gap, receive, stream or waits' >&2; exit 2;;
+    *) echo 'study must be gap, receive, reverse, stream or waits' >&2; exit 2;;
 esac
 [[ ( "$RANK" == 0 || "$RANK" == 1 ) && "$JOB" =~ ^[a-zA-Z0-9_-]+$ ]] || exit 2
 [[ "$ACTION" == check || "$ACTION" == run || ( "$ACTION" == setup && ( "$STUDY" == stream || "$STUDY" == waits ) ) ]] || exit 2
@@ -72,7 +77,7 @@ ROOT="$ROOT/$JOB"
 SOURCE="$HERE/.."
 VERBS_BUILD=${VERBS_BUILD:-"$URMA_DIAG_HOME/metax_dev/verbs_same_kernel_build/current_v1"}
 URMA_BUILD=${URMA_BUILD:-"$URMA_DIAG_HOME/metax_dev/writes_first_batch_build/urma_v1"}
-unset UCCL_IB_MAX_INFLIGHT_BYTES NORMAL_STREAM_TIMING NORMAL_RECEIVER_WAITS
+unset UCCL_IB_MAX_INFLIGHT_BYTES NORMAL_STREAM_TIMING NORMAL_RECEIVER_WAITS NORMAL_REVERSE_LOAD
 
 if [ "$ACTION" = run ]; then
     for name in "${cases[@]}"; do
@@ -128,6 +133,10 @@ run_one() {
     if [[ ( "$STUDY" == stream || "$STUDY" == waits ) && "$action" == run && "$RANK" == 0 && "$name" == *_probe ]]; then
         if [ "$STUDY" = waits ]; then launch=(env NORMAL_RECEIVER_WAITS=1 bash)
         else launch=(env NORMAL_STREAM_TIMING=1 bash); fi
+    fi
+    if [[ "$STUDY" == reverse && "$action" == run ]]; then
+        if [[ "$name" == *_half ]]; then launch=(env NORMAL_REVERSE_LOAD=half_reverse bash)
+        else launch=(env NORMAL_REVERSE_LOAD=both bash); fi
     fi
     "${launch[@]}" "$entry" "${args[@]}" --build-dir "$build" 2>&1 | tee "$console/$action.log" || rc=$?
     "$URMA_DIAG_PYTHON" "$HERE/../gpu_stage_recovery/collect.py" "$ROOT/$name" \
