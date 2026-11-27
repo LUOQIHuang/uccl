@@ -1,0 +1,16 @@
+DIAG_ROOT=/home/h00918771
+DIAG_PYTHON=/home/h00918771/metax_dev/venv-maca-py312/bin/python
+VERBS_CASE_BEGIN r01_baseline/normal log=/home/h00918771/metax_dev/same_kernel_gap_results/normal_reverse_load_01/rdma_half/node1/r01_baseline/normal/bench.log
+VERBS_CASE_END r01_baseline/normal rc=1 checks={} error=unexpected timing labels
+Traceback (most recent call last):
+  File "/home/h00918771/uccl-ep-xpu-integration-new/test/verbs_baseline/driver.py", line 425, in <module>
+    main()
+  File "/home/h00918771/uccl-ep-xpu-integration-new/test/verbs_baseline/driver.py", line 421, in main
+    {'build': build, 'check': check, 'collect': collect, 'run': run}[args.action](args)
+  File "/home/h00918771/uccl-ep-xpu-integration-new/test/verbs_baseline/driver.py", line 409, in run
+    run_case(args, root, f'r{repeat:02d}_baseline', mode, False, module, info['module_sha'])
+  File "/home/h00918771/uccl-ep-xpu-integration-new/test/verbs_baseline/driver.py", line 349, in run_case
+    legacy.pair(args, dict(stage='done', job=args.job, tag=tag, mode=mode, rc=rc))
+  File "/home/h00918771/uccl-ep-xpu-integration-new/test/verbs_diag/driver.py", line 63, in pair
+    raise RuntimeError(f'PAIR_STOP local={payload!r} peer={peer!r}')
+RuntimeError: PAIR_STOP local={'stage': 'done', 'job': 'rdma_half', 'tag': 'r01_baseline', 'mode': 'normal', 'rc': 1} peer={'stage': 'done', 'job': 'rdma_half', 'tag': 'r01_baseline', 'mode': 'normal', 'rc': 1}
